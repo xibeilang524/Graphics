@@ -6,11 +6,13 @@
 #include <QGraphicsView>
 #include <QToolBar>
 #include <QActionGroup>
+#include <QComboBox>
 #include <QDebug>
 
 #include "actionmanager.h"
 #include "item/myscene.h"
 #include "./item/myitem.h"
+#include "./SelfWidget/myslider.h"
 #include "global.h"
 
 using namespace Graphics;
@@ -207,6 +209,7 @@ void MainWindow::createSceneAndView()
     scene->setSceneRect(0,0,5000,5000);
 
     connect(scene,SIGNAL(resetItemAction()),this,SLOT(respRestItemAction()));
+    connect(scene, SIGNAL(selectionChanged()),this, SLOT(updateActions()));
 
     view = new QGraphicsView(this);
     view->setScene(scene);
@@ -220,6 +223,45 @@ void MainWindow::createSceneAndView()
 void MainWindow::respRestItemAction()
 {
     ActionManager::instance()->action(Constants::ARROW_ID)->setChecked(true);
+}
+
+//当选择的item状态改变后，更新action
+void MainWindow::updateActions()
+{
+    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
+
+    int selectedSize = scene->selectedItems().size();
+
+    bool isEmpty = scene->selectedItems().size();
+
+    if(selectedSize == 0)
+    {
+        ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(false);
+    }
+    else if(selectedSize == 1)
+    {
+        ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
+    }
+    else
+    {
+        ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
+    }
 }
 
 //创建右键菜单，作为每个相具有的功能
@@ -238,13 +280,6 @@ void MainWindow::createContextMenu()
 //创建工具栏
 void MainWindow::createToolBar()
 {
-    QToolBar * editBar = addToolBar("Edit");
-    editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
-    editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
-    editBar->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
-    editBar->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
-    editBar->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
-
     QToolBar * itemBar = addToolBar("Item");
     itemBar->addAction(ActionManager::instance()->action(Constants::ARROW_ID));
     itemBar->addSeparator();
@@ -253,9 +288,46 @@ void MainWindow::createToolBar()
     itemBar->addAction(ActionManager::instance()->action(Constants::CIRCLE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::POLYGON_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::LINE_ID));
+
+    QToolBar * editBar = addToolBar("Edit");
+    editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
+
+    QToolBar * sceneBar = addToolBar("Scene");
+
+//    addToolBar(Qt::BottomToolBarArea,sceneBar);
+
+//    sizeBox = new QComboBox;
+//    QStringList list;
+//    list<<"50%"<<"75%"<<"100%"<<"125%"<<"150%";
+//    sizeBox->addItems(list);
+//    sizeBox->setCurrentIndex(2);
+//    connect(sizeBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(sceneScaled(QString)));
+//    sceneBar->addWidget(sizeBox);
+
+    mySlider = new MySlider;
+    connect(mySlider,SIGNAL(scaleView(int)),this,SLOT(sceneScaled(int)));
+    sceneBar->addWidget(mySlider);
+
+}
+
+//切换视图缩放
+void MainWindow::sceneScaled(int currScale)
+{
+//     double newScale = currScale.left(currScale.indexOf(tr("%"))).toDouble() / 100.0;
+     double newScale = currScale/100.0;
+     QMatrix oldMatrix = view->matrix();
+     view->resetMatrix();
+     view->translate(oldMatrix.dx(), oldMatrix.dy());
+     view->scale(newScale, newScale);
 }
 
 MainWindow::~MainWindow()
 {
+    delete mySlider;
+
     delete ui;
 }

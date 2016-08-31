@@ -23,7 +23,9 @@ HEADERS  += mainwindow.h \
     Header.h \
     global.h
 
-include(./item/item.pri)
+include($$PWD\SelfWidget\SelfWidget.pri)
+include($$PWD\item\item.pri)
+
 
 FORMS    += mainwindow.ui
 

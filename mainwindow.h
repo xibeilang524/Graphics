@@ -6,6 +6,7 @@
 class QGraphicsView;
 class MyScene;
 class QActionGroup;
+class MySlider;
 
 namespace Ui {
 class MainWindow;
@@ -30,6 +31,8 @@ private slots:
     void addItem();
 
     void respRestItemAction();
+    void updateActions();
+    void sceneScaled(int currScale);
     
 private:
     void createActionAndMenus();
@@ -45,6 +48,8 @@ private:
     QMenu * rightMenu;
 
     QActionGroup * itemGroup;
+
+    MySlider * mySlider;
 };
 
 #endif // MAINWINDOW_H
