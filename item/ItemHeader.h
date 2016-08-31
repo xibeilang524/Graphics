@@ -1,0 +1,29 @@
+#ifndef ITEMHEADER_H
+#define ITEMHEADER_H
+
+enum PointType
+{
+    TOP_LEFT,
+    TOP_MIDDLE,
+    TOP_RIGHT,
+    MIDDLE_LEFT,
+    MIDDLE_RIGHT,
+    BOTTOM_LEFT,
+    BOTTOM_MIDDLE,
+    BOTTOM_RIGHT
+};
+
+enum MouseType
+{
+    MOUSE_NONE,
+    MOUSE_PRESS,
+    MOUSE_MOVE,
+    MOUSE_RELEASE
+};
+
+#define PI 3.141592653
+#define ROTATE_WIDTH   30
+#define ROTATE_SQUARE_WIDTH 5
+
+
+#endif // HEADER_H

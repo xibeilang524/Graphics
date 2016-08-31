@@ -13,8 +13,19 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    actionmanager.cpp \
+    global.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    actionmanager.h \
+    Constants.h \
+    Header.h \
+    global.h
+
+include(./item/item.pri)
 
 FORMS    += mainwindow.ui
+
+RESOURCES += \
+    res.qrc

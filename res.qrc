@@ -1,0 +1,13 @@
+<RCC>
+    <qresource prefix="/">
+        <file>images/bringtofront.png</file>
+        <file>images/delete.png</file>
+        <file>images/linepointer.png</file>
+        <file>images/pointer.png</file>
+        <file>images/sendtoback.png</file>
+        <file>images/rotateRight.png</file>
+        <file>images/rotateLeft.png</file>
+        <file>images/square.png</file>
+        <file>images/rotate32.png</file>
+    </qresource>
+</RCC>
