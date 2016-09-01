@@ -12,6 +12,7 @@
 #include "actionmanager.h"
 #include "item/myscene.h"
 #include "./item/myitem.h"
+#include "./item/myarrow.h"
 #include "./SelfWidget/myslider.h"
 #include "global.h"
 
@@ -51,10 +52,10 @@ void MainWindow::createActionAndMenus()
 
     QMenu * editMenu = menuBar()->addMenu("编辑(&E)");
 
-    MyAction * rotateLeftAction = ActionManager::instance()->crateAction(Constants::ROTATE_LEFT_ID,QIcon(":/images/rotateLeft.png"),"向左旋转");
+    MyAction * rotateLeftAction = ActionManager::instance()->crateAction(Constants::ROTATE_LEFT_ID,QIcon(":/images/rotateLeft.png"),"左转90°");
     ActionManager::instance()->registerAction(rotateLeftAction,this,SLOT(rotateItem()));
 
-    MyAction * rotateRightAction = ActionManager::instance()->crateAction(Constants::ROTATE_RIGHT_ID,QIcon(":/images/rotateRight.png"),"向右旋转");
+    MyAction * rotateRightAction = ActionManager::instance()->crateAction(Constants::ROTATE_RIGHT_ID,QIcon(":/images/rotateRight.png"),"右转90°");
     ActionManager::instance()->registerAction(rotateRightAction,this,SLOT(rotateItem()));
 
     MyAction * bringFrontAction = ActionManager::instance()->crateAction(Constants::BRING_FRONT_ID,QIcon(":/images/bringtofront.png"),"置于顶层");
@@ -77,6 +78,7 @@ void MainWindow::createActionAndMenus()
     MyAction * arrowAction = ActionManager::instance()->crateAction(Constants::ARROW_ID,QIcon(":/images/pointer.png"),"箭头");
     ActionManager::instance()->registerAction(arrowAction,this,SLOT(addItem()),true);
     arrowAction->setType(GRA_NONE);
+    arrowAction->setChecked(true);
 
     MyAction * squareAction = ActionManager::instance()->crateAction(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形");
     ActionManager::instance()->registerAction(squareAction,this,SLOT(addItem()),true);
@@ -128,14 +130,23 @@ void MainWindow::exitApp()
 
 void MainWindow::rotateItem()
 {
+    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
+
+    if(selectedItems.size() !=  1)
+    {
+        return;
+    }
+
+    QGraphicsItem * graphicsTmp = scene->selectedItems().first();
+
     QString objName = QObject::sender()->objectName();
     if(objName == QString(Constants::ROTATE_LEFT_ID))
     {
-
+        graphicsTmp->rotate(-90);
     }
     else if(objName == QString(Constants::ROTATE_RIGHT_ID))
     {
-
+        graphicsTmp->rotate(90);
     }
 }
 
@@ -147,7 +158,7 @@ void MainWindow::bringZItem()
     }
 
     QGraphicsItem *selectedItem = scene->selectedItems().first();
-//    QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();
+//    QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();     //找到与当前item有重合的items
     QList<QGraphicsItem * > allItems = scene->items();
 
     bool isFront = false;
@@ -178,19 +189,33 @@ void MainWindow::bringZItem()
     selectedItem->setZValue(zValue);
 }
 
+//还需要从scene中删除item
 void MainWindow::deleteItem()
 {
     QList<QGraphicsItem *> selectedItems = scene->selectedItems();
+
+    foreach(QGraphicsItem * item, selectedItems)
+    {
+        MyArrow * tmp = dynamic_cast<MyArrow *>(item);
+        if(tmp)
+        {
+            tmp->getStartItem()->removeArrow(tmp);
+            tmp->getEndItem()->removeArrow(tmp);
+            delete tmp;
+        }
+    }
 
     foreach (QGraphicsItem * item, selectedItems)
     {
         MyItem * tmp = dynamic_cast<MyItem *>(item);
         if(tmp)
         {
-            scene->removeItem(item);
-            delete item;
+            tmp->removeArrows();
+            scene->removeItem(tmp);
+            delete tmp;
         }
     }
+    scene->update();
 }
 
 void MainWindow::addItem()
@@ -213,8 +238,8 @@ void MainWindow::createSceneAndView()
 
     view = new QGraphicsView(this);
     view->setScene(scene);
-    view->setDragMode(QGraphicsView::RubberBandDrag);
-    view->setRenderHints(QPainter::Antialiasing| QPainter::TextAntialiasing);
+//    view->setDragMode(QGraphicsView::RubberBandDrag);   //此行添加后会导致scene无法捕获mousemove事件
+//    view->setRenderHints(QPainter::Antialiasing| QPainter::TextAntialiasing);
 
     this->setCentralWidget(view);
 }
@@ -311,7 +336,6 @@ void MainWindow::createToolBar()
     mySlider = new MySlider;
     connect(mySlider,SIGNAL(scaleView(int)),this,SLOT(sceneScaled(int)));
     sceneBar->addWidget(mySlider);
-
 }
 
 //切换视图缩放

@@ -6,6 +6,7 @@
 #include "../Header.h"
 
 class QMenu;
+class MyArrow;
 
 class MyScene : public QGraphicsScene
 {
@@ -19,11 +20,13 @@ signals:
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-
-
     QMenu * rightMenu;
+
+    QGraphicsLineItem * insertTmpLine;
 
 };
 

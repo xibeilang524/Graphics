@@ -6,6 +6,9 @@
 #include <QPainter>
 #include <QMenu>
 #include <QDebug>
+#include <QGraphicsScene>
+
+#include "myarrow.h"
 
 MyItem::MyItem(QMenu *menu, QGraphicsItem *parent):
     rightMenu(menu),
@@ -17,7 +20,7 @@ MyItem::MyItem(QMenu *menu, QGraphicsItem *parent):
     setFlag(QGraphicsItem::ItemIsSelectable,true);
 
     prepareGeometryChange();
-    boundRect = QRectF(-radius,0,2*radius,2*radius);
+    boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
 
     currMouseType = MOUSE_NONE;
     isNeedBorder = false;
@@ -55,6 +58,32 @@ QRectF MyItem::boundingRect()const
     return boundRect;
 }
 
+//保存添加的箭头
+void MyItem::addArrow(MyArrow *arrow)
+{
+    arrows.push_back(arrow);
+}
+
+//删除此控件时，移除所有的箭头
+void MyItem::removeArrows()
+{
+    foreach (MyArrow *arrow, arrows)
+    {
+        arrow->getStartItem()->removeArrow(arrow);
+        arrow->getEndItem()->removeArrow(arrow);
+        scene()->removeItem(arrow);
+        delete arrow;
+    }
+}
+
+void MyItem::removeArrow(MyArrow *arrow)
+{
+    int index = arrows.indexOf(arrow);
+
+    if (index != -1)
+        arrows.removeAt(index);
+}
+
 void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     painter->save();
@@ -87,13 +116,18 @@ void MyItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MyItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-//    emit updateSceneDraw();
+    emit updateSceneDraw();
     QGraphicsObject::mouseMoveEvent(event);
+}
+
+void MyItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit updateSceneDraw();
+    QGraphicsObject::mouseReleaseEvent(event);
 }
 
 void MyItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-
     QGraphicsObject::hoverEnterEvent(event);
 }
 
@@ -144,7 +178,6 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
 qDebug()<<"=%%%QGraphicsItem::ItemPositionChange==";
     }
 
-//    qDebug()<< change;
 
     return QGraphicsObject::itemChange(change,value);
 }
@@ -229,6 +262,11 @@ void MyItem::procRotate(int degree)
 
 MyItem::~MyItem()
 {
+//    foreach(MyArrow * tmp,arrows)
+//    {
+//        delete tmp;
+//    }
+
     if(leftTopPoint)
     {
         delete leftTopPoint;

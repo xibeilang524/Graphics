@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QRectF>
 #include <QLineF>
+#include <QDebug>
 
 #include "myitem.h"
 
@@ -23,7 +24,7 @@ QRectF MyArrow::boundingRect()const
 QPainterPath MyArrow::shape()const
 {
     QPainterPath path = QGraphicsLineItem::shape();
-    path.addPolygon(arrowHead);
+//    path.addPolygon(arrowHead);
     return path;
 }
 
@@ -31,32 +32,26 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 {
     painter->save();
 
-    //»æÖÆÖ±Ïß
-    QLineF centerLine(startItem->pos(), endItem->pos());
-//    QPolygonF endPolygon = endItem->polygon();
-//    QPointF p1 = endPolygon.first() + endItem->pos();
-//    QPointF p2;
-//    QPointF intersectPoint;
-//    QLineF polyLine;
-//    for (int i = 1; i < endPolygon.count(); ++i)
-//    {
-//        p2 = endPolygon.at(i) + endItem->pos();
-//        polyLine = QLineF(p1, p2);
-//        QLineF::IntersectType intersectType =
-//            polyLine.intersect(centerLine, &intersectPoint);
-//        if (intersectType == QLineF::BoundedIntersection)
-//        {
-//            break;
-//        }
-//            p1 = p2;
-//    }
+    if(startItem && endItem)
+    {
+        setLine(QLineF(startItem->pos(), endItem->pos()));
 
-//    setLine(QLineF(intersectPoint, myStartItem->pos()));
-
+        painter->setPen(QPen(Qt::black,2));
+    //    painter->drawRect(QRectF(startItem->pos(), endItem->pos()));
+        painter->drawLine(line());
+    }
     painter->restore();
+}
+
+void MyArrow::updatePosition()
+{
+    QLineF line(mapFromItem(startItem, 0, 0), mapFromItem(endItem, 0, 0));
+    setLine(line);
 }
 
 MyArrow::~MyArrow()
 {
+    startItem = NULL;
+    endItem = NULL;
 
 }

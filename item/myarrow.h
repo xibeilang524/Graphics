@@ -15,6 +15,10 @@ public:
     QRectF boundingRect()const;
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QPainterPath shape()const;
+    void updatePosition();
+
+    MyItem * getStartItem() const{ return startItem; }
+    MyItem * getEndItem() const{ return endItem; }
 
 private:
     MyItem  * startItem;

@@ -10,6 +10,7 @@ class QGraphicsItem;
 class DragPoint;
 class RotateLine;
 class QMenu;
+class MyArrow;
 
 #include "dragpoint.h"
 #include "rotateline.h"
@@ -25,6 +26,10 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    void addArrow(MyArrow * arrow);
+    void removeArrows();
+    void removeArrow(MyArrow * arrow);
+
 signals:
     void updateSceneDraw();
 
@@ -38,6 +43,7 @@ protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
@@ -63,6 +69,8 @@ private:
     QMenu * rightMenu;
 
     MouseType currMouseType;
+
+    QList<MyArrow *> arrows;           //保存添加的箭头
 
     bool isNeedBorder;
 };
