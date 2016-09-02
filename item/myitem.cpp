@@ -22,20 +22,47 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QObject *parent1, QGraphicsIt
     setFlag(QGraphicsItem::ItemIsSelectable,true);
 
     prepareGeometryChange();
-    boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
 
     QPolygonF tmpPoly;
 
+    float factor;
+
     switch(currItemType)
     {
-          case GRA_SQUARE:
-                             tmpPoly<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
+            //正方形
+            case GRA_SQUARE:
+                               boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
+                               tmpPoly<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
                                       QPointF(radius,radius)<<QPointF(-radius,radius);
-                             break;
+                               setBrush(Qt::red);
+                               break;
+            //长方形
+            case GRA_RECT:
+                               factor = 0.5;
+                               boundRect = QRectF(-radius,-factor*radius,2*radius,radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
+                               tmpPoly<<QPointF(-radius,-factor*radius)<<QPointF(radius,-factor*radius)<<
+                                        QPointF(radius,factor*radius)<<QPointF(-radius,factor*radius);
+                               setBrush(Qt::blue);
+                               break;
+            //圆形
+            case GRA_CIRCLE:
+                               {
+                                   boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
+                                   QPainterPath path;
+                                   path.addEllipse(boundRect);
+                                   tmpPoly = path.toFillPolygon();
+                                   setBrush(Qt::yellow);
+                               }
+                               break;
+            //菱形
+            case GRA_POLYGON:
+                               factor = 0.5;
+                               boundRect = QRectF(-radius,-factor*radius,2*radius,radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
+                               tmpPoly<<QPointF(-radius,-factor*radius)<<QPointF(0.5*radius,-factor*radius)<<
+                                         QPointF(radius,factor*radius)<<QPointF(-0.5*radius,factor*radius);
+                               setBrush(Qt::gray);
+        break;
     }
-
-
-    setBrush(Qt::red);
     setPolygon(tmpPoly);
 
 
