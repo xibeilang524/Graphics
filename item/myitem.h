@@ -1,7 +1,8 @@
 #ifndef MYITEM_H
 #define MYITEM_H
 
-#include <QGraphicsObject>
+#include <QObject>
+#include <QGraphicsPolygonItem>
 #include <QPen>
 
 #include "ItemHeader.h"
@@ -14,17 +15,18 @@ class MyArrow;
 
 #include "dragpoint.h"
 #include "rotateline.h"
+#include "../Header.h"
 
-class MyItem : public QGraphicsObject
+class MyItem : public QObject,public QGraphicsPolygonItem
 {
     Q_OBJECT
 public:
-    MyItem(QMenu * menu,QGraphicsItem * parent = 0);
+    MyItem(GraphicsType itemType,QMenu * menu,QObject * parent1 = 0,QGraphicsItem * parent2 = 0);
     ~MyItem();
 
     QRectF boundingRect() const;
 
-    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    //void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     void addArrow(MyArrow * arrow);
     void removeArrows();
@@ -53,6 +55,8 @@ private:
     void updateRotateLinePos();
 
     int radius;
+
+    GraphicsType currItemType;
 
     QRectF boundRect;
 

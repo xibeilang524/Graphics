@@ -2,6 +2,7 @@
 
 #include <QPainter>
 #include <QCursor>
+#include <QGraphicsSceneMouseEvent>
 #include <QDebug>
 
 #include "myitem.h"
@@ -96,6 +97,7 @@ void DragPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void DragPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+//    qDebug()<<"===mouseMoveEvent====="<<event->pos().x()<<"__"<<event->pos().y();
     emit currMouseState(MOUSE_MOVE);
     QGraphicsItem::mouseMoveEvent(event);
 }

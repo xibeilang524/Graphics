@@ -28,15 +28,15 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
         else
         {
-            switch(CurrAddGraType)
-            {
-                 case GRA_SQUARE:
-                                    MyItem * myItem = new MyItem(rightMenu);
-                                    myItem->setPos(event->scenePos());
-                                    connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-                                    addItem(myItem);
-                                 break;
-            }
+//            switch(CurrAddGraType)
+//            {
+//                 case GRA_SQUARE:
+                MyItem * myItem = new MyItem(CurrAddGraType,rightMenu);
+                myItem->setPos(event->scenePos());
+                connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+                addItem(myItem);
+//                                 break;
+//            }
 
         }
     }

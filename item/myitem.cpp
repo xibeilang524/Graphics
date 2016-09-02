@@ -10,9 +10,11 @@
 
 #include "myarrow.h"
 
-MyItem::MyItem(QMenu *menu, QGraphicsItem *parent):
+MyItem::MyItem(GraphicsType itemType, QMenu *menu, QObject *parent1, QGraphicsItem *parent2):
+    currItemType(itemType),
     rightMenu(menu),
-    QGraphicsObject(parent)
+    QObject(parent1),
+    QGraphicsPolygonItem(parent2)
 {
     radius = 100;
 
@@ -21,6 +23,21 @@ MyItem::MyItem(QMenu *menu, QGraphicsItem *parent):
 
     prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
+
+    QPolygonF tmpPoly;
+
+    switch(currItemType)
+    {
+          case GRA_SQUARE:
+                             tmpPoly<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
+                                      QPointF(radius,radius)<<QPointF(-radius,radius);
+                             break;
+    }
+
+
+    setBrush(Qt::red);
+    setPolygon(tmpPoly);
+
 
     currMouseType = MOUSE_NONE;
     isNeedBorder = false;
@@ -84,25 +101,25 @@ void MyItem::removeArrow(MyArrow *arrow)
         arrows.removeAt(index);
 }
 
-void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-{
-    painter->save();
+//void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+//{
+//    painter->save();
 
-    if(isNeedBorder)
-    {
-       painter->save();
-       painter->setPen(selectedPen);
-       painter->drawRect(boundRect.adjusted(-1,-1,1,1));
-       painter->restore();
-    }
+//    if(isNeedBorder)
+//    {
+//       painter->save();
+//       painter->setPen(selectedPen);
+//       painter->drawRect(boundRect.adjusted(-1,-1,1,1));
+//       painter->restore();
+//    }
 
-    painter->setPen(Qt::black);
-    painter->setBrush(Qt::blue);
+//    painter->setPen(Qt::black);
+//    painter->setBrush(Qt::blue);
 
-    painter->drawRect(boundRect);
+//    painter->drawRect(boundRect);
 
-    painter->restore();
-}
+//    painter->restore();
+//}
 
 void MyItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -111,29 +128,29 @@ void MyItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
         setDragPointVisible(true);
     }
 
-    QGraphicsObject::mousePressEvent(event);
+    QGraphicsPolygonItem::mousePressEvent(event);
 }
 
 void MyItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     emit updateSceneDraw();
-    QGraphicsObject::mouseMoveEvent(event);
+    QGraphicsPolygonItem::mouseMoveEvent(event);
 }
 
 void MyItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     emit updateSceneDraw();
-    QGraphicsObject::mouseReleaseEvent(event);
+    QGraphicsPolygonItem::mouseReleaseEvent(event);
 }
 
 void MyItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    QGraphicsObject::hoverEnterEvent(event);
+    QGraphicsPolygonItem::hoverEnterEvent(event);
 }
 
 void MyItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-    QGraphicsObject::hoverLeaveEvent(event);
+    QGraphicsPolygonItem::hoverLeaveEvent(event);
 }
 
 //右键菜单事件
@@ -179,7 +196,7 @@ qDebug()<<"=%%%QGraphicsItem::ItemPositionChange==";
     }
 
 
-    return QGraphicsObject::itemChange(change,value);
+    return QGraphicsPolygonItem::itemChange(change,value);
 }
 
 void MyItem::procDragSize(PointType type)
@@ -231,7 +248,11 @@ void MyItem::procDragSize(PointType type)
         return;
     }
 
+    tmpRect.setWidth(tmpRect.height());
+
     boundRect = tmpRect;
+
+    qDebug()<<boundRect.width()<<"=="<<boundRect.height();
 
     updateRotateLinePos();
 }
