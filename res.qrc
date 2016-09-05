@@ -9,5 +9,14 @@
         <file>images/rotateLeft.png</file>
         <file>images/square.png</file>
         <file>images/rotate32.png</file>
+        <file>images/circle.png</file>
+        <file>images/ellipse.png</file>
+        <file>images/polygon.png</file>
+        <file>images/rectange.png</file>
+        <file>images/roundedrect.png</file>
+        <file>images/vectorbox.png</file>
+        <file>images/vectorlin.png</file>
+        <file>images/diamonds.png</file>
+        <file>images/text.png</file>
     </qresource>
 </RCC>

@@ -7,6 +7,7 @@
 #include <QToolBar>
 #include <QActionGroup>
 #include <QComboBox>
+#include <QVBoxLayout>
 #include <QDebug>
 
 #include "actionmanager.h"
@@ -14,7 +15,9 @@
 #include "./item/myitem.h"
 #include "./item/myarrow.h"
 #include "./SelfWidget/myslider.h"
+#include "./SelfWidget/righttoolbox.h"
 #include "global.h"
+
 
 using namespace Graphics;
 
@@ -33,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent) :
     createSceneAndView();
 
     createToolBar();
+
+    showMaximized();
 }
 
 //创建窗口的菜单栏，绑定响应事件
@@ -84,15 +89,23 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(squareAction,this,SLOT(addItem()),true);
     squareAction->setType(GRA_SQUARE);
 
-    MyAction * rectAction = ActionManager::instance()->crateAction(Constants::RECT_ID,"矩形");
+    MyAction * rectAction = ActionManager::instance()->crateAction(Constants::RECT_ID,QIcon(":/images/rectange.png"),"矩形");
     ActionManager::instance()->registerAction(rectAction,this,SLOT(addItem()),true);
     rectAction->setType(GRA_RECT);
 
-    MyAction * circleAction = ActionManager::instance()->crateAction(Constants::CIRCLE_ID,"圆形");
+    MyAction * roundRectAction = ActionManager::instance()->crateAction(Constants::ROUNDRECT_ID,QIcon(":/images/roundedrect.png"),"圆角矩形");
+    ActionManager::instance()->registerAction(roundRectAction,this,SLOT(addItem()),true);
+    roundRectAction->setType(GRA_ROUND_RECT);
+
+    MyAction * circleAction = ActionManager::instance()->crateAction(Constants::CIRCLE_ID,QIcon(":/images/circle.png"),"圆");
     ActionManager::instance()->registerAction(circleAction,this,SLOT(addItem()),true);
     circleAction->setType(GRA_CIRCLE);
 
-    MyAction * polygonAction = ActionManager::instance()->crateAction(Constants::POLYGON_ID,"菱形");
+    MyAction * ellipseAction = ActionManager::instance()->crateAction(Constants::ELLIPSE_ID,QIcon(":/images/ellipse.png"),"椭圆");
+    ActionManager::instance()->registerAction(ellipseAction,this,SLOT(addItem()),true);
+    ellipseAction->setType(GRA_ELLIPSE);
+
+    MyAction * polygonAction = ActionManager::instance()->crateAction(Constants::POLYGON_ID,QIcon(":/images/diamonds.png"),"菱形");
     ActionManager::instance()->registerAction(polygonAction,this,SLOT(addItem()),true);
     polygonAction->setType(GRA_POLYGON);
 
@@ -100,22 +113,34 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(lineAction,this,SLOT(addItem()),true);
     lineAction->setType(GRA_LINE);
 
+    MyAction * textAction = ActionManager::instance()->crateAction(Constants::TEXT_ID,QIcon(":/images/text.png"),"文字");
+    ActionManager::instance()->registerAction(textAction,this,SLOT(addItem()),true);
+    textAction->setType(GRA_TEXT);
+
+
+
     //用于控制一组中只有一个状态被选中
     itemGroup = new QActionGroup(this);
 
     itemGroup->addAction(arrowAction);
     itemGroup->addAction(squareAction);
     itemGroup->addAction(rectAction);
+    itemGroup->addAction(roundRectAction);
     itemGroup->addAction(circleAction);
+    itemGroup->addAction(ellipseAction);
     itemGroup->addAction(polygonAction);
     itemGroup->addAction(lineAction);
+    itemGroup->addAction(textAction);
 
     itemMenu->addAction(arrowAction);
     itemMenu->addAction(squareAction);
     itemMenu->addAction(rectAction);
+    itemMenu->addAction(roundRectAction);
     itemMenu->addAction(circleAction);
+    itemMenu->addAction(ellipseAction);
     itemMenu->addAction(polygonAction);
     itemMenu->addAction(lineAction);
+    itemMenu->addAction(textAction);
 }
 
 void MainWindow::fileOpen()
@@ -137,16 +162,18 @@ void MainWindow::rotateItem()
         return;
     }
 
-    QGraphicsItem * graphicsTmp = scene->selectedItems().first();
+    MyItem * graphicsTmp = dynamic_cast<MyItem *>(scene->selectedItems().first());
 
     QString objName = QObject::sender()->objectName();
     if(objName == QString(Constants::ROTATE_LEFT_ID))
     {
-        graphicsTmp->rotate(-90);
+        graphicsTmp->setRotation(-90);
+        graphicsTmp->updateRotation(-90);
     }
     else if(objName == QString(Constants::ROTATE_RIGHT_ID))
     {
-        graphicsTmp->rotate(90);
+        graphicsTmp->setRotation(90);
+        graphicsTmp->updateRotation(90);
     }
 }
 
@@ -230,6 +257,10 @@ void MainWindow::addItem()
 //创建场景和视图
 void MainWindow::createSceneAndView()
 {
+    QWidget * centralWidget = new QWidget;
+    QHBoxLayout * layout = new QHBoxLayout;
+
+
     scene = new MyScene(rightMenu);
     scene->setSceneRect(0,0,5000,5000);
 
@@ -241,7 +272,16 @@ void MainWindow::createSceneAndView()
 //    view->setDragMode(QGraphicsView::RubberBandDrag);   //此行添加后会导致scene无法捕获mousemove事件
 //    view->setRenderHints(QPainter::Antialiasing| QPainter::TextAntialiasing);
 
-    this->setCentralWidget(view);
+    rightToolBox = new RightToolBox;
+    connect(this,SIGNAL(initToolBox(int,ItemProperty)),rightToolBox,SLOT(respInitToolBox(int,ItemProperty)));
+    connect(rightToolBox,SIGNAL(updateProperty(ItemProperty)),this,SLOT(respPropertyUpdate(ItemProperty)));
+    connect(rightToolBox,SIGNAL(deleteCurrItem()),this,SLOT(deleteItem()));
+
+    layout->addWidget(view);
+    layout->addWidget(rightToolBox);
+    centralWidget->setLayout(layout);
+
+    this->setCentralWidget(centralWidget);
 }
 
 //当在scene中右击时，将item工具栏中的状态恢复至箭头状态
@@ -261,7 +301,7 @@ void MainWindow::updateActions()
 
     int selectedSize = scene->selectedItems().size();
 
-    bool isEmpty = scene->selectedItems().size();
+    ItemProperty  property;
 
     if(selectedSize == 0)
     {
@@ -278,6 +318,10 @@ void MainWindow::updateActions()
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
+
+        MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
+
+        property = myItem->getProperty();
     }
     else
     {
@@ -286,6 +330,19 @@ void MainWindow::updateActions()
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
+    }
+
+    emit initToolBox(selectedSize,property);
+}
+
+//更新item的属性
+void MainWindow::respPropertyUpdate(ItemProperty property)
+{
+    if(scene->selectedItems().size() == 1)
+    {
+        MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
+
+        myItem->setProperty(property);
     }
 }
 
@@ -310,9 +367,12 @@ void MainWindow::createToolBar()
     itemBar->addSeparator();
     itemBar->addAction(ActionManager::instance()->action(Constants::SQUARE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::RECT_ID));
+    itemBar->addAction(ActionManager::instance()->action(Constants::ROUNDRECT_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::CIRCLE_ID));
+    itemBar->addAction(ActionManager::instance()->action(Constants::ELLIPSE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::POLYGON_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::LINE_ID));
+    itemBar->addAction(ActionManager::instance()->action(Constants::TEXT_ID));
 
     QToolBar * editBar = addToolBar("Edit");
     editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));

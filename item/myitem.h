@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QGraphicsPolygonItem>
+#include <QPolygonF>
 #include <QPen>
 
 #include "ItemHeader.h"
@@ -21,16 +22,19 @@ class MyItem : public QObject,public QGraphicsPolygonItem
 {
     Q_OBJECT
 public:
-    MyItem(GraphicsType itemType,QMenu * menu,QObject * parent1 = 0,QGraphicsItem * parent2 = 0);
+    MyItem(GraphicsType itemType,QMenu * menu,QGraphicsScene * parentScene,QObject * parent1 = 0,QGraphicsItem * parent2 = 0);
     ~MyItem();
 
     QRectF boundingRect() const;
 
-    //void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+    void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     void addArrow(MyArrow * arrow);
     void removeArrows();
     void removeArrow(MyArrow * arrow);
+    void setProperty(ItemProperty property);
+    void updateRotation(int rotateValue);
+    ItemProperty getProperty(){return this->property;}
 
 signals:
     void updateSceneDraw();
@@ -69,14 +73,18 @@ private:
     DragPoint * rightBottomPoint;
 
     RotateLine * rotateLine;
+    QGraphicsScene * parentScene;      //窗口的索引
 
     QMenu * rightMenu;
 
     MouseType currMouseType;
 
     QList<MyArrow *> arrows;           //保存添加的箭头
+    QPolygonF itemPolygon;             //当前图形的各个顶点坐标集合
 
-    bool isNeedBorder;
+    ItemProperty property;             //保存当前属性
+
+    bool isNeedBorder;                 //是否需要选中边框
 };
 
 #endif // MYITEM_H

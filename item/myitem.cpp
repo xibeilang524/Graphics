@@ -10,9 +10,10 @@
 
 #include "myarrow.h"
 
-MyItem::MyItem(GraphicsType itemType, QMenu *menu, QObject *parent1, QGraphicsItem *parent2):
+MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, QObject *parent1, QGraphicsItem *parent2):
     currItemType(itemType),
     rightMenu(menu),
+    parentScene(parentScene),
     QObject(parent1),
     QGraphicsPolygonItem(parent2)
 {
@@ -23,8 +24,6 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QObject *parent1, QGraphicsIt
 
     prepareGeometryChange();
 
-    QPolygonF tmpPoly;
-
     float factor;
 
     switch(currItemType)
@@ -32,38 +31,65 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QObject *parent1, QGraphicsIt
             //正方形
             case GRA_SQUARE:
                                boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
-                               tmpPoly<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
+                               itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
                                       QPointF(radius,radius)<<QPointF(-radius,radius);
-                               setBrush(Qt::red);
+                               property.itemBrush = QBrush(Qt::red);
                                break;
-            //长方形
+            //矩形
             case GRA_RECT:
                                factor = 0.5;
-                               boundRect = QRectF(-radius,-factor*radius,2*radius,radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
-                               tmpPoly<<QPointF(-radius,-factor*radius)<<QPointF(radius,-factor*radius)<<
+                               boundRect = QRectF(-radius,-factor*radius,2*radius,radius);
+                               itemPolygon<<QPointF(-radius,-factor*radius)<<QPointF(radius,-factor*radius)<<
                                         QPointF(radius,factor*radius)<<QPointF(-radius,factor*radius);
-                               setBrush(Qt::blue);
+
+                               property.itemBrush = QBrush(Qt::blue);
                                break;
+           //圆角矩形
+           case GRA_ROUND_RECT:
+                              {
+                                  boundRect = QRectF(-radius,-0.5*radius,2*radius,radius);
+                                  QPainterPath path;
+                                  path.addRoundedRect(boundRect,10,10);
+                                  itemPolygon = path.toFillPolygon();
+
+                                  property.itemBrush = QBrush(Qt::yellow);
+                              }
+                              break;
             //圆形
             case GRA_CIRCLE:
                                {
-                                   boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
+                                   boundRect = QRectF(-radius,-radius,2*radius,2*radius);
                                    QPainterPath path;
                                    path.addEllipse(boundRect);
-                                   tmpPoly = path.toFillPolygon();
-                                   setBrush(Qt::yellow);
+                                   itemPolygon = path.toFillPolygon();
+
+                                   property.itemBrush = QBrush(Qt::yellow);
+                               }
+                               break;
+            //椭圆
+            case GRA_ELLIPSE:
+                               {
+                                   boundRect = QRectF(-radius,-0.5*radius,2*radius,radius);
+                                   QPainterPath path;
+                                   path.addEllipse(boundRect);
+                                   itemPolygon = path.toFillPolygon();
+
+                                   property.itemBrush = QBrush(Qt::yellow);
                                }
                                break;
             //菱形
             case GRA_POLYGON:
                                factor = 0.5;
-                               boundRect = QRectF(-radius,-factor*radius,2*radius,radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
-                               tmpPoly<<QPointF(-radius,-factor*radius)<<QPointF(0.5*radius,-factor*radius)<<
+                               boundRect = QRectF(-radius,-factor*radius,2*radius,radius);
+                               itemPolygon<<QPointF(-radius,-factor*radius)<<QPointF(0.5*radius,-factor*radius)<<
                                          QPointF(radius,factor*radius)<<QPointF(-0.5*radius,factor*radius);
-                               setBrush(Qt::gray);
-        break;
+
+                               property.itemBrush = QBrush(Qt::gray);
+                             break;
     }
-    setPolygon(tmpPoly);
+    setPolygon(itemPolygon);
+
+    setBrush(property.itemBrush);
 
 
     currMouseType = MOUSE_NONE;
@@ -128,25 +154,28 @@ void MyItem::removeArrow(MyArrow *arrow)
         arrows.removeAt(index);
 }
 
-//void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
-//{
-//    painter->save();
+void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+{
+    painter->save();
 
-//    if(isNeedBorder)
-//    {
-//       painter->save();
-//       painter->setPen(selectedPen);
-//       painter->drawRect(boundRect.adjusted(-1,-1,1,1));
-//       painter->restore();
-//    }
+    if(property.isNeedBorder)
+    {
+        painter->setPen(property.itemPen);
+    }
+    else
+    {
+        painter->setPen(Qt::NoPen);
+    }
 
-//    painter->setPen(Qt::black);
-//    painter->setBrush(Qt::blue);
+    if(property.isNeedBrush)
+    {
+        painter->setBrush(property.itemBrush);
+    }
 
-//    painter->drawRect(boundRect);
+    painter->drawPolygon(itemPolygon);
 
-//    painter->restore();
-//}
+    painter->restore();
+}
 
 void MyItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
@@ -279,7 +308,7 @@ void MyItem::procDragSize(PointType type)
 
     boundRect = tmpRect;
 
-    qDebug()<<boundRect.width()<<"=="<<boundRect.height();
+//    qDebug()<<boundRect.width()<<"=="<<boundRect.height();
 
     updateRotateLinePos();
 }
@@ -308,13 +337,27 @@ void MyItem::procRotate(int degree)
     setRotation(degree);
 }
 
+//设置控件的样式属性
+void MyItem::setProperty(ItemProperty property)
+{
+    this->property = property;
+    setBrush(property.itemBrush);
+
+    setRotation(property.rotateDegree);
+
+    parentScene->update();
+}
+
+//左旋转或者右旋转后更新当前属性的旋转角度值
+void MyItem::updateRotation(int rotateValue)
+{
+    property.rotateDegree += rotateValue;
+    property.rotateDegree = property.rotateDegree%360;
+
+}
+
 MyItem::~MyItem()
 {
-//    foreach(MyArrow * tmp,arrows)
-//    {
-//        delete tmp;
-//    }
-
     if(leftTopPoint)
     {
         delete leftTopPoint;

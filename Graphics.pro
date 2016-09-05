@@ -15,13 +15,15 @@ TEMPLATE = app
 SOURCES += main.cpp\
         mainwindow.cpp \
     actionmanager.cpp \
-    global.cpp
+    global.cpp \
+    util.cpp
 
 HEADERS  += mainwindow.h \
     actionmanager.h \
     Constants.h \
     Header.h \
-    global.h
+    global.h \
+    util.h
 
 include($$PWD\SelfWidget\SelfWidget.pri)
 include($$PWD\item\item.pri)
