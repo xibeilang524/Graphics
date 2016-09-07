@@ -14,10 +14,10 @@
 #include "item/myscene.h"
 #include "./item/myitem.h"
 #include "./item/myarrow.h"
+#include "./item/mytextitem.h"
 #include "./SelfWidget/myslider.h"
 #include "./SelfWidget/righttoolbox.h"
 #include "global.h"
-
 
 using namespace Graphics;
 
@@ -116,8 +116,6 @@ void MainWindow::createActionAndMenus()
     MyAction * textAction = ActionManager::instance()->crateAction(Constants::TEXT_ID,QIcon(":/images/text.png"),"文字");
     ActionManager::instance()->registerAction(textAction,this,SLOT(addItem()),true);
     textAction->setType(GRA_TEXT);
-
-
 
     //用于控制一组中只有一个状态被选中
     itemGroup = new QActionGroup(this);
@@ -260,9 +258,10 @@ void MainWindow::createSceneAndView()
     QWidget * centralWidget = new QWidget;
     QHBoxLayout * layout = new QHBoxLayout;
 
+    SceneWidth = SceneHeight = 5000;
 
     scene = new MyScene(rightMenu);
-    scene->setSceneRect(0,0,5000,5000);
+    scene->setSceneRect(0,0,SceneWidth,SceneHeight);
 
     connect(scene,SIGNAL(resetItemAction()),this,SLOT(respRestItemAction()));
     connect(scene, SIGNAL(selectionChanged()),this, SLOT(updateActions()));
@@ -321,7 +320,24 @@ void MainWindow::updateActions()
 
         MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
 
-        property = myItem->getProperty();
+        if(myItem)
+        {
+            property = myItem->getProperty();
+        }
+        //为text模式
+        else
+        {
+            MyTextItem * textItem = dynamic_cast<MyTextItem *>(scene->selectedItems().first());
+            if(textItem)
+            {
+                property = textItem->getProperty();
+            }
+        }
+        //        qDebug()<< myItem->pos().x()<<"==="<<myItem->pos().y();
+//        qDebug()<< myItem->scenePos().x()<<"========="<<myItem->scenePos().y();
+//        qDebug()<< myItem->sceneBoundingRect().x()<<"==========="<<myItem->sceneBoundingRect().y();
+//        qDebug()<< myItem->boundingRect().width()<<"===%%%%==="<<myItem->boundingRect().height();
+//        qDebug()<< myItem->getProperty().itemRect.width<<"=="<<myItem->getProperty().itemRect.height;
     }
     else
     {
@@ -341,8 +357,18 @@ void MainWindow::respPropertyUpdate(ItemProperty property)
     if(scene->selectedItems().size() == 1)
     {
         MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
-
-        myItem->setProperty(property);
+        if(myItem)
+        {
+            myItem->setProperty(property);
+        }
+        else
+        {
+            MyTextItem * textItem = dynamic_cast<MyTextItem *>(scene->selectedItems().first());
+            if(textItem)
+            {
+                textItem->setProperty(property);
+            }
+        }
     }
 }
 

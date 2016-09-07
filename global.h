@@ -5,4 +5,6 @@
 
 extern GraphicsType CurrAddGraType;              //当前添加的类型
 
+extern int SceneWidth,SceneHeight;               //scene的宽度和高度
+
 #endif // GLOBAL_H

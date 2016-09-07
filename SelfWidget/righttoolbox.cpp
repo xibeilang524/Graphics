@@ -6,6 +6,7 @@
 #include <QDebug>
 
 #include "../util.h"
+#include "../global.h"
 
 RightToolBox::RightToolBox(QWidget *parent) :
     QWidget(parent),
@@ -20,6 +21,8 @@ RightToolBox::RightToolBox(QWidget *parent) :
     initConnection();
 
     isDataInit = false;
+
+    ui->tabWidget->setCurrentIndex(0);
 }
 
 //初始化信号槽连接
@@ -165,7 +168,7 @@ void RightToolBox::chooseLineColor()
         setLineColor();
         newPen.setColor(selectedLineColor);
         currItemProperty.itemPen = newPen;
-        emit updateProperty(this->currItemProperty);
+        updateItemProperty();
     }
 }
 
@@ -222,7 +225,7 @@ void RightToolBox::preparePen()
     currItemProperty.isNeedBorder = ui->borderChecked->isChecked();
     currItemProperty.itemPen = newPen;
 
-    emit updateProperty(this->currItemProperty);
+    updateItemProperty();
 }
 
 //显示颜色选择对话框
@@ -273,7 +276,7 @@ void RightToolBox::prepareBrush()
 
         currItemProperty.itemBrush = newBrush;
     }
-    emit updateProperty(this->currItemProperty);
+    updateItemProperty();
 }
 
 //设置填充颜色
@@ -294,31 +297,26 @@ void RightToolBox::sizeChange()
     QString tname = dynamic_cast<QPushButton *>(QObject::sender())->objectName();
     if(tname=="sizeWM")
     {
-        setNum(ui->sizew,true);
+        setNum(ui->sizew,true,currItemProperty.itemRect.width);
     }
     else if(tname=="sizeWP")
     {
-        setNum(ui->sizew,false);
+        setNum(ui->sizew,false,currItemProperty.itemRect.width);
     }
     else if(tname=="sizeHM")
     {
-        setNum(ui->sizeh,true);
+        setNum(ui->sizeh,true,currItemProperty.itemRect.height);
     }
     else if(tname=="sizeHP")
     {
-        setNum(ui->sizeh,false);
+        setNum(ui->sizeh,false,currItemProperty.itemRect.height);
     }
-    prepareGeometry();
+    updateItemProperty();
 }
 
 //改变尺寸之后，重新发送给控件。
-void RightToolBox::prepareGeometry()
+void RightToolBox::updateItemProperty()
 {
-    QRect rect;
-    rect.setX(getSizeValue(ui->posx,2));
-    rect.setY(getSizeValue(ui->posy,2));
-    rect.setWidth(getSizeValue(ui->sizew,2));
-    rect.setHeight(getSizeValue(ui->sizeh,2));
     emit updateProperty(this->currItemProperty);
 }
 
@@ -327,35 +325,38 @@ void RightToolBox::positionChange()
     QString tname = dynamic_cast<QPushButton *>(QObject::sender())->objectName();
     if(tname=="posXM")
     {
-        setNum(ui->posx,true);
+        setNum(ui->posx,true,currItemProperty.itemRect.x);
     }
     else if(tname=="posXP")
     {
-        setNum(ui->posx,false);
+        setNum(ui->posx,false,currItemProperty.itemRect.x);
     }
     else if(tname=="posYM")
     {
-        setNum(ui->posy,true);
+        setNum(ui->posy,true,currItemProperty.itemRect.y);
     }
     else if(tname=="posYP")
     {
-        setNum(ui->posy,false);
+        setNum(ui->posy,false,currItemProperty.itemRect.y);
     }
-    prepareGeometry();
+    updateItemProperty();
 }
 
 //用于数值的加减操作
-void RightToolBox::setNum(QLabel *edit, bool minus)
+void RightToolBox::setNum(QLabel *edit, bool minus, int &newValue)
 {
     int num = getSizeValue(edit,2);
+
     if(minus)
     {
          num = (--num)>=1?num:1;
     }
     else
     {
-         num = (++num)>=2000?2000:num;
+         num = (++num)>= SceneWidth ? SceneWidth :num;
     }
+    newValue = num;
+
     edit->setText(QString::number(num)+"px");
 }
 
@@ -385,10 +386,6 @@ void RightToolBox::degreeChange()
 
     changeDegree(degree);
 
-    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
-             <<degree
-             <<"\n";
-
     ui->dial->setValue(degree);
 }
 
@@ -405,7 +402,7 @@ void RightToolBox::changeDegree(int value)
 
     currItemProperty.rotateDegree = value;
 
-    emit updateProperty(currItemProperty);
+    updateItemProperty();
 }
 
 //删除选中的一个图层
@@ -418,10 +415,11 @@ void RightToolBox::deleteItem()
 void RightToolBox::chooseFont()
 {
     bool ok;
-//    QFont seFont = QFontDialog::getFont(&ok,this->font, this);
+    QFont seFont = QFontDialog::getFont(&ok,currItemProperty.itemFont, this);
     if (ok)
     {
-        emit updateProperty(this->currItemProperty);
+        currItemProperty.itemFont = seFont;
+        updateItemProperty();
     }
 }
 
@@ -445,6 +443,12 @@ void RightToolBox::respInitToolBox(int seletedItemNum,ItemProperty property)
         //旋转角度
         ui->dial->setValue(currItemProperty.rotateDegree);
         ui->degreeValue->setText(QString::number(currItemProperty.rotateDegree)+"度");
+
+        //w、h、x、y
+        ui->sizew->setText(QString::number(currItemProperty.itemRect.width)+"px");
+        ui->sizeh->setText(QString::number(currItemProperty.itemRect.height)+"px");
+        ui->posx->setText(QString::number(currItemProperty.itemRect.x)+"px");
+        ui->posy->setText(QString::number(currItemProperty.itemRect.y)+"px");
 
         ui->colorFill->setChecked(currItemProperty.isNeedBrush);
         ui->borderChecked->setChecked(currItemProperty.isNeedBorder);
@@ -480,9 +484,6 @@ void RightToolBox::respInitToolBox(int seletedItemNum,ItemProperty property)
                  ui->fillKind->setCurrentIndex(6);
                  break;
         }
-
-        //画笔的颜色
-        QColor colorPen = currItemProperty.itemPen.color();
 
         switch(currItemProperty.itemPen.style())
         {

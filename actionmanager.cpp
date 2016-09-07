@@ -116,8 +116,6 @@ MyAction * ActionManager::action(const char *name)
         return tmp;
     }
 
-    qDebug()<<"**********";
-
     return 0;
 }
 

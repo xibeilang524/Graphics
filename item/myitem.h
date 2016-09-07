@@ -33,8 +33,8 @@ public:
     void removeArrows();
     void removeArrow(MyArrow * arrow);
     void setProperty(ItemProperty property);
-    void updateRotation(int rotateValue);
     ItemProperty getProperty(){return this->property;}
+    void updateRotation(int rotateValue);
 
 signals:
     void updateSceneDraw();

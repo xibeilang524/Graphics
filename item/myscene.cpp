@@ -1,11 +1,13 @@
 #include "myscene.h"
 
 #include <QGraphicsSceneMouseEvent>
+#include <QTextCursor>
 #include <QDebug>
 
 #include "global.h"
 #include "myitem.h"
 #include "myarrow.h"
+#include "mytextitem.h"
 
 MyScene::MyScene(QMenu *menu, QObject * parent):
     rightMenu(menu),
@@ -26,6 +28,14 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
             insertTmpLine->setPen(QPen(Qt::red, 2));
             addItem(insertTmpLine);
         }
+        else if(CurrAddGraType == GRA_TEXT)
+        {
+            MyTextItem  * item = new MyTextItem(CurrAddGraType,rightMenu);
+            item->setTextInteractionFlags(Qt::TextEditorInteraction);
+            connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
+            item->setPos(event->scenePos());
+            addItem(item);
+        }
         else
         {
             MyItem * myItem = new MyItem(CurrAddGraType,rightMenu,this);
@@ -42,6 +52,20 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 
     QGraphicsScene::mousePressEvent(event);
+}
+
+//添加文字后，光标移除，判断内容是否为空，为空则删除
+void MyScene::respTextLostFocus(MyTextItem *item)
+{
+    QTextCursor cursor = item->textCursor();
+    cursor.clearSelection();
+    item->setTextCursor(cursor);
+
+    if (item->toPlainText().isEmpty())
+    {
+        removeItem(item);
+        item->deleteLater();
+    }
 }
 
 void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)

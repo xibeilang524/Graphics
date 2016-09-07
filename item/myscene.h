@@ -6,7 +6,7 @@
 #include "../Header.h"
 
 class QMenu;
-class MyArrow;
+class MyTextItem;
 
 class MyScene : public QGraphicsScene
 {
@@ -17,6 +17,9 @@ public:
 
 signals:
     void resetItemAction();
+
+private slots:
+    void respTextLostFocus(MyTextItem * item);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

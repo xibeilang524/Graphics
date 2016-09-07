@@ -33,6 +33,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
                                itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
                                       QPointF(radius,radius)<<QPointF(-radius,radius);
+
                                property.itemBrush = QBrush(Qt::red);
                                break;
             //矩形
@@ -40,7 +41,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                factor = 0.5;
                                boundRect = QRectF(-radius,-factor*radius,2*radius,radius);
                                itemPolygon<<QPointF(-radius,-factor*radius)<<QPointF(radius,-factor*radius)<<
-                                        QPointF(radius,factor*radius)<<QPointF(-radius,factor*radius);
+                                       QPointF(radius,factor*radius)<<QPointF(-radius,factor*radius);
 
                                property.itemBrush = QBrush(Qt::blue);
                                break;
@@ -85,11 +86,15 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                          QPointF(radius,factor*radius)<<QPointF(-0.5*radius,factor*radius);
 
                                property.itemBrush = QBrush(Qt::gray);
-                             break;
+                               break;
     }
     setPolygon(itemPolygon);
-
     setBrush(property.itemBrush);
+
+    property.itemRect.width = boundRect.width();
+    property.itemRect.height = boundRect.height();
+    property.itemRect.x = 0;
+    property.itemRect.y = 0;
 
 
     currMouseType = MOUSE_NONE;
@@ -235,7 +240,6 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
     }
     else if(change == ItemSelectedHasChanged && scene())
     {
-//        qDebug()<<"====="<<isSelected();
         if(!isSelected()&&(currMouseType == MOUSE_NONE||currMouseType == MOUSE_RELEASE))
         {
             setDragPointVisible(false);
@@ -345,7 +349,43 @@ void MyItem::setProperty(ItemProperty property)
 
     setRotation(property.rotateDegree);
 
+    //对于正方形和圆要保持宽高一致
+    itemPolygon.clear();
+    prepareGeometryChange();
+    int x,y;
+    if(currItemType == GRA_SQUARE || currItemType == GRA_CIRCLE)
+    {
+        qDebug()<<"==============="<<property.itemRect.width;
+        radius = property.itemRect.width /2 ;
+
+        boundRect = QRectF(-radius,-radius,2*radius,2*radius);
+
+        itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
+              QPointF(radius,radius)<<QPointF(-radius,radius);
+
+        x = pos().x() + radius;
+        y = pos().y() + radius;
+
+        setPos(property.itemRect.x,property.itemRect.y);
+
+        qDebug()<<sceneBoundingRect().x()<<"=="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
+
+    }
+    else
+    {
+
+    }
+
+    setPolygon(itemPolygon);
+
+    setPos(x,y);
+
+    procResizeItem();
+    updateRotateLinePos();
+
     parentScene->update();
+
+    qDebug()<<sceneBoundingRect().x()<<"=after="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
 }
 
 //左旋转或者右旋转后更新当前属性的旋转角度值
