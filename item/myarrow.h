@@ -4,6 +4,8 @@
 #include <QGraphicsLineItem>
 #include <QPolygonF>
 
+#include "../Header.h"
+
 class MyItem;
 
 class MyArrow : public QGraphicsLineItem

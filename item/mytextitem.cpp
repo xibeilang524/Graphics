@@ -13,8 +13,6 @@ MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent,
 
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
-
-//
 }
 
 void MyTextItem::focusOutEvent(QFocusEvent *event)
