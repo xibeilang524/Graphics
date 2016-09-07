@@ -15,6 +15,9 @@ MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     QGraphicsLineItem(parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable, true);
+//    setFlag(QGraphicsItem::ItemIsMovable,true);
+
+    property.itemBrush = QBrush(Qt::black);
 }
 
 QRectF MyArrow::boundingRect()const
@@ -26,8 +29,15 @@ QRectF MyArrow::boundingRect()const
 QPainterPath MyArrow::shape()const
 {
     QPainterPath path = QGraphicsLineItem::shape();
-//    path.addPolygon(arrowHead);
+    path.addPolygon(arrowHead);
     return path;
+}
+
+void MyArrow::setProperty(ItemProperty property)
+{
+    this->property = property;
+
+    update();
 }
 
 void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
@@ -64,8 +74,18 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
             p1 = p2;
         }
-
+        //将交点和起点作为线段的端点
         setLine(QLineF(intersectPoint, startItem->pos()));
+
+        if (isSelected())
+        {
+            painter->setPen(QPen(Qt::blue, 1, Qt::DashLine));
+            QLineF myLine = line();
+            myLine.translate(0, 4.0);
+            painter->drawLine(myLine);
+            myLine.translate(0,-8.0);
+            painter->drawLine(myLine);
+        }
 
         qreal arrowSize = 20;
 
@@ -82,18 +102,13 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
             arrowHead.clear();
             arrowHead << line().p1() << arrowP1 << arrowP2;
-            painter->setBrush(Qt::black);
+
+            painter->setPen(property.itemPen);
             painter->drawLine(line());
+
+            painter->setBrush(property.itemBrush);
             painter->drawPolygon(arrowHead);
-            if (isSelected())
-            {
-                painter->setPen(QPen(Qt::blue, 1, Qt::DashLine));
-                QLineF myLine = line();
-                myLine.translate(0, 4.0);
-                painter->drawLine(myLine);
-                myLine.translate(0,-8.0);
-                painter->drawLine(myLine);
-            }
+
     }
     painter->restore();
 }

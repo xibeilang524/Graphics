@@ -16,7 +16,8 @@ enum GraphicsType
     GRA_ELLIPSE,
     GRA_POLYGON,
     GRA_LINE,
-    GRA_TEXT
+    GRA_TEXT,
+    GRA_ARROW
 };
 
 //记录当前item在scene中的x、y、w、h值

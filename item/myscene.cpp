@@ -2,6 +2,7 @@
 
 #include <QGraphicsSceneMouseEvent>
 #include <QTextCursor>
+#include <QKeyEvent>
 #include <QDebug>
 
 #include "global.h"
@@ -117,6 +118,14 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
     insertTmpLine = 0;
     QGraphicsScene::mouseReleaseEvent(event);
+}
+
+void MyScene::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Delete)
+    {
+        emit deleteKeyPress();
+    }
 }
 
 MyScene::~MyScene()

@@ -17,6 +17,7 @@ public:
 
 signals:
     void resetItemAction();
+    void deleteKeyPress();
 
 private slots:
     void respTextLostFocus(MyTextItem * item);
@@ -25,6 +26,7 @@ protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
 private:
     QMenu * rightMenu;

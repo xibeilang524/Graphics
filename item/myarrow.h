@@ -22,10 +22,15 @@ public:
     MyItem * getStartItem() const{ return startItem; }
     MyItem * getEndItem() const{ return endItem; }
 
+    void setProperty(ItemProperty property);
+    ItemProperty getProperty(){return this->property;}
+
 private:
     MyItem  * startItem;
     MyItem  * endItem;
     QPolygonF arrowHead;
+
+    ItemProperty property;
 
     QRectF boundRect;
 };

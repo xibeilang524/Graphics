@@ -8,6 +8,7 @@
 #include <QActionGroup>
 #include <QComboBox>
 #include <QVBoxLayout>
+#include <QKeyEvent>
 #include <QDebug>
 
 #include "actionmanager.h"
@@ -265,6 +266,7 @@ void MainWindow::createSceneAndView()
 
     connect(scene,SIGNAL(resetItemAction()),this,SLOT(respRestItemAction()));
     connect(scene, SIGNAL(selectionChanged()),this, SLOT(updateActions()));
+    connect(scene,SIGNAL(deleteKeyPress()),this,SLOT(deleteItem()));
 
     view = new QGraphicsView(this);
     view->setScene(scene);
@@ -332,6 +334,16 @@ void MainWindow::updateActions()
             {
                 property = textItem->getProperty();
             }
+            //箭头模式
+            else
+            {
+                MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
+                if(arrowItem)
+                {
+                    qDebug()<< "==========";
+                    property = arrowItem->getProperty();
+                }
+            }
         }
         //        qDebug()<< myItem->pos().x()<<"==="<<myItem->pos().y();
 //        qDebug()<< myItem->scenePos().x()<<"========="<<myItem->scenePos().y();
@@ -347,6 +359,8 @@ void MainWindow::updateActions()
         ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
     }
+
+    scene->update();
 
     emit initToolBox(selectedSize,property);
 }
@@ -368,7 +382,18 @@ void MainWindow::respPropertyUpdate(ItemProperty property)
             {
                 textItem->setProperty(property);
             }
+            //箭头模式
+            else
+            {
+                MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
+                if(arrowItem)
+                {
+                   arrowItem->setProperty(property);
+                }
+            }
         }
+
+        scene->update();
     }
 }
 
