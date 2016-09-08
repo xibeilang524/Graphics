@@ -45,6 +45,11 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
             addItem(myItem);
         }
     }
+    else if(event->button() == Qt::RightButton)
+    {
+        CurrAddGraType = GRA_NONE;
+        emit resetItemAction();
+    }
 
     if(CurrAddGraType != GRA_NONE && CurrAddGraType != GRA_LINE)
     {

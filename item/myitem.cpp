@@ -350,42 +350,42 @@ void MyItem::setProperty(ItemProperty property)
     setRotation(property.rotateDegree);
 
     //对于正方形和圆要保持宽高一致
-    itemPolygon.clear();
+//    itemPolygon.clear();
     prepareGeometryChange();
     int x,y;
-    if(currItemType == GRA_SQUARE || currItemType == GRA_CIRCLE)
-    {
-        qDebug()<<"==============="<<property.itemRect.width;
-        radius = property.itemRect.width /2 ;
+//    if(currItemType == GRA_SQUARE || currItemType == GRA_CIRCLE)
+//    {
+//        qDebug()<<"==============="<<property.itemRect.width;
+//        radius = property.itemRect.width /2 ;
 
-        boundRect = QRectF(-radius,-radius,2*radius,2*radius);
+//        boundRect = QRectF(-radius,-radius,2*radius,2*radius);
 
-        itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
-              QPointF(radius,radius)<<QPointF(-radius,radius);
+//        itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
+//              QPointF(radius,radius)<<QPointF(-radius,radius);
 
-        x = pos().x() + radius;
-        y = pos().y() + radius;
+//        x = pos().x() + radius;
+//        y = pos().y() + radius;
 
-        setPos(property.itemRect.x,property.itemRect.y);
+//        setPos(property.itemRect.x,property.itemRect.y);
 
-        qDebug()<<sceneBoundingRect().x()<<"=="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
+//        qDebug()<<sceneBoundingRect().x()<<"=="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
 
-    }
-    else
-    {
+//    }
+//    else
+//    {
 
-    }
+//    }
 
-    setPolygon(itemPolygon);
+//    setPolygon(itemPolygon);
 
-    setPos(x,y);
+//    setPos(x,y);
 
     procResizeItem();
     updateRotateLinePos();
 
     parentScene->update();
 
-    qDebug()<<sceneBoundingRect().x()<<"=after="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
+//    qDebug()<<sceneBoundingRect().x()<<"=after="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
 }
 
 //左旋转或者右旋转后更新当前属性的旋转角度值
