@@ -43,6 +43,7 @@ private slots:
     void changeDegree(int value);        //旋转diral
     void deleteItem();                   //删除item
     void chooseFont();                   //选择字体
+    void chooseFontColor();              //显示字体颜色选择对话框
     
 private:
     void initConnection();
@@ -62,7 +63,8 @@ private:
     QBrush newBrush;
     QColor selectedFillColor;
     QColor selectedLineColor;
-    QColor initalFillColor,initalLineColor;          //用于在弹出的颜色选择对话框中设置初始的颜色
+    QColor selectedFontColor;
+    QColor initalFillColor,initalLineColor,initalFontColor;  //用于在弹出的颜色选择对话框中设置初始的颜色
     QPen newPen;
 
     ItemProperty currItemProperty;

@@ -10,7 +10,7 @@
 **        5：支持两控件间的箭头连线，支持删除
 **
 **修改历史:
-**
+**20160908:wey:添加文字描述
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -27,6 +27,7 @@ class DragPoint;
 class RotateLine;
 class QMenu;
 class MyArrow;
+class MyTextItem;
 
 #include "dragpoint.h"
 #include "rotateline.h"
@@ -50,6 +51,8 @@ public:
     ItemProperty getProperty(){return this->property;}
     GraphicsType getType(){return this->currItemType;}
     void updateRotation(int rotateValue);
+    QString getText();
+    void setText(QString text);
 
 signals:
     void updateSceneDraw();
@@ -86,6 +89,8 @@ private:
     DragPoint * rightTopPoint;
     DragPoint * leftBottomPoint;
     DragPoint * rightBottomPoint;
+
+    MyTextItem * myTextItem;           //文字信息
 
     RotateLine * rotateLine;
     QGraphicsScene * parentScene;      //窗口的索引

@@ -47,6 +47,8 @@ void RightToolBox::initConnection()
     connect(ui->lineKind,SIGNAL(currentIndexChanged(int)),this,SLOT(borderKindChange(int)));
     connect(ui->lineWidth,SIGNAL(currentIndexChanged(int)),this,SLOT(borderWidthChange(int)));
 
+    connect(ui->fontColorButt,SIGNAL(clicked()),this,SLOT(chooseFontColor()));
+
     //样式-排列
     connect(ui->sizeWM,SIGNAL(clicked()),this,SLOT(sizeChange()));    //宽度尺寸减少
     connect(ui->sizeWP,SIGNAL(clicked()),this,SLOT(sizeChange()));
@@ -171,6 +173,20 @@ void RightToolBox::chooseLineColor()
         updateItemProperty();
     }
 }
+
+//显示字体颜色选择对话框
+void RightToolBox::chooseFontColor()
+{
+    selectedFontColor = QColorDialog::getColor(initalFontColor,0,"选择边框色");
+    if(selectedFontColor.isValid())
+    {
+        initalFontColor = selectedFontColor;
+        currItemProperty.fontColor = selectedFontColor;
+        Util::setWidgetColor(ui->fontColorButt,selectedFontColor);
+        updateItemProperty();
+    }
+}
+
 
 //边框类型改变
 void RightToolBox::borderKindChange(int i)
@@ -419,6 +435,7 @@ void RightToolBox::chooseFont()
     if (ok)
     {
         currItemProperty.itemFont = seFont;
+        ui->fontInfo->setText(Util::getFontInfo(currItemProperty.itemFont));
         updateItemProperty();
     }
 }
@@ -459,6 +476,9 @@ void RightToolBox::respInitToolBox(int seletedItemNum,ItemProperty property)
 
         QColor colorBrush = currItemProperty.itemBrush.color();
         Util::setWidgetColor(ui->colorFillButt,colorBrush);
+
+        Util::setWidgetColor(ui->fontColorButt,currItemProperty.fontColor);
+        ui->fontInfo->setText(Util::getFontInfo(currItemProperty.itemFont));
 
         switch(currItemProperty.itemBrush.style())
         {

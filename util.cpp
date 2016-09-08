@@ -9,3 +9,9 @@ void Util::setWidgetColor(QWidget *widget, QColor &color)
                           +","+QString::number(color.blue())\
                           +","+QString::number(color.alpha())+")");
 }
+
+//获取字体的信息
+QString Util::getFontInfo(QFont font)
+{
+    return QString("%1px,%2").arg(font.pointSize()).arg(font.family());
+}

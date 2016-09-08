@@ -56,6 +56,8 @@ private slots:
     void bringZItem();
     void deleteItem();
 
+    void editTextItem();
+
     void addItem();
 
     void respRestItemAction();

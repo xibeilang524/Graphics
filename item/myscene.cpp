@@ -33,7 +33,6 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         else if(CurrAddGraType == GRA_TEXT)
         {
             MyTextItem  * item = new MyTextItem(CurrAddGraType,rightMenu);
-            item->setTextInteractionFlags(Qt::TextEditorInteraction);
             connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
             item->setPos(event->scenePos());
             addItem(item);

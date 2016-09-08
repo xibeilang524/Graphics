@@ -29,7 +29,13 @@ public:
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
 
+    void updateFont(QFont font);
+
     GraphicsType getType(){return this->type;}
+
+    int getWidth();
+
+//    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 signals:
     void textLostFocus(MyTextItem *item);

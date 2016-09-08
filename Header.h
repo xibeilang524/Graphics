@@ -54,7 +54,10 @@ struct ItemProperty
 
     bool isNeedBorder;       //为true时表示是否需要边框
     QPen   itemPen;
+
     QFont  itemFont;
+    QColor fontColor;        //字体颜色
+
     MyRect itemRect;
     int    alphaValue;       //透明度值
     int    rotateDegree;

@@ -20,6 +20,7 @@
 #include "./item/mytextitem.h"
 #include "./SelfWidget/myslider.h"
 #include "./SelfWidget/righttoolbox.h"
+#include "./SelfWidget/mytextinput.h"
 #include "global.h"
 
 using namespace Graphics;
@@ -105,6 +106,13 @@ void MainWindow::createActionAndMenus()
     MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::DELETE_ID,QIcon(":/images/delete.png"),"删除");
     ActionManager::instance()->registerAction(deleteAction,this,SLOT(deleteItem()));
 
+    MyAction * editTextAction = ActionManager::instance()->crateAction(Constants::EDIT_TEXT_ID,QIcon(":/images/editText.png"),"编辑文本");
+    editTextAction->setShortcut(QKeySequence("Ctrl+T"));
+    ActionManager::instance()->registerAction(editTextAction,this,SLOT(editTextItem()));
+
+
+    editMenu->addAction(editTextAction);
+    editMenu->addSeparator();
     editMenu->addAction(cutAction);
     editMenu->addAction(copyAction);
     editMenu->addAction(pasteAction);
@@ -225,6 +233,7 @@ void MainWindow::cutItem()
         {
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
+            cutTmpInfo.content = item->getText();
             deleteItem();
         }
         else
@@ -253,6 +262,7 @@ void MainWindow::copyItem()
         {
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
+            cutTmpInfo.content = item->getText();
         }
         else
         {
@@ -283,6 +293,7 @@ void MainWindow::pasteItem()
     else if(cutTmpInfo.graphicsType != GRA_NONE && cutTmpInfo.graphicsType != GRA_LINE)
     {
         MyItem * item = new MyItem(cutTmpInfo.graphicsType,rightMenu,scene);
+        item->setText(cutTmpInfo.content);
         item->setProperty(cutTmpInfo.itemProperty);
         item->setPos(SceneLastClickPoint);
         connect(item,SIGNAL(updateSceneDraw()),scene,SLOT(update()));
@@ -395,8 +406,26 @@ void MainWindow::deleteItem()
         }
     }
 
-
     scene->update();
+}
+
+//编辑文本
+void MainWindow::editTextItem()
+{
+    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
+    if(selectedItems.size() == 1)
+    {
+        MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+        if(item)
+        {
+            MyTextInput textInput(this);
+
+            textInput.setTex(item->getText());
+            textInput.exec();
+
+            item->setText(textInput.getText());
+        }
+    }
 }
 
 void MainWindow::addItem()
@@ -449,6 +478,8 @@ void MainWindow::respItemSizeChanged(int size)
     ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(actionEnabled);
     ActionManager::instance()->action(Constants::CLEAR_ID)->setEnabled(actionEnabled);
 
+    ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(actionEnabled);
+
     ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(actionEnabled);
     ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(actionEnabled);
 
@@ -481,6 +512,7 @@ void MainWindow::updateActions()
 
     if(selectedSize == 0)
     {
+        ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
 
@@ -492,6 +524,7 @@ void MainWindow::updateActions()
     }
     else if(selectedSize == 1)
     {
+        ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(true);
 
@@ -534,6 +567,7 @@ void MainWindow::updateActions()
     }
     else
     {
+        ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
 
@@ -586,6 +620,8 @@ void MainWindow::createContextMenu()
 {
     rightMenu = new QMenu;
 
+    rightMenu->addAction(ActionManager::instance()->action(Constants::EDIT_TEXT_ID));
+    rightMenu->addSeparator();
     rightMenu->addAction(ActionManager::instance()->action(Constants::CUT_ID));
     rightMenu->addAction(ActionManager::instance()->action(Constants::COPY_ID));
     rightMenu->addAction(ActionManager::instance()->action(Constants::PASTE_ID));

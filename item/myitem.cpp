@@ -9,6 +9,7 @@
 #include <QGraphicsScene>
 
 #include "myarrow.h"
+#include "mytextitem.h"
 
 MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, QObject *parent1, QGraphicsItem *parent2):
     currItemType(itemType),
@@ -114,10 +115,28 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     connect(rotateLine,SIGNAL(rotateItem(int)),this,SLOT(procRotate(int)));
     updateRotateLinePos();
 
+    myTextItem = new MyTextItem(GRA_TEXT,menu,this);
+
+    myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
+    myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);
+    myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
+
     setAcceptHoverEvents(true);
     setDragPointVisible(false);
 
     procResizeItem();
+}
+
+QString MyItem::getText()
+{
+    return myTextItem->toPlainText();
+}
+
+//更新文字信息，同时更新textItem在item中的位置
+void MyItem::setText(QString text)
+{
+    myTextItem->setPlainText(text);
+    myTextItem->setPos(-myTextItem->getWidth()/2,boundRect.height()/2);
 }
 
 void MyItem::updateRotateLinePos()
@@ -383,6 +402,10 @@ void MyItem::setProperty(ItemProperty property)
     procResizeItem();
     updateRotateLinePos();
 
+    myTextItem->updateFont(property.itemFont);
+    myTextItem->setDefaultTextColor(property.fontColor);
+    setText(myTextItem->toPlainText());
+
     parentScene->update();
 
 //    qDebug()<<sceneBoundingRect().x()<<"=after="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
@@ -426,6 +449,12 @@ MyItem::~MyItem()
     {
         delete rotateLine;
         rotateLine = NULL;
+    }
+
+    if(myTextItem)
+    {
+        delete myTextItem;
+        myTextItem = NULL;
     }
 }
 
