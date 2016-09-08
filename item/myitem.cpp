@@ -64,7 +64,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
 
-                                   property.itemBrush = QBrush(Qt::yellow);
+                                   property.itemBrush = QBrush(Qt::darkCyan);
                                }
                                break;
             //Õ÷‘≤
@@ -75,7 +75,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
 
-                                   property.itemBrush = QBrush(Qt::yellow);
+                                   property.itemBrush = QBrush(Qt::darkMagenta);
                                }
                                break;
             //¡‚–Œ

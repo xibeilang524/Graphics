@@ -10,6 +10,10 @@ const char OPEN_ID[] = "Constants.Open";
 const char CLEAR_ID[] = "Constants.Clear";
 const char EXIT_ID[] = "Constants.Exit";
 
+const char CUT_ID[] = "Constants.Cut";
+const char COPY_ID[] = "Constants.Copy";
+const char PASTE_ID[] = "Constants.Paste";
+
 const char ROTATE_LEFT_ID[] = "Constants.RotateLeft";
 const char ROTATE_RIGHT_ID[] = "Constants.RotateRight";
 const char BRING_FRONT_ID[] = "Constants.BringFront";

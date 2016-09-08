@@ -9,6 +9,8 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QKeyEvent>
+#include <QMessageBox>
+#include <QClipboard>
 #include <QDebug>
 
 #include "actionmanager.h"
@@ -39,6 +41,8 @@ MainWindow::MainWindow(QWidget *parent) :
     createToolBar();
 
     showMaximized();
+
+    respItemSizeChanged(0);
 }
 
 //创建窗口的菜单栏，绑定响应事件
@@ -46,19 +50,19 @@ void MainWindow::createActionAndMenus()
 {
     QMenu * fileMenu = menuBar()->addMenu("文件(&F)");
 
-    MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,"新建");
+    MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建");
     newAction->setShortcut(QKeySequence("Ctrl+N"));
     ActionManager::instance()->registerAction(newAction,this,SLOT(fileOpen()));
 
-    MyAction * saveAction = ActionManager::instance()->crateAction(Constants::SAVE_ID,"保存");
+    MyAction * saveAction = ActionManager::instance()->crateAction(Constants::SAVE_ID,QIcon(":/images/save.png"),"保存");
     saveAction->setShortcut(QKeySequence("Ctrl+S"));
     ActionManager::instance()->registerAction(saveAction,this,SLOT(fileSave()));
 
-    MyAction * openAction = ActionManager::instance()->crateAction(Constants::OPEN_ID,"打开");
+    MyAction * openAction = ActionManager::instance()->crateAction(Constants::OPEN_ID,QIcon(":/images/open.png"),"打开");
     openAction->setShortcut(QKeySequence("Ctrl+O"));
     ActionManager::instance()->registerAction(openAction,this,SLOT(fileOpen()));
 
-    MyAction * clearAction = ActionManager::instance()->crateAction(Constants::CLEAR_ID,"清空");
+    MyAction * clearAction = ActionManager::instance()->crateAction(Constants::CLEAR_ID,QIcon(":/images/clear.png"),"清空");
     ActionManager::instance()->registerAction(clearAction,this,SLOT(fileClear()));
 
     MyAction * exitAction = ActionManager::instance()->crateAction(Constants::EXIT_ID,"退出");
@@ -73,6 +77,18 @@ void MainWindow::createActionAndMenus()
     fileMenu->addAction(exitAction);
 
     QMenu * editMenu = menuBar()->addMenu("编辑(&E)");
+
+    MyAction * cutAction = ActionManager::instance()->crateAction(Constants::CUT_ID,QIcon(":/images/cut.png"),"剪切");
+    cutAction->setShortcut(QKeySequence("Ctrl+X"));
+    ActionManager::instance()->registerAction(cutAction,this,SLOT(cutItem()));
+
+    MyAction * copyAction = ActionManager::instance()->crateAction(Constants::COPY_ID,QIcon(":/images/copy.png"),"复制");
+    copyAction->setShortcut(QKeySequence("Ctrl+C"));
+    ActionManager::instance()->registerAction(copyAction,this,SLOT(copyItem()));
+
+    MyAction * pasteAction = ActionManager::instance()->crateAction(Constants::PASTE_ID,QIcon(":/images/paste.png"),"粘贴");
+    pasteAction->setShortcut(QKeySequence("Ctrl+V"));
+    ActionManager::instance()->registerAction(pasteAction,this,SLOT(pasteItem()));
 
     MyAction * rotateLeftAction = ActionManager::instance()->crateAction(Constants::ROTATE_LEFT_ID,QIcon(":/images/rotateLeft.png"),"左转90°");
     ActionManager::instance()->registerAction(rotateLeftAction,this,SLOT(rotateItem()));
@@ -89,6 +105,10 @@ void MainWindow::createActionAndMenus()
     MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::DELETE_ID,QIcon(":/images/delete.png"),"删除");
     ActionManager::instance()->registerAction(deleteAction,this,SLOT(deleteItem()));
 
+    editMenu->addAction(cutAction);
+    editMenu->addAction(copyAction);
+    editMenu->addAction(pasteAction);
+    editMenu->addSeparator();
     editMenu->addAction(rotateLeftAction);
     editMenu->addAction(rotateRightAction);
     editMenu->addAction(bringFrontAction);
@@ -179,12 +199,95 @@ void MainWindow::fileSave()
 //清空当前的控件
 void MainWindow::fileClear()
 {
-
+    int result = QMessageBox::warning(this,"警告","是否清空所有内容?",QMessageBox::Yes,QMessageBox::No);
+    if(result == QMessageBox::Yes)
+    {
+        scene->clear();
+        respItemSizeChanged(0);
+    }
 }
 
 void MainWindow::exitApp()
 {
     qApp->exit();
+}
+
+//目前支持一个控件的剪切，只支持除箭头以外控件操作
+void MainWindow::cutItem()
+{
+    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
+
+    if(selectedItems.size() == 1)
+    {
+        MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+
+        if(item)
+        {
+            cutTmpInfo.graphicsType = item->getType();
+            cutTmpInfo.itemProperty = item->getProperty();
+            deleteItem();
+        }
+        else
+        {
+            MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
+
+            if(item)
+            {
+                cutTmpInfo.graphicsType = item->getType();
+                cutTmpInfo.itemProperty = item->getProperty();
+                delete item;
+            }
+        }
+    }
+}
+
+void MainWindow::copyItem()
+{
+    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
+
+    if(selectedItems.size() == 1)
+    {
+        MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+
+        if(item)
+        {
+            cutTmpInfo.graphicsType = item->getType();
+            cutTmpInfo.itemProperty = item->getProperty();
+        }
+        else
+        {
+            MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
+
+            if(item)
+            {
+                cutTmpInfo.graphicsType = item->getType();
+                cutTmpInfo.itemProperty = item->getProperty();
+                cutTmpInfo.content = item->toPlainText();
+            }
+        }
+    }
+}
+
+void MainWindow::pasteItem()
+{
+    if(cutTmpInfo.graphicsType == GRA_TEXT)
+    {
+        MyTextItem  * item = new MyTextItem(cutTmpInfo.graphicsType,rightMenu);
+        item->setTextInteractionFlags(Qt::TextEditorInteraction);
+        item->setProperty(cutTmpInfo.itemProperty);
+        connect(item,SIGNAL(textLostFocus(MyTextItem *)),scene,SLOT(respTextLostFocus(MyTextItem *)));
+        item->setPos(SceneLastClickPoint);
+        item->setPlainText(cutTmpInfo.content);
+        scene->addItem(item);
+    }
+    else if(cutTmpInfo.graphicsType != GRA_NONE && cutTmpInfo.graphicsType != GRA_LINE)
+    {
+        MyItem * item = new MyItem(cutTmpInfo.graphicsType,rightMenu,scene);
+        item->setProperty(cutTmpInfo.itemProperty);
+        item->setPos(SceneLastClickPoint);
+        connect(item,SIGNAL(updateSceneDraw()),scene,SLOT(update()));
+        scene->addItem(item);
+    }
 }
 
 void MainWindow::rotateItem()
@@ -280,6 +383,19 @@ void MainWindow::deleteItem()
         }
     }
 
+    selectedItems = scene->selectedItems();
+
+    foreach (QGraphicsItem * item, selectedItems)
+    {
+        MyTextItem * tmp = dynamic_cast<MyTextItem *>(item);
+        if(tmp)
+        {
+            scene->removeItem(tmp);
+            delete tmp;
+        }
+    }
+
+
     scene->update();
 }
 
@@ -306,6 +422,7 @@ void MainWindow::createSceneAndView()
     connect(scene,SIGNAL(resetItemAction()),this,SLOT(respRestItemAction()));
     connect(scene, SIGNAL(selectionChanged()),this, SLOT(updateActions()));
     connect(scene,SIGNAL(deleteKeyPress()),this,SLOT(deleteItem()));
+    connect(scene,SIGNAL(itemSizeChanged(int)),this,SLOT(respItemSizeChanged(int)));
 
     view = new QGraphicsView(this);
     view->setScene(scene);
@@ -322,6 +439,25 @@ void MainWindow::createSceneAndView()
     centralWidget->setLayout(layout);
 
     this->setCentralWidget(centralWidget);
+}
+
+//响应item改变
+void MainWindow::respItemSizeChanged(int size)
+{
+    bool actionEnabled = size;
+
+    ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(actionEnabled);
+    ActionManager::instance()->action(Constants::CLEAR_ID)->setEnabled(actionEnabled);
+
+    ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(actionEnabled);
+    ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(actionEnabled);
+
+    ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(actionEnabled);
+    ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(actionEnabled);
+    ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(actionEnabled);
+    ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(actionEnabled);
+    ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(actionEnabled);
+
 }
 
 //当在scene中右击时，将item工具栏中的状态恢复至箭头状态
@@ -345,6 +481,9 @@ void MainWindow::updateActions()
 
     if(selectedSize == 0)
     {
+        ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
+
         ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
@@ -353,6 +492,9 @@ void MainWindow::updateActions()
     }
     else if(selectedSize == 1)
     {
+        ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(true);
+
         ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(true);
@@ -392,6 +534,9 @@ void MainWindow::updateActions()
     }
     else
     {
+        ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
+
         ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
@@ -441,6 +586,10 @@ void MainWindow::createContextMenu()
 {
     rightMenu = new QMenu;
 
+    rightMenu->addAction(ActionManager::instance()->action(Constants::CUT_ID));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::COPY_ID));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
+    rightMenu->addSeparator();
     rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
     rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
     rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
@@ -452,6 +601,12 @@ void MainWindow::createContextMenu()
 //创建工具栏
 void MainWindow::createToolBar()
 {
+    QToolBar * fileBar = addToolBar("File");
+    fileBar->addAction(ActionManager::instance()->action(Constants::FILE_ID));
+    fileBar->addAction(ActionManager::instance()->action(Constants::OPEN_ID));
+    fileBar->addAction(ActionManager::instance()->action(Constants::SAVE_ID));
+    fileBar->addAction(ActionManager::instance()->action(Constants::CLEAR_ID));
+
     QToolBar * itemBar = addToolBar("Item");
     itemBar->addAction(ActionManager::instance()->action(Constants::ARROW_ID));
     itemBar->addSeparator();
@@ -465,6 +620,9 @@ void MainWindow::createToolBar()
     itemBar->addAction(ActionManager::instance()->action(Constants::TEXT_ID));
 
     QToolBar * editBar = addToolBar("Edit");
+    editBar->addAction(ActionManager::instance()->action(Constants::CUT_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::COPY_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));

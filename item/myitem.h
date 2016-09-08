@@ -48,6 +48,7 @@ public:
     void removeArrow(MyArrow * arrow);
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
+    GraphicsType getType(){return this->currItemType;}
     void updateRotation(int rotateValue);
 
 signals:

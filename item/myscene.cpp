@@ -21,6 +21,7 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
 
 void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+    SceneLastClickPoint = event->scenePos();
     if(event->button () == Qt::LeftButton)
     {
         if(CurrAddGraType == GRA_LINE)
@@ -58,6 +59,22 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     }
 
     QGraphicsScene::mousePressEvent(event);
+}
+
+//添加子控件
+void MyScene::addItem(QGraphicsItem *item)
+{
+    QGraphicsScene::addItem(item);
+
+    emit itemSizeChanged(items().size());
+}
+
+//删除子控件
+void MyScene::removeItem(QGraphicsItem *item)
+{
+    QGraphicsScene::removeItem(item);
+
+    emit itemSizeChanged(items().size());
 }
 
 //添加文字后，光标移除，判断内容是否为空，为空则删除

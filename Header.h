@@ -62,4 +62,12 @@ struct ItemProperty
     bool isFont;             //是否为字体
 };
 
+//暂存一个剪切时的控件信息
+struct CutInfo
+{
+    GraphicsType graphicsType;
+    ItemProperty itemProperty;
+    QString content;
+};
+
 #endif // HEADER_H

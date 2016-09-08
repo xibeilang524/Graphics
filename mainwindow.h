@@ -8,7 +8,9 @@
 **
 **修改历史:
 **20160908:wey:修复删除只选中线条时奔溃问题
-**
+**             添加文件工具栏，包含新建、删除
+**             添加文字信息删除
+**             添加剪切、复制、粘贴
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -46,6 +48,10 @@ private slots:
     void fileClear();
     void exitApp();
 
+    void cutItem();
+    void copyItem();
+    void pasteItem();
+
     void rotateItem();
     void bringZItem();
     void deleteItem();
@@ -56,6 +62,7 @@ private slots:
     void updateActions();
     void sceneScaled(int currScale);
     void respPropertyUpdate(ItemProperty property);
+    void respItemSizeChanged(int size);
     
 private:
     void createActionAndMenus();
@@ -75,6 +82,7 @@ private:
     MySlider * mySlider;
     RightToolBox * rightToolBox;
 
+    CutInfo cutTmpInfo;               //保存剪切信息
 };
 
 #endif // MAINWINDOW_H

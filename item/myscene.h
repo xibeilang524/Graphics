@@ -8,7 +8,7 @@
 **
 **修改历史:
 **20160907:wey:添加对delete键盘事件，支持选中删除
-**
+**20160908:wey:添加对item数量的监管
 *************************************************/
 #ifndef MYSCENE_H
 #define MYSCENE_H
@@ -25,11 +25,14 @@ class MyScene : public QGraphicsScene
     Q_OBJECT
 public:
     MyScene(QMenu * menu,QObject * parent = 0 );
+    void addItem(QGraphicsItem *item);
+    void removeItem(QGraphicsItem *item);
     ~MyScene();
 
 signals:
     void resetItemAction();
     void deleteKeyPress();
+    void itemSizeChanged(int size);
 
 private slots:
     void respTextLostFocus(MyTextItem * item);
