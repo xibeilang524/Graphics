@@ -33,7 +33,7 @@ public:
 
     GraphicsType getType(){return this->type;}
 
-    int getWidth();
+    QRectF getBoundRect();
 
 //    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 

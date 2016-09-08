@@ -94,9 +94,9 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 
     property.itemRect.width = boundRect.width();
     property.itemRect.height = boundRect.height();
-    property.itemRect.x = 0;
-    property.itemRect.y = 0;
 
+
+    property.itemFont = QFont("黑体",15);
 
     currMouseType = MOUSE_NONE;
     isNeedBorder = false;
@@ -127,6 +127,15 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     procResizeItem();
 }
 
+
+void MyItem::setPos(const QPointF &pos)
+{
+    property.itemRect.x = pos.x();
+    property.itemRect.y = pos.y();
+
+    QGraphicsPolygonItem::setPos(pos);
+}
+
 QString MyItem::getText()
 {
     return myTextItem->toPlainText();
@@ -136,7 +145,7 @@ QString MyItem::getText()
 void MyItem::setText(QString text)
 {
     myTextItem->setPlainText(text);
-    myTextItem->setPos(-myTextItem->getWidth()/2,boundRect.height()/2);
+    myTextItem->setPos(-myTextItem->getBoundRect().width()/2,-myTextItem->getBoundRect().height()/2);
 }
 
 void MyItem::updateRotateLinePos()
@@ -214,6 +223,13 @@ void MyItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void MyItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     emit updateSceneDraw();
+
+    property.itemRect.x = this->x();
+    property.itemRect.y = this->y();
+    property.itemRect.width = this->boundingRect().width();
+    property.itemRect.height = this->boundingRect().height();
+    emit posHasChanged(property.itemRect);
+
     QGraphicsPolygonItem::mouseMoveEvent(event);
 }
 
@@ -367,6 +383,8 @@ void MyItem::setProperty(ItemProperty property)
     setBrush(property.itemBrush);
 
     setRotation(property.rotateDegree);
+
+    setPos(QPointF (property.itemRect.x,property.itemRect.y));
 
     //对于正方形和圆要保持宽高一致
 //    itemPolygon.clear();

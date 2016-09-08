@@ -462,6 +462,7 @@ void MainWindow::createSceneAndView()
     connect(this,SIGNAL(initToolBox(int,ItemProperty)),rightToolBox,SLOT(respInitToolBox(int,ItemProperty)));
     connect(rightToolBox,SIGNAL(updateProperty(ItemProperty)),this,SLOT(respPropertyUpdate(ItemProperty)));
     connect(rightToolBox,SIGNAL(deleteCurrItem()),this,SLOT(deleteItem()));
+    connect(scene,SIGNAL(selectedItemPosChanged(MyRect)),rightToolBox,SLOT(respItemPosChanged(MyRect)));
 
     layout->addWidget(view);
     layout->addWidget(rightToolBox);
@@ -488,7 +489,6 @@ void MainWindow::respItemSizeChanged(int size)
     ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(actionEnabled);
     ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(actionEnabled);
     ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(actionEnabled);
-
 }
 
 //当在scene中右击时，将item工具栏中的状态恢复至箭头状态

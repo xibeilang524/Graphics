@@ -29,7 +29,7 @@
       <item>
        <widget class="QTabWidget" name="tabWidget">
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -1148,34 +1148,13 @@ QPushButton#sizeHP:pressed{
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_18">
                     <item>
-                     <widget class="QPushButton" name="sizeWM_3">
+                     <widget class="QLabel" name="label_7">
                       <property name="minimumSize">
                        <size>
-                        <width>25</width>
+                        <width>0</width>
                         <height>25</height>
                        </size>
                       </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton#sizeWM{
-  background-color:red;
-  color:white;
-  border-top-left-radius:12px;
-  border-bottom-left-radius:12px;
-}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_7">
                       <property name="font">
                        <font>
                         <family>Microsoft YaHei UI</family>
@@ -1193,66 +1172,18 @@ QPushButton#sizeHP:pressed{
                       </property>
                      </widget>
                     </item>
-                    <item>
-                     <widget class="QPushButton" name="sizeWP_3">
-                      <property name="minimumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton#sizeWP{
-  background-color:red;
-  color:white;
-  border-top-right-radius:12px;
-  border-bottom-right-radius:12px;
-}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
                    </layout>
                   </item>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_17">
                     <item>
-                     <widget class="QPushButton" name="sizeWM_2">
+                     <widget class="QLabel" name="label_6">
                       <property name="minimumSize">
                        <size>
-                        <width>25</width>
+                        <width>0</width>
                         <height>25</height>
                        </size>
                       </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton#sizeWM{
-  background-color:red;
-  color:white;
-  border-top-left-radius:12px;
-  border-bottom-left-radius:12px;
-}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_6">
                       <property name="font">
                        <font>
                         <family>Microsoft YaHei UI</family>
@@ -1267,33 +1198,6 @@ QPushButton#sizeHP:pressed{
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="sizeWP_2">
-                      <property name="minimumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton#sizeWP{
-  background-color:red;
-  color:white;
-  border-top-right-radius:12px;
-  border-bottom-right-radius:12px;
-}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
                       </property>
                      </widget>
                     </item>
@@ -1350,7 +1254,7 @@ QPushButton#sizeHP:pressed{
                    <string notr="true"/>
                   </property>
                   <property name="text">
-                   <string>位  置</string>
+                   <string>中心点位置</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
@@ -1568,34 +1472,13 @@ QPushButton#posYP:pressed{
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_16">
                     <item>
-                     <widget class="QPushButton" name="posXM_3">
+                     <widget class="QLabel" name="label_12">
                       <property name="minimumSize">
                        <size>
-                        <width>25</width>
+                        <width>0</width>
                         <height>25</height>
                        </size>
                       </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton#posXM{
-  background-color:red;
-  color:white;
-  border-top-left-radius:12px;
-  border-bottom-left-radius:12px;
-}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_12">
                       <property name="font">
                        <font>
                         <family>Microsoft YaHei UI</family>
@@ -1613,66 +1496,18 @@ QPushButton#posYP:pressed{
                       </property>
                      </widget>
                     </item>
-                    <item>
-                     <widget class="QPushButton" name="posXP_3">
-                      <property name="minimumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton#posXP{
-  background-color:red;
-  color:white;
-  border-top-right-radius:12px;
-  border-bottom-right-radius:12px;
-}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
                    </layout>
                   </item>
                   <item>
                    <layout class="QHBoxLayout" name="horizontalLayout_15">
                     <item>
-                     <widget class="QPushButton" name="posXM_2">
+                     <widget class="QLabel" name="label_11">
                       <property name="minimumSize">
                        <size>
-                        <width>25</width>
+                        <width>0</width>
                         <height>25</height>
                        </size>
                       </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton#posXM{
-  background-color:red;
-  color:white;
-  border-top-left-radius:12px;
-  border-bottom-left-radius:12px;
-}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QLabel" name="label_11">
                       <property name="font">
                        <font>
                         <family>Microsoft YaHei UI</family>
@@ -1687,33 +1522,6 @@ QPushButton#posYP:pressed{
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-                    <item>
-                     <widget class="QPushButton" name="posXP_2">
-                      <property name="minimumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="maximumSize">
-                       <size>
-                        <width>25</width>
-                        <height>25</height>
-                       </size>
-                      </property>
-                      <property name="styleSheet">
-                       <string notr="true">QPushButton#posXP{
-  background-color:red;
-  color:white;
-  border-top-right-radius:12px;
-  border-bottom-right-radius:12px;
-}</string>
-                      </property>
-                      <property name="text">
-                       <string/>
                       </property>
                      </widget>
                     </item>

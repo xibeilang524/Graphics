@@ -11,6 +11,8 @@ MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent,
     QGraphicsTextItem(parent,scene)
 {
     property.isFont = true;
+    property.itemFont = QFont("黑体",15);
+    setFont(property.itemFont);
 
     setTextInteractionFlags(Qt::TextEditorInteraction);
     setFlag(QGraphicsItem::ItemIsMovable);
@@ -54,11 +56,10 @@ void MyTextItem::updateFont(QFont font)
 }
 
 //根据显示的数据来动态计算宽度
-int MyTextItem::getWidth()
+QRectF MyTextItem::getBoundRect()
 {
     QFontMetricsF metrics = property.itemFont;
-    QRectF rect = metrics.boundingRect(toPlainText());
-    return rect.width();
+    return metrics.boundingRect(toPlainText());
 }
 
 //QVariant MyTextItem::itemChange(GraphicsItemChange change, const QVariant &value)

@@ -34,6 +34,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         {
             MyTextItem  * item = new MyTextItem(CurrAddGraType,rightMenu);
             connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
+
             item->setPos(event->scenePos());
             addItem(item);
         }
@@ -42,6 +43,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
             MyItem * myItem = new MyItem(CurrAddGraType,rightMenu,this);
             myItem->setPos(event->scenePos());
             connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+            connect(myItem,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
             addItem(myItem);
         }
     }

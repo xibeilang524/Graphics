@@ -11,6 +11,8 @@
 **
 **修改历史:
 **20160908:wey:添加文字描述
+**             添加对控件拖拽实时显示位置，同时支持菜单栏设置控件位置
+**
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -54,8 +56,11 @@ public:
     QString getText();
     void setText(QString text);
 
+    void setPos(const QPointF &pos);
+
 signals:
     void updateSceneDraw();
+    void posHasChanged(MyRect);
 
 private slots:
     void procDragSize(PointType type);

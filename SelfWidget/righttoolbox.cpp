@@ -537,6 +537,20 @@ void RightToolBox::respInitToolBox(int seletedItemNum,ItemProperty property)
     }
 }
 
+//选中item移动时，实时更新位置信息
+void RightToolBox::respItemPosChanged(MyRect rect)
+{
+    currItemProperty.itemRect.width = rect.width;
+    currItemProperty.itemRect.height = rect.height;
+    currItemProperty.itemRect.x = rect.x;
+    currItemProperty.itemRect.y = rect.y;
+
+    ui->sizew->setText(QString::number(rect.width)+"px");
+    ui->sizeh->setText(QString::number(rect.height)+"px");
+    ui->posx->setText(QString::number(rect.x)+"px");
+    ui->posy->setText(QString::number(rect.y)+"px");
+}
+
 RightToolBox::~RightToolBox()
 {
     delete ui;
