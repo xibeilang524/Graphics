@@ -5,6 +5,9 @@ namespace Graphics {
 namespace Constants {
 
 const char FILE_ID[] = "Constants.File";
+const char SAVE_ID[] = "Constants.Save";
+const char OPEN_ID[] = "Constants.Open";
+const char CLEAR_ID[] = "Constants.Clear";
 const char EXIT_ID[] = "Constants.Exit";
 
 const char ROTATE_LEFT_ID[] = "Constants.RotateLeft";

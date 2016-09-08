@@ -48,7 +48,8 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     {
         QLineF centerLine(startItem->pos(), endItem->pos());
         QPolygonF endPolygon = endItem->polygon();
-        QPointF p1 = endPolygon.first() + endItem->pos();   //将polygons中item的坐标系转换成scene的坐标系
+        //将polygons中item的坐标系转换成scene的坐标系，支持即使控件旋转后依然可以保持箭头指向某一边
+        QPointF p1 = endItem->mapToScene(endPolygon.first());
         QPointF p2;
         QPointF intersectPoint;
         QLineF polyLine;
@@ -58,11 +59,11 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
             //最后一个需要和第一个进行连线
             if(i == endPolygon.count())
             {
-                p1 = endPolygon.first() + endItem->pos();
+                p1 = endItem->mapToScene(endPolygon.first());
             }
             else
             {
-                p2 = endPolygon.at(i) + endItem->pos();
+                p2 = endItem->mapToScene(endPolygon.at(i));
             }
 
             polyLine = QLineF(p1, p2);

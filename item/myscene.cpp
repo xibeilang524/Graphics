@@ -37,7 +37,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
             item->setPos(event->scenePos());
             addItem(item);
         }
-        else
+        else if(CurrAddGraType != GRA_NONE)
         {
             MyItem * myItem = new MyItem(CurrAddGraType,rightMenu,this);
             myItem->setPos(event->scenePos());

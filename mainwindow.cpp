@@ -46,13 +46,29 @@ void MainWindow::createActionAndMenus()
 {
     QMenu * fileMenu = menuBar()->addMenu("文件(&F)");
 
-    MyAction * fileAction = ActionManager::instance()->crateAction(Constants::FILE_ID,tr("File"));
-    ActionManager::instance()->registerAction(fileAction,this,SLOT(fileOpen()));
+    MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,"新建");
+    newAction->setShortcut(QKeySequence("Ctrl+N"));
+    ActionManager::instance()->registerAction(newAction,this,SLOT(fileOpen()));
 
-    MyAction * exitAction = ActionManager::instance()->crateAction(Constants::EXIT_ID,tr("Exit"));
+    MyAction * saveAction = ActionManager::instance()->crateAction(Constants::SAVE_ID,"保存");
+    saveAction->setShortcut(QKeySequence("Ctrl+S"));
+    ActionManager::instance()->registerAction(saveAction,this,SLOT(fileSave()));
+
+    MyAction * openAction = ActionManager::instance()->crateAction(Constants::OPEN_ID,"打开");
+    openAction->setShortcut(QKeySequence("Ctrl+O"));
+    ActionManager::instance()->registerAction(openAction,this,SLOT(fileOpen()));
+
+    MyAction * clearAction = ActionManager::instance()->crateAction(Constants::CLEAR_ID,"清空");
+    ActionManager::instance()->registerAction(clearAction,this,SLOT(fileClear()));
+
+    MyAction * exitAction = ActionManager::instance()->crateAction(Constants::EXIT_ID,"退出");
+    exitAction->setShortcut(QKeySequence("Ctrl+E"));
     ActionManager::instance()->registerAction(exitAction,this,SLOT(exitApp()));
 
-    fileMenu->addAction(fileAction);
+    fileMenu->addAction(newAction);
+    fileMenu->addAction(openAction);
+    fileMenu->addAction(saveAction);
+    fileMenu->addAction(clearAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
@@ -142,9 +158,28 @@ void MainWindow::createActionAndMenus()
     itemMenu->addAction(textAction);
 }
 
+//新建空白空间
+void MainWindow::fileNew()
+{
+
+}
+
+//打开本地保存的文件，会先提示是否要保存当前添加的控件
 void MainWindow::fileOpen()
 {
     scene->update();
+}
+
+//保存当前所添加的控件
+void MainWindow::fileSave()
+{
+
+}
+
+//清空当前的控件
+void MainWindow::fileClear()
+{
+
 }
 
 void MainWindow::exitApp()
@@ -227,9 +262,12 @@ void MainWindow::deleteItem()
         {
             tmp->getStartItem()->removeArrow(tmp);
             tmp->getEndItem()->removeArrow(tmp);
+            scene->removeItem(tmp);
             delete tmp;
         }
     }
+
+    selectedItems = scene->selectedItems();
 
     foreach (QGraphicsItem * item, selectedItems)
     {
@@ -241,6 +279,7 @@ void MainWindow::deleteItem()
             delete tmp;
         }
     }
+
     scene->update();
 }
 
