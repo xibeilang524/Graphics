@@ -34,6 +34,8 @@ public:
 
     GraphicsType getType(){return this->type;}
 
+    void setZValue(qreal z);
+
     QRectF getBoundRect();
 
     friend QDataStream & operator <<(QDataStream &,MyTextItem * item);

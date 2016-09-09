@@ -82,8 +82,15 @@ void MyTextItem::setProperty(ItemProperty property)
 
     setDefaultTextColor(property.fontColor);
     setFont(property.itemFont);
+    setZValue(property.zValue);
 
     setRotation(property.rotateDegree);
+}
+
+void MyTextItem::setZValue(qreal z)
+{
+    property.zValue = z;
+    QGraphicsTextItem::setZValue(z);
 }
 
 //从item中更新字体样式

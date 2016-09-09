@@ -383,7 +383,17 @@ void MainWindow::bringZItem()
              }
          }
      }
-    selectedItem->setZValue(zValue);
+    QString itemName = typeid(*selectedItem).name();
+    if(itemName == typeid(MyItem).name())
+    {
+        MyItem * tmp = dynamic_cast<MyItem *>(selectedItem);
+        tmp->setZValue(zValue);
+    }
+    else if(itemName == typeid(MyTextItem).name())
+    {
+        MyTextItem * tmp = dynamic_cast<MyTextItem *>(selectedItem);
+        tmp->setZValue(zValue);
+    }
 }
 
 //还需要从scene中删除item

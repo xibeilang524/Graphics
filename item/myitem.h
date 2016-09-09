@@ -59,6 +59,7 @@ public:
     void setText(QString text);
 
     void setPos(const QPointF &pos);
+    void setZValue(qreal z);
 
     friend QDataStream & operator <<(QDataStream &,MyItem * item);
     friend QDataStream & operator >>(QDataStream &,MyItem * item);

@@ -31,7 +31,8 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
            <<prop.isNeedBrush<<prop.itemBrush
             <<prop.isNeedBorder<<prop.itemPen<<prop.itemRect
              <<prop.alphaValue<<prop.rotateDegree
-              <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor;
+              <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor
+               <<prop.zValue;
 
     return stream;
 }
@@ -43,7 +44,8 @@ QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
            >>prop.isNeedBrush>>prop.itemBrush
             >>prop.isNeedBorder>>prop.itemPen>>prop.itemRect
              >>prop.alphaValue>>prop.rotateDegree
-              >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor;
+              >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor
+               >>prop.zValue;
     return stream;
 }
 
@@ -190,6 +192,12 @@ void MyItem::setPos(const QPointF &pos)
     property.itemRect.y = pos.y();
 
     QGraphicsPolygonItem::setPos(pos);
+}
+
+void MyItem::setZValue(qreal z)
+{
+    property.zValue = z;
+    QGraphicsPolygonItem::setZValue(z);
 }
 
 QString MyItem::getText()
@@ -438,7 +446,8 @@ void MyItem::setProperty(ItemProperty property)
     setBrush(property.itemBrush);
 
     setRotation(property.rotateDegree);
-
+    setZValue(property.zValue);
+    qDebug()<<"===property.zValue:"<<property.zValue;
     setPos(QPointF (property.itemRect.x,property.itemRect.y));
 
     //对于正方形和圆要保持宽高一致

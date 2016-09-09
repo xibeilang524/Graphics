@@ -61,6 +61,7 @@ struct ItemProperty
         rotateDegree = 0;
         itemPen.setWidth(1);
         alphaValue = 100;
+        zValue = 0;
 
         startItemID = QUuid::createUuid().toString();
     }
@@ -86,6 +87,8 @@ struct ItemProperty
 
     QFont  itemFont;
     QColor fontColor;        //字体颜色
+
+    float zValue;            //深度值
 };
 
 
