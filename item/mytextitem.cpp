@@ -44,8 +44,23 @@ MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent,
 void MyTextItem::focusOutEvent(QFocusEvent *event)
 {
     setTextInteractionFlags(Qt::NoTextInteraction);
+    property.content = toPlainText();
     emit textLostFocus(this);
+    property.itemRect.x = this->x();
+    property.itemRect.y = this->y();
+    property.itemRect.width = getBoundRect().width();
+    property.itemRect.height = getBoundRect().height();
     QGraphicsTextItem::focusOutEvent(event);
+}
+
+void MyTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    property.itemRect.x = this->x();
+    property.itemRect.y = this->y();
+    property.itemRect.width = getBoundRect().width();
+    property.itemRect.height = getBoundRect().height();
+    emit posHasChanged(property.itemRect);
+    QGraphicsTextItem::mouseMoveEvent(event);
 }
 
 void MyTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
@@ -65,6 +80,7 @@ void MyTextItem::setProperty(ItemProperty property)
 {
     this->property = property;
 
+    setDefaultTextColor(property.fontColor);
     setFont(property.itemFont);
 
     setRotation(property.rotateDegree);

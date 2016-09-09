@@ -5,6 +5,7 @@
 #include <QPen>
 #include <QFont>
 #include <QDataStream>
+#include <QUuid>
 
 enum ReturnType
 {
@@ -26,8 +27,7 @@ enum GraphicsType
     GRA_ELLIPSE,
     GRA_POLYGON,
     GRA_LINE,
-    GRA_TEXT,
-    GRA_ARROW
+    GRA_TEXT
 };
 
 //记录当前item在scene中的x、y、w、h值
@@ -61,7 +61,12 @@ struct ItemProperty
         rotateDegree = 0;
         itemPen.setWidth(1);
         alphaValue = 100;
+
+        startItemID = QUuid::createUuid().toString();
     }
+
+    QString startItemID;                  //在用于非直线的控件时，只用startItemId标识当前控件
+    QString endItemID;                    //在用于直线控件时，两个表示直线两端连接的控件
 
     friend QDataStream & operator <<(QDataStream &,ItemProperty & item);
     friend QDataStream & operator >>(QDataStream &,ItemProperty & item);

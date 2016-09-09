@@ -27,10 +27,11 @@ QDataStream & operator >>(QDataStream &stream,MyRect & rect)
 ////写入属性
 QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 {
-    stream<<prop.isNeedBrush<<prop.itemBrush
+    stream<<prop.startItemID<<prop.endItemID
+           <<prop.isNeedBrush<<prop.itemBrush
             <<prop.isNeedBorder<<prop.itemPen<<prop.itemRect
-               <<prop.alphaValue<<prop.rotateDegree
-                 <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor;
+             <<prop.alphaValue<<prop.rotateDegree
+              <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor;
 
     return stream;
 }
@@ -38,10 +39,11 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 ////读属性
 QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
 {
-    stream>>prop.isNeedBrush>>prop.itemBrush
+    stream>>prop.startItemID>>prop.endItemID
+           >>prop.isNeedBrush>>prop.itemBrush
             >>prop.isNeedBorder>>prop.itemPen>>prop.itemRect
-               >>prop.alphaValue>>prop.rotateDegree
-                 >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor;
+             >>prop.alphaValue>>prop.rotateDegree
+              >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor;
     return stream;
 }
 
@@ -150,7 +152,6 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 
     property.itemRect.width = boundRect.width();
     property.itemRect.height = boundRect.height();
-
 
     property.itemFont = QFont("黑体",15);
 
@@ -402,8 +403,6 @@ void MyItem::procDragSize(PointType type)
     tmpRect.setWidth(tmpRect.height());
 
     boundRect = tmpRect;
-
-//    qDebug()<<boundRect.width()<<"=="<<boundRect.height();
 
     updateRotateLinePos();
 }

@@ -39,8 +39,11 @@ MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     setFlag(QGraphicsItem::ItemIsSelectable, true);
 //    setFlag(QGraphicsItem::ItemIsMovable,true);
 
-    type = GRA_ARROW;
+    type = GRA_LINE;
     property.itemBrush = QBrush(Qt::black);
+    //直线保存两端控件的引用
+    property.startItemID = startItem->getProperty().startItemID;
+    property.endItemID = endItem->getProperty().startItemID;
 }
 
 QRectF MyArrow::boundingRect()const

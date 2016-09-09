@@ -34,6 +34,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         {
             MyTextItem  * item = new MyTextItem(CurrAddGraType,rightMenu);
             connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
+            connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
             item->setPos(event->scenePos());
             addItem(item);
@@ -70,17 +71,26 @@ void MyScene::addItem(QGraphicsItem *item)
     emit itemSizeChanged(items().size());
 }
 
-void MyScene::addItem(CutInfo cutInfo)
+void MyScene::addItem(CutInfo cutInfo, bool isCopy)
 {
     if(cutInfo.graphicsType == GRA_TEXT)
     {
         MyTextItem  * item = new MyTextItem(cutInfo.graphicsType,rightMenu);
         connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
+        connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
         item->setTextInteractionFlags(Qt::TextEditorInteraction);
         item->setProperty(cutInfo.itemProperty);
-        item->setPos(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y);
-        item->setPlainText(cutInfo.content);
+        if(isCopy)
+        {
+            item->setPos(SceneLastClickPoint);
+        }
+        else
+        {
+            item->setPos(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y);
+        }
+
+        item->setPlainText(cutInfo.itemProperty.content);
 
         addItem(item);
     }
@@ -88,13 +98,71 @@ void MyScene::addItem(CutInfo cutInfo)
     {
         MyItem * item = new MyItem(cutInfo.graphicsType,rightMenu,this);
         connect(item,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+        connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
         item->setText(cutInfo.content);
         item->setProperty(cutInfo.itemProperty);
-        item->setPos(QPointF(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y));
+        if(isCopy)
+        {
+            item->setPos(SceneLastClickPoint);
+        }
+        else
+        {
+            item->setPos(QPointF(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y));
+        }
+
+        if(!isCopy)
+        {
+            localItems.push_back(item);
+        }
 
         addItem(item);
     }
+    else if(cutInfo.graphicsType == GRA_LINE)
+    {
+        int startIndex = findItemById(localItems,cutInfo.itemProperty.startItemID);
+        int endIndex = findItemById(localItems,cutInfo.itemProperty.endItemID);
+
+        if(startIndex>=0&&startIndex<localItems.size() &&
+                endIndex>=0&&endIndex<localItems.size())
+        {
+            MyItem * startItem = localItems.at(startIndex);
+            MyItem * endItem = localItems.at(endIndex);
+
+            MyArrow *arrow = new MyArrow(startItem, endItem);
+
+            startItem->addArrow(arrow);
+            endItem->addArrow(arrow);
+            arrow->setZValue(-1000.0);
+
+            arrow->updatePosition();
+            addItem(arrow);
+        }
+    }
+}
+
+void MyScene::addItem(QList<CutInfo> &cutInfos)
+{
+    foreach (CutInfo cutInfo, cutInfos)
+    {
+        addItem(cutInfo);
+    }
+    localItems.clear();
+}
+
+int MyScene::findItemById(QList<MyItem *> &localItem,QString Id)
+{
+    int index = -1;
+
+    for (int i=0;i<localItem.size();i++)
+    {
+        if(localItem.at(i)->getProperty().startItemID == Id)
+        {
+            index = i;
+            break;
+        }
+    }
+    return index;
 }
 
 //É¾³ý×Ó¿Ø¼þ
@@ -157,13 +225,15 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         {
             MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
             MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
-            MyArrow *arrow = new MyArrow(startItem, endItem);
-//            arrow->setColor(Qt::red);
-            startItem->addArrow(arrow);
-            endItem->addArrow(arrow);
-            arrow->setZValue(-1000.0);
-            addItem(arrow);
-            arrow->updatePosition();
+            if(startItem && endItem)
+            {
+                MyArrow *arrow = new MyArrow(startItem, endItem);
+                startItem->addArrow(arrow);
+                endItem->addArrow(arrow);
+                arrow->setZValue(-1000.0);
+                addItem(arrow);
+                arrow->updatePosition();
+            }
         }
     }
     insertTmpLine = 0;

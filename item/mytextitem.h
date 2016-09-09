@@ -43,9 +43,11 @@ public:
 
 signals:
     void textLostFocus(MyTextItem *item);
+    void posHasChanged(MyRect);
 
 protected:
     void focusOutEvent(QFocusEvent *event);
+    void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 

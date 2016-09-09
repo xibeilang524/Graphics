@@ -19,6 +19,7 @@
 
 class QMenu;
 class MyTextItem;
+class MyItem;
 
 class MyScene : public QGraphicsScene
 {
@@ -26,7 +27,8 @@ class MyScene : public QGraphicsScene
 public:
     MyScene(QMenu * menu,QObject * parent = 0 );
     void addItem(QGraphicsItem *item);
-    void addItem(CutInfo cutInfo);
+    void addItem(CutInfo cutInfo,bool isCopy = false);
+    void addItem(QList<CutInfo> & cutInfos);
     void removeItem(QGraphicsItem *item);
     ~MyScene();
 
@@ -46,10 +48,13 @@ protected:
     void keyPressEvent(QKeyEvent *event);
 
 private:
+    int findItemById(QList<MyItem *> &localItem, QString Id);
+
     QMenu * rightMenu;
 
     QGraphicsLineItem * insertTmpLine;
 
+    QList<MyItem*> localItems;
 };
 
 #endif // MYSCENE_H

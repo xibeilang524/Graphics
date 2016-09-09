@@ -37,7 +37,7 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
     }
 
     QFile file(fileName);
-    if(!file.open(QFile::WriteOnly))
+    if(!file.open(QFile::ReadWrite))
     {
         return FILE_CANT_WRITE;
     }
@@ -73,7 +73,7 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
 ReturnType FileOperate::openFile(QString fileName,QList<CutInfo> &items)
 {
     QFile file(fileName);
-    if(!file.open(QFile::ReadOnly))
+    if(!file.open(QFile::ReadWrite))
     {
         return FILE_CANT_READ;
     }
@@ -84,6 +84,7 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo> &items)
     stream>>fileFlag;
     if(fileFlag != SaveFileHeadFlag)
     {
+        file.close();
         return FILE_ILLEGAL;
     }
 

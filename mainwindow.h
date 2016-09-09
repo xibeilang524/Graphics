@@ -12,6 +12,7 @@
 **             添加文字信息删除
 **             添加剪切、复制、粘贴
 **20160909:wey:添加控件的保存、打开(二进制文件)、增加文件头判断
+**             修复选中某个item，编辑完文字后，点击右侧工具栏，文字消失问题。
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -66,12 +67,14 @@ private slots:
     void sceneScaled(int currScale);
     void respPropertyUpdate(ItemProperty property);
     void respItemSizeChanged(int size);
-    
+
 private:
     void createActionAndMenus();
     void createSceneAndView();
     void createContextMenu();
     void createToolBar();
+    void createStatusBar();
+    void respShowStatusInfo(QString, int time = 2000);
 
     Ui::MainWindow *ui;
 

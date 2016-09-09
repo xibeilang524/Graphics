@@ -9,10 +9,10 @@
 #include <QComboBox>
 #include <QVBoxLayout>
 #include <QKeyEvent>
-#include <QMessageBox>
 #include <QClipboard>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QStatusBar>
 #include <QDebug>
 
 #include "actionmanager.h"
@@ -46,9 +46,12 @@ MainWindow::MainWindow(QWidget *parent) :
 
     createToolBar();
 
+    createStatusBar();
+
     showMaximized();
 
     respItemSizeChanged(0);
+
 }
 
 //创建窗口的菜单栏，绑定响应事件
@@ -199,6 +202,8 @@ void MainWindow::fileNew()
 //打开本地保存的文件，会先提示是否要保存当前添加的控件
 void MainWindow::fileOpen()
 {
+    respRestItemAction();
+
     if(scene->items().size()>0)
     {
         fileClear();
@@ -211,14 +216,13 @@ void MainWindow::fileOpen()
         ReturnType returnType = FileOperate::instance()->openFile(openFileName,cutInfos);
         if(returnType == FILE_ILLEGAL)
         {
-            QMessageBox::warning(this,"警告","文件格式不符，请重新选择！");
+            respShowStatusInfo("文件格式不符，请重新选择！");
         }
         else if(returnType == RETURN_OK)
         {
-            foreach (CutInfo cutInfo, cutInfos)
-            {
-                scene->addItem(cutInfo);
-            }
+            scene->addItem(cutInfos);
+
+            respShowStatusInfo("文件解析完成!");
         }
     }
     scene->update();
@@ -227,16 +231,24 @@ void MainWindow::fileOpen()
 //保存当前所添加的控件
 void MainWindow::fileSave()
 {
+    respRestItemAction();
+
     QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
     if(!saveFileName.isEmpty())
     {
-        FileOperate::instance()->saveFile(saveFileName,scene->items());
+        ReturnType  result = FileOperate::instance()->saveFile(saveFileName,scene->items());
+        if(result == RETURN_OK)
+        {
+            respShowStatusInfo("文件保存成功!");
+        }
     }
 }
 
 //清空当前的控件
 void MainWindow::fileClear()
 {
+    respRestItemAction();
+
     int result = QMessageBox::warning(this,"警告","是否清空场景的内容?",QMessageBox::Yes,QMessageBox::No);
     if(result == QMessageBox::Yes)
     {
@@ -308,7 +320,7 @@ void MainWindow::copyItem()
 
 void MainWindow::pasteItem()
 {
-    scene->addItem(cutTmpInfo);
+    scene->addItem(cutTmpInfo,true);
 }
 
 void MainWindow::rotateItem()
@@ -442,6 +454,9 @@ void MainWindow::editTextItem()
             textInput.exec();
 
             item->setText(textInput.getText());
+
+            //当修改文字后，需要重新将信息发送至右侧的工具栏。
+            emit initToolBox(selectedItems.size(),item->getProperty());
         }
     }
 }
@@ -598,7 +613,6 @@ void MainWindow::respPropertyUpdate(ItemProperty property)
 {
     if(scene->selectedItems().size() == 1)
     {
-
         QString itemName = typeid(*(scene->selectedItems().first())).name();
 
         if(itemName == typeid(MyItem).name())
@@ -686,6 +700,19 @@ void MainWindow::createToolBar()
     mySlider = new MySlider;
     connect(mySlider,SIGNAL(scaleView(int)),this,SLOT(sceneScaled(int)));
     sceneBar->addWidget(mySlider);
+}
+
+//创建状态栏
+void MainWindow::createStatusBar()
+{
+    QStatusBar * statusBar = new QStatusBar;
+    setStatusBar(statusBar);
+}
+
+//显示状态信息
+void MainWindow::respShowStatusInfo(QString text,int time)
+{
+    statusBar()->showMessage(text);
 }
 
 //切换视图缩放
