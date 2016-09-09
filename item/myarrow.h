@@ -15,6 +15,7 @@
 
 #include <QGraphicsLineItem>
 #include <QPolygonF>
+#include <QDataStream>
 
 #include "../Header.h"
 
@@ -37,11 +38,15 @@ public:
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
 
+    friend QDataStream & operator <<(QDataStream &,MyArrow * item);
+    friend QDataStream & operator >>(QDataStream &,MyArrow * item);
+
 private:
     MyItem  * startItem;
     MyItem  * endItem;
     QPolygonF arrowHead;
 
+    GraphicsType type;
     ItemProperty property;
 
     QRectF boundRect;

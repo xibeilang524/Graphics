@@ -4,6 +4,16 @@
 #include <QBrush>
 #include <QPen>
 #include <QFont>
+#include <QDataStream>
+
+enum ReturnType
+{
+    RETURN_OK,
+    FILE_NOT_EXIST,
+    FILE_CANT_READ,
+    FILE_CANT_WRITE,
+    FILE_ILLEGAL             //文件格式不合法
+};
 
 //当前添加的类型
 enum GraphicsType
@@ -30,6 +40,10 @@ struct MyRect
         width = 0;
         height = 0;
     }
+
+    friend QDataStream& operator <<(QDataStream &,MyRect & rect);
+    friend QDataStream& operator >>(QDataStream &,MyRect & rect);
+
     int x;
     int y;
     int width;
@@ -49,21 +63,26 @@ struct ItemProperty
         alphaValue = 100;
     }
 
+    friend QDataStream & operator <<(QDataStream &,ItemProperty & item);
+    friend QDataStream & operator >>(QDataStream &,ItemProperty & item);
+
     bool isNeedBrush;        //为ture时表示需要笔刷填充
     QBrush itemBrush;
 
     bool isNeedBorder;       //为true时表示是否需要边框
     QPen   itemPen;
 
-    QFont  itemFont;
-    QColor fontColor;        //字体颜色
-
     MyRect itemRect;
     int    alphaValue;       //透明度值
     int    rotateDegree;
 
     bool isFont;             //是否为字体
+    QString content;         //文字内容
+
+    QFont  itemFont;
+    QColor fontColor;        //字体颜色
 };
+
 
 //暂存一个剪切时的控件信息
 struct CutInfo

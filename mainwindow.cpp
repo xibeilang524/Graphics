@@ -11,6 +11,8 @@
 #include <QKeyEvent>
 #include <QMessageBox>
 #include <QClipboard>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QDebug>
 
 #include "actionmanager.h"
@@ -21,7 +23,10 @@
 #include "./SelfWidget/myslider.h"
 #include "./SelfWidget/righttoolbox.h"
 #include "./SelfWidget/mytextinput.h"
+#include "fileoperate.h"
 #include "global.h"
+
+#include "typeinfo.h"
 
 using namespace Graphics;
 
@@ -110,7 +115,6 @@ void MainWindow::createActionAndMenus()
     editTextAction->setShortcut(QKeySequence("Ctrl+T"));
     ActionManager::instance()->registerAction(editTextAction,this,SLOT(editTextItem()));
 
-
     editMenu->addAction(editTextAction);
     editMenu->addSeparator();
     editMenu->addAction(cutAction);
@@ -195,19 +199,45 @@ void MainWindow::fileNew()
 //打开本地保存的文件，会先提示是否要保存当前添加的控件
 void MainWindow::fileOpen()
 {
+    if(scene->items().size()>0)
+    {
+        fileClear();
+    }
+
+    QString openFileName = QFileDialog::getOpenFileName(this,"选择打开文件","","Files(*"+SaveFileSuffix+")");
+    if(!openFileName.isEmpty())
+    {
+        QList<CutInfo> cutInfos;
+        ReturnType returnType = FileOperate::instance()->openFile(openFileName,cutInfos);
+        if(returnType == FILE_ILLEGAL)
+        {
+            QMessageBox::warning(this,"警告","文件格式不符，请重新选择！");
+        }
+        else if(returnType == RETURN_OK)
+        {
+            foreach (CutInfo cutInfo, cutInfos)
+            {
+                scene->addItem(cutInfo);
+            }
+        }
+    }
     scene->update();
 }
 
 //保存当前所添加的控件
 void MainWindow::fileSave()
 {
-
+    QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
+    if(!saveFileName.isEmpty())
+    {
+        FileOperate::instance()->saveFile(saveFileName,scene->items());
+    }
 }
 
 //清空当前的控件
 void MainWindow::fileClear()
 {
-    int result = QMessageBox::warning(this,"警告","是否清空所有内容?",QMessageBox::Yes,QMessageBox::No);
+    int result = QMessageBox::warning(this,"警告","是否清空场景的内容?",QMessageBox::Yes,QMessageBox::No);
     if(result == QMessageBox::Yes)
     {
         scene->clear();
@@ -227,25 +257,24 @@ void MainWindow::cutItem()
 
     if(selectedItems.size() == 1)
     {
-        MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+        QString itemName = typeid(*(selectedItems.first())).name();
 
-        if(item)
+        if(itemName == typeid(MyItem).name())
         {
+            MyItem * item = dynamic_cast<MyItem *>(scene->selectedItems().first());
+
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->getText();
             deleteItem();
         }
-        else
+        else if(itemName == typeid(MyTextItem).name())
         {
             MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
 
-            if(item)
-            {
-                cutTmpInfo.graphicsType = item->getType();
-                cutTmpInfo.itemProperty = item->getProperty();
-                delete item;
-            }
+            cutTmpInfo.graphicsType = item->getType();
+            cutTmpInfo.itemProperty = item->getProperty();
+            delete item;
         }
     }
 }
@@ -256,49 +285,30 @@ void MainWindow::copyItem()
 
     if(selectedItems.size() == 1)
     {
-        MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+        QString itemName = typeid(*(selectedItems.first())).name();
 
-        if(item)
+        if(itemName == typeid(MyItem).name())
         {
+            MyItem * item = dynamic_cast<MyItem *>(scene->selectedItems().first());
+
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->getText();
         }
-        else
+        else if(itemName == typeid(MyTextItem).name())
         {
             MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
 
-            if(item)
-            {
-                cutTmpInfo.graphicsType = item->getType();
-                cutTmpInfo.itemProperty = item->getProperty();
-                cutTmpInfo.content = item->toPlainText();
-            }
+            cutTmpInfo.graphicsType = item->getType();
+            cutTmpInfo.itemProperty = item->getProperty();
+            cutTmpInfo.content = item->toPlainText();
         }
     }
 }
 
 void MainWindow::pasteItem()
 {
-    if(cutTmpInfo.graphicsType == GRA_TEXT)
-    {
-        MyTextItem  * item = new MyTextItem(cutTmpInfo.graphicsType,rightMenu);
-        item->setTextInteractionFlags(Qt::TextEditorInteraction);
-        item->setProperty(cutTmpInfo.itemProperty);
-        connect(item,SIGNAL(textLostFocus(MyTextItem *)),scene,SLOT(respTextLostFocus(MyTextItem *)));
-        item->setPos(SceneLastClickPoint);
-        item->setPlainText(cutTmpInfo.content);
-        scene->addItem(item);
-    }
-    else if(cutTmpInfo.graphicsType != GRA_NONE && cutTmpInfo.graphicsType != GRA_LINE)
-    {
-        MyItem * item = new MyItem(cutTmpInfo.graphicsType,rightMenu,scene);
-        item->setText(cutTmpInfo.content);
-        item->setProperty(cutTmpInfo.itemProperty);
-        item->setPos(SceneLastClickPoint);
-        connect(item,SIGNAL(updateSceneDraw()),scene,SLOT(update()));
-        scene->addItem(item);
-    }
+    scene->addItem(cutTmpInfo);
 }
 
 void MainWindow::rotateItem()
@@ -371,12 +381,15 @@ void MainWindow::deleteItem()
 
     foreach(QGraphicsItem * item, selectedItems)
     {
-        MyArrow * tmp = dynamic_cast<MyArrow *>(item);
-        if(tmp)
+        QString itemName = typeid(*item).name();
+        if(itemName == typeid(MyArrow).name())
         {
+            MyArrow * tmp = dynamic_cast<MyArrow *>(item);
+
             tmp->getStartItem()->removeArrow(tmp);
             tmp->getEndItem()->removeArrow(tmp);
             scene->removeItem(tmp);
+
             delete tmp;
         }
     }
@@ -385,9 +398,10 @@ void MainWindow::deleteItem()
 
     foreach (QGraphicsItem * item, selectedItems)
     {
-        MyItem * tmp = dynamic_cast<MyItem *>(item);
-        if(tmp)
+        QString itemName = typeid(*item).name();
+        if(itemName == typeid(MyItem).name())
         {
+            MyItem * tmp = dynamic_cast<MyItem *>(item);
             tmp->removeArrows();
             scene->removeItem(tmp);
             delete tmp;
@@ -398,9 +412,10 @@ void MainWindow::deleteItem()
 
     foreach (QGraphicsItem * item, selectedItems)
     {
-        MyTextItem * tmp = dynamic_cast<MyTextItem *>(item);
-        if(tmp)
+        QString itemName = typeid(*item).name();
+        if(itemName == typeid(MyTextItem).name())
         {
+            MyTextItem * tmp = dynamic_cast<MyTextItem *>(item);
             scene->removeItem(tmp);
             delete tmp;
         }
@@ -415,9 +430,12 @@ void MainWindow::editTextItem()
     QList<QGraphicsItem *> selectedItems = scene->selectedItems();
     if(selectedItems.size() == 1)
     {
-        MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
-        if(item)
+        QString itemName = typeid(*(selectedItems.first())).name();
+
+        if(itemName == typeid(MyItem).name())
         {
+            MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+
             MyTextInput textInput(this);
 
             textInput.setTex(item->getText());
@@ -534,30 +552,22 @@ void MainWindow::updateActions()
         ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
 
-        MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
+        QString itemName = typeid(*(scene->selectedItems().first())).name();
 
-        if(myItem)
+        if(itemName == typeid(MyItem).name())
         {
+            MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
             property = myItem->getProperty();
         }
-        //为text模式
-        else
+        else if(itemName == typeid(MyTextItem).name())
         {
             MyTextItem * textItem = dynamic_cast<MyTextItem *>(scene->selectedItems().first());
-            if(textItem)
-            {
-                property = textItem->getProperty();
-            }
-            //箭头模式
-            else
-            {
-                MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
-                if(arrowItem)
-                {
-                    qDebug()<< "==========";
-                    property = arrowItem->getProperty();
-                }
-            }
+            property = textItem->getProperty();
+        }
+        else if(itemName == typeid(MyArrow).name())
+        {
+            MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
+            property = arrowItem->getProperty();
         }
         //        qDebug()<< myItem->pos().x()<<"==="<<myItem->pos().y();
 //        qDebug()<< myItem->scenePos().x()<<"========="<<myItem->scenePos().y();
@@ -588,27 +598,23 @@ void MainWindow::respPropertyUpdate(ItemProperty property)
 {
     if(scene->selectedItems().size() == 1)
     {
-        MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
-        if(myItem)
+
+        QString itemName = typeid(*(scene->selectedItems().first())).name();
+
+        if(itemName == typeid(MyItem).name())
         {
+            MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
             myItem->setProperty(property);
         }
-        else
+        else if(itemName == typeid(MyTextItem).name())
         {
             MyTextItem * textItem = dynamic_cast<MyTextItem *>(scene->selectedItems().first());
-            if(textItem)
-            {
-                textItem->setProperty(property);
-            }
-            //箭头模式
-            else
-            {
-                MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
-                if(arrowItem)
-                {
-                   arrowItem->setProperty(property);
-                }
-            }
+            textItem->setProperty(property);
+        }
+        else if(itemName == typeid(MyArrow).name())
+        {
+            MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
+            arrowItem->setProperty(property);
         }
 
         scene->update();

@@ -26,6 +26,7 @@ class MyScene : public QGraphicsScene
 public:
     MyScene(QMenu * menu,QObject * parent = 0 );
     void addItem(QGraphicsItem *item);
+    void addItem(CutInfo cutInfo);
     void removeItem(QGraphicsItem *item);
     ~MyScene();
 

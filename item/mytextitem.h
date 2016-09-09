@@ -14,6 +14,7 @@
 
 #include <QGraphicsTextItem>
 #include <QObject>
+#include <QDataStream>
 
 class QMenu;
 
@@ -35,6 +36,9 @@ public:
 
     QRectF getBoundRect();
 
+    friend QDataStream & operator <<(QDataStream &,MyTextItem * item);
+    friend QDataStream & operator >>(QDataStream &,MyTextItem * item);
+
 //    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 signals:
@@ -47,7 +51,6 @@ protected:
 
 private:
     GraphicsType type;
-
     ItemProperty property;
 
     QMenu * menu;

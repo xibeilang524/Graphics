@@ -70,6 +70,33 @@ void MyScene::addItem(QGraphicsItem *item)
     emit itemSizeChanged(items().size());
 }
 
+void MyScene::addItem(CutInfo cutInfo)
+{
+    if(cutInfo.graphicsType == GRA_TEXT)
+    {
+        MyTextItem  * item = new MyTextItem(cutInfo.graphicsType,rightMenu);
+        connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
+
+        item->setTextInteractionFlags(Qt::TextEditorInteraction);
+        item->setProperty(cutInfo.itemProperty);
+        item->setPos(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y);
+        item->setPlainText(cutInfo.content);
+
+        addItem(item);
+    }
+    else if(cutInfo.graphicsType != GRA_NONE && cutInfo.graphicsType != GRA_LINE)
+    {
+        MyItem * item = new MyItem(cutInfo.graphicsType,rightMenu,this);
+        connect(item,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+
+        item->setText(cutInfo.content);
+        item->setProperty(cutInfo.itemProperty);
+        item->setPos(QPointF(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y));
+
+        addItem(item);
+    }
+}
+
 //É¾³ý×Ó¿Ø¼þ
 void MyScene::removeItem(QGraphicsItem *item)
 {

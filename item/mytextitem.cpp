@@ -5,6 +5,28 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QDebug>
 
+QDataStream & operator <<(QDataStream &stream,MyTextItem * item)
+{
+    int type = item->type;
+
+    stream<<type<<item->property;
+
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream &stream,MyTextItem * item)
+{
+    int type;
+    ItemProperty prop;
+
+    stream>>type>>prop;
+    item->type = (GraphicsType)type;
+
+    item->setProperty(prop);
+
+    return stream;
+}
+
 MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent, QGraphicsScene *scene):
     menu(menu),
     type(itemType),

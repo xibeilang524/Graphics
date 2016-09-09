@@ -31,6 +31,8 @@ class QMenu;
 class MyArrow;
 class MyTextItem;
 
+#include <QDataStream>
+
 #include "dragpoint.h"
 #include "rotateline.h"
 #include "../Header.h"
@@ -57,6 +59,9 @@ public:
     void setText(QString text);
 
     void setPos(const QPointF &pos);
+
+    friend QDataStream & operator <<(QDataStream &,MyItem * item);
+    friend QDataStream & operator >>(QDataStream &,MyItem * item);
 
 signals:
     void updateSceneDraw();

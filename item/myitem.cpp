@@ -11,6 +11,62 @@
 #include "myarrow.h"
 #include "mytextitem.h"
 
+//对MyRect的输出进行重构
+QDataStream & operator <<(QDataStream &stream,MyRect & rect)
+{
+    stream<<rect.x<<rect.y<<rect.width<<rect.height;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream &stream,MyRect & rect)
+{
+    stream>>rect.x>>rect.y>>rect.width>>rect.height;
+    return stream;
+}
+
+////写入属性
+QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
+{
+    stream<<prop.isNeedBrush<<prop.itemBrush
+            <<prop.isNeedBorder<<prop.itemPen<<prop.itemRect
+               <<prop.alphaValue<<prop.rotateDegree
+                 <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor;
+
+    return stream;
+}
+
+////读属性
+QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
+{
+    stream>>prop.isNeedBrush>>prop.itemBrush
+            >>prop.isNeedBorder>>prop.itemPen>>prop.itemRect
+               >>prop.alphaValue>>prop.rotateDegree
+                 >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor;
+    return stream;
+}
+
+QDataStream & operator <<(QDataStream &stream,MyItem * item)
+{
+    int type = item->currItemType;
+
+    stream<<type<<item->property;
+
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream &stream,MyItem * item)
+{
+    int type;
+    ItemProperty prop;
+
+    stream>>type>>prop;
+    item->currItemType = (GraphicsType)type;
+
+    item->setProperty(prop);
+
+    return stream;
+}
+
 MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, QObject *parent1, QGraphicsItem *parent2):
     currItemType(itemType),
     rightMenu(menu),
@@ -127,7 +183,6 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     procResizeItem();
 }
 
-
 void MyItem::setPos(const QPointF &pos)
 {
     property.itemRect.x = pos.x();
@@ -144,6 +199,7 @@ QString MyItem::getText()
 //更新文字信息，同时更新textItem在item中的位置
 void MyItem::setText(QString text)
 {
+    property.content = text;
     myTextItem->setPlainText(text);
     myTextItem->setPos(-myTextItem->getBoundRect().width()/2,-myTextItem->getBoundRect().height()/2);
 }
@@ -420,6 +476,7 @@ void MyItem::setProperty(ItemProperty property)
     procResizeItem();
     updateRotateLinePos();
 
+    myTextItem->setPlainText(property.content);
     myTextItem->updateFont(property.itemFont);
     myTextItem->setDefaultTextColor(property.fontColor);
     setText(myTextItem->toPlainText());

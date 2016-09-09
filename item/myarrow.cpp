@@ -9,6 +9,28 @@
 
 const qreal Pi = 3.14;
 
+QDataStream & operator <<(QDataStream &stream,MyArrow * item)
+{
+    int type = item->type;
+
+    stream<<type<<item->property;
+
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream &stream,MyArrow * item)
+{
+    int type;
+    ItemProperty prop;
+
+    stream>>type>>prop;
+    item->type = (GraphicsType)type;
+
+    item->setProperty(prop);
+
+    return stream;
+}
+
 MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     startItem(startItem),
     endItem(endItem),
@@ -17,6 +39,7 @@ MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     setFlag(QGraphicsItem::ItemIsSelectable, true);
 //    setFlag(QGraphicsItem::ItemIsMovable,true);
 
+    type = GRA_ARROW;
     property.itemBrush = QBrush(Qt::black);
 }
 
