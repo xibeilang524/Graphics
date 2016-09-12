@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    setWindowTitle("模型工具");
 
     rightMenu = NULL;
 
@@ -165,6 +166,10 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(lineAction,this,SLOT(addItem()),true);
     lineAction->setType(GRA_LINE);
 
+    MyAction * vectorLineAction = ActionManager::instance()->crateAction(Constants::VECTOR_LINE_ID,QIcon(":/images/vectorLine.png"),"连接线");
+    ActionManager::instance()->registerAction(vectorLineAction,this,SLOT(addItem()),true);
+    vectorLineAction->setType(GRA_VECTOR_LINE);
+
     MyAction * textAction = ActionManager::instance()->crateAction(Constants::TEXT_ID,QIcon(":/images/text.png"),"文字");
     ActionManager::instance()->registerAction(textAction,this,SLOT(addItem()),true);
     textAction->setType(GRA_TEXT);
@@ -179,8 +184,9 @@ void MainWindow::createActionAndMenus()
     itemGroup->addAction(circleAction);
     itemGroup->addAction(ellipseAction);
     itemGroup->addAction(polygonAction);
-    itemGroup->addAction(lineAction);
     itemGroup->addAction(textAction);
+    itemGroup->addAction(lineAction);
+    itemGroup->addAction(vectorLineAction);
 
     itemMenu->addAction(arrowAction);
     itemMenu->addAction(squareAction);
@@ -189,8 +195,9 @@ void MainWindow::createActionAndMenus()
     itemMenu->addAction(circleAction);
     itemMenu->addAction(ellipseAction);
     itemMenu->addAction(polygonAction);
-    itemMenu->addAction(lineAction);
     itemMenu->addAction(textAction);
+    itemMenu->addAction(lineAction);
+    itemMenu->addAction(vectorLineAction);
 }
 
 //新建空白空间
@@ -682,8 +689,9 @@ void MainWindow::createToolBar()
     itemBar->addAction(ActionManager::instance()->action(Constants::CIRCLE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::ELLIPSE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::POLYGON_ID));
-    itemBar->addAction(ActionManager::instance()->action(Constants::LINE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::TEXT_ID));
+    itemBar->addAction(ActionManager::instance()->action(Constants::LINE_ID));
+    itemBar->addAction(ActionManager::instance()->action(Constants::VECTOR_LINE_ID));
 
     QToolBar * editBar = addToolBar("Edit");
     editBar->addAction(ActionManager::instance()->action(Constants::CUT_ID));

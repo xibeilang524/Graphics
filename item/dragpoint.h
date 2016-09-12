@@ -30,7 +30,7 @@ public:
 
 signals:
     void pointPosChanged(PointType);
-    void currMouseState(MouseType);
+    void currMouseState(MouseType,PointType,QPointF);
     void resizeItemSize();
 
 protected:

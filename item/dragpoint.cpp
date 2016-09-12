@@ -19,14 +19,14 @@ DragPoint::DragPoint(const PointType pointType, MyItem *parent):
 
     setFlags(QGraphicsItem::ItemIsSelectable |
              QGraphicsItem::ItemSendsGeometryChanges |
-             QGraphicsItem::ItemIsFocusable |
-             QGraphicsItem::ItemIsMovable);
+             QGraphicsItem::ItemIsFocusable
+             /*QGraphicsItem::ItemIsMovable*/);
 
     setAcceptHoverEvents(true);
 
     connect(this,SIGNAL(pointPosChanged(PointType)),parent,SLOT(procDragSize(PointType)));
     connect(this,SIGNAL(resizeItemSize()),parent,SLOT(procResizeItem()));
-    connect(this,SIGNAL(currMouseState(MouseType)),parent,SLOT(procMouseState(MouseType)));
+    connect(this,SIGNAL(currMouseState(MouseType,PointType,QPointF)),parent,SLOT(procMouseState(MouseType,PointType,QPointF)));
 }
 
 void DragPoint::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
@@ -90,15 +90,16 @@ QVariant DragPoint::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void DragPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
+//    qDebug()<<"===mousePressEvent*****====="<<event->pos().x()<<"__"<<event->pos().y();
     isPressed = true;
-    emit currMouseState(MOUSE_PRESS);
+    emit currMouseState(MOUSE_PRESS,pointType,event->pos());
     QGraphicsItem::mousePressEvent(event);
 }
 
 void DragPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-//    qDebug()<<"===mouseMoveEvent====="<<event->pos().x()<<"__"<<event->pos().y();
-    emit currMouseState(MOUSE_MOVE);
+    qDebug()<<"===mouseMoveEvent====="<<event->pos().x()<<"__"<<event->pos().y();
+    emit currMouseState(MOUSE_MOVE,pointType,event->pos());
     QGraphicsItem::mouseMoveEvent(event);
 }
 
@@ -106,6 +107,6 @@ void DragPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     isPressed = false;
     emit resizeItemSize();
-    emit currMouseState(MOUSE_RELEASE);
+    emit currMouseState(MOUSE_RELEASE,pointType,event->pos());
     QGraphicsItem::mouseReleaseEvent(event);
 }

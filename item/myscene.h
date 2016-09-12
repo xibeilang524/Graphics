@@ -20,6 +20,7 @@
 class QMenu;
 class MyTextItem;
 class MyItem;
+class MyPathItem;
 
 class MyScene : public QGraphicsScene
 {
@@ -53,6 +54,7 @@ private:
     QMenu * rightMenu;
 
     QGraphicsLineItem * insertTmpLine;
+    MyPathItem * insertTmpPath;
 
     QList<MyItem*> localItems;
 };

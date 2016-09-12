@@ -15,7 +15,6 @@
         <file>images/rectange.png</file>
         <file>images/roundedrect.png</file>
         <file>images/vectorbox.png</file>
-        <file>images/vectorlin.png</file>
         <file>images/diamonds.png</file>
         <file>images/text.png</file>
         <file>images/new.png</file>
@@ -26,5 +25,6 @@
         <file>images/cut.png</file>
         <file>images/save.png</file>
         <file>images/editText.png</file>
+        <file>images/vectorLine.png</file>
     </qresource>
 </RCC>

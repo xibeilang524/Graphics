@@ -9,6 +9,7 @@
 #include "myitem.h"
 #include "myarrow.h"
 #include "mytextitem.h"
+#include "mypathitem.h"
 
 MyScene::MyScene(QMenu *menu, QObject * parent):
     rightMenu(menu),
@@ -16,7 +17,7 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
 {
     CurrAddGraType =  GRA_NONE;
     insertTmpLine = NULL;
-
+    insertTmpPath = NULL;
 }
 
 void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -39,6 +40,13 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
             item->setPos(event->scenePos());
             addItem(item);
         }
+        else if(CurrAddGraType == GRA_VECTOR_LINE)
+        {
+//            insertTmpPath = new MyPathItem;
+//            insertTmpPath->setPen(QPen(Qt::blue,2));
+//            insertTmpPath->setPos(event->screenPos());
+//            addItem(insertTmpPath);
+        }
         else if(CurrAddGraType != GRA_NONE)
         {
             MyItem * myItem = new MyItem(CurrAddGraType,rightMenu,this);
@@ -54,13 +62,87 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         emit resetItemAction();
     }
 
-    if(CurrAddGraType != GRA_NONE && CurrAddGraType != GRA_LINE)
+    if(CurrAddGraType != GRA_NONE && CurrAddGraType != GRA_LINE && CurrAddGraType != GRA_VECTOR_LINE)
     {
         CurrAddGraType = GRA_NONE;
         emit resetItemAction();
     }
 
     QGraphicsScene::mousePressEvent(event);
+}
+
+void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(CurrAddGraType == GRA_LINE && insertTmpLine)
+    {
+        QLineF newLine(insertTmpLine->line().p1(), event->scenePos());
+        insertTmpLine->setLine(newLine);
+    }
+    else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
+    {
+        QPainterPath path;
+        path.moveTo(0,0);
+        path.lineTo(event->scenePos());
+        insertTmpPath->setPath(path);
+        qDebug()<<event->scenePos();
+    }
+    else
+    {
+        QGraphicsScene::mouseMoveEvent(event);
+    }
+}
+
+void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(CurrAddGraType == GRA_LINE && insertTmpLine)
+    {
+        QList<QGraphicsItem *> startItems = items(insertTmpLine->line().p1());
+        if (startItems.count() && startItems.first() == insertTmpLine)
+        {
+            startItems.removeFirst();
+        }
+        QList<QGraphicsItem *> endItems = items(insertTmpLine->line().p2());
+        if (endItems.count() && endItems.first() == insertTmpLine)
+        {
+            endItems.removeFirst();
+        }
+
+        removeItem(insertTmpLine);
+        delete insertTmpLine;
+
+        if (startItems.count() > 0 && endItems.count() > 0 &&
+//            startItems.first()->type() == DiagramItem::Type &&
+//            endItems.first()->type() == DiagramItem::Type &&
+            startItems.first() != endItems.first())
+        {
+            MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
+            MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
+            if(startItem && endItem)
+            {
+                MyArrow *arrow = new MyArrow(startItem, endItem);
+                startItem->addArrow(arrow);
+                endItem->addArrow(arrow);
+                arrow->setZValue(-1000.0);
+                addItem(arrow);
+                arrow->updatePosition();
+            }
+        }
+    }
+    else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
+    {
+
+    }
+    insertTmpLine = 0;
+    insertTmpPath = NULL;
+    QGraphicsScene::mouseReleaseEvent(event);
+}
+
+void MyScene::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Delete)
+    {
+        emit deleteKeyPress();
+    }
 }
 
 //Ìí¼Ó×Ó¿Ø¼þ
@@ -187,66 +269,7 @@ void MyScene::respTextLostFocus(MyTextItem *item)
     }
 }
 
-void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
-{
-    if(CurrAddGraType == GRA_LINE && insertTmpLine)
-    {
-        QLineF newLine(insertTmpLine->line().p1(), event->scenePos());
-        insertTmpLine->setLine(newLine);
-    }
-    else
-    {
-        QGraphicsScene::mouseMoveEvent(event);
-    }
-}
 
-void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
-{
-    if(CurrAddGraType == GRA_LINE && insertTmpLine)
-    {
-        QList<QGraphicsItem *> startItems = items(insertTmpLine->line().p1());
-        if (startItems.count() && startItems.first() == insertTmpLine)
-        {
-            startItems.removeFirst();
-        }
-        QList<QGraphicsItem *> endItems = items(insertTmpLine->line().p2());
-        if (endItems.count() && endItems.first() == insertTmpLine)
-        {
-            endItems.removeFirst();
-        }
-
-        removeItem(insertTmpLine);
-        delete insertTmpLine;
-
-        if (startItems.count() > 0 && endItems.count() > 0 &&
-//            startItems.first()->type() == DiagramItem::Type &&
-//            endItems.first()->type() == DiagramItem::Type &&
-            startItems.first() != endItems.first())
-        {
-            MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
-            MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
-            if(startItem && endItem)
-            {
-                MyArrow *arrow = new MyArrow(startItem, endItem);
-                startItem->addArrow(arrow);
-                endItem->addArrow(arrow);
-                arrow->setZValue(-1000.0);
-                addItem(arrow);
-                arrow->updatePosition();
-            }
-        }
-    }
-    insertTmpLine = 0;
-    QGraphicsScene::mouseReleaseEvent(event);
-}
-
-void MyScene::keyPressEvent(QKeyEvent *event)
-{
-    if(event->key() == Qt::Key_Delete)
-    {
-        emit deleteKeyPress();
-    }
-}
 
 MyScene::~MyScene()
 {

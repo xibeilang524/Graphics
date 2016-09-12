@@ -27,6 +27,7 @@ enum GraphicsType
     GRA_ELLIPSE,
     GRA_POLYGON,
     GRA_LINE,
+    GRA_VECTOR_LINE,
     GRA_TEXT
 };
 

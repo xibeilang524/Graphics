@@ -5,7 +5,8 @@ HEADERS += \
     item/myarrow.h \
     item/dragpoint.h \
     item/ItemHeader.h \
-    item/mytextitem.h
+    item/mytextitem.h \
+    item/mypathitem.h
 
 SOURCES += \
     item/rotateline.cpp \
@@ -13,4 +14,5 @@ SOURCES += \
     item/myitem.cpp \
     item/myarrow.cpp \
     item/dragpoint.cpp \
-    item/mytextitem.cpp
+    item/mytextitem.cpp \
+    item/mypathitem.cpp

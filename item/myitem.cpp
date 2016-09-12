@@ -7,11 +7,12 @@
 #include <QMenu>
 #include <QDebug>
 #include <QGraphicsScene>
+#include <QPointF>
 
 #include "myarrow.h"
 #include "mytextitem.h"
 
-//对MyRect的输出进行重构
+//对MyRect的输出进行重载
 QDataStream & operator <<(QDataStream &stream,MyRect & rect)
 {
     stream<<rect.x<<rect.y<<rect.width<<rect.height;
@@ -169,6 +170,11 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     rightTopPoint = new DragPoint(TOP_RIGHT,this);
     leftBottomPoint = new DragPoint(BOTTOM_LEFT,this);
     rightBottomPoint = new DragPoint(BOTTOM_RIGHT,this);
+
+    topPoint = new DragPoint(TOP_MIDDLE,this);
+    leftPoint = new DragPoint(MIDDLE_LEFT,this);
+    rightPoint = new DragPoint(MIDDLE_RIGHT,this);
+    bottomPoint = new DragPoint(BOTTOM_MIDDLE,this);
 
     rotateLine = new RotateLine(this);
     connect(rotateLine,SIGNAL(rotateItem(int)),this,SLOT(procRotate(int)));
@@ -328,6 +334,11 @@ void MyItem::setDragPointVisible(bool flag)
     leftBottomPoint->setVisible(flag);
     rightBottomPoint->setVisible(flag);
 
+    topPoint->setVisible(flag);
+    leftPoint->setVisible(flag);
+    rightPoint->setVisible(flag);
+    bottomPoint->setVisible(flag);
+
     rotateLine->setVisible(flag);
 }
 
@@ -415,14 +426,118 @@ void MyItem::procDragSize(PointType type)
     updateRotateLinePos();
 }
 
-void MyItem::procMouseState(MouseType type)
+void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 {
     currMouseType = type;
-    if(currMouseType == MOUSE_RELEASE)
+
+    if(currMouseType == MOUSE_PRESS)
+    {
+        startPressPoint = currPos;
+    }
+    else if(currMouseType == MOUSE_MOVE)
+    {
+        qreal leftTopX = mapToScene(boundRect.topLeft()).x();
+        qreal leftTopY = mapToScene(boundRect.topLeft()).y();
+
+        qreal rightBottomX = mapToScene(boundRect.bottomRight()).x();
+        qreal rightBottomY = mapToScene(boundRect.bottomRight()).y();
+
+        qreal w = boundRect.width();
+        qreal h = boundRect.height();
+
+        //鼠标移动当前坐标值
+        qreal px = currPos.x();
+        qreal py = currPos.y();
+        //移动后x、y、w、h
+        qreal tmpX,tmpY,tmpW,tmpH;
+        //移动后中心点的x、y
+        qreal centerX,centerY;
+
+        switch(pointType)
+        {
+            case MIDDLE_RIGHT:
+                    switch(currItemType)
+                    {
+                        case GRA_RECT:
+                            tmpW = w + px;
+                            tmpX = tmpW/2;
+                            tmpY = h/2;
+                            centerX = leftTopX + tmpX;
+                            centerY = leftTopY + tmpY;
+                            prepareGeometryChange();
+                            boundRect = QRectF(-tmpX,-tmpY,tmpW,h);
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+
+                        break;
+                    }
+                    break;
+            case MIDDLE_LEFT:
+                    switch(currItemType)
+                    {
+                        case GRA_RECT:
+                            tmpW = w - px;
+                            tmpX = tmpW/2;
+                            tmpY = h/2;
+                            centerX = rightBottomX - tmpW/2;
+                            centerY = rightBottomY - tmpY;
+                            prepareGeometryChange();
+                            boundRect = QRectF(-tmpX,-tmpY,tmpW,h);
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+
+                        break;
+                    }
+                    break;
+            case TOP_MIDDLE:
+                    switch(currItemType)
+                    {
+                        case GRA_RECT:
+                            tmpH = h - py;
+                            tmpX = w/2;
+                            tmpY = tmpH/2;
+                            centerX = rightBottomX - w/2;
+                            centerY = rightBottomY - tmpH/2;
+                            prepareGeometryChange();
+                            boundRect = QRectF(-tmpX,-tmpY,w,tmpH);
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+
+                        break;
+                    }
+                    break;
+            case BOTTOM_MIDDLE:
+                    switch(currItemType)
+                    {
+                        case GRA_RECT:
+                            tmpH = h + py;
+                            tmpX = w/2;
+                            tmpY = tmpH/2;
+                            centerX = leftTopX + tmpX;
+                            centerY = leftTopY + tmpY;
+                            prepareGeometryChange();
+                            boundRect = QRectF(-tmpX,-tmpY,w,tmpH);
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+
+                        break;
+                    }
+                    break;
+            default:
+                    break;
+        }
+        qDebug()<<tmpH<<"_"<<w<<"_"<<rightBottomX<<"_"<<rightBottomY<<"_"<<h<<"_"<<py;
+        setPos(QPointF(centerX,centerY));
+        setPolygon(itemPolygon);
+        procResizeItem();
+    }
+    else if(currMouseType == MOUSE_RELEASE)
     {
         setSelected(true);
-//        isNeedBorder = false;
-//        update();
     }
 }
 
@@ -432,6 +547,11 @@ void MyItem::procResizeItem()
     rightTopPoint->setPos(boundRect.topRight());
     leftBottomPoint->setPos(boundRect.bottomLeft());
     rightBottomPoint->setPos(boundRect.bottomRight());
+
+    topPoint->setPos(QPointF(0,boundRect.topLeft().y()));
+    leftPoint->setPos(QPointF(boundRect.topLeft().x(),0));
+    rightPoint->setPos(QPointF(boundRect.bottomRight().x(),0));
+    bottomPoint->setPos(QPointF(0,boundRect.bottomLeft().y()));
 }
 
 void MyItem::procRotate(int degree)
@@ -447,7 +567,6 @@ void MyItem::setProperty(ItemProperty property)
 
     setRotation(property.rotateDegree);
     setZValue(property.zValue);
-    qDebug()<<"===property.zValue:"<<property.zValue;
     setPos(QPointF (property.itemRect.x,property.itemRect.y));
 
     //对于正方形和圆要保持宽高一致
@@ -526,6 +645,30 @@ MyItem::~MyItem()
     {
         delete rightBottomPoint;
         rightBottomPoint = NULL;
+    }
+
+    if(topPoint)
+    {
+        delete topPoint;
+        topPoint = NULL;
+    }
+
+    if(leftPoint)
+    {
+        delete leftPoint;
+        leftPoint = NULL;
+    }
+
+    if(rightPoint)
+    {
+        delete rightPoint;
+        rightPoint = NULL;
+    }
+
+    if(bottomPoint)
+    {
+        delete bottomPoint;
+        bottomPoint = NULL;
     }
 
     if(rotateLine)

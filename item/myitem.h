@@ -12,6 +12,7 @@
 **修改历史:
 **20160908:wey:添加文字描述
 **             添加对控件拖拽实时显示位置，同时支持菜单栏设置控件位置
+**20160909:wey:增加对对当前类的输入输出重载，主要用于文件保存。
 **
 *************************************************/
 #ifndef MYITEM_H
@@ -72,7 +73,7 @@ private slots:
     void procDragSize(PointType type);
     void procResizeItem();
     void procRotate(int degree);
-    void procMouseState(MouseType);
+    void procMouseState(MouseType, PointType pointType, QPointF currPos);
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
@@ -101,6 +102,11 @@ private:
     DragPoint * leftBottomPoint;
     DragPoint * rightBottomPoint;
 
+    DragPoint * topPoint;
+    DragPoint * leftPoint;
+    DragPoint * rightPoint;
+    DragPoint * bottomPoint;
+
     MyTextItem * myTextItem;           //文字信息
 
     RotateLine * rotateLine;
@@ -114,6 +120,9 @@ private:
     QPolygonF itemPolygon;             //当前图形的各个顶点坐标集合
 
     ItemProperty property;             //保存当前属性
+
+    QPointF startPressPoint;           //鼠标按下点
+    QPointF movePoint;                 //鼠标移动点
 
     bool isNeedBorder;                 //是否需要选中边框
 };
