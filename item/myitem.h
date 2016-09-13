@@ -125,6 +125,7 @@ private:
     QPointF movePoint;                 //鼠标移动点
 
     bool isNeedBorder;                 //是否需要选中边框
+
 };
 
 #endif // MYITEM_H

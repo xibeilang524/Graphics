@@ -47,8 +47,6 @@ private:
 
     int radius;
 
-    bool isPressed;
-
     PointType pointType;
 };
 

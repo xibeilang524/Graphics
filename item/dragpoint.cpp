@@ -11,10 +11,7 @@ DragPoint::DragPoint(const PointType pointType, MyItem *parent):
     pointType(pointType),
     QGraphicsObject(parent)
 {
-
     radius = 3;
-    isPressed= false;
-
     boundRect = QRectF(-radius,-radius,radius *2,radius *2);
 
     setFlags(QGraphicsItem::ItemIsSelectable |
@@ -79,7 +76,7 @@ void DragPoint::updatePos(PointType type, QPointF point)
 
 QVariant DragPoint::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if(isPressed && change == ItemPositionHasChanged && scene())
+    if(change == ItemPositionHasChanged && scene())
     {
 
     }
@@ -89,22 +86,18 @@ QVariant DragPoint::itemChange(GraphicsItemChange change, const QVariant &value)
 
 void DragPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-//    qDebug()<<"===mousePressEvent*****====="<<event->pos().x()<<"__"<<event->pos().y();
-    isPressed = true;
     emit currMouseState(MOUSE_PRESS,pointType,event->pos());
     QGraphicsItem::mousePressEvent(event);
 }
 
 void DragPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-//    qDebug()<<"===mouseMoveEvent====="<<event->pos().x()<<"__"<<event->pos().y();
     emit currMouseState(MOUSE_MOVE,pointType,event->pos());
     QGraphicsItem::mouseMoveEvent(event);
 }
 
 void DragPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    isPressed = false;
     emit resizeItemSize();
     emit currMouseState(MOUSE_RELEASE,pointType,event->pos());
     QGraphicsItem::mouseReleaseEvent(event);

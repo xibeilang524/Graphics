@@ -89,6 +89,8 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
 
+
+
     prepareGeometryChange();
 
     float factor;
@@ -411,168 +413,199 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 
         qreal  factor = w / h;
 
+        QPainterPath path;
+
+        bool hasProcessed = false;                 //选中的控件在拖拽时是否可用
+
         switch(pointType)
         {
             case TOP_LEFT:
-                    switch(currItemType)
-                    {
-                        case GRA_RECT:
-                            tmpW = w - px;
-                            tmpH = tmpW /factor;
-                            tmpX = tmpW/2;
-                            tmpY = tmpH/2;
-                            centerX = rightBottomX - tmpW/2;
-                            centerY = rightBottomY - tmpH/2;
-                            prepareGeometryChange();
-                            boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-                        break;
-                    }
-                    break;
             case TOP_RIGHT:
-                    switch(currItemType)
-                    {
-                        case GRA_RECT:
-                            tmpW = w + px;
-                            tmpH = tmpW /factor;
-                            tmpX = tmpW/2;
-                            tmpY = tmpH/2;
-                            centerX = leftBottomX + tmpW/2;
-                            centerY = leftBottomY - tmpH/2;
-                            prepareGeometryChange();
-                            boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-
-                        break;
-                    }
-                    break;
             case BOTTOM_LEFT:
-                    switch(currItemType)
-                    {
-                        case GRA_RECT:
-                            tmpW = w - px;
-                            tmpH = tmpW /factor;
-                            tmpX = tmpW/2;
-                            tmpY = tmpH/2;
-                            centerX = rightTopX - tmpW/2;
-                            centerY = rightTopY + tmpH/2;
-                            prepareGeometryChange();
-                            boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-
-                        break;
-                    }
-                    break;
             case BOTTOM_RIGHT:
+                {
+                    if(pointType ==  TOP_LEFT)
+                    {
+                        tmpW = w - px;
+                        tmpH = tmpW /factor;
+                        tmpX = tmpW/2;
+                        tmpY = tmpH/2;
+                        centerX = rightBottomX - tmpW/2;
+                        centerY = rightBottomY - tmpH/2;
+                        prepareGeometryChange();
+                        boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
+                    }
+                    else if(pointType ==  TOP_RIGHT)
+                    {
+                        tmpW = w + px;
+                        tmpH = tmpW /factor;
+                        tmpX = tmpW/2;
+                        tmpY = tmpH/2;
+                        centerX = leftBottomX + tmpW/2;
+                        centerY = leftBottomY - tmpH/2;
+                        prepareGeometryChange();
+                        boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
+                    }
+                    else if(pointType ==  BOTTOM_LEFT)
+                    {
+                        tmpW = w - px;
+                        tmpH = tmpW /factor;
+                        tmpX = tmpW/2;
+                        tmpY = tmpH/2;
+                        centerX = rightTopX - tmpW/2;
+                        centerY = rightTopY + tmpH/2;
+                        prepareGeometryChange();
+                        boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
+                    }
+                    else if(pointType ==  BOTTOM_RIGHT)
+                    {
+                        tmpW = w + px;
+                        tmpH = tmpW /factor;
+                        tmpX = tmpW/2;
+                        tmpY = tmpH/2;
+                        centerX = leftTopX + tmpW/2;
+                        centerY = leftTopY + tmpH/2;
+                        prepareGeometryChange();
+                        boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
+                    }
+
                     switch(currItemType)
                     {
+                        case GRA_SQUARE:
                         case GRA_RECT:
-                            tmpW = w + px;
-                            tmpH = tmpW /factor;
-                            tmpX = tmpW/2;
-                            tmpY = tmpH/2;
-                            centerX = leftTopX + tmpW/2;
-                            centerY = leftTopY + tmpH/2;
-                            prepareGeometryChange();
-                            boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
                             itemPolygon.clear();
                             itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
                                     QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+                            hasProcessed = true;
+                            break;
 
-                        break;
+                        case GRA_ROUND_RECT:
+                            itemPolygon.clear();
+
+                            path.addRoundedRect(boundRect,10,10);
+                            itemPolygon = path.toFillPolygon();
+                            hasProcessed = true;
+                            break;
+
+                        case GRA_CIRCLE:
+                            itemPolygon.clear();
+                            path.addEllipse(boundRect);
+                            itemPolygon = path.toFillPolygon();
+                            hasProcessed = true;
+                            break;
+                        case GRA_ELLIPSE:
+                            itemPolygon.clear();
+                            path.addEllipse(boundRect);
+                            itemPolygon = path.toFillPolygon();
+                            hasProcessed = true;
+                            break;
+                        case GRA_POLYGON:
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(0.5*tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-0.5*tmpX,tmpY);
+                            hasProcessed = true;
+                            break;
                     }
                     break;
+                }
             case MIDDLE_RIGHT:
-                    switch(currItemType)
-                    {
-                        case GRA_RECT:
-//                            tmpW = (w + px)*QCOS(property.rotateDegree);
-                            tmpX = tmpW/2;
-                            tmpY = h/2;
-                            centerX = leftTopX + tmpX;
-                            centerY = leftTopY + tmpY;
-                            prepareGeometryChange();
-                            boundRect = QRectF(-tmpX,-tmpY,tmpW,h);
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-                        break;
-                    }
-                    break;
             case MIDDLE_LEFT:
-                    switch(currItemType)
-                    {
-                        case GRA_RECT:
-                            tmpW = w - px;
-                            tmpX = tmpW/2;
-                            tmpY = h/2;
-                            centerX = rightBottomX - tmpW/2;
-                            centerY = rightBottomY - tmpY;
-                            prepareGeometryChange();
-                            boundRect = QRectF(-tmpX,-tmpY,tmpW,h);
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-
-                        break;
-                    }
-                    break;
             case TOP_MIDDLE:
-                    switch(currItemType)
-                    {
-                        case GRA_RECT:
-                            tmpH = h - py;
-                            tmpX = w/2;
-                            tmpY = tmpH/2;
-                            centerX = rightBottomX - w/2;
-                            centerY = rightBottomY - tmpH/2;
-                            prepareGeometryChange();
-                            boundRect = QRectF(-tmpX,-tmpY,w,tmpH);
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-
-                        break;
-                    }
-                    break;
             case BOTTOM_MIDDLE:
+                {
+                    if(currItemType == GRA_SQUARE ||currItemType == GRA_CIRCLE)
+                    {
+                        break;
+                    }
+                    if(pointType ==  MIDDLE_RIGHT)
+                    {
+                        tmpW = w + px /** QCOS(property.rotateDegree)*/;
+                        tmpX = tmpW/2;
+                        tmpY = h/2;
+                        centerX = leftTopX + tmpX;
+                        centerY = leftTopY + tmpY;
+                        prepareGeometryChange();
+                        boundRect = QRectF(-tmpX,-tmpY,tmpW,h);
+                    }
+                    else if(pointType ==  MIDDLE_LEFT)
+                    {
+                        tmpW = w - px;
+                        tmpX = tmpW/2;
+                        tmpY = h/2;
+                        centerX = rightBottomX - tmpW/2;
+                        centerY = rightBottomY - tmpY;
+                        prepareGeometryChange();
+                        boundRect = QRectF(-tmpX,-tmpY,tmpW,h);
+                    }
+                    else if(pointType ==  TOP_MIDDLE)
+                    {
+                        tmpH = h - py;
+                        tmpX = w/2;
+                        tmpY = tmpH/2;
+                        centerX = rightBottomX - w/2;
+                        centerY = rightBottomY - tmpH/2;
+                        prepareGeometryChange();
+                        boundRect = QRectF(-tmpX,-tmpY,w,tmpH);
+                    }
+                    else if(pointType ==  BOTTOM_MIDDLE)
+                    {
+                        tmpH = h + py;
+                        tmpX = w/2;
+                        tmpY = tmpH/2;
+                        centerX = leftTopX + tmpX;
+                        centerY = leftTopY + tmpY;
+                        prepareGeometryChange();
+                        boundRect = QRectF(-tmpX,-tmpY,w,tmpH);
+                    }
+
                     switch(currItemType)
                     {
                         case GRA_RECT:
-                            tmpH = h + py;
-                            tmpX = w/2;
-                            tmpY = tmpH/2;
-                            centerX = leftTopX + tmpX;
-                            centerY = leftTopY + tmpY;
-                            prepareGeometryChange();
-                            boundRect = QRectF(-tmpX,-tmpY,w,tmpH);
                             itemPolygon.clear();
                             itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
                                     QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+                            hasProcessed = true;
+                            break;
 
-                        break;
+                        case GRA_ROUND_RECT:
+                            itemPolygon.clear();
+
+                            path.addRoundedRect(boundRect,10,10);
+                            itemPolygon = path.toFillPolygon();
+                            hasProcessed = true;
+                            break;
+
+                        case GRA_ELLIPSE:
+                            itemPolygon.clear();
+                            path.addEllipse(boundRect);
+                            itemPolygon = path.toFillPolygon();
+                            hasProcessed = true;
+                            break;
+                        case GRA_POLYGON:
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(0.5*tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-0.5*tmpX,tmpY);
+                            hasProcessed = true;
+                            break;
                     }
                     break;
-            default:
-                    break;
+                }
         }
-        setPos(QPointF(centerX,centerY));
-        setPolygon(itemPolygon);
-        procResizeItem();
-        updateRotateLinePos();
 
-        property.itemRect.x = mapToScene(boundRect.topLeft()).x()+boundRect.width()/2;
-        property.itemRect.y = mapToScene(boundRect.topLeft()).y()+boundRect.height()/2;
-        property.itemRect.width = boundRect.width();
-        property.itemRect.height = boundRect.height();
+        if(hasProcessed)
+        {
+            setPos(QPointF(centerX,centerY));
+            setPolygon(itemPolygon);
+            procResizeItem();
+            updateRotateLinePos();
 
-        emit posHasChanged(property.itemRect);
+            property.itemRect.x = mapToScene(boundRect.topLeft()).x()+boundRect.width()/2;
+            property.itemRect.y = mapToScene(boundRect.topLeft()).y()+boundRect.height()/2;
+            property.itemRect.width = boundRect.width();
+            property.itemRect.height = boundRect.height();
+
+            emit posHasChanged(property.itemRect);
+        }
     }
     else if(currMouseType == MOUSE_RELEASE)
     {
@@ -580,6 +613,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
     }
 }
 
+//调整8个拖拽矩形的位置
 void MyItem::procResizeItem()
 {
     leftTopPoint->setPos(boundRect.topLeft());
@@ -609,6 +643,7 @@ void MyItem::setProperty(ItemProperty property)
     setPos(QPointF (property.itemRect.x,property.itemRect.y));
 
     procResizeItem();
+
     updateRotateLinePos();
 
     myTextItem->setPlainText(property.content);

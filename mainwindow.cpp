@@ -601,11 +601,6 @@ void MainWindow::updateActions()
             MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
             property = arrowItem->getProperty();
         }
-        //        qDebug()<< myItem->pos().x()<<"==="<<myItem->pos().y();
-//        qDebug()<< myItem->scenePos().x()<<"========="<<myItem->scenePos().y();
-//        qDebug()<< myItem->sceneBoundingRect().x()<<"==========="<<myItem->sceneBoundingRect().y();
-//        qDebug()<< myItem->boundingRect().width()<<"===%%%%==="<<myItem->boundingRect().height();
-//        qDebug()<< myItem->getProperty().itemRect.width<<"=="<<myItem->getProperty().itemRect.height;
     }
     else
     {
