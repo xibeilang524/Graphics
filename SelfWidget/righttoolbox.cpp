@@ -359,7 +359,7 @@ void RightToolBox::positionChange()
 }
 
 //用于数值的加减操作
-void RightToolBox::setNum(QLabel *edit, bool minus, int &newValue)
+void RightToolBox::setNum(QLabel *edit, bool minus, qreal &newValue)
 {
     int num = getSizeValue(edit,2);
 
@@ -377,7 +377,7 @@ void RightToolBox::setNum(QLabel *edit, bool minus, int &newValue)
 }
 
 //获得控件中的数值,pos表示几位
-int RightToolBox::getSizeValue(QLabel* edit,int pos)
+int RightToolBox::getSizeValue(QLabel* edit, qreal pos)
 {
     QString text = edit->text();
     return text.left(text.size()-pos).toInt();

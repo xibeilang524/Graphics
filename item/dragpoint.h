@@ -29,7 +29,6 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
 signals:
-    void pointPosChanged(PointType);
     void currMouseState(MouseType,PointType,QPointF);
     void resizeItemSize();
 

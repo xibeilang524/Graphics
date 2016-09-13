@@ -53,8 +53,8 @@ private:
     void enableButtState(bool isEnabled);
     void prepareBrush();                 //准备笔刷
     void preparePen();                   //准备画笔
-    void setNum(QLabel *edit, bool minus,int &newValue);
-    int getSizeValue(QLabel* edit,int pos);
+    void setNum(QLabel *edit, bool minus, qreal &newValue);
+    int getSizeValue(QLabel* edit,qreal pos);
     void updateItemProperty();
 
     Ui::RightToolBox *ui;

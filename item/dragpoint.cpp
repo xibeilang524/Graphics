@@ -24,7 +24,6 @@ DragPoint::DragPoint(const PointType pointType, MyItem *parent):
 
     setAcceptHoverEvents(true);
 
-    connect(this,SIGNAL(pointPosChanged(PointType)),parent,SLOT(procDragSize(PointType)));
     connect(this,SIGNAL(resizeItemSize()),parent,SLOT(procResizeItem()));
     connect(this,SIGNAL(currMouseState(MouseType,PointType,QPointF)),parent,SLOT(procMouseState(MouseType,PointType,QPointF)));
 }
@@ -82,7 +81,7 @@ QVariant DragPoint::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if(isPressed && change == ItemPositionHasChanged && scene())
     {
-        emit pointPosChanged(pointType);
+
     }
 
     return QGraphicsObject::itemChange(change,value);
@@ -98,7 +97,7 @@ void DragPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void DragPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qDebug()<<"===mouseMoveEvent====="<<event->pos().x()<<"__"<<event->pos().y();
+//    qDebug()<<"===mouseMoveEvent====="<<event->pos().x()<<"__"<<event->pos().y();
     emit currMouseState(MOUSE_MOVE,pointType,event->pos());
     QGraphicsItem::mouseMoveEvent(event);
 }

@@ -13,7 +13,8 @@
 **20160908:wey:添加文字描述
 **             添加对控件拖拽实时显示位置，同时支持菜单栏设置控件位置
 **20160909:wey:增加对对当前类的输入输出重载，主要用于文件保存。
-**
+**20160912:wey:增加对控件中、左、右、下拉伸
+**20160913:wey:增加对控件左斜上、右斜上、左斜下、右斜下拉伸
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -70,7 +71,6 @@ signals:
     void posHasChanged(MyRect);
 
 private slots:
-    void procDragSize(PointType type);
     void procResizeItem();
     void procRotate(int degree);
     void procMouseState(MouseType, PointType pointType, QPointF currPos);

@@ -1,5 +1,17 @@
+/*************************************************
+**版  权：RenGu Company
+**文件名: Header.h
+**作  者: wey       Version: 1.0       Date: 2016.09.01
+**描  述: 定义通用的结构体
+**Others:
+**
+**修改历史:
+**20160913:wey:调整类型格式定义为qreal
+*************************************************/
 #ifndef HEADER_H
 #define HEADER_H
+
+#define PI 3.141592653
 
 #include <QBrush>
 #include <QPen>
@@ -45,10 +57,10 @@ struct MyRect
     friend QDataStream& operator <<(QDataStream &,MyRect & rect);
     friend QDataStream& operator >>(QDataStream &,MyRect & rect);
 
-    int x;
-    int y;
-    int width;
-    int height;
+    qreal x;
+    qreal y;
+    qreal width;
+    qreal height;
 };
 
 //每个item拥有的属性，笔刷、画笔、位置、大小、角度、字体
@@ -89,7 +101,7 @@ struct ItemProperty
     QFont  itemFont;
     QColor fontColor;        //字体颜色
 
-    float zValue;            //深度值
+    qreal zValue;            //深度值
 };
 
 

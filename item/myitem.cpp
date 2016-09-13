@@ -12,6 +12,11 @@
 #include "myarrow.h"
 #include "mytextitem.h"
 
+#include "qmath.h"
+
+#define QCOS(a) qCos(a*PI/180)
+#define QSIN(a) qSin(a*PI/180)
+
 //对MyRect的输出进行重载
 QDataStream & operator <<(QDataStream &stream,MyRect & rect)
 {
@@ -359,73 +364,18 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
     }
     else if(change  == QGraphicsItem::ItemPositionChange && scene())
     {
-        qDebug()<<"====QGraphicsItem::ItemPositionChange==";
+
     }
     else if(change == QGraphicsItem::ItemPositionHasChanged && scene())
     {
-qDebug()<<"=%%%QGraphicsItem::ItemPositionChange==";
     }
 
 
     return QGraphicsPolygonItem::itemChange(change,value);
 }
 
-void MyItem::procDragSize(PointType type)
-{
-    QRectF rect(0,0,0,0);
-
-//    QList<QGraphicsItem*> allItems = childItems();
-
-//    foreach (QGraphicsItem * item, allItems)
-//    {
-//        DragPoint* drag = dynamic_cast<DragPoint*>(item);
-//        if(drag)
-//        {
-//            //计算可以包裹两个矩形的外切矩形
-//            QRectF r = drag->mapRectToScene(drag->boundingRect());
-//            rect = rect.united(r);
-//        }
-//    }
-
-    //左上和右下拉动时，矩形依照此二点来构成。
-    if(type == TOP_LEFT || type == BOTTOM_RIGHT)
-    {
-        QRectF r = leftTopPoint->mapRectToScene(leftTopPoint->boundingRect());
-        rect = rect.united(r);
-
-        rect = rect.united(rightBottomPoint->mapRectToScene(rightBottomPoint->boundingRect()));
-
-        rightTopPoint->updatePos(type,boundRect.topRight());
-        leftBottomPoint->updatePos(type,boundRect.bottomLeft());
-    }
-    //右上和左下拉动时，矩形按照此二点构成。
-    else if(type == TOP_RIGHT || type == BOTTOM_LEFT)
-    {
-        QRectF r = rightTopPoint->mapRectToScene(rightTopPoint->boundingRect());
-        rect = rect.united(r);
-
-        rect = rect.united(leftBottomPoint->mapRectToScene(leftBottomPoint->boundingRect()));
-
-        leftTopPoint->updatePos(type,boundRect.topLeft());
-        rightBottomPoint->updatePos(type,boundRect.bottomRight());
-//        leftBottomPoint->updatePos(type,(leftBottomPoint->boundingRect().adjusted(-2,-1,0,0)).bottomLeft());
-    }
-    prepareGeometryChange();
-
-    QRectF tmpRect = mapRectFromScene(rect);
-
-    if(tmpRect.width()<10 || tmpRect.height()<10)
-    {
-        return;
-    }
-
-    tmpRect.setWidth(tmpRect.height());
-
-    boundRect = tmpRect;
-
-    updateRotateLinePos();
-}
-
+//左上、右上、左下、右下在缩放时要按照比例进行
+//上、左、右、下在缩放时只按改变一边长度
 void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 {
     currMouseType = type;
@@ -439,8 +389,14 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
         qreal leftTopX = mapToScene(boundRect.topLeft()).x();
         qreal leftTopY = mapToScene(boundRect.topLeft()).y();
 
+        qreal rightTopX = mapToScene(boundRect.topRight()).x();
+        qreal rightTopY = mapToScene(boundRect.topRight()).y();
+
         qreal rightBottomX = mapToScene(boundRect.bottomRight()).x();
         qreal rightBottomY = mapToScene(boundRect.bottomRight()).y();
+
+        qreal leftBottomX = mapToScene(boundRect.bottomLeft()).x();
+        qreal leftBottomY = mapToScene(boundRect.bottomLeft()).y();
 
         qreal w = boundRect.width();
         qreal h = boundRect.height();
@@ -453,13 +409,90 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
         //移动后中心点的x、y
         qreal centerX,centerY;
 
+        qreal  factor = w / h;
+
         switch(pointType)
         {
-            case MIDDLE_RIGHT:
+            case TOP_LEFT:
+                    switch(currItemType)
+                    {
+                        case GRA_RECT:
+                            tmpW = w - px;
+                            tmpH = tmpW /factor;
+                            tmpX = tmpW/2;
+                            tmpY = tmpH/2;
+                            centerX = rightBottomX - tmpW/2;
+                            centerY = rightBottomY - tmpH/2;
+                            prepareGeometryChange();
+                            boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+                        break;
+                    }
+                    break;
+            case TOP_RIGHT:
                     switch(currItemType)
                     {
                         case GRA_RECT:
                             tmpW = w + px;
+                            tmpH = tmpW /factor;
+                            tmpX = tmpW/2;
+                            tmpY = tmpH/2;
+                            centerX = leftBottomX + tmpW/2;
+                            centerY = leftBottomY - tmpH/2;
+                            prepareGeometryChange();
+                            boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+
+                        break;
+                    }
+                    break;
+            case BOTTOM_LEFT:
+                    switch(currItemType)
+                    {
+                        case GRA_RECT:
+                            tmpW = w - px;
+                            tmpH = tmpW /factor;
+                            tmpX = tmpW/2;
+                            tmpY = tmpH/2;
+                            centerX = rightTopX - tmpW/2;
+                            centerY = rightTopY + tmpH/2;
+                            prepareGeometryChange();
+                            boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+
+                        break;
+                    }
+                    break;
+            case BOTTOM_RIGHT:
+                    switch(currItemType)
+                    {
+                        case GRA_RECT:
+                            tmpW = w + px;
+                            tmpH = tmpW /factor;
+                            tmpX = tmpW/2;
+                            tmpY = tmpH/2;
+                            centerX = leftTopX + tmpW/2;
+                            centerY = leftTopY + tmpH/2;
+                            prepareGeometryChange();
+                            boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+
+                        break;
+                    }
+                    break;
+            case MIDDLE_RIGHT:
+                    switch(currItemType)
+                    {
+                        case GRA_RECT:
+//                            tmpW = (w + px)*QCOS(property.rotateDegree);
                             tmpX = tmpW/2;
                             tmpY = h/2;
                             centerX = leftTopX + tmpX;
@@ -469,7 +502,6 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                             itemPolygon.clear();
                             itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
                                     QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-
                         break;
                     }
                     break;
@@ -530,10 +562,17 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
             default:
                     break;
         }
-        qDebug()<<tmpH<<"_"<<w<<"_"<<rightBottomX<<"_"<<rightBottomY<<"_"<<h<<"_"<<py;
         setPos(QPointF(centerX,centerY));
         setPolygon(itemPolygon);
         procResizeItem();
+        updateRotateLinePos();
+
+        property.itemRect.x = mapToScene(boundRect.topLeft()).x()+boundRect.width()/2;
+        property.itemRect.y = mapToScene(boundRect.topLeft()).y()+boundRect.height()/2;
+        property.itemRect.width = boundRect.width();
+        property.itemRect.height = boundRect.height();
+
+        emit posHasChanged(property.itemRect);
     }
     else if(currMouseType == MOUSE_RELEASE)
     {
@@ -569,37 +608,6 @@ void MyItem::setProperty(ItemProperty property)
     setZValue(property.zValue);
     setPos(QPointF (property.itemRect.x,property.itemRect.y));
 
-    //对于正方形和圆要保持宽高一致
-//    itemPolygon.clear();
-    prepareGeometryChange();
-    int x,y;
-//    if(currItemType == GRA_SQUARE || currItemType == GRA_CIRCLE)
-//    {
-//        qDebug()<<"==============="<<property.itemRect.width;
-//        radius = property.itemRect.width /2 ;
-
-//        boundRect = QRectF(-radius,-radius,2*radius,2*radius);
-
-//        itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
-//              QPointF(radius,radius)<<QPointF(-radius,radius);
-
-//        x = pos().x() + radius;
-//        y = pos().y() + radius;
-
-//        setPos(property.itemRect.x,property.itemRect.y);
-
-//        qDebug()<<sceneBoundingRect().x()<<"=="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
-
-//    }
-//    else
-//    {
-
-//    }
-
-//    setPolygon(itemPolygon);
-
-//    setPos(x,y);
-
     procResizeItem();
     updateRotateLinePos();
 
@@ -609,8 +617,6 @@ void MyItem::setProperty(ItemProperty property)
     setText(myTextItem->toPlainText());
 
     parentScene->update();
-
-//    qDebug()<<sceneBoundingRect().x()<<"=after="<<sceneBoundingRect().y()<<"++"<<x<<"=="<<y<<"__"<<radius;
 }
 
 //左旋转或者右旋转后更新当前属性的旋转角度值
@@ -618,7 +624,6 @@ void MyItem::updateRotation(int rotateValue)
 {
     property.rotateDegree += rotateValue;
     property.rotateDegree = property.rotateDegree%360;
-
 }
 
 MyItem::~MyItem()
