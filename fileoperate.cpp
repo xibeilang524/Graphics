@@ -11,7 +11,8 @@
 #include <QDataStream>
 #include <QDebug>
 
-#include "typeinfo.h"
+//#include "typeinfo.h"
+#include "typeinfo"
 
 FileOperate::FileOperate()
 {

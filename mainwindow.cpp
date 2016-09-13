@@ -26,7 +26,8 @@
 #include "fileoperate.h"
 #include "global.h"
 
-#include "typeinfo.h"
+//#include "typeinfo.h"
+#include "typeinfo"
 
 using namespace Graphics;
 

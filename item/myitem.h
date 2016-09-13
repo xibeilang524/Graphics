@@ -15,6 +15,7 @@
 **20160909:wey:增加对对当前类的输入输出重载，主要用于文件保存。
 **20160912:wey:增加对控件中、左、右、下拉伸
 **20160913:wey:增加对控件左斜上、右斜上、左斜下、右斜下拉伸
+**             修复保存和解析时，未能按照缩放后的尺寸显示
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -62,6 +63,8 @@ public:
 
     void setPos(const QPointF &pos);
     void setZValue(qreal z);
+
+    void resetPolygon();                   //重新设定多边形
 
     friend QDataStream & operator <<(QDataStream &,MyItem * item);
     friend QDataStream & operator >>(QDataStream &,MyItem * item);

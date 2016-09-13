@@ -190,6 +190,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
         }
         else
         {
+            item->resetPolygon();
             item->setPos(QPointF(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y));
         }
 

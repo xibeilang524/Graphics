@@ -89,8 +89,6 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
 
-
-
     prepareGeometryChange();
 
     float factor;
@@ -157,6 +155,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                property.itemBrush = QBrush(Qt::gray);
                                break;
     }
+
     setPolygon(itemPolygon);
     setBrush(property.itemBrush);
 
@@ -643,7 +642,6 @@ void MyItem::setProperty(ItemProperty property)
     setPos(QPointF (property.itemRect.x,property.itemRect.y));
 
     procResizeItem();
-
     updateRotateLinePos();
 
     myTextItem->setPlainText(property.content);
@@ -652,6 +650,70 @@ void MyItem::setProperty(ItemProperty property)
     setText(myTextItem->toPlainText());
 
     parentScene->update();
+}
+
+//本地打开文件后，对控件进行重新设定
+void MyItem::resetPolygon()
+{
+    qreal tw = this->property.itemRect.width;
+    qreal th = this->property.itemRect.height;
+    qreal tx = tw/2;
+    qreal ty = th/2;
+
+    prepareGeometryChange();
+    boundRect = QRectF(-tx,-ty,tw,th);
+
+    itemPolygon.clear();
+
+    switch(currItemType)
+    {
+            //正方形
+            case GRA_SQUARE:
+                               itemPolygon<<QPointF(-tx,-ty)<<QPointF(tx,-ty)<<
+                                      QPointF(tx,ty)<<QPointF(-tx,ty);
+                               break;
+            //矩形
+            case GRA_RECT:
+                               itemPolygon<<QPointF(-tx,-ty)<<QPointF(tx,-ty)<<
+                                       QPointF(tx,ty)<<QPointF(-tx,ty);
+                               break;
+           //圆角矩形
+           case GRA_ROUND_RECT:
+                            {
+                                QPainterPath path;
+                                path.addRoundedRect(boundRect,10,10);
+                                itemPolygon = path.toFillPolygon();
+                            }
+                              break;
+            //圆形
+            case GRA_CIRCLE:
+                            {
+                                QPainterPath path;
+                                path.addEllipse(boundRect);
+                                itemPolygon = path.toFillPolygon();
+                            }
+                               break;
+            //椭圆
+            case GRA_ELLIPSE:
+                            {
+                                QPainterPath path;
+                                path.addEllipse(boundRect);
+                                itemPolygon = path.toFillPolygon();
+                            }
+                               break;
+            //菱形
+            case GRA_POLYGON:
+                            {
+                               qreal factor = 0.5;
+                               itemPolygon<<QPointF(-tx,-ty)<<QPointF(0.5*tx,-ty)<<
+                                      QPointF(tx,ty)<<QPointF(-0.5*tx,ty);
+                            }
+                               break;
+    }
+    setPolygon(itemPolygon);
+
+    procResizeItem();
+    updateRotateLinePos();
 }
 
 //左旋转或者右旋转后更新当前属性的旋转角度值

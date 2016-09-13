@@ -7,6 +7,8 @@
 
 #include "myitem.h"
 
+#include "math.h"
+
 const qreal Pi = 3.14;
 
 QDataStream & operator <<(QDataStream &stream,MyArrow * item)
