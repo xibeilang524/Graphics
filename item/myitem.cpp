@@ -183,7 +183,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     bottomPoint = new DragPoint(BOTTOM_MIDDLE,this);
 
     rotateLine = new RotateLine(this);
-    connect(rotateLine,SIGNAL(rotateItem(int)),this,SLOT(procRotate(int)));
+    connect(rotateLine,SIGNAL(rotateItem(MouseType,int)),this,SLOT(procRotate(MouseType,int)));
     updateRotateLinePos();
 
     myTextItem = new MyTextItem(GRA_TEXT,menu,this);
@@ -626,9 +626,19 @@ void MyItem::procResizeItem()
     bottomPoint->setPos(QPointF(0,boundRect.bottomLeft().y()));
 }
 
-void MyItem::procRotate(int degree)
+//处理旋转控件旋转后角度的设置
+void MyItem::procRotate(MouseType mouseType,int degree)
 {
+    currMouseType = mouseType;
     setRotation(degree);
+
+    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
+             <<degree
+             <<"\n";
+
+    property.rotateDegree = degree;
+
+    emit propHasChanged(property);
 }
 
 //设置控件的样式属性

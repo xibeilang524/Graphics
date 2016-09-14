@@ -70,6 +70,7 @@ void RotateLine::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 //    qDebug()<<startPoint.x()<<"============"<<startPoint.y();
 
+    emit rotateItem(MOUSE_PRESS,0);
     QGraphicsObject::mousePressEvent(event);
 }
 
@@ -108,7 +109,7 @@ void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 //    qDebug()<< rotateDegree<<"==="<<posX<<"=="<<posY<<"__"<<tmpPoint.x()<<"--"<<tmpPoint.y();
 
-//    emit rotateItem(rotateDegree);
+    emit rotateItem(MOUSE_MOVE,rotateDegree);
 
     startPoint = event->pos();
 
@@ -117,6 +118,7 @@ void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void RotateLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    emit rotateItem(MOUSE_RELEASE,0);
     QGraphicsObject::mouseReleaseEvent(event);
 }
 

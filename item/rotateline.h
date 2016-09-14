@@ -35,7 +35,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 signals:
-    void rotateItem(int);
+    void rotateItem(MouseType,int);
 
 private:
     QGraphicsItem * parentItem;
