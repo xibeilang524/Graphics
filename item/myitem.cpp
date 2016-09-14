@@ -305,7 +305,7 @@ void MyItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     property.itemRect.y = this->y();
     property.itemRect.width = this->boundingRect().width();
     property.itemRect.height = this->boundingRect().height();
-    emit posHasChanged(property.itemRect);
+    emit propHasChanged(property);
 
     QGraphicsPolygonItem::mouseMoveEvent(event);
 }
@@ -603,7 +603,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
             property.itemRect.width = boundRect.width();
             property.itemRect.height = boundRect.height();
 
-            emit posHasChanged(property.itemRect);
+            emit propHasChanged(property);
         }
     }
     else if(currMouseType == MOUSE_RELEASE)
@@ -721,6 +721,7 @@ void MyItem::updateRotation(int rotateValue)
 {
     property.rotateDegree += rotateValue;
     property.rotateDegree = property.rotateDegree%360;
+    emit propHasChanged(property);
 }
 
 MyItem::~MyItem()

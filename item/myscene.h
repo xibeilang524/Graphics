@@ -38,7 +38,7 @@ signals:
     void resetItemAction();
     void deleteKeyPress();
     void itemSizeChanged(int size);
-    void selectedItemPosChanged(MyRect);
+    void itemPropChanged(ItemProperty);
 
 private slots:
     void respTextLostFocus(MyTextItem * item);

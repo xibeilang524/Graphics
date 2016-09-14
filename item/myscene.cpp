@@ -52,7 +52,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
             MyItem * myItem = new MyItem(CurrAddGraType,rightMenu,this);
             myItem->setPos(event->scenePos());
             connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-            connect(myItem,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
+            connect(myItem,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
             addItem(myItem);
         }
     }
@@ -180,7 +180,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     {
         MyItem * item = new MyItem(cutInfo.graphicsType,rightMenu,this);
         connect(item,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-        connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
+        connect(item,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
 
         item->setText(cutInfo.content);
         item->setProperty(cutInfo.itemProperty);

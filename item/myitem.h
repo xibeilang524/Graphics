@@ -72,7 +72,7 @@ public:
 
 signals:
     void updateSceneDraw();
-    void posHasChanged(MyRect);
+    void propHasChanged(ItemProperty);
 
 private slots:
     void procResizeItem();

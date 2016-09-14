@@ -27,7 +27,7 @@ signals:
 
 private slots:
     void respInitToolBox(int seletedItemNum,ItemProperty property);
-    void respItemPosChanged(MyRect rect);
+    void respItemPropChanged(ItemProperty prop);
 
     void changeFillColor();              //改变填充颜色
     void opacityChange(int value);       //改变透明度

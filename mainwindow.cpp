@@ -345,14 +345,13 @@ void MainWindow::rotateItem()
     QString objName = QObject::sender()->objectName();
     if(objName == QString(Constants::ROTATE_LEFT_ID))
     {
-        graphicsTmp->setRotation(-90);
         graphicsTmp->updateRotation(-90);
     }
     else if(objName == QString(Constants::ROTATE_RIGHT_ID))
     {
-        graphicsTmp->setRotation(90);
         graphicsTmp->updateRotation(90);
     }
+    graphicsTmp->setRotation(graphicsTmp->getProperty().rotateDegree);
 }
 
 void MainWindow::bringZItem()
@@ -513,7 +512,7 @@ void MainWindow::createSceneAndView()
     connect(this,SIGNAL(initToolBox(int,ItemProperty)),rightToolBox,SLOT(respInitToolBox(int,ItemProperty)));
     connect(rightToolBox,SIGNAL(updateProperty(ItemProperty)),this,SLOT(respPropertyUpdate(ItemProperty)));
     connect(rightToolBox,SIGNAL(deleteCurrItem()),this,SLOT(deleteItem()));
-    connect(scene,SIGNAL(selectedItemPosChanged(MyRect)),rightToolBox,SLOT(respItemPosChanged(MyRect)));
+    connect(scene,SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
 
     layout->addWidget(view);
     layout->addWidget(rightToolBox);
