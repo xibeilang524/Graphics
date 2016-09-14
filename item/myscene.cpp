@@ -187,6 +187,8 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
         if(isCopy)
         {
             item->setPos(SceneLastClickPoint);
+            item->setSelected(true);
+            item->setDragPointVisible(true);
         }
         else
         {

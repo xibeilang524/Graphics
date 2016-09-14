@@ -65,6 +65,7 @@ public:
     void setZValue(qreal z);
 
     void resetPolygon();                   //重新设定多边形
+    void setDragPointVisible(bool flag);
 
     friend QDataStream & operator <<(QDataStream &,MyItem * item);
     friend QDataStream & operator >>(QDataStream &,MyItem * item);
@@ -88,7 +89,6 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 private:
-    void setDragPointVisible(bool flag);
     void updateRotateLinePos();
 
     int radius;
