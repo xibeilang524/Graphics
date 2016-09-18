@@ -8,9 +8,13 @@
 #include <QDebug>
 #include <QGraphicsScene>
 #include <QPointF>
+#include <QGraphicsSceneDragDropEvent>
+#include <QMimeData>
+#include <QUrl>
 
 #include "myarrow.h"
 #include "mytextitem.h"
+#include "mynodeport.h"
 
 #include "qmath.h"
 
@@ -88,6 +92,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
+    setAcceptDrops(true);
 
     prepareGeometryChange();
 
@@ -227,8 +232,8 @@ void MyItem::setText(QString text)
 
 void MyItem::updateRotateLinePos()
 {
-    int posX = boundingRect().center().x() - rotateLine->boundingRect().width()/2;
-    int posY = boundingRect().topLeft().y() - 1.5*rotateLine->boundingRect().height();
+    int posX = boundingRect().center().x();
+    int posY = boundingRect().topLeft().y() - 5*rotateLine->boundingRect().height();
 
     rotateLine->setPos(posX,posY);
 }
@@ -333,6 +338,219 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     rightMenu->exec(event->screenPos());
 }
 
+//拖入事件
+void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if(event->mimeData()->hasUrls())
+    {
+       event->acceptProposedAction();
+    }
+    else
+    {
+        event->ignore();
+    }
+}
+
+//计算点到矩形四边最小距离
+qreal MyItem::getPointToRectMinDistance(QRectF rect,QPointF point)
+{
+    //左侧
+    qreal minDis = 100000;
+
+    qreal leftDis = qAbs(rect.topLeft().x() - point.x());
+    minDis = minDis <= leftDis ? minDis:leftDis;
+
+    qreal topDis = qAbs(rect.topLeft().y() - point.y());
+    minDis = minDis <= topDis ? minDis:topDis;
+
+    qreal rightDis = qAbs(rect.bottomRight().x() - point.x());
+    minDis = minDis <= rightDis ? minDis:rightDis;
+
+    qreal bottomDis = qAbs(rect.bottomRight().y() - point.y());
+    minDis = minDis <= bottomDis ? minDis:bottomDis;
+
+    return minDis;
+}
+
+//拖入移动
+void MyItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if(event->mimeData()->hasUrls())
+    {
+        qreal dis = getPointToRectMinDistance(boundRect,event->pos());
+        if(getPointToRectMinDistance(boundRect,event->pos()) <= ALLOW_DROP_RANGE)
+        {
+            event->acceptProposedAction();
+        }
+        else
+        {
+            event->ignore();
+        }
+    }
+    else
+    {
+        event->ignore();
+    }
+}
+
+//拖入离开
+void MyItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
+{
+
+}
+
+/*!
+*拖拽放下
+*在放下时候需要考虑放在哪一侧,
+***/
+void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if (event->mimeData()->hasUrls())
+    {
+        QPointF dropPoint = event->pos();
+        QPointF itemPos;
+        DragDirect direct;
+        qreal scaleFactor;
+        //放在左侧
+        if(qAbs(dropPoint.x() - boundRect.topLeft().x()) <=  ALLOW_DROP_RANGE)
+        {
+            itemPos.setX(boundRect.topLeft().x());
+            itemPos.setY(dropPoint.y());
+            direct = DRAG_LEFT;
+            scaleFactor = (dropPoint.y() - boundRect.topLeft().y()) / boundRect.height();
+        }
+        //放在上侧
+        else if(qAbs(dropPoint.y() - boundRect.topLeft().y()) <=  ALLOW_DROP_RANGE)
+        {
+            itemPos.setX(dropPoint.x());
+            itemPos.setY(boundRect.topLeft().y());
+            direct = DRAG_TOP;
+            scaleFactor = (dropPoint.x() - boundRect.topLeft().x()) / boundRect.width();
+        }
+        //放在右侧
+        else if(qAbs(dropPoint.x() - boundRect.bottomRight().x()) <=  ALLOW_DROP_RANGE)
+        {
+            itemPos.setX(boundRect.bottomRight().x());
+            itemPos.setY(dropPoint.y());
+            direct = DRAG_RIGHT;
+            scaleFactor = (dropPoint.y() - boundRect.topRight().y()) / boundRect.height();
+        }
+        //放在下侧
+        else if(qAbs(dropPoint.y() - boundRect.bottomRight().y()) <=  ALLOW_DROP_RANGE)
+        {
+            itemPos.setX(dropPoint.x());
+            itemPos.setY(boundRect.bottomRight().y());
+            direct = DRAG_BOTTOM;
+            scaleFactor = (dropPoint.x() - boundRect.bottomLeft().x()) / boundRect.width();
+        }
+
+        MyNodePort * port = new MyNodePort(this);
+        port->setPos(itemPos);
+        port->setDragDirect(direct);
+        port->setScaleFactor(scaleFactor);
+
+        connect(port,SIGNAL(portPosChanged(MouseType,QPointF)),this,SLOT(procPortChanged(MouseType,QPointF)));
+
+        ports.push_back(port);
+    }
+}
+
+//处理端口位置改变,确保端口只可以在边上移动
+void MyItem::procPortChanged(MouseType type, QPointF currPoint)
+{
+    MyNodePort * tmpPort = qobject_cast<MyNodePort *>(QObject::sender());
+
+    if(tmpPort)
+    {
+        if(type == MOUSE_MOVE)
+        {
+            QPointF newPoint;
+            qreal tmpX,tmpY;
+
+            switch(tmpPort->getDragDirect())
+            {
+                case DRAG_LEFT:
+                              {
+                                   tmpX = boundRect.topLeft().x();
+                                   tmpY = tmpPort->pos().y() + currPoint.y();
+                                   getRangeValue(boundRect.bottomLeft().y(),boundRect.topLeft().y(),tmpY);
+                              }
+                               break;
+                case DRAG_TOP:
+                              {
+                                   tmpX = tmpPort->pos().x() + currPoint.x();
+                                   getRangeValue(boundRect.topRight().x(),boundRect.topLeft().x(),tmpX);
+
+                                   tmpY = boundRect.topLeft().y();
+                              }
+                               break;
+                case DRAG_RIGHT:
+                              {
+                                   tmpX = boundRect.topRight().x();
+                                   tmpY = tmpPort->pos().y() + currPoint.y();
+                                   getRangeValue(boundRect.bottomRight().y(),boundRect.topRight().y(),tmpY);
+                              }
+                               break;
+                case DRAG_BOTTOM:
+                              {
+                                   tmpX = tmpPort->pos().x() + currPoint.x();
+                                   getRangeValue(boundRect.bottomRight().x(),boundRect.bottomLeft().x(),tmpX);
+                                   tmpY = boundRect.bottomLeft().y();
+                              }
+                               break;
+            }
+
+            newPoint.setX(tmpX);
+            newPoint.setY(tmpY);
+
+            tmpPort->setPos(newPoint);
+        }
+        else if(type == MOUSE_RELEASE)
+        {
+            qreal scaleFactor;
+            switch(tmpPort->getDragDirect())
+            {
+                case DRAG_LEFT:
+                              {
+                                   scaleFactor = (tmpPort->pos().y() - boundRect.topLeft().y()) / boundRect.height();
+                              }
+                               break;
+                case DRAG_TOP:
+                              {
+                                   scaleFactor = (tmpPort->pos().x() - boundRect.topLeft().x()) / boundRect.width();
+                              }
+                               break;
+                case DRAG_RIGHT:
+                              {
+                                   scaleFactor = (tmpPort->pos().y() - boundRect.topRight().y()) / boundRect.height();
+                              }
+                               break;
+                case DRAG_BOTTOM:
+                              {
+                                   scaleFactor = (tmpPort->pos().x() - boundRect.topLeft().x()) / boundRect.width();
+                              }
+                               break;
+            }
+
+            tmpPort->setScaleFactor(scaleFactor);
+        }
+    }
+}
+
+//将当前值和最大及最小值相比较，只能在此范围内
+void MyItem::getRangeValue(qreal maxValue, qreal minValue, qreal &currValue)
+{
+    if(currValue >= maxValue)
+    {
+        currValue = maxValue;
+    }
+    else if(currValue <= minValue)
+    {
+        currValue = minValue;
+    }
+}
+
+//设置是否拖拽点和旋转点是否可见
 void MyItem::setDragPointVisible(bool flag)
 {
     leftTopPoint->setVisible(flag);
@@ -383,7 +601,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 
     if(currMouseType == MOUSE_PRESS)
     {
-        startPressPoint = currPos;
+
     }
     else if(currMouseType == MOUSE_MOVE)
     {
@@ -597,6 +815,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
             setPolygon(itemPolygon);
             procResizeItem();
             updateRotateLinePos();
+            procResizeNodePort();
 
             property.itemRect.x = mapToScene(boundRect.topLeft()).x()+boundRect.width()/2;
             property.itemRect.y = mapToScene(boundRect.topLeft()).y()+boundRect.height()/2;
@@ -626,17 +845,59 @@ void MyItem::procResizeItem()
     bottomPoint->setPos(QPointF(0,boundRect.bottomLeft().y()));
 }
 
+//调整拖入端口的位置
+void MyItem::procResizeNodePort()
+{
+    QPointF newPoint;
+    foreach (MyNodePort * nodePort, ports)
+    {
+        switch(nodePort->getDragDirect())
+        {
+            case DRAG_LEFT:
+                          {
+                               newPoint.setX(boundRect.topLeft().x());
+                               newPoint.setY(nodePort->getScaleFactor()*boundRect.height() + boundRect.topLeft().y());
+                          }
+                           break;
+            case DRAG_TOP:
+                          {
+                               newPoint.setX(nodePort->getScaleFactor()*boundRect.width() + boundRect.topLeft().x());
+                               newPoint.setY(boundRect.topLeft().y());
+                          }
+                           break;
+            case DRAG_RIGHT:
+                          {
+                               newPoint.setX(boundRect.topRight().x());
+                               newPoint.setY(nodePort->getScaleFactor()*boundRect.height() + boundRect.topRight().y());
+                          }
+                           break;
+            case DRAG_BOTTOM:
+                          {
+                               newPoint.setX(nodePort->getScaleFactor()*boundRect.width() + boundRect.bottomLeft().x());
+                               newPoint.setY(boundRect.bottomLeft().y());
+                          }
+                           break;
+        }
+
+        nodePort->setPos(newPoint);
+    }
+}
+
 //处理旋转控件旋转后角度的设置
 void MyItem::procRotate(MouseType mouseType,int degree)
 {
     currMouseType = mouseType;
-    setRotation(degree);
 
-    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
-             <<degree
-             <<"\n";
+    if(currMouseType == MOUSE_MOVE)
+    {
+        setRotation(degree);
 
-    property.rotateDegree = degree;
+        property.rotateDegree = degree;
+    }
+    else if(currMouseType == MOUSE_RELEASE)
+    {
+        setSelected(true);
+    }
 
     emit propHasChanged(property);
 }
@@ -653,6 +914,7 @@ void MyItem::setProperty(ItemProperty property)
 
     procResizeItem();
     updateRotateLinePos();
+    procResizeNodePort();
 
     myTextItem->setPlainText(property.content);
     myTextItem->updateFont(property.itemFont);
@@ -724,6 +986,7 @@ void MyItem::resetPolygon()
 
     procResizeItem();
     updateRotateLinePos();
+    procResizeNodePort();
 }
 
 //左旋转或者右旋转后更新当前属性的旋转角度值

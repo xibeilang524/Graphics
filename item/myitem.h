@@ -33,6 +33,7 @@ class RotateLine;
 class QMenu;
 class MyArrow;
 class MyTextItem;
+class MyNodePort;
 
 #include <QDataStream>
 
@@ -54,10 +55,13 @@ public:
     void addArrow(MyArrow * arrow);
     void removeArrows();
     void removeArrow(MyArrow * arrow);
+
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
+
     GraphicsType getType(){return this->currItemType;}
     void updateRotation(int rotateValue);
+
     QString getText();
     void setText(QString text);
 
@@ -78,6 +82,7 @@ private slots:
     void procResizeItem();
     void procRotate(MouseType mouseType, int degree);
     void procMouseState(MouseType, PointType pointType, QPointF currPos);
+    void procPortChanged(MouseType type, QPointF currPoint);
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
@@ -87,9 +92,16 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void dragEnterEvent(QGraphicsSceneDragDropEvent *event);
+    void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
+    void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
+    void dropEvent(QGraphicsSceneDragDropEvent *event);
 
 private:
     void updateRotateLinePos();
+    void procResizeNodePort();
+    qreal getPointToRectMinDistance(QRectF rect,QPointF point);
+    void getRangeValue(qreal maxValue,qreal minValue,qreal & currValue);
 
     int radius;
 
@@ -122,10 +134,9 @@ private:
     QList<MyArrow *> arrows;           //保存添加的箭头
     QPolygonF itemPolygon;             //当前图形的各个顶点坐标集合
 
-    ItemProperty property;             //保存当前属性
+    QList<MyNodePort*> ports;          //当前控件端口的集合
 
-    QPointF startPressPoint;           //鼠标按下点
-    QPointF movePoint;                 //鼠标移动点
+    ItemProperty property;             //保存当前属性
 
     bool isNeedBorder;                 //是否需要选中边框
 
