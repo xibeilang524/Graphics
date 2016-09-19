@@ -26,5 +26,6 @@
         <file>images/save.png</file>
         <file>images/editText.png</file>
         <file>images/vectorLine.png</file>
+        <file>images/nodePort.png</file>
     </qresource>
 </RCC>

@@ -14,6 +14,7 @@
 #define MYNODEPORT_H
 
 #include <QGraphicsObject>
+#include <QBrush>
 
 #include "ItemHeader.h"
 
@@ -29,6 +30,8 @@ public:
     QRectF boundingRect() const;
 
     void setPos(const QPointF &pos);
+
+    void setBrush(const QBrush & brush);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -56,6 +59,8 @@ private:
     DragDirect dragDirect;
 
     qreal scaleFactor;                 //拖入的位置相当于当前一边所在的比例
+
+    QBrush brush;
 
 };
 

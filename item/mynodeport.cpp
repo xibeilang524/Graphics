@@ -34,6 +34,13 @@ void MyNodePort::setScaleFactor(qreal scaleFactor)
     this->scaleFactor = scaleFactor;
 }
 
+//ÉèÖÃ¶Ë¿ÚµÄ»­Ë¢
+void MyNodePort::setBrush(const QBrush &brush)
+{
+    this->brush = brush;
+    update();
+}
+
 QRectF MyNodePort::boundingRect()const
 {
     return boundRect;
@@ -43,7 +50,7 @@ void MyNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 {
     painter->save();
 
-    painter->setBrush(Qt::gray);
+    painter->setBrush(brush);
 
     painter->drawRect(boundRect);
 

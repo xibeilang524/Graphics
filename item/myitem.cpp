@@ -271,6 +271,9 @@ void MyItem::removeArrow(MyArrow *arrow)
 
 void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+
     painter->save();
 
     if(property.isNeedBorder)
@@ -343,7 +346,6 @@ void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
     if(event->mimeData()->hasFormat("MyItem"))
     {
-        qDebug()<<"=====dragEnterEvent===";
        event->acceptProposedAction();
     }
     else
@@ -378,7 +380,6 @@ void MyItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
     if(event->mimeData()->hasFormat("MyItem"))
     {
-        qreal dis = getPointToRectMinDistance(boundRect,event->pos());
         if(getPointToRectMinDistance(boundRect,event->pos()) <= ALLOW_DROP_RANGE)
         {
             event->acceptProposedAction();
@@ -449,6 +450,7 @@ void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
         port->setPos(itemPos);
         port->setDragDirect(direct);
         port->setScaleFactor(scaleFactor);
+        port->setBrush(property.itemBrush);
 
         connect(port,SIGNAL(portPosChanged(MouseType,QPointF)),this,SLOT(procPortChanged(MouseType,QPointF)));
 
@@ -913,14 +915,17 @@ void MyItem::setProperty(ItemProperty property)
     setZValue(property.zValue);
     setPos(QPointF (property.itemRect.x,property.itemRect.y));
 
-    procResizeItem();
-    updateRotateLinePos();
-    procResizeNodePort();
+    resetPolygon();
 
     myTextItem->setPlainText(property.content);
     myTextItem->updateFont(property.itemFont);
     myTextItem->setDefaultTextColor(property.fontColor);
     setText(myTextItem->toPlainText());
+
+    foreach (MyNodePort * node, ports)
+    {
+        node->setBrush(property.itemBrush);
+    }
 
     parentScene->update();
 }
@@ -977,7 +982,6 @@ void MyItem::resetPolygon()
             //¡‚–Œ
             case GRA_POLYGON:
                             {
-                               qreal factor = 0.5;
                                itemPolygon<<QPointF(-tx,-ty)<<QPointF(0.5*tx,-ty)<<
                                       QPointF(tx,ty)<<QPointF(-0.5*tx,ty);
                             }
@@ -1059,6 +1063,13 @@ MyItem::~MyItem()
         delete myTextItem;
         myTextItem = NULL;
     }
+
+    foreach (MyNodePort * node, ports)
+    {
+        delete node;
+    }
+    ports.clear();
+
 }
 
 /**

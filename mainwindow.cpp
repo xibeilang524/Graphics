@@ -300,6 +300,7 @@ void MainWindow::cutItem()
     }
 }
 
+//复制Item，支持对其样式的、端口的复制
 void MainWindow::copyItem()
 {
     QList<QGraphicsItem *> selectedItems = scene->selectedItems();
