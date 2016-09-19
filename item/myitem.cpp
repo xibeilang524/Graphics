@@ -415,7 +415,7 @@ void MyItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 ***/
 void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    if (event->mimeData()->hasFormat("MyItem"))
+    if(event->mimeData()->hasFormat("MyItem"))
     {
         QPointF dropPoint = event->pos();
         QPointF itemPos;

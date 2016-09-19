@@ -28,6 +28,11 @@ public:
 
     void showNodePortEdit(MyNodePort * nodePort);
 
+protected:
+    void dragEnterEvent(QDragEnterEvent *event);
+    void dragMoveEvent(QDragMoveEvent *event);
+    void dropEvent(QDropEvent *event);
+
 
 private:
     static MyGraphicsView * viewManager;

@@ -53,11 +53,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
         else if(CurrAddGraType != GRA_NONE)
         {
-            MyItem * myItem = new MyItem(CurrAddGraType,rightMenu,this);
-            myItem->setPos(event->scenePos());
-            connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-            connect(myItem,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
-            addItem(myItem);
+            addItem(CurrAddGraType,event->scenePos());
         }
     }
     else if(event->button() == Qt::RightButton)
@@ -261,6 +257,15 @@ void MyScene::addItem(QList<CutInfo> &cutInfos)
         addItem(cutInfo);
     }
     localItems.clear();
+}
+
+void MyScene::addItem(GraphicsType type, QPointF pos)
+{
+    MyItem * myItem = new MyItem(type,rightMenu,this);
+    myItem->setPos(pos);
+    connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+    connect(myItem,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
+    addItem(myItem);
 }
 
 int MyScene::findItemById(QList<MyItem *> &localItem,QString Id)

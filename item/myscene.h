@@ -31,6 +31,7 @@ public:
     void addItem(QGraphicsItem *item);
     void addItem(CutInfo cutInfo,bool isCopy = false);
     void addItem(QList<CutInfo> & cutInfos);
+    void addItem(GraphicsType type,QPointF pos);
     void removeItem(QGraphicsItem *item);
     ~MyScene();
 

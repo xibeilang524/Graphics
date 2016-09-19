@@ -12,6 +12,8 @@
 #define HEADER_H
 
 #define PI 3.141592653
+#define ICON_WIDTH  60    //图标的宽高
+#define ICON_HEIGHT 60
 
 #include <QBrush>
 #include <QPen>
@@ -40,7 +42,8 @@ enum GraphicsType
     GRA_POLYGON,
     GRA_LINE,
     GRA_VECTOR_LINE,
-    GRA_TEXT
+    GRA_TEXT,
+    GRA_NODE_PORT
 };
 
 //拖入端口的方向
