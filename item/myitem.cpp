@@ -341,8 +341,9 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 //拖入事件
 void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
-    if(event->mimeData()->hasUrls())
+    if(event->mimeData()->hasFormat("MyItem"))
     {
+        qDebug()<<"=====dragEnterEvent===";
        event->acceptProposedAction();
     }
     else
@@ -375,7 +376,7 @@ qreal MyItem::getPointToRectMinDistance(QRectF rect,QPointF point)
 //拖入移动
 void MyItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 {
-    if(event->mimeData()->hasUrls())
+    if(event->mimeData()->hasFormat("MyItem"))
     {
         qreal dis = getPointToRectMinDistance(boundRect,event->pos());
         if(getPointToRectMinDistance(boundRect,event->pos()) <= ALLOW_DROP_RANGE)
@@ -405,7 +406,7 @@ void MyItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 ***/
 void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
-    if (event->mimeData()->hasUrls())
+    if (event->mimeData()->hasFormat("MyItem"))
     {
         QPointF dropPoint = event->pos();
         QPointF itemPos;

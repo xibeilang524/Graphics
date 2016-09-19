@@ -23,11 +23,12 @@
 
 #include "Header.h"
 
-class QGraphicsView;
+class MyGraphicsView;
 class MyScene;
 class QActionGroup;
 class MySlider;
 class RightToolBox;
+class LeftIconWidget;
 
 namespace Ui {
 class MainWindow;
@@ -81,7 +82,7 @@ private:
     Ui::MainWindow *ui;
 
     MyScene * scene;
-    QGraphicsView * view;
+    MyGraphicsView * view;
 
     QMenu * rightMenu;
 
@@ -89,6 +90,7 @@ private:
 
     MySlider * mySlider;
     RightToolBox * rightToolBox;
+    LeftIconWidget * leftIconWidget;
 
     CutInfo cutTmpInfo;               //±£¥ÊºÙ«––≈œ¢
 };

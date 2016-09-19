@@ -3,7 +3,6 @@
 
 #include <QMenuBar>
 #include <QAction>
-#include <QGraphicsView>
 #include <QToolBar>
 #include <QActionGroup>
 #include <QComboBox>
@@ -20,9 +19,11 @@
 #include "./item/myitem.h"
 #include "./item/myarrow.h"
 #include "./item/mytextitem.h"
+#include "./item/mygraphicsview.h"
 #include "./SelfWidget/myslider.h"
 #include "./SelfWidget/righttoolbox.h"
 #include "./SelfWidget/mytextinput.h"
+#include "./SelfWidget/lefticonwidget.h"
 #include "fileoperate.h"
 #include "global.h"
 
@@ -503,7 +504,7 @@ void MainWindow::createSceneAndView()
     connect(scene,SIGNAL(deleteKeyPress()),this,SLOT(deleteItem()));
     connect(scene,SIGNAL(itemSizeChanged(int)),this,SLOT(respItemSizeChanged(int)));
 
-    view = new QGraphicsView(this);
+    view = new MyGraphicsView(this);
     view->setScene(scene);
 //    view->setDragMode(QGraphicsView::RubberBandDrag);   //此行添加后会导致scene无法捕获mousemove事件
 //    view->setRenderHints(QPainter::Antialiasing| QPainter::TextAntialiasing);
@@ -514,6 +515,9 @@ void MainWindow::createSceneAndView()
     connect(rightToolBox,SIGNAL(deleteCurrItem()),this,SLOT(deleteItem()));
     connect(scene,SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
 
+    leftIconWidget = new LeftIconWidget;
+
+    layout->addWidget(leftIconWidget);
     layout->addWidget(view);
     layout->addWidget(rightToolBox);
     centralWidget->setLayout(layout);

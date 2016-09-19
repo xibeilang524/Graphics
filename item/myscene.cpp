@@ -18,6 +18,7 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
     CurrAddGraType =  GRA_NONE;
     insertTmpLine = NULL;
     insertTmpPath = NULL;
+
 }
 
 void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
