@@ -7,11 +7,13 @@
 #include <QDebug>
 
 #include "myitem.h"
+#include "myarrow.h"
 #include "../actionmanager.h"
 
 using namespace Graphics;
 
 MyNodePort::MyNodePort(MyItem *parentItem):
+    parentMyItem(parentItem),
     QGraphicsObject(parentItem)
 {
 //    setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -122,6 +124,38 @@ void MyNodePort::respDeleteAction()
 void MyNodePort::respEditAction()
 {
     emit editPort(this);
+}
+
+//保存添加的箭头
+void MyNodePort::addArrow(MyArrow *arrow)
+{
+    arrows.push_back(arrow);
+}
+
+//删除此控件时，移除所有的箭头
+void MyNodePort::removeArrows()
+{
+    foreach (MyArrow *arrow, arrows)
+    {
+        arrow->getStartNodePort()->removeArrow(arrow);
+        arrow->getEndNodePort()->removeArrow(arrow);
+//        scene()->removeItem(arrow);
+        delete arrow;
+    }
+}
+
+void MyNodePort::removeArrow(MyArrow *arrow)
+{
+    int index = arrows.indexOf(arrow);
+
+    if (index != -1)
+        arrows.removeAt(index);
+}
+
+//设置控件的样式属性
+void MyNodePort::setProperty(ItemProperty property)
+{
+    this->property = property;
 }
 
 MyNodePort::~MyNodePort()

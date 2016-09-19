@@ -557,6 +557,8 @@ void MyItem::procDeleteNodePort(MyNodePort *nodePort)
 
     if(index >= 0)
     {
+        ports.at(index)->removeArrows();
+
         delete ports.at(index);
         ports.removeAt(index);
     }
@@ -1032,6 +1034,13 @@ void MyItem::updateRotation(int rotateValue)
 
 MyItem::~MyItem()
 {
+    foreach (MyNodePort* node, ports)
+    {
+        node->removeArrows();
+        delete node;
+    }
+    ports.clear();
+
     if(leftTopPoint)
     {
         delete leftTopPoint;
@@ -1091,12 +1100,6 @@ MyItem::~MyItem()
         delete myTextItem;
         myTextItem = NULL;
     }
-
-    foreach (MyNodePort * node, ports)
-    {
-        delete node;
-    }
-    ports.clear();
 
 }
 

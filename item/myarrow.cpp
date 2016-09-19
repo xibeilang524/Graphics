@@ -6,6 +6,7 @@
 #include <QDebug>
 
 #include "myitem.h"
+#include "mynodeport.h"
 
 #include "math.h"
 
@@ -39,13 +40,30 @@ MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     QGraphicsLineItem(parent)
 {
     setFlag(QGraphicsItem::ItemIsSelectable, true);
-//    setFlag(QGraphicsItem::ItemIsMovable,true);
 
     type = GRA_LINE;
     property.itemBrush = QBrush(Qt::black);
     //直线保存两端控件的引用
     property.startItemID = startItem->getProperty().startItemID;
     property.endItemID = endItem->getProperty().startItemID;
+
+    lineType = LINE_MYITEM;
+}
+
+MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *parent):
+    startNodePort(startItem),
+    endNodePort(endItem),
+    QGraphicsLineItem(parent)
+{
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+    type = GRA_LINE;
+    property.itemBrush = QBrush(Qt::black);
+    //直线保存两端控件的引用
+    property.startItemID = startItem->getProperty().startItemID;
+    property.endItemID = endItem->getProperty().startItemID;
+
+    lineType = LINE_NODEPORT;
 }
 
 QRectF MyArrow::boundingRect()const
@@ -57,7 +75,10 @@ QRectF MyArrow::boundingRect()const
 QPainterPath MyArrow::shape()const
 {
     QPainterPath path = QGraphicsLineItem::shape();
-    path.addPolygon(arrowHead);
+    if(lineType == LINE_MYITEM)
+    {
+        path.addPolygon(arrowHead);
+    }
     return path;
 }
 
@@ -72,7 +93,7 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 {
     painter->save();
 
-    if(startItem && endItem)
+    if(lineType == LINE_MYITEM && startItem && endItem)
     {
         QLineF centerLine(startItem->pos(), endItem->pos());
         QPolygonF endPolygon = endItem->polygon();
@@ -105,7 +126,6 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
         }
         //将交点和起点作为线段的端点
         setLine(QLineF(intersectPoint, startItem->pos()));
-
         if (isSelected())
         {
             painter->setPen(QPen(Qt::blue, 1, Qt::DashLine));
@@ -139,13 +159,30 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
             painter->drawPolygon(arrowHead);
 
     }
+    else if(lineType == LINE_NODEPORT && startNodePort && endNodePort)
+    {
+        QPointF startPoint = startNodePort->getParentItem()->mapToScene(startNodePort->pos());
+        QPointF endPoint = endNodePort->getParentItem()->mapToScene(endNodePort->pos());
+
+        painter->setPen(Qt::black);
+        QLineF centerLine(startPoint, endPoint);
+        painter->drawLine(centerLine);
+    }
     painter->restore();
 }
 
 void MyArrow::updatePosition()
 {
-    QLineF line(mapFromItem(startItem, 0, 0), mapFromItem(endItem, 0, 0));
-    setLine(line);
+    if(lineType == LINE_NODEPORT)
+    {
+        QLineF line(mapFromItem(startNodePort, 0, 0), mapFromItem(endNodePort, 0, 0));
+        setLine(line);
+    }
+    else if(lineType == LINE_MYITEM)
+    {
+        QLineF line(mapFromItem(startItem, 0, 0), mapFromItem(endItem, 0, 0));
+        setLine(line);
+    }
 }
 
 MyArrow::~MyArrow()

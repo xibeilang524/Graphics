@@ -72,12 +72,25 @@ void LeftIconWidget::initListItems()
 
     MyListItem * nodePort = ListItemManager::instance()->createListItem(Constants::NODE_PORT_ID,QIcon(":/images/nodePort.png"),"¶Ë¿Ú",nodeWidget);
     nodeWidget->addItem(nodePort);
-
 }
 
 LeftIconWidget::~LeftIconWidget()
 {
-    delete toolBox;
-    delete polygonWidget;
-    delete nodeWidget;
+    if(polygonWidget)
+    {
+        delete polygonWidget;
+        polygonWidget = NULL;
+    }
+
+    if(nodeWidget)
+    {
+        delete nodeWidget;
+        nodeWidget = NULL;
+    }
+
+    if(toolBox)
+    {
+        delete toolBox;
+        toolBox = NULL;
+    }
 }

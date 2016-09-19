@@ -31,6 +31,14 @@ enum MouseType
     MOUSE_RELEASE
 };
 
+//线段两端所连接的类型
+enum LineType
+{
+    LINE_NONE,
+    LINE_MYITEM,
+    LINE_NODEPORT
+};
+
 //拖入端口的方向
 enum DragDirect
 {

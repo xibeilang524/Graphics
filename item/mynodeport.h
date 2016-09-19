@@ -18,9 +18,11 @@
 #include <QBrush>
 
 #include "ItemHeader.h"
+#include "../Header.h"
 
 class QMenu;
 class MyItem;
+class MyArrow;
 
 class MyNodePort : public QGraphicsObject
 {
@@ -42,6 +44,15 @@ public:
 
     void setScaleFactor(qreal scaleFactor);
     qreal getScaleFactor(){return this->scaleFactor;}
+
+    void setProperty(ItemProperty property);
+    ItemProperty getProperty(){return this->property;}
+
+    MyItem * getParentItem(){return this->parentMyItem;}
+
+    void addArrow(MyArrow * arrow);
+    void removeArrows();
+    void removeArrow(MyArrow * arrow);
 
 signals:
     void deletePort(MyNodePort *);
@@ -73,7 +84,13 @@ private:
 
     QBrush brush;
 
+    ItemProperty property;             //保存当前属性
+
     QMenu * nodePortRightMenu;         //端口右键菜单，支持删除
+
+    QList<MyArrow *> arrows;           //保存添加的箭头
+
+    MyItem * parentMyItem;             //父节点
 };
 
 #endif // MYNODEPORT_H

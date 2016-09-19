@@ -40,6 +40,11 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("模型工具");
 
     rightMenu = NULL;
+    mySlider = NULL;
+    rightToolBox = NULL;
+    leftIconWidget = NULL;
+    scene = NULL;
+    view = NULL;
 
     createActionAndMenus();
 
@@ -746,7 +751,35 @@ void MainWindow::sceneScaled(int currScale)
 
 MainWindow::~MainWindow()
 {
-    delete mySlider;
+    if(mySlider)
+    {
+        delete mySlider;
+        mySlider = NULL;
+    }
+
+    if(leftIconWidget)
+    {
+        delete leftIconWidget;
+        leftIconWidget = NULL;
+    }
+
+    if(rightToolBox)
+    {
+        delete rightToolBox;
+        rightToolBox = NULL;
+    }
+
+    if(scene)
+    {
+        delete scene;
+        scene = NULL;
+    }
+
+    if(view)
+    {
+        delete view;
+        view = NULL;
+    }
 
     delete ui;
 }

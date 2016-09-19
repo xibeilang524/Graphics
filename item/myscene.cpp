@@ -10,6 +10,9 @@
 #include "myarrow.h"
 #include "mytextitem.h"
 #include "mypathitem.h"
+#include "mynodeport.h"
+
+#include "typeinfo.h"
 
 MyScene::MyScene(QMenu *menu, QObject * parent):
     rightMenu(menu),
@@ -112,20 +115,40 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         delete insertTmpLine;
 
         if (startItems.count() > 0 && endItems.count() > 0 &&
-//            startItems.first()->type() == DiagramItem::Type &&
-//            endItems.first()->type() == DiagramItem::Type &&
             startItems.first() != endItems.first())
         {
-            MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
-            MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
-            if(startItem && endItem)
+            QString firstItemId = typeid(* startItems.first()).name();
+            QString secondItemId = typeid(* endItems.first()).name();
+
+            if(firstItemId == typeid(MyItem).name() && secondItemId == typeid(MyItem).name())
             {
-                MyArrow *arrow = new MyArrow(startItem, endItem);
-                startItem->addArrow(arrow);
-                endItem->addArrow(arrow);
-                arrow->setZValue(-1000.0);
-                addItem(arrow);
-                arrow->updatePosition();
+                MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
+                MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
+
+                if(startItem && endItem)
+                {
+                    MyArrow *arrow = new MyArrow(startItem, endItem);
+                    startItem->addArrow(arrow);
+                    endItem->addArrow(arrow);
+                    arrow->setZValue(-1000.0);
+                    addItem(arrow);
+                    arrow->updatePosition();
+                }
+            }
+            else if(firstItemId == typeid(MyNodePort).name() && secondItemId == typeid(MyNodePort).name())
+            {
+                MyNodePort *startItem = qgraphicsitem_cast<MyNodePort *>(startItems.first());
+                MyNodePort *endItem = qgraphicsitem_cast<MyNodePort *>(endItems.first());
+
+                if(startItem && endItem)
+                {
+                    MyArrow *arrow = new MyArrow(startItem, endItem);
+                    startItem->addArrow(arrow);
+                    endItem->addArrow(arrow);
+                    arrow->setZValue(-1000.0);
+                    addItem(arrow);
+                    arrow->updatePosition();
+                }
             }
         }
     }

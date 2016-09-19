@@ -18,13 +18,17 @@
 #include <QDataStream>
 
 #include "../Header.h"
+#include "ItemHeader.h"
 
 class MyItem;
+class MyNodePort;
 
 class MyArrow : public QGraphicsLineItem
 {
 public:
     MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem * parent = 0);
+    MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem * parent = 0);
+
     ~MyArrow();
 
     QRectF boundingRect()const;
@@ -35,6 +39,9 @@ public:
     MyItem * getStartItem() const{ return startItem; }
     MyItem * getEndItem() const{ return endItem; }
 
+    MyNodePort * getStartNodePort() const{return this->startNodePort;}
+    MyNodePort * getEndNodePort() const{return this->endNodePort;}
+
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
 
@@ -44,6 +51,12 @@ public:
 private:
     MyItem  * startItem;
     MyItem  * endItem;
+
+    MyNodePort * startNodePort;
+    MyNodePort * endNodePort;
+
+    LineType lineType;
+
     QPolygonF arrowHead;
 
     GraphicsType type;
