@@ -88,6 +88,9 @@ private slots:
     void procMouseState(MouseType, PointType pointType, QPointF currPos);
     void procPortChanged(MouseType type, QPointF currPoint);
 
+    void procDeleteNodePort(MyNodePort * nodePort);
+    void procEditNodePort(MyNodePort * nodePort);
+
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

@@ -2,18 +2,27 @@
 
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
+#include <QMenu>
 #include <QDebug>
 
-MyNodePort::MyNodePort(QGraphicsItem *parentItem):
+#include "myitem.h"
+#include "../actionmanager.h"
+
+using namespace Graphics;
+
+MyNodePort::MyNodePort(MyItem *parentItem):
     QGraphicsObject(parentItem)
 {
-
 //    setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
 
     radius = 15;
 
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);
+
+    initNodePortRightMenu();
+    connect(this,SIGNAL(deletePort(MyNodePort*)),parentItem,SLOT(procDeleteNodePort(MyNodePort*)));
+    connect(this,SIGNAL(editPort(MyNodePort*)),parentItem,SLOT(procEditNodePort(MyNodePort*)));
 }
 
 //设置端口拖入的方向
@@ -77,7 +86,43 @@ void MyNodePort::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void MyNodePort::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
+    emit editPort(this);
     QGraphicsObject::mouseDoubleClickEvent(event);
+}
+
+void MyNodePort::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    nodePortRightMenu->exec(event->screenPos());
+}
+
+//初始化端口右键菜单
+void MyNodePort::initNodePortRightMenu()
+{
+    nodePortRightMenu = new QMenu;
+
+
+    MyAction * editAction = ActionManager::instance()->crateAction(Constants::NODE_EDIT_ID,QIcon(":/images/edit.png"),"编辑节点");
+
+    MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::NODE_DELETE_ID,QIcon(":/images/delete.png"),"删除");
+
+    nodePortRightMenu->addAction(ActionManager::instance()->action(Constants::NODE_EDIT_ID));
+    nodePortRightMenu->addSeparator();
+    nodePortRightMenu->addAction(ActionManager::instance()->action(Constants::NODE_DELETE_ID));
+
+    connect(editAction,SIGNAL(triggered()),this,SLOT(respEditAction()));
+    connect(deleteAction,SIGNAL(triggered()),this,SLOT(respDeleteAction()));
+}
+
+//响应删除
+void MyNodePort::respDeleteAction()
+{
+    emit deletePort(this);
+}
+
+//响应编辑
+void MyNodePort::respEditAction()
+{
+    emit editPort(this);
 }
 
 MyNodePort::~MyNodePort()

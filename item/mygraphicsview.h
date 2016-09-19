@@ -6,19 +6,33 @@
 **Others:
 **
 **修改历史:
-**
+**20160919:wey:添加单利模式
+**             添加端口编辑页面
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
 
 #include <QGraphicsView>
 
+class MyNodePort;
+class NodeEditDialog;
+
 class MyGraphicsView : public QGraphicsView
 {
     Q_OBJECT
 public:
+    static MyGraphicsView * instance();
+
     MyGraphicsView(QWidget * parent = 0);
     ~MyGraphicsView();
+
+    void showNodePortEdit(MyNodePort * nodePort);
+
+
+private:
+    static MyGraphicsView * viewManager;
+
+    NodeEditDialog * nodeEdit;
 };
 
 #endif // MYGRAPHICSVIEW_H

@@ -273,8 +273,6 @@ void MyScene::respTextLostFocus(MyTextItem *item)
     }
 }
 
-
-
 MyScene::~MyScene()
 {
 

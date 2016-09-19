@@ -15,6 +15,7 @@
 #include "myarrow.h"
 #include "mytextitem.h"
 #include "mynodeport.h"
+#include "mygraphicsview.h"
 
 #include "qmath.h"
 
@@ -201,6 +202,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     setDragPointVisible(false);
 
     procResizeItem();
+
 }
 
 void MyItem::setPos(const QPointF &pos)
@@ -538,6 +540,32 @@ void MyItem::procPortChanged(MouseType type, QPointF currPoint)
             tmpPort->setScaleFactor(scaleFactor);
         }
     }
+}
+
+//删除某个端口
+void MyItem::procDeleteNodePort(MyNodePort *nodePort)
+{
+    int index = -1;
+    for(int i = 0;i<ports.size();i++)
+    {
+        if(ports.at(i) ==  nodePort)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if(index >= 0)
+    {
+        delete ports.at(index);
+        ports.removeAt(index);
+    }
+}
+
+//编辑某个端口
+void MyItem::procEditNodePort(MyNodePort *nodePort)
+{
+    MyGraphicsView::instance()->showNodePortEdit(nodePort);
 }
 
 //将当前值和最大及最小值相比较，只能在此范围内

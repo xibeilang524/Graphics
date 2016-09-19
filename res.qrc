@@ -27,5 +27,6 @@
         <file>images/editText.png</file>
         <file>images/vectorLine.png</file>
         <file>images/nodePort.png</file>
+        <file>images/edit.png</file>
     </qresource>
 </RCC>

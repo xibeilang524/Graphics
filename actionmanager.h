@@ -40,6 +40,7 @@ private:
 };
 
 #include <QMap>
+class MyItem;
 
 class ActionManager : public QObject
 {

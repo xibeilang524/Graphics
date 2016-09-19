@@ -8,7 +8,8 @@
 **       3.支持连线
 **
 **修改历史:
-**
+**20160919:wey:添加右键删除事件
+**             添加右键编辑功能
 *************************************************/
 #ifndef MYNODEPORT_H
 #define MYNODEPORT_H
@@ -18,13 +19,14 @@
 
 #include "ItemHeader.h"
 
+class QMenu;
 class MyItem;
 
 class MyNodePort : public QGraphicsObject
 {
     Q_OBJECT
 public:
-    MyNodePort(QGraphicsItem * parentItem);
+    MyNodePort(MyItem * parentItem);
     ~MyNodePort();
 
     QRectF boundingRect() const;
@@ -41,16 +43,25 @@ public:
     void setScaleFactor(qreal scaleFactor);
     qreal getScaleFactor(){return this->scaleFactor;}
 
+signals:
+    void deletePort(MyNodePort *);
+    void editPort(MyNodePort *);
+    void portPosChanged(MouseType,QPointF);
+
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
-signals:
-    void portPosChanged(MouseType,QPointF);
+private slots:
+    void respDeleteAction();
+    void respEditAction();
 
 private:
+    void initNodePortRightMenu();
+
     QRectF boundRect;
     int radius;
 
@@ -62,6 +73,7 @@ private:
 
     QBrush brush;
 
+    QMenu * nodePortRightMenu;         //端口右键菜单，支持删除
 };
 
 #endif // MYNODEPORT_H
