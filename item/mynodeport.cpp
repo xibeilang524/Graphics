@@ -3,6 +3,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QPainter>
 #include <QMenu>
+#include <QAction>
 #include <QDebug>
 
 #include "myitem.h"
@@ -16,7 +17,7 @@ MyNodePort::MyNodePort(MyItem *parentItem):
 //    setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
 
-    radius = 15;
+    radius = 13;
 
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);
 
@@ -100,14 +101,12 @@ void MyNodePort::initNodePortRightMenu()
 {
     nodePortRightMenu = new QMenu;
 
+    QAction * editAction = new QAction(QIcon(":/images/edit.png"),"±à¼­½Úµã",nodePortRightMenu);
+    QAction * deleteAction = new QAction(QIcon(":/images/delete.png"),"É¾³ý",nodePortRightMenu);
 
-    MyAction * editAction = ActionManager::instance()->crateAction(Constants::NODE_EDIT_ID,QIcon(":/images/edit.png"),"±à¼­½Úµã");
-
-    MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::NODE_DELETE_ID,QIcon(":/images/delete.png"),"É¾³ý");
-
-    nodePortRightMenu->addAction(ActionManager::instance()->action(Constants::NODE_EDIT_ID));
+    nodePortRightMenu->addAction(editAction);
     nodePortRightMenu->addSeparator();
-    nodePortRightMenu->addAction(ActionManager::instance()->action(Constants::NODE_DELETE_ID));
+    nodePortRightMenu->addAction(deleteAction);
 
     connect(editAction,SIGNAL(triggered()),this,SLOT(respEditAction()));
     connect(deleteAction,SIGNAL(triggered()),this,SLOT(respDeleteAction()));
@@ -127,5 +126,9 @@ void MyNodePort::respEditAction()
 
 MyNodePort::~MyNodePort()
 {
-
+//    if(nodePortRightMenu)
+//    {
+//        delete nodePortRightMenu;
+//        nodePortRightMenu = NULL;
+//    }
 }
