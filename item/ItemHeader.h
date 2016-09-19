@@ -39,15 +39,6 @@ enum LineType
     LINE_NODEPORT
 };
 
-//拖入端口的方向
-enum DragDirect
-{
-    DRAG_LEFT,
-    DRAG_TOP,
-    DRAG_RIGHT,
-    DRAG_BOTTOM
-};
-
 #define PI 3.141592653
 #define ROTATE_WIDTH   5
 #define ROTATE_SQUARE_WIDTH 5

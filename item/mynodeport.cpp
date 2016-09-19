@@ -46,13 +46,6 @@ void MyNodePort::setScaleFactor(qreal scaleFactor)
     this->scaleFactor = scaleFactor;
 }
 
-//ÉèÖÃ¶Ë¿ÚµÄ»­Ë¢
-void MyNodePort::setBrush(const QBrush &brush)
-{
-    this->brush = brush;
-    update();
-}
-
 QRectF MyNodePort::boundingRect()const
 {
     return boundRect;
@@ -62,7 +55,7 @@ void MyNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 {
     painter->save();
 
-    painter->setBrush(brush);
+    painter->setBrush(property.itemBrush);
 
     painter->drawRect(boundRect);
 
@@ -156,13 +149,10 @@ void MyNodePort::removeArrow(MyArrow *arrow)
 void MyNodePort::setProperty(ItemProperty property)
 {
     this->property = property;
+
+    update();
 }
 
 MyNodePort::~MyNodePort()
 {
-//    if(nodePortRightMenu)
-//    {
-//        delete nodePortRightMenu;
-//        nodePortRightMenu = NULL;
-//    }
 }

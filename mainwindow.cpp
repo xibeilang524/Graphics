@@ -20,6 +20,7 @@
 #include "./item/myarrow.h"
 #include "./item/mytextitem.h"
 #include "./item/mygraphicsview.h"
+#include "./item/mynodeport.h"
 #include "./SelfWidget/myslider.h"
 #include "./SelfWidget/righttoolbox.h"
 #include "./SelfWidget/mytextinput.h"
@@ -292,6 +293,13 @@ void MainWindow::cutItem()
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->getText();
+            foreach (MyNodePort * node, item->getNodePorts())
+            {
+                NodePortProperty  props;
+                props.direct = node->getDragDirect();
+                props.scaleFactor = node->getScaleFactor();
+                cutTmpInfo.nodeProperties.push_back(props);
+            }
             deleteItem();
         }
         else if(itemName == typeid(MyTextItem).name())
@@ -321,6 +329,14 @@ void MainWindow::copyItem()
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->getText();
+            cutTmpInfo.nodeProperties.clear();
+            foreach (MyNodePort * node, item->getNodePorts())
+            {
+                NodePortProperty  props;
+                props.direct = node->getDragDirect();
+                props.scaleFactor = node->getScaleFactor();
+                cutTmpInfo.nodeProperties.push_back(props);
+            }
         }
         else if(itemName == typeid(MyTextItem).name())
         {
@@ -452,6 +468,22 @@ void MainWindow::deleteItem()
         if(itemName == typeid(MyTextItem).name())
         {
             MyTextItem * tmp = dynamic_cast<MyTextItem *>(item);
+            scene->removeItem(tmp);
+            delete tmp;
+        }
+    }
+
+    selectedItems = scene->selectedItems();
+
+    foreach (QGraphicsItem * item, selectedItems)
+    {
+        QString itemName = typeid(*item).name();
+        if(itemName == typeid(MyNodePort).name())
+        {
+            MyNodePort * tmp = dynamic_cast<MyNodePort *>(item);
+            tmp->removeArrows();
+            //从父类集合中删除
+            tmp->getParentItem()->removeNodePort(tmp);
             scene->removeItem(tmp);
             delete tmp;
         }
@@ -610,6 +642,11 @@ void MainWindow::updateActions()
         {
             MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
             property = arrowItem->getProperty();
+        }
+        else if(itemName == typeid(MyNodePort).name())
+        {
+            MyNodePort  * nodePort = dynamic_cast<MyNodePort *>(scene->selectedItems().first());
+//            property = nodePort->getProperty();
         }
     }
     else

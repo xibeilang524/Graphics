@@ -43,6 +43,15 @@ enum GraphicsType
     GRA_TEXT
 };
 
+//拖入端口的方向
+enum DragDirect
+{
+    DRAG_LEFT,
+    DRAG_TOP,
+    DRAG_RIGHT,
+    DRAG_BOTTOM
+};
+
 //记录当前item在scene中的x、y、w、h值
 struct MyRect
 {
@@ -104,6 +113,12 @@ struct ItemProperty
     qreal zValue;            //深度值
 };
 
+//节点属性
+struct NodePortProperty
+{
+    DragDirect direct;          //保存的方向
+    qreal scaleFactor;          //拖入的位置相当于当前一边所在的比例
+};
 
 //暂存一个剪切时的控件信息
 struct CutInfo
@@ -111,6 +126,7 @@ struct CutInfo
     GraphicsType graphicsType;
     ItemProperty itemProperty;
     QString content;
+    QList<NodePortProperty> nodeProperties;      //控件包含端口的信息
 };
 
 #endif // HEADER_H

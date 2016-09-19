@@ -10,6 +10,7 @@
 **修改历史:
 **20160919:wey:添加右键删除事件
 **             添加右键编辑功能
+**             增加连线功能
 *************************************************/
 #ifndef MYNODEPORT_H
 #define MYNODEPORT_H
@@ -34,8 +35,6 @@ public:
     QRectF boundingRect() const;
 
     void setPos(const QPointF &pos);
-
-    void setBrush(const QBrush & brush);
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
@@ -76,13 +75,9 @@ private:
     QRectF boundRect;
     int radius;
 
-    QPolygonF itemPolygon;             //当前图形的各个顶点坐标集合
-
     DragDirect dragDirect;
 
     qreal scaleFactor;                 //拖入的位置相当于当前一边所在的比例
-
-    QBrush brush;
 
     ItemProperty property;             //保存当前属性
 

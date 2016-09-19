@@ -19,7 +19,9 @@
 **20160918:wey:增加端口拖入，支持移动和按边拖入
 **20160919:wey:增加端口样式和本控件笔刷绑定
 **             修复复制控件时，大小不会复制问题
-**
+**             增加删除时同步删除端口集合
+**             增加尺寸或者移动端口更新端口连线
+**             增加拖入状态切换，允许时选中控件否则取消选择。
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -69,6 +71,11 @@ public:
     QString getText();
     void setText(QString text);
 
+    const QList<MyNodePort *> & getNodePorts(){return this->ports;}
+
+    void addNodePort(const NodePortProperty & prop);
+    void removeNodePort(MyNodePort * port);
+
     void setPos(const QPointF &pos);
     void setZValue(qreal z);
 
@@ -109,6 +116,7 @@ private:
     void procResizeNodePort();
     qreal getPointToRectMinDistance(QRectF rect,QPointF point);
     void getRangeValue(qreal maxValue,qreal minValue,qreal & currValue);
+    void createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);
 
     int radius;
 

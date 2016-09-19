@@ -348,10 +348,12 @@ void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
     if(event->mimeData()->hasFormat("MyItem"))
     {
+       setSelected(true);
        event->acceptProposedAction();
     }
     else
     {
+        setSelected(false);
         event->ignore();
     }
 }
@@ -384,15 +386,18 @@ void MyItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
     {
         if(getPointToRectMinDistance(boundRect,event->pos()) <= ALLOW_DROP_RANGE)
         {
+            setSelected(true);
             event->acceptProposedAction();
         }
         else
         {
+            setSelected(false);
             event->ignore();
         }
     }
     else
     {
+        setSelected(false);
         event->ignore();
     }
 }
@@ -400,7 +405,8 @@ void MyItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
 //拖入离开
 void MyItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 {
-
+    setSelected(false);
+    event->ignore();
 }
 
 /*!
@@ -448,15 +454,63 @@ void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
             scaleFactor = (dropPoint.x() - boundRect.bottomLeft().x()) / boundRect.width();
         }
 
-        MyNodePort * port = new MyNodePort(this);
-        port->setPos(itemPos);
-        port->setDragDirect(direct);
-        port->setScaleFactor(scaleFactor);
-        port->setBrush(property.itemBrush);
+        createProp(itemPos,direct,scaleFactor);
+    }
+}
 
-        connect(port,SIGNAL(portPosChanged(MouseType,QPointF)),this,SLOT(procPortChanged(MouseType,QPointF)));
+//拷贝或者拖入一个端口
+void MyItem::addNodePort(const NodePortProperty &prop)
+{
+    QPointF itemPos;
+    switch(prop.direct)
+    {
+        case DRAG_LEFT:
+                    {
+                        itemPos.setX(boundRect.topLeft().x());
+                        itemPos.setY(prop.scaleFactor*boundRect.height()+boundRect.topLeft().y());
+                    }
+                    break;
+        case DRAG_TOP:
+                    {
+                        itemPos.setX(prop.scaleFactor*boundRect.width()+boundRect.topLeft().x());
+                        itemPos.setY(boundRect.topLeft().y());
+                    }
+                    break;
+        case DRAG_RIGHT:
+                    {
+                        itemPos.setX(boundRect.topRight().x());
+                        itemPos.setY(prop.scaleFactor*boundRect.height()+boundRect.topRight().y());
+                    }
+                    break;
+        case DRAG_BOTTOM:
+                    {
+                        itemPos.setX(prop.scaleFactor*boundRect.width()+boundRect.bottomLeft().x());
+                        itemPos.setY(boundRect.bottomLeft().y());
+                    }
+                    break;
+    }
+    createProp(itemPos,prop.direct,prop.scaleFactor);
+}
 
-        ports.push_back(port);
+void MyItem::createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor)
+{
+    MyNodePort * port = new MyNodePort(this);
+    port->setPos(pos);
+    port->setDragDirect(direct);
+    port->setScaleFactor(scaleFactor);
+    port->setProperty(property);
+
+    connect(port,SIGNAL(portPosChanged(MouseType,QPointF)),this,SLOT(procPortChanged(MouseType,QPointF)));
+
+    ports.push_back(port);
+}
+
+//移除端口
+void MyItem::removeNodePort(MyNodePort *port)
+{
+    if(ports.size() > 0)
+    {
+        ports.removeOne(port);
     }
 }
 
@@ -539,6 +593,8 @@ void MyItem::procPortChanged(MouseType type, QPointF currPoint)
 
             tmpPort->setScaleFactor(scaleFactor);
         }
+
+        emit updateSceneDraw();
     }
 }
 
@@ -862,6 +918,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
     {
         setSelected(true);
     }
+    emit updateSceneDraw();
 }
 
 //调整8个拖拽矩形的位置
@@ -954,7 +1011,7 @@ void MyItem::setProperty(ItemProperty property)
 
     foreach (MyNodePort * node, ports)
     {
-        node->setBrush(property.itemBrush);
+        node->setProperty(property);
     }
 
     parentScene->update();

@@ -213,6 +213,10 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
             item->setPos(SceneLastClickPoint);
             item->setSelected(true);
             item->setDragPointVisible(true);
+            foreach(NodePortProperty prop,cutInfo.nodeProperties)
+            {
+                item->addNodePort(prop);
+            }
         }
         else
         {
