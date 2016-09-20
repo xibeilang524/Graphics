@@ -80,6 +80,7 @@ private:
     void createToolBar();
     void createStatusBar();
     void respShowStatusInfo(QString, int time = 2000);
+    void resetEditActionState(bool state);
 
     Ui::MainWindow *ui;
 

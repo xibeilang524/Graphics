@@ -22,6 +22,8 @@
 #define QCOS(a) qCos(a*PI/180)
 #define QSIN(a) qSin(a*PI/180)
 
+#define CROSS_RADIUS 8    //绘制拖入十字星半径
+
 //对MyRect的输出进行重载
 QDataStream & operator <<(QDataStream &stream,MyRect & rect)
 {
@@ -90,6 +92,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     QGraphicsPolygonItem(parent2)
 {
     radius = 100;
+    isDragging = false;            //默认无拖入
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -166,7 +169,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     setBrush(property.itemBrush);
 
     property.itemBrush = QBrush(Qt::white);
-    property.itemPen = QPen(Qt::black);
+    property.itemPen = QPen(Qt::black,1,Qt::SolidLine);
 
     property.itemRect.width = boundRect.width();
     property.itemRect.height = boundRect.height();
@@ -297,6 +300,34 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
     painter->drawPolygon(itemPolygon);
 
+    //绘制外部接口拖入至本控件时的位置状态
+    if(isDragging)
+    {
+        painter->save();
+        painter->setPen(QPen(Qt::red,2,Qt::SolidLine));
+
+        switch(dragMoveDirect)
+        {
+            case DRAG_LEFT:
+                             painter->drawLine(dragMovePoint.x(),dragMovePoint.y(),dragMovePoint.x()+CROSS_RADIUS,dragMovePoint.y());
+                             painter->drawLine(dragMovePoint.x(),dragMovePoint.y()-CROSS_RADIUS,dragMovePoint.x(),dragMovePoint.y()+CROSS_RADIUS);
+                             break;
+            case DRAG_TOP:
+                             painter->drawLine(dragMovePoint.x()-CROSS_RADIUS,dragMovePoint.y(),dragMovePoint.x()+CROSS_RADIUS,dragMovePoint.y());
+                             painter->drawLine(dragMovePoint.x(),dragMovePoint.y(),dragMovePoint.x(),dragMovePoint.y()+CROSS_RADIUS);
+                             break;
+            case DRAG_RIGHT:
+                             painter->drawLine(dragMovePoint.x()-CROSS_RADIUS,dragMovePoint.y(),dragMovePoint.x(),dragMovePoint.y());
+                             painter->drawLine(dragMovePoint.x(),dragMovePoint.y()-CROSS_RADIUS,dragMovePoint.x(),dragMovePoint.y()+CROSS_RADIUS);
+                             break;
+            case DRAG_BOTTOM:
+                             painter->drawLine(dragMovePoint.x()-CROSS_RADIUS,dragMovePoint.y(),dragMovePoint.x()+CROSS_RADIUS,dragMovePoint.y());
+                             painter->drawLine(dragMovePoint.x(),dragMovePoint.y()-CROSS_RADIUS,dragMovePoint.x(),dragMovePoint.y());
+                             break;
+        }
+        painter->restore();
+    }
+
     painter->restore();
 }
 
@@ -349,18 +380,84 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 //拖入事件
 void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
-    qDebug()<<__FUNCTION__;
-
     if(event->mimeData()->hasFormat("MyItem"))
     {
-       setSelected(true);
-       event->acceptProposedAction();
+        QByteArray array = event->mimeData()->data("MyItem");
+        QDataStream stream(&array, QIODevice::ReadOnly);//流，读数据
+
+        int graphicsType;
+        stream>>graphicsType;
+        if(graphicsType == GRA_NODE_PORT)
+        {
+            setSelected(true);
+            event->acceptProposedAction();
+            isDragging = false;
+        }
+        else
+        {
+            isDragging = false;
+            event->ignore();
+        }
     }
     else
     {
         setSelected(false);
+        isDragging = false;
         event->ignore();
     }
+    update();
+}
+
+//拖入移动
+void MyItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
+{
+    if(event->mimeData()->hasFormat("MyItem"))
+    {
+        if(getPointToRectMinDistance(boundRect,event->pos()) <= ALLOW_DROP_RANGE)
+        {
+            isDragging = true;
+
+            dragMoveDirect = getDropDirect(event->pos());
+
+            switch (dragMoveDirect)
+            {
+                case DRAG_NONE:
+                                  return;
+                              break;
+                case DRAG_LEFT:
+                                  dragMovePoint.setX(boundRect.topLeft().x());
+                                  dragMovePoint.setY(event->pos().y());
+                              break;
+                case DRAG_TOP:
+                                  dragMovePoint.setX(event->pos().x());
+                                  dragMovePoint.setY(boundRect.topLeft().y());
+                              break;
+                case DRAG_RIGHT:
+                                  dragMovePoint.setX(boundRect.topRight().x());
+                                  dragMovePoint.setY(event->pos().y());
+                              break;
+                case DRAG_BOTTOM:
+                                  dragMovePoint.setX(event->pos().x());
+                                  dragMovePoint.setY(boundRect.bottomRight().y());
+                              break;
+            }
+            setSelected(true);
+            event->acceptProposedAction();
+        }
+        else
+        {
+            isDragging = false;
+            setSelected(false);
+            event->ignore();
+        }
+    }
+    else
+    {
+        isDragging = false;
+        setSelected(false);
+        event->ignore();
+    }
+    update();
 }
 
 //计算点到矩形四边最小距离
@@ -384,34 +481,13 @@ qreal MyItem::getPointToRectMinDistance(QRectF rect,QPointF point)
     return minDis;
 }
 
-//拖入移动
-void MyItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
-{
-    if(event->mimeData()->hasFormat("MyItem"))
-    {
-        if(getPointToRectMinDistance(boundRect,event->pos()) <= ALLOW_DROP_RANGE)
-        {
-            setSelected(true);
-            event->acceptProposedAction();
-        }
-        else
-        {
-            setSelected(false);
-            event->ignore();
-        }
-    }
-    else
-    {
-        setSelected(false);
-        event->ignore();
-    }
-}
-
 //拖入离开
 void MyItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 {
+    isDragging = false;
     setSelected(false);
     event->ignore();
+    update();
 }
 
 /*!
@@ -424,43 +500,71 @@ void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
     {
         QPointF dropPoint = event->pos();
         QPointF itemPos;
-        DragDirect direct;
         qreal scaleFactor;
-        //放在左侧
-        if(qAbs(dropPoint.x() - boundRect.topLeft().x()) <=  ALLOW_DROP_RANGE)
+
+        DragDirect direct = getDropDirect(dropPoint);
+
+        switch (direct)
         {
-            itemPos.setX(boundRect.topLeft().x());
-            itemPos.setY(dropPoint.y());
-            direct = DRAG_LEFT;
-            scaleFactor = (dropPoint.y() - boundRect.topLeft().y()) / boundRect.height();
-        }
-        //放在上侧
-        else if(qAbs(dropPoint.y() - boundRect.topLeft().y()) <=  ALLOW_DROP_RANGE)
-        {
-            itemPos.setX(dropPoint.x());
-            itemPos.setY(boundRect.topLeft().y());
-            direct = DRAG_TOP;
-            scaleFactor = (dropPoint.x() - boundRect.topLeft().x()) / boundRect.width();
-        }
-        //放在右侧
-        else if(qAbs(dropPoint.x() - boundRect.bottomRight().x()) <=  ALLOW_DROP_RANGE)
-        {
-            itemPos.setX(boundRect.bottomRight().x());
-            itemPos.setY(dropPoint.y());
-            direct = DRAG_RIGHT;
-            scaleFactor = (dropPoint.y() - boundRect.topRight().y()) / boundRect.height();
-        }
-        //放在下侧
-        else if(qAbs(dropPoint.y() - boundRect.bottomRight().y()) <=  ALLOW_DROP_RANGE)
-        {
-            itemPos.setX(dropPoint.x());
-            itemPos.setY(boundRect.bottomRight().y());
-            direct = DRAG_BOTTOM;
-            scaleFactor = (dropPoint.x() - boundRect.bottomLeft().x()) / boundRect.width();
+            case DRAG_NONE:
+                              return;
+                          break;
+            case DRAG_LEFT:
+                              itemPos.setX(boundRect.topLeft().x());
+                              itemPos.setY(dropPoint.y());
+                              scaleFactor = (dropPoint.y() - boundRect.topLeft().y()) / boundRect.height();
+                          break;
+            case DRAG_TOP:
+                              itemPos.setX(dropPoint.x());
+                              itemPos.setY(boundRect.topLeft().y());
+                              scaleFactor = (dropPoint.x() - boundRect.topLeft().x()) / boundRect.width();
+                          break;
+            case DRAG_RIGHT:
+                              itemPos.setX(boundRect.bottomRight().x());
+                              itemPos.setY(dropPoint.y());
+                              scaleFactor = (dropPoint.y() - boundRect.topRight().y()) / boundRect.height();
+                          break;
+            case DRAG_BOTTOM:
+                              itemPos.setX(dropPoint.x());
+                              itemPos.setY(boundRect.bottomRight().y());
+                              scaleFactor = (dropPoint.x() - boundRect.bottomLeft().x()) / boundRect.width();
+                          break;
         }
 
         createProp(itemPos,direct,scaleFactor);
+        isDragging = false;
     }
+}
+
+//获取拖放在四边的位置
+DragDirect MyItem::getDropDirect(const QPointF &currPoint)
+{
+    DragDirect direct;
+    //放在左侧
+    if(qAbs(currPoint.x() - boundRect.topLeft().x()) <=  ALLOW_DROP_RANGE)
+    {
+        direct = DRAG_LEFT;
+    }
+    //放在上侧
+    else if(qAbs(currPoint.y() - boundRect.topLeft().y()) <=  ALLOW_DROP_RANGE)
+    {
+        direct = DRAG_TOP;
+    }
+    //放在右侧
+    else if(qAbs(currPoint.x() - boundRect.bottomRight().x()) <=  ALLOW_DROP_RANGE)
+    {
+        direct = DRAG_RIGHT;
+    }
+    //放在下侧
+    else if(qAbs(currPoint.y() - boundRect.bottomRight().y()) <=  ALLOW_DROP_RANGE)
+    {
+        direct = DRAG_BOTTOM;
+    }
+    else
+    {
+        direct = DRAG_NONE;
+    }
+    return direct;
 }
 
 //拷贝或者拖入一个端口

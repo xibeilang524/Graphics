@@ -49,6 +49,7 @@ enum GraphicsType
 //拖入端口的方向
 enum DragDirect
 {
+    DRAG_NONE,
     DRAG_LEFT,
     DRAG_TOP,
     DRAG_RIGHT,

@@ -22,6 +22,7 @@
 **             增加删除时同步删除端口集合
 **             增加尺寸或者移动端口更新端口连线
 **             增加拖入状态切换，允许时选中控件否则取消选择。
+**20160920:wey:增加对拖入端口标绘位置十字星
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -117,6 +118,7 @@ private:
     qreal getPointToRectMinDistance(QRectF rect,QPointF point);
     void getRangeValue(qreal maxValue,qreal minValue,qreal & currValue);
     void createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);
+    DragDirect getDropDirect(const QPointF &currPoint);
 
     int radius;
 
@@ -154,6 +156,9 @@ private:
     ItemProperty property;             //保存当前属性
 
     bool isNeedBorder;                 //是否需要选中边框
+    bool isDragging;                   //是否有拖入，有拖入后在边框显示拖入点
+    DragDirect dragMoveDirect;         //拖动时拖入点在哪个方向上
+    QPointF dragMovePoint;             //有拖入时，用于记录拖入移动的点
 
 };
 

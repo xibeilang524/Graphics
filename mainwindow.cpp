@@ -61,6 +61,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     respItemSizeChanged(0);
 
+    resetEditActionState(false);
 }
 
 //创建窗口的菜单栏，绑定响应事件
@@ -269,6 +270,7 @@ void MainWindow::fileClear()
     {
         scene->clear();
         respItemSizeChanged(0);
+        resetEditActionState(false);
     }
 }
 
@@ -301,6 +303,7 @@ void MainWindow::cutItem()
                 cutTmpInfo.nodeProperties.push_back(props);
             }
             deleteItem();
+            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
         }
         else if(itemName == typeid(MyTextItem).name())
         {
@@ -309,6 +312,7 @@ void MainWindow::cutItem()
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             delete item;
+            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
         }
     }
 }
@@ -337,6 +341,7 @@ void MainWindow::copyItem()
                 props.scaleFactor = node->getScaleFactor();
                 cutTmpInfo.nodeProperties.push_back(props);
             }
+            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
         }
         else if(itemName == typeid(MyTextItem).name())
         {
@@ -345,6 +350,7 @@ void MainWindow::copyItem()
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->toPlainText();
+            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
         }
     }
 }
@@ -573,14 +579,24 @@ void MainWindow::respItemSizeChanged(int size)
 
     ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(actionEnabled);
 
-    ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(actionEnabled);
-    ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(actionEnabled);
+    if(scene->selectedItems().size() > 0)
+    {
+        resetEditActionState(actionEnabled);
+    }
+}
 
-    ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(actionEnabled);
-    ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(actionEnabled);
-    ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(actionEnabled);
-    ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(actionEnabled);
-    ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(actionEnabled);
+//重置编辑action的状态
+void MainWindow::resetEditActionState(bool state)
+{
+    ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(state);
+    ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(state);
+    ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(state);
+
+    ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(state);
+    ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(state);
+    ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(state);
+    ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(state);
+    ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(state);
 }
 
 //当在scene中右击时，将item工具栏中的状态恢复至箭头状态
@@ -645,7 +661,7 @@ void MainWindow::updateActions()
         }
         else if(itemName == typeid(MyNodePort).name())
         {
-            MyNodePort  * nodePort = dynamic_cast<MyNodePort *>(scene->selectedItems().first());
+//            MyNodePort  * nodePort = dynamic_cast<MyNodePort *>(scene->selectedItems().first());
 //            property = nodePort->getProperty();
         }
     }

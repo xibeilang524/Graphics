@@ -470,9 +470,10 @@ void RightToolBox::respInitToolBox(int seletedItemNum,ItemProperty property)
         ui->colorFill->setChecked(currItemProperty.isNeedBrush);
         ui->borderChecked->setChecked(currItemProperty.isNeedBorder);
 
-        //填充的颜色
+        //填充的颜色和线条颜色
         selectedFillColor = currItemProperty.itemBrush.color();
         selectedLineColor = currItemProperty.itemPen.color();
+        setLineColor();
 
         QColor colorBrush = currItemProperty.itemBrush.color();
         Util::setWidgetColor(ui->colorFillButt,colorBrush);
