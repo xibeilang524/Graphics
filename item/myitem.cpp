@@ -107,7 +107,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
                                       QPointF(radius,radius)<<QPointF(-radius,radius);
 
-                               property.itemBrush = QBrush(Qt::red);
+//                               property.itemBrush = QBrush(Qt::red);
                                break;
             //矩形
             case GRA_RECT:
@@ -116,7 +116,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                itemPolygon<<QPointF(-radius,-factor*radius)<<QPointF(radius,-factor*radius)<<
                                        QPointF(radius,factor*radius)<<QPointF(-radius,factor*radius);
 
-                               property.itemBrush = QBrush(Qt::blue);
+//                               property.itemBrush = QBrush(Qt::blue);
                                break;
            //圆角矩形
            case GRA_ROUND_RECT:
@@ -126,7 +126,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                   path.addRoundedRect(boundRect,10,10);
                                   itemPolygon = path.toFillPolygon();
 
-                                  property.itemBrush = QBrush(Qt::yellow);
+//                                  property.itemBrush = QBrush(Qt::yellow);
                               }
                               break;
             //圆形
@@ -137,7 +137,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
 
-                                   property.itemBrush = QBrush(Qt::darkCyan);
+//                                   property.itemBrush = QBrush(Qt::darkCyan);
                                }
                                break;
             //椭圆
@@ -148,7 +148,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
 
-                                   property.itemBrush = QBrush(Qt::darkMagenta);
+//                                   property.itemBrush = QBrush(Qt::darkMagenta);
                                }
                                break;
             //菱形
@@ -158,12 +158,15 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                itemPolygon<<QPointF(-radius,-factor*radius)<<QPointF(0.5*radius,-factor*radius)<<
                                          QPointF(radius,factor*radius)<<QPointF(-0.5*radius,factor*radius);
 
-                               property.itemBrush = QBrush(Qt::gray);
+//                               property.itemBrush = QBrush(Qt::gray);
                                break;
     }
 
     setPolygon(itemPolygon);
     setBrush(property.itemBrush);
+
+    property.itemBrush = QBrush(Qt::white);
+    property.itemPen = QPen(Qt::black);
 
     property.itemRect.width = boundRect.width();
     property.itemRect.height = boundRect.height();
@@ -346,6 +349,8 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 //拖入事件
 void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
+    qDebug()<<__FUNCTION__;
+
     if(event->mimeData()->hasFormat("MyItem"))
     {
        setSelected(true);

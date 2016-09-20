@@ -40,7 +40,9 @@ void MyGraphicsView::dragEnterEvent(QDragEnterEvent *event)
         stream>>graphicsType;
         if(graphicsType == GRA_LINE || graphicsType == GRA_VECTOR_LINE || graphicsType == GRA_NODE_PORT)
         {
-            event->ignore();
+//            event->ignore();
+            //此处如果不希望GraphicsView处理事件，那么需要将此事件交由系统处理，不能直接忽略【1】
+            QGraphicsView::dragEnterEvent(event);
         }
         else
         {
@@ -53,11 +55,13 @@ void MyGraphicsView::dragEnterEvent(QDragEnterEvent *event)
     }
 }
 
+//在执行拖入移动时，先将事件交由父类处理，这样时间可以被其它控件捕获
 void MyGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 {
+    QGraphicsView::dragMoveEvent(event);
     if(event->mimeData()->hasFormat("MyItem"))
     {
-       event->acceptProposedAction();
+        event->acceptProposedAction();
     }
 }
 
@@ -72,7 +76,7 @@ void MyGraphicsView::dropEvent(QDropEvent *event)
         stream>>graphicsType;
         if(graphicsType == GRA_LINE || graphicsType == GRA_VECTOR_LINE || graphicsType == GRA_NODE_PORT)
         {
-
+            QGraphicsView::dropEvent(event);
         }
         else
         {

@@ -8,6 +8,7 @@
 **修改历史:
 **20160919:wey:添加单利模式
 **             添加端口编辑页面
+**20160920:wey:修复拖入端口放置在控件上无效问题
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -32,7 +33,6 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
-
 
 private:
     static MyGraphicsView * viewManager;
