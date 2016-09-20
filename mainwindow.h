@@ -79,7 +79,7 @@ private:
     void createContextMenu();
     void createToolBar();
     void createStatusBar();
-    void respShowStatusInfo(QString, int time = 2000);
+    void respShowStatusInfo(QString);
     void resetEditActionState(bool state);
 
     Ui::MainWindow *ui;

@@ -776,7 +776,7 @@ void MainWindow::createStatusBar()
 }
 
 //ÏÔÊ¾×´Ì¬ÐÅÏ¢
-void MainWindow::respShowStatusInfo(QString text,int time)
+void MainWindow::respShowStatusInfo(QString text)
 {
     statusBar()->showMessage(text);
 }

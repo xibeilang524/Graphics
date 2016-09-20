@@ -91,6 +91,9 @@ void MyArrow::setProperty(ItemProperty property)
 
 void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+
     painter->save();
 
     if(lineType == LINE_MYITEM && startItem && endItem)
@@ -121,53 +124,87 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
             {
                 break;
             }
-
             p1 = p2;
         }
         //将交点和起点作为线段的端点
         setLine(QLineF(intersectPoint, startItem->pos()));
-        if (isSelected())
-        {
-            painter->setPen(QPen(Qt::blue, 1, Qt::DashLine));
-            QLineF myLine = line();
-            myLine.translate(0, 4.0);
-            painter->drawLine(myLine);
-            myLine.translate(0,-8.0);
-            painter->drawLine(myLine);
-        }
-
-        qreal arrowSize = 20;
-
-        double angle = ::acos(line().dx() / line().length());
-        if (line().dy() >= 0)
-        {
-            angle = (Pi * 2) - angle;
-        }
-
-            QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                            cos(angle + Pi / 3) * arrowSize);
-            QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                            cos(angle + Pi - Pi / 3) * arrowSize);
-
-            arrowHead.clear();
-            arrowHead << line().p1() << arrowP1 << arrowP2;
-
-            painter->setPen(property.itemPen);
-            painter->drawLine(line());
-
-            painter->setBrush(property.itemBrush);
-            painter->drawPolygon(arrowHead);
-
     }
     else if(lineType == LINE_NODEPORT && startNodePort && endNodePort)
     {
+        //获取端口相对整个scene的坐标值
         QPointF startPoint = startNodePort->getParentItem()->mapToScene(startNodePort->pos());
         QPointF endPoint = endNodePort->getParentItem()->mapToScene(endNodePort->pos());
 
         painter->setPen(Qt::black);
         QLineF centerLine(startPoint, endPoint);
         painter->drawLine(centerLine);
+
+        //获取终点端口各顶点在scene中的坐标
+        QPolygonF polygon = endNodePort->getScenePolygon();
+
+        QPointF p1 = polygon.first();
+        QPointF p2;
+        QPointF intersectPoint;
+        QLineF polyLine;
+        //计算起点多边形的中点和终点多边形的交点
+        for (int i = 1; i <= polygon.count(); ++i)
+        {
+            //最后一个需要和第一个进行连线
+            if(i == polygon.count())
+            {
+                p1 = polygon.first();
+            }
+            else
+            {
+                p2 = polygon.at(i);
+            }
+
+            polyLine = QLineF(p1, p2);
+            QLineF::IntersectType intersectType = polyLine.intersect(centerLine, &intersectPoint);
+            if (intersectType == QLineF::BoundedIntersection)
+            {
+                break;
+            }
+            p1 = p2;
+        }
+
+        setLine(QLineF(intersectPoint,startPoint));
     }
+
+    //绘制箭头
+    qreal arrowSize = 20;
+
+    double angle = ::acos(line().dx() / line().length());
+    if (line().dy() >= 0)
+    {
+        angle = (Pi * 2) - angle;
+    }
+
+        QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
+                                        cos(angle + Pi / 3) * arrowSize);
+        QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
+                                        cos(angle + Pi - Pi / 3) * arrowSize);
+
+        arrowHead.clear();
+        //p1()线段的起点
+        arrowHead << line().p1() << arrowP1 << arrowP2;
+
+        painter->setPen(property.itemPen);
+        painter->drawLine(line());
+
+        painter->setBrush(property.itemBrush);
+        painter->drawPolygon(arrowHead);
+
+    if (isSelected())
+    {
+        painter->setPen(QPen(Qt::blue, 1, Qt::DashLine));
+        QLineF myLine = line();
+        myLine.translate(0, 4.0);
+        painter->drawLine(myLine);
+        myLine.translate(0,-8.0);
+        painter->drawLine(myLine);
+    }
+
     painter->restore();
 }
 

@@ -53,6 +53,9 @@ QRectF MyNodePort::boundingRect()const
 
 void MyNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+
     painter->save();
 
     painter->setBrush(property.itemBrush);
@@ -143,6 +146,20 @@ void MyNodePort::removeArrow(MyArrow *arrow)
 
     if (index != -1)
         arrows.removeAt(index);
+}
+
+//获取端口顶点在当前坐标系中的值(要顺时针保存)
+QPolygonF MyNodePort::getScenePolygon()
+{
+    QPointF topLeftPoint = getParentItem()->mapToScene(boundingRect().topLeft() + pos());
+    QPointF topRightPoint = getParentItem()->mapToScene(boundingRect().topRight() + pos());
+    QPointF bottomRightPoint = getParentItem()->mapToScene(boundingRect().bottomRight() + pos());
+    QPointF bottomLeftPoint = getParentItem()->mapToScene(boundingRect().bottomLeft() + pos());
+
+    QPolygonF polygonF;
+    polygonF<<topLeftPoint<<topRightPoint<<bottomRightPoint<<bottomLeftPoint;
+
+    return polygonF;
 }
 
 //设置控件的样式属性

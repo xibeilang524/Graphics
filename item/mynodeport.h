@@ -47,6 +47,8 @@ public:
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
 
+    QPolygonF getScenePolygon();
+
     MyItem * getParentItem(){return this->parentMyItem;}
 
     void addArrow(MyArrow * arrow);
