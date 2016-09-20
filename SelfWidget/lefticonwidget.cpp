@@ -70,14 +70,6 @@ void LeftIconWidget::initListItems()
     polygonWidget->addItem(polygon);
 
     //插入节点
-    MyListItem * line = ListItemManager::instance()->createListItem(Constants::LINE_ID,QIcon(":/images/linepointer.png"),"线条",nodeWidget);
-    line->setData(Qt::UserRole,(int)GRA_LINE);
-    nodeWidget->addItem(line);
-
-    MyListItem * vectorLine = ListItemManager::instance()->createListItem(Constants::VECTOR_LINE_ID,QIcon(":/images/vectorLine.png"),"连接线",nodeWidget);
-    vectorLine->setData(Qt::UserRole,(int)GRA_VECTOR_LINE);
-    nodeWidget->addItem(vectorLine);
-
     MyListItem * nodePort = ListItemManager::instance()->createListItem(Constants::NODE_PORT_ID,QIcon(":/images/nodePort.png"),"端口",nodeWidget);
     nodePort->setData(Qt::UserRole,(int)GRA_NODE_PORT);
     nodeWidget->addItem(nodePort);

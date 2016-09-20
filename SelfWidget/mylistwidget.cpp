@@ -11,7 +11,7 @@ MyListWidget::MyListWidget(QWidget *parent):
     QListWidget(parent)
 {
      setViewMode(QListView::IconMode);
-     setIconSize(QSize(50,50));
+     setIconSize(QSize(ICON_WIDTH,ICON_WIDTH));
      setSpacing(10);
      setAcceptDrops(false);
 }
@@ -19,6 +19,8 @@ MyListWidget::MyListWidget(QWidget *parent):
 //拖动
 void MyListWidget::startDrag(Qt::DropActions supportedActions)
 {
+    Q_UNUSED(supportedActions)
+
      MyListItem * item = dynamic_cast<MyListItem*>(currentItem());
      if(item)
      {
@@ -55,15 +57,6 @@ void MyListWidget::startDrag(Qt::DropActions supportedActions)
              case GRA_POLYGON:
                                 pixmap.load(":/images/diamonds.png");
                                 break;
-             case GRA_LINE:
-                                pixmap.load(":/images/linepointer.png");
-                                break;
-             case GRA_VECTOR_LINE:
-                                pixmap.load(":/images/vectorLine.png");
-                                break;
-             case GRA_TEXT:
-                                pixmap.load(":/images/text.png");
-                                break;
              case GRA_NODE_PORT:
                                 pixmap.load(":/images/nodePort.png");
                                 break;
@@ -79,5 +72,5 @@ void MyListWidget::startDrag(Qt::DropActions supportedActions)
 
          }
      }
-//          delete takeItem(row(item));
+//          delete takeItem(row(item));    //删除选中的item
 }

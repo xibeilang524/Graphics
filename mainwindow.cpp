@@ -146,29 +146,29 @@ void MainWindow::createActionAndMenus()
     arrowAction->setType(GRA_NONE);
     arrowAction->setChecked(true);
 
-    MyAction * squareAction = ActionManager::instance()->crateAction(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形");
-    ActionManager::instance()->registerAction(squareAction,this,SLOT(addItem()),true);
-    squareAction->setType(GRA_SQUARE);
+//    MyAction * squareAction = ActionManager::instance()->crateAction(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形");
+//    ActionManager::instance()->registerAction(squareAction,this,SLOT(addItem()),true);
+//    squareAction->setType(GRA_SQUARE);
 
-    MyAction * rectAction = ActionManager::instance()->crateAction(Constants::RECT_ID,QIcon(":/images/rectange.png"),"矩形");
-    ActionManager::instance()->registerAction(rectAction,this,SLOT(addItem()),true);
-    rectAction->setType(GRA_RECT);
+//    MyAction * rectAction = ActionManager::instance()->crateAction(Constants::RECT_ID,QIcon(":/images/rectange.png"),"矩形");
+//    ActionManager::instance()->registerAction(rectAction,this,SLOT(addItem()),true);
+//    rectAction->setType(GRA_RECT);
 
-    MyAction * roundRectAction = ActionManager::instance()->crateAction(Constants::ROUNDRECT_ID,QIcon(":/images/roundedrect.png"),"圆角矩形");
-    ActionManager::instance()->registerAction(roundRectAction,this,SLOT(addItem()),true);
-    roundRectAction->setType(GRA_ROUND_RECT);
+//    MyAction * roundRectAction = ActionManager::instance()->crateAction(Constants::ROUNDRECT_ID,QIcon(":/images/roundedrect.png"),"圆角矩形");
+//    ActionManager::instance()->registerAction(roundRectAction,this,SLOT(addItem()),true);
+//    roundRectAction->setType(GRA_ROUND_RECT);
 
-    MyAction * circleAction = ActionManager::instance()->crateAction(Constants::CIRCLE_ID,QIcon(":/images/circle.png"),"圆");
-    ActionManager::instance()->registerAction(circleAction,this,SLOT(addItem()),true);
-    circleAction->setType(GRA_CIRCLE);
+//    MyAction * circleAction = ActionManager::instance()->crateAction(Constants::CIRCLE_ID,QIcon(":/images/circle.png"),"圆");
+//    ActionManager::instance()->registerAction(circleAction,this,SLOT(addItem()),true);
+//    circleAction->setType(GRA_CIRCLE);
 
-    MyAction * ellipseAction = ActionManager::instance()->crateAction(Constants::ELLIPSE_ID,QIcon(":/images/ellipse.png"),"椭圆");
-    ActionManager::instance()->registerAction(ellipseAction,this,SLOT(addItem()),true);
-    ellipseAction->setType(GRA_ELLIPSE);
+//    MyAction * ellipseAction = ActionManager::instance()->crateAction(Constants::ELLIPSE_ID,QIcon(":/images/ellipse.png"),"椭圆");
+//    ActionManager::instance()->registerAction(ellipseAction,this,SLOT(addItem()),true);
+//    ellipseAction->setType(GRA_ELLIPSE);
 
-    MyAction * polygonAction = ActionManager::instance()->crateAction(Constants::POLYGON_ID,QIcon(":/images/diamonds.png"),"菱形");
-    ActionManager::instance()->registerAction(polygonAction,this,SLOT(addItem()),true);
-    polygonAction->setType(GRA_POLYGON);
+//    MyAction * polygonAction = ActionManager::instance()->crateAction(Constants::POLYGON_ID,QIcon(":/images/diamonds.png"),"菱形");
+//    ActionManager::instance()->registerAction(polygonAction,this,SLOT(addItem()),true);
+//    polygonAction->setType(GRA_POLYGON);
 
     MyAction * lineAction = ActionManager::instance()->crateAction(Constants::LINE_ID,QIcon(":/images/linepointer.png"),"线条");
     ActionManager::instance()->registerAction(lineAction,this,SLOT(addItem()),true);
@@ -186,23 +186,23 @@ void MainWindow::createActionAndMenus()
     itemGroup = new QActionGroup(this);
 
     itemGroup->addAction(arrowAction);
-    itemGroup->addAction(squareAction);
-    itemGroup->addAction(rectAction);
-    itemGroup->addAction(roundRectAction);
-    itemGroup->addAction(circleAction);
-    itemGroup->addAction(ellipseAction);
-    itemGroup->addAction(polygonAction);
+//    itemGroup->addAction(squareAction);
+//    itemGroup->addAction(rectAction);
+//    itemGroup->addAction(roundRectAction);
+//    itemGroup->addAction(circleAction);
+//    itemGroup->addAction(ellipseAction);
+//    itemGroup->addAction(polygonAction);
     itemGroup->addAction(textAction);
     itemGroup->addAction(lineAction);
     itemGroup->addAction(vectorLineAction);
 
     itemMenu->addAction(arrowAction);
-    itemMenu->addAction(squareAction);
-    itemMenu->addAction(rectAction);
-    itemMenu->addAction(roundRectAction);
-    itemMenu->addAction(circleAction);
-    itemMenu->addAction(ellipseAction);
-    itemMenu->addAction(polygonAction);
+//    itemMenu->addAction(squareAction);
+//    itemMenu->addAction(rectAction);
+//    itemMenu->addAction(roundRectAction);
+//    itemMenu->addAction(circleAction);
+//    itemMenu->addAction(ellipseAction);
+//    itemMenu->addAction(polygonAction);
     itemMenu->addAction(textAction);
     itemMenu->addAction(lineAction);
     itemMenu->addAction(vectorLineAction);
@@ -725,12 +725,12 @@ void MainWindow::createToolBar()
     QToolBar * itemBar = addToolBar("Item");
     itemBar->addAction(ActionManager::instance()->action(Constants::ARROW_ID));
     itemBar->addSeparator();
-    itemBar->addAction(ActionManager::instance()->action(Constants::SQUARE_ID));
-    itemBar->addAction(ActionManager::instance()->action(Constants::RECT_ID));
-    itemBar->addAction(ActionManager::instance()->action(Constants::ROUNDRECT_ID));
-    itemBar->addAction(ActionManager::instance()->action(Constants::CIRCLE_ID));
-    itemBar->addAction(ActionManager::instance()->action(Constants::ELLIPSE_ID));
-    itemBar->addAction(ActionManager::instance()->action(Constants::POLYGON_ID));
+//    itemBar->addAction(ActionManager::instance()->action(Constants::SQUARE_ID));
+//    itemBar->addAction(ActionManager::instance()->action(Constants::RECT_ID));
+//    itemBar->addAction(ActionManager::instance()->action(Constants::ROUNDRECT_ID));
+//    itemBar->addAction(ActionManager::instance()->action(Constants::CIRCLE_ID));
+//    itemBar->addAction(ActionManager::instance()->action(Constants::ELLIPSE_ID));
+//    itemBar->addAction(ActionManager::instance()->action(Constants::POLYGON_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::TEXT_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::LINE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::VECTOR_LINE_ID));
@@ -746,16 +746,6 @@ void MainWindow::createToolBar()
     editBar->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
 
     QToolBar * sceneBar = addToolBar("Scene");
-
-//    addToolBar(Qt::BottomToolBarArea,sceneBar);
-
-//    sizeBox = new QComboBox;
-//    QStringList list;
-//    list<<"50%"<<"75%"<<"100%"<<"125%"<<"150%";
-//    sizeBox->addItems(list);
-//    sizeBox->setCurrentIndex(2);
-//    connect(sizeBox,SIGNAL(currentIndexChanged(QString)),this,SLOT(sceneScaled(QString)));
-//    sceneBar->addWidget(sizeBox);
 
     mySlider = new MySlider;
     connect(mySlider,SIGNAL(scaleView(int)),this,SLOT(sceneScaled(int)));
