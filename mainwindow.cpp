@@ -444,8 +444,16 @@ void MainWindow::deleteItem()
         {
             MyArrow * tmp = dynamic_cast<MyArrow *>(item);
 
-            tmp->getStartItem()->removeArrow(tmp);
-            tmp->getEndItem()->removeArrow(tmp);
+            if(tmp->getLineType() == LINE_MYITEM)
+            {
+                tmp->getStartItem()->removeArrow(tmp);
+                tmp->getEndItem()->removeArrow(tmp);
+            }
+            else if(tmp->getLineType() == LINE_NODEPORT)
+            {
+                tmp->getStartNodePort()->removeArrow(tmp);
+                tmp->getEndNodePort()->removeArrow(tmp);
+            }
             scene->removeItem(tmp);
 
             delete tmp;

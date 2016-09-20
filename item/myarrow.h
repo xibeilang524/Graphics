@@ -43,6 +43,8 @@ public:
     MyNodePort * getStartNodePort() const{return this->startNodePort;}
     MyNodePort * getEndNodePort() const{return this->endNodePort;}
 
+    LineType getLineType()const {return this->lineType;}
+
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
 

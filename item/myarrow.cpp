@@ -137,7 +137,7 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
         painter->setPen(Qt::black);
         QLineF centerLine(startPoint, endPoint);
-        painter->drawLine(centerLine);
+
 
         //获取终点端口各顶点在scene中的坐标
         QPolygonF polygon = endNodePort->getScenePolygon();
@@ -169,6 +169,7 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
         }
 
         setLine(QLineF(intersectPoint,startPoint));
+        painter->drawLine(line());
     }
 
     //绘制箭头
