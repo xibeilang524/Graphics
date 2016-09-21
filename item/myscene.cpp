@@ -163,6 +163,7 @@ void MyScene::keyPressEvent(QKeyEvent *event)
     {
         emit deleteKeyPress();
     }
+    QGraphicsScene::keyPressEvent(event);
 }
 
 //Ìí¼Ó×Ó¿Ø¼þ
