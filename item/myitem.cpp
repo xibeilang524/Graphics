@@ -40,12 +40,13 @@ QDataStream & operator >>(QDataStream &stream,MyRect & rect)
 ////写入属性
 QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 {
+    int lineType = (int)prop.lineType;
     stream<<prop.startItemID<<prop.endItemID
            <<prop.isNeedBrush<<prop.itemBrush
             <<prop.isNeedBorder<<prop.itemPen<<prop.itemRect
              <<prop.alphaValue<<prop.rotateDegree
               <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor
-               <<prop.zValue;
+               <<prop.zValue<<lineType;
 
     return stream;
 }
@@ -53,12 +54,16 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 ////读属性
 QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
 {
+    int lineType = 0;
     stream>>prop.startItemID>>prop.endItemID
            >>prop.isNeedBrush>>prop.itemBrush
             >>prop.isNeedBorder>>prop.itemPen>>prop.itemRect
              >>prop.alphaValue>>prop.rotateDegree
               >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor
-               >>prop.zValue;
+               >>prop.zValue>>lineType;
+
+    prop.lineType = (LineType)lineType;
+
     return stream;
 }
 
@@ -568,7 +573,7 @@ DragDirect MyItem::getDropDirect(const QPointF &currPoint)
 }
 
 //拷贝或者拖入一个端口
-void MyItem::addNodePort(const NodePortProperty &prop)
+MyNodePort * MyItem::addNodePort(const NodePortProperty &prop)
 {
     QPointF itemPos;
     switch(prop.direct)
@@ -598,10 +603,10 @@ void MyItem::addNodePort(const NodePortProperty &prop)
                     }
                     break;
     }
-    createProp(itemPos,prop.direct,prop.scaleFactor);
+    return createProp(itemPos,prop.direct,prop.scaleFactor);
 }
 
-void MyItem::createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor)
+MyNodePort * MyItem::createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor)
 {
     MyNodePort * port = new MyNodePort(this);
     port->setPos(pos);
@@ -612,6 +617,8 @@ void MyItem::createProp(const QPointF pos,const DragDirect direct,const qreal sc
     connect(port,SIGNAL(portPosChanged(MouseType,QPointF)),this,SLOT(procPortChanged(MouseType,QPointF)));
 
     ports.push_back(port);
+
+    return port;
 }
 
 //移除端口

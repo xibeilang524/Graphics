@@ -212,6 +212,12 @@ void MyNodePort::setProperty(ItemProperty property)
     update();
 }
 
+//更新端口的ID号，主要用于本地打开时保存原始的ID号
+void MyNodePort::updatePortID(QString portId)
+{
+    nodeProperty.startItemID = portId;
+}
+
 //更新节点属性
 void MyNodePort::setNodeProperty(NodePortProperty prop)
 {

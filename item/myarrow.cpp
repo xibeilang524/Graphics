@@ -47,7 +47,7 @@ MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     property.startItemID = startItem->getProperty().startItemID;
     property.endItemID = endItem->getProperty().startItemID;
 
-    lineType = LINE_MYITEM;
+    property.lineType = LINE_MYITEM;
 }
 
 MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *parent):
@@ -63,7 +63,7 @@ MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *pa
     property.startItemID = startItem->getNodeProperty().startItemID;
     property.endItemID = endItem->getNodeProperty().startItemID;
 
-    lineType = LINE_NODEPORT;
+    property.lineType = LINE_NODEPORT;
 }
 
 QRectF MyArrow::boundingRect()const
@@ -75,7 +75,7 @@ QRectF MyArrow::boundingRect()const
 QPainterPath MyArrow::shape()const
 {
     QPainterPath path = QGraphicsLineItem::shape();
-    if(lineType == LINE_MYITEM)
+    if(property.lineType == LINE_MYITEM)
     {
         path.addPolygon(arrowHead);
     }
@@ -96,7 +96,7 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
     painter->save();
 
-    if(lineType == LINE_MYITEM && startItem && endItem)
+    if(property.lineType == LINE_MYITEM && startItem && endItem)
     {
         QLineF centerLine(startItem->pos(), endItem->pos());
         QPolygonF endPolygon = endItem->polygon();
@@ -129,7 +129,7 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
         //将交点和起点作为线段的端点
         setLine(QLineF(intersectPoint, startItem->pos()));
     }
-    else if(lineType == LINE_NODEPORT && startNodePort && endNodePort)
+    else if(property.lineType == LINE_NODEPORT && startNodePort && endNodePort)
     {
         //获取端口相对整个scene的坐标值
         QPointF startPoint = startNodePort->getParentItem()->mapToScene(startNodePort->pos());
@@ -209,14 +209,15 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     painter->restore();
 }
 
+//更新线段的位置
 void MyArrow::updatePosition()
 {
-    if(lineType == LINE_NODEPORT)
+    if(property.lineType == LINE_NODEPORT)
     {
         QLineF line(mapFromItem(startNodePort, 0, 0), mapFromItem(endNodePort, 0, 0));
         setLine(line);
     }
-    else if(lineType == LINE_MYITEM)
+    else if(property.lineType == LINE_MYITEM)
     {
         QLineF line(mapFromItem(startItem, 0, 0), mapFromItem(endItem, 0, 0));
         setLine(line);

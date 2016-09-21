@@ -21,6 +21,8 @@
 #include <QDataStream>
 #include <QUuid>
 
+#include "./item/ItemHeader.h"
+
 enum ReturnType
 {
     RETURN_OK,
@@ -121,6 +123,8 @@ struct ItemProperty
     QColor fontColor;        //字体颜色
 
     qreal zValue;            //深度值
+
+    LineType lineType;       //线条的类型
 };
 
 //节点属性

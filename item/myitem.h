@@ -74,7 +74,7 @@ public:
 
     const QList<MyNodePort *> & getNodePorts(){return this->ports;}
 
-    void addNodePort(const NodePortProperty & prop);
+    MyNodePort *addNodePort(const NodePortProperty & prop);
     void removeNodePort(MyNodePort * port);
 
     void setPos(const QPointF &pos);
@@ -119,7 +119,7 @@ private:
     void procResizeNodePort();
     qreal getPointToRectMinDistance(QRectF rect,QPointF point);
     void getRangeValue(qreal maxValue,qreal minValue,qreal & currValue);
-    void createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);
+    MyNodePort * createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);
     DragDirect getDropDirect(const QPointF &currPoint);
 
     int radius;

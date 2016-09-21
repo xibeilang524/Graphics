@@ -58,6 +58,8 @@ public:
 
     MyItem * getParentItem(){return this->parentMyItem;}
 
+    void updatePortID(QString portId);
+
     friend QDataStream & operator >>(QDataStream & ,MyNodePort *);
     friend QDataStream & operator <<(QDataStream & ,MyNodePort *);
 

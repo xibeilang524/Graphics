@@ -225,11 +225,18 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
             item->setPos(QPointF(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y));
         }
 
+        //本地打开时，由于创建时会产生新的ID，但需要手动的更新
         foreach(NodePortProperty prop,cutInfo.nodeProperties)
         {
-            item->addNodePort(prop);
+            MyNodePort * tmp = item->addNodePort(prop);
+            localNodeports.push_back(tmp);
+            if(!isCopy)
+            {
+                tmp->updatePortID(prop.startItemID);
+            }
         }
 
+        //本地打开时需要保存
         if(!isCopy)
         {
             localItems.push_back(item);
@@ -239,23 +246,48 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     }
     else if(cutInfo.graphicsType == GRA_LINE)
     {
-        int startIndex = findItemById(localItems,cutInfo.itemProperty.startItemID);
-        int endIndex = findItemById(localItems,cutInfo.itemProperty.endItemID);
 
-        if(startIndex>=0&&startIndex<localItems.size() &&
-                endIndex>=0&&endIndex<localItems.size())
+        if(cutInfo.itemProperty.lineType == LINE_MYITEM)
         {
-            MyItem * startItem = localItems.at(startIndex);
-            MyItem * endItem = localItems.at(endIndex);
+            int startIndex = findItemById(localItems,cutInfo.itemProperty.startItemID);
+            int endIndex = findItemById(localItems,cutInfo.itemProperty.endItemID);
 
-            MyArrow *arrow = new MyArrow(startItem, endItem);
+            if(startIndex>=0&&startIndex<localItems.size() &&
+                    endIndex>=0&&endIndex<localItems.size())
+            {
+                MyItem * startItem = localItems.at(startIndex);
+                MyItem * endItem = localItems.at(endIndex);
 
-            startItem->addArrow(arrow);
-            endItem->addArrow(arrow);
-            arrow->setZValue(-1000.0);
+                MyArrow *arrow = new MyArrow(startItem, endItem);
 
-            arrow->updatePosition();
-            addItem(arrow);
+                startItem->addArrow(arrow);
+                endItem->addArrow(arrow);
+                arrow->setZValue(-1000.0);
+
+                arrow->updatePosition();
+                addItem(arrow);
+            }
+        }
+        else if(cutInfo.itemProperty.lineType == LINE_NODEPORT)
+        {
+            int startIndex = findItemById(localNodeports,cutInfo.itemProperty.startItemID);
+            int endIndex = findItemById(localNodeports,cutInfo.itemProperty.endItemID);
+            if(startIndex>=0&&startIndex<localNodeports.size() &&
+                    endIndex>=0&&endIndex<localNodeports.size())
+            {
+
+                MyNodePort * startNode = localNodeports.at(startIndex);
+                MyNodePort * endNode = localNodeports.at(endIndex);
+
+                MyArrow *arrow = new MyArrow(startNode, endNode);
+
+                startNode->addArrow(arrow);
+                endNode->addArrow(arrow);
+                arrow->setZValue(-1000.0);
+
+                arrow->updatePosition();
+                addItem(arrow);
+            }
         }
     }
 }
@@ -275,6 +307,7 @@ void MyScene::addItem(QList<CutInfo *> &cutInfos)
         addItem(*cutInfo);
     }
     localItems.clear();
+    localNodeports.clear();
 }
 
 void MyScene::addItem(GraphicsType type, QPointF pos)
@@ -286,6 +319,7 @@ void MyScene::addItem(GraphicsType type, QPointF pos)
     addItem(myItem);
 }
 
+//添加箭头时，找出箭头的父节点
 int MyScene::findItemById(QList<MyItem *> &localItem,QString Id)
 {
     int index = -1;
@@ -297,6 +331,23 @@ int MyScene::findItemById(QList<MyItem *> &localItem,QString Id)
             index = i;
             break;
         }
+    }
+    return index;
+}
+
+//添加箭头时，找出箭头的父端口
+int MyScene::findItemById(QList<MyNodePort *> &localNode, QString Id)
+{
+    int index = -1;
+
+    for (int i=0;i<localNode.size();i++)
+    {
+        if(localNode.at(i)->getNodeProperty().startItemID == Id)
+        {
+            index = i;
+            break;
+        }
+
     }
     return index;
 }

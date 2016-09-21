@@ -24,6 +24,7 @@ class QMenu;
 class MyTextItem;
 class MyItem;
 class MyPathItem;
+class MyNodePort;
 
 class MyScene : public QGraphicsScene
 {
@@ -54,6 +55,7 @@ protected:
 
 private:
     int findItemById(QList<MyItem *> &localItem, QString Id);
+    int findItemById(QList<MyNodePort *> &localNode, QString Id);
 
     QMenu * rightMenu;
 
@@ -61,6 +63,7 @@ private:
     MyPathItem * insertTmpPath;
 
     QList<MyItem*> localItems;
+    QList<MyNodePort*> localNodeports;
 };
 
 #endif // MYSCENE_H

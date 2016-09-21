@@ -43,12 +43,10 @@ public:
     MyNodePort * getStartNodePort() const{return this->startNodePort;}
     MyNodePort * getEndNodePort() const{return this->endNodePort;}
 
-    LineType getLineType()const {return this->lineType;}
+    LineType getLineType()const {return this->property.lineType;}
 
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
-
-    void updateParentId(const QString oldParentId, QString newParentId);
 
     friend QDataStream & operator <<(QDataStream &,MyArrow * item);
     friend QDataStream & operator >>(QDataStream &,MyArrow * item);
@@ -59,8 +57,6 @@ private:
 
     MyNodePort * startNodePort;
     MyNodePort * endNodePort;
-
-    LineType lineType;
 
     QPolygonF arrowHead;
 
