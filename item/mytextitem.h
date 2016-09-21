@@ -41,7 +41,7 @@ public:
     friend QDataStream & operator <<(QDataStream &,MyTextItem * item);
     friend QDataStream & operator >>(QDataStream &,MyTextItem * item);
 
-//    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
+    QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 
 signals:
     void textLostFocus(MyTextItem *item);

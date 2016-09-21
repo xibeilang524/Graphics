@@ -103,14 +103,15 @@ void MyTextItem::updateFont(QFont font)
 //根据显示的数据来动态计算宽度
 QRectF MyTextItem::getBoundRect()
 {
+    //获取字符串的宽度
     QFontMetricsF metrics = property.itemFont;
     return metrics.boundingRect(toPlainText());
 }
 
-//QVariant MyTextItem::itemChange(GraphicsItemChange change, const QVariant &value)
-//{
-//    return QGraphicsTextItem::itemChange(change,value);
-//}
+QVariant MyTextItem::itemChange(GraphicsItemChange change, const QVariant &value)
+{
+    return QGraphicsTextItem::itemChange(change,value);
+}
 
 MyTextItem::~MyTextItem()
 {

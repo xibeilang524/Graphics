@@ -39,7 +39,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         {
             MyTextItem  * item = new MyTextItem(CurrAddGraType,rightMenu);
             connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
-            connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
+//            connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
             item->setPos(event->scenePos());
             addItem(item);
