@@ -63,7 +63,7 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
             MyArrow * myItem = dynamic_cast<MyArrow *>(item);
             stream<<myItem;
 
-            qDebug()<<myItem->getProperty().startItemID<<"_arrow_"<<myItem->getProperty().endItemID<<"_"<<__FUNCTION__;
+//            qDebug()<<myItem->getProperty().startItemID<<"_arrow_"<<myItem->getProperty().endItemID<<"_"<<__FUNCTION__;
         }
         else if(itemName == typeid(MyTextItem).name())
         {
@@ -74,7 +74,7 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
         {
             MyNodePort * myItem = dynamic_cast<MyNodePort *>(item);
             stream<<myItem;
-            qDebug()<< myItem->getNodeProperty().startItemID<<"_______"<<__FUNCTION__;
+//            qDebug()<< myItem->getNodeProperty().startItemID<<"_______"<<__FUNCTION__;
         }
     }
     file.close();

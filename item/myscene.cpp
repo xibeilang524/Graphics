@@ -229,10 +229,10 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
         foreach(NodePortProperty prop,cutInfo.nodeProperties)
         {
             MyNodePort * tmp = item->addNodePort(prop);
-            localNodeports.push_back(tmp);
             if(!isCopy)
             {
                 tmp->updatePortID(prop.startItemID);
+                localNodeports.push_back(tmp);
             }
         }
 
