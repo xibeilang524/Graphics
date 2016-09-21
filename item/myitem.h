@@ -83,6 +83,8 @@ public:
     void resetPolygon();                   //重新设定多边形
     void setDragPointVisible(bool flag);
 
+    void resetItemUUID();                  //重新设定控件的UUID编号，同时更新子节点的父索引值
+
     friend QDataStream & operator <<(QDataStream &,MyItem * item);
     friend QDataStream & operator >>(QDataStream &,MyItem * item);
 

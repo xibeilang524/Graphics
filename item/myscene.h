@@ -10,6 +10,8 @@
 **20160907:wey:添加对delete键盘事件，支持选中删除
 **20160908:wey:添加对item数量的监管
 **20160913:wey:修复复制或剪切后按钮未及时更新
+**20160921:wey:修复拷贝、剪切控件ID同步复制未更新问题
+**
 *************************************************/
 #ifndef MYSCENE_H
 #define MYSCENE_H
@@ -30,7 +32,7 @@ public:
     MyScene(QMenu * menu,QObject * parent = 0 );
     void addItem(QGraphicsItem *item);
     void addItem(CutInfo cutInfo,bool isCopy = false);
-    void addItem(QList<CutInfo> & cutInfos);
+    void addItem(QList<CutInfo *> & cutInfos);
     void addItem(GraphicsType type,QPointF pos);
     void removeItem(QGraphicsItem *item);
     ~MyScene();

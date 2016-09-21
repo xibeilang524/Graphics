@@ -60,8 +60,8 @@ MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *pa
     type = GRA_LINE;
     property.itemBrush = QBrush(Qt::black);
     //直线保存两端控件的引用
-    property.startItemID = startItem->getProperty().startItemID;
-    property.endItemID = endItem->getProperty().startItemID;
+    property.startItemID = startItem->getNodeProperty().startItemID;
+    property.endItemID = endItem->getNodeProperty().startItemID;
 
     lineType = LINE_NODEPORT;
 }

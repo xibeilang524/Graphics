@@ -7,6 +7,7 @@
 **
 **修改历史:
 **20160909:wey:添加对控件的保存和解析
+**20160920:wey:添加对端口的保存和解析
 *************************************************/
 #ifndef FILEOPERATE_H
 #define FILEOPERATE_H
@@ -23,7 +24,7 @@ public:
     static FileOperate * instance();
 
     ReturnType saveFile(QString fileName, const QList<QGraphicsItem *> &items);
-    ReturnType openFile(QString fileName, QList<CutInfo> &items);
+    ReturnType openFile(QString fileName, QList<CutInfo *> &items);
 
 private:
     FileOperate();

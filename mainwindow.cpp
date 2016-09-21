@@ -228,7 +228,7 @@ void MainWindow::fileOpen()
     QString openFileName = QFileDialog::getOpenFileName(this,"选择打开文件","","Files(*"+SaveFileSuffix+")");
     if(!openFileName.isEmpty())
     {
-        QList<CutInfo> cutInfos;
+        QList<CutInfo *> cutInfos;
         ReturnType returnType = FileOperate::instance()->openFile(openFileName,cutInfos);
         if(returnType == FILE_ILLEGAL)
         {

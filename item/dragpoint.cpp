@@ -27,6 +27,7 @@ DragPoint::DragPoint(const PointType pointType, MyItem *parent):
 
 void DragPoint::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
+    Q_UNUSED(event)
     switch(pointType)
     {
         case TOP_LEFT:
@@ -46,6 +47,7 @@ void DragPoint::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 
 void DragPoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
+    Q_UNUSED(event)
     this->setCursor(Qt::ArrowCursor);
 }
 
@@ -56,6 +58,8 @@ QRectF DragPoint::boundingRect()const
 
 void DragPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(widget)
+    Q_UNUSED(option)
     painter->save();
 
     painter->setBrush(Qt::black);

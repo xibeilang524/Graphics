@@ -173,6 +173,14 @@ void MyScene::addItem(QGraphicsItem *item)
     emit itemSizeChanged(items().size());
 }
 
+///*****************************************************
+///**Function:
+///**Description:1:用于复制、剪切时调用.2:用于本地打开时调用
+///**Input:
+///**Output:
+///**Return:
+///**Others:
+///****************************************************/
 void MyScene::addItem(CutInfo cutInfo, bool isCopy)
 {
     if(cutInfo.graphicsType == GRA_TEXT)
@@ -209,15 +217,17 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
             item->setPos(SceneLastClickPoint);
             item->setSelected(true);
             item->setDragPointVisible(true);
-            foreach(NodePortProperty prop,cutInfo.nodeProperties)
-            {
-                item->addNodePort(prop);
-            }
+            item->resetItemUUID();         //拷贝时，要将新控件的ID号进行更新【!!!!】
         }
         else
         {
             item->resetPolygon();
             item->setPos(QPointF(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y));
+        }
+
+        foreach(NodePortProperty prop,cutInfo.nodeProperties)
+        {
+            item->addNodePort(prop);
         }
 
         if(!isCopy)
@@ -250,11 +260,19 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     }
 }
 
-void MyScene::addItem(QList<CutInfo> &cutInfos)
+///*****************************************************
+///**Function:
+///**Description:本地打开保存文件后，对解析的内容进行界面显示
+///**Input:
+///**Output:
+///**Return:
+///**Others:
+///****************************************************/
+void MyScene::addItem(QList<CutInfo *> &cutInfos)
 {
-    foreach (CutInfo cutInfo, cutInfos)
+    foreach (CutInfo * cutInfo, cutInfos)
     {
-        addItem(cutInfo);
+        addItem(*cutInfo);
     }
     localItems.clear();
 }

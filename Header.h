@@ -89,11 +89,17 @@ struct ItemProperty
         alphaValue = 100;
         zValue = 0;
 
-        startItemID = QUuid::createUuid().toString();
+        createUUID();
+    }
+
+    //产生一个新的身份唯一标识，在剪切、复制、本地打开时需要手动的更新此值
+    void createUUID()
+    {
+        startItemID = QUuid::createUuid().toString();    //新建对象时创建唯一标识符
     }
 
     QString startItemID;                  //在用于非直线的控件时，只用startItemId标识当前控件
-    QString endItemID;                    //在用于直线控件时，两个表示直线两端连接的控件
+    QString endItemID;                    //在用于直线控件时，两个表示直线两端连接的控件的ID号
 
     friend QDataStream & operator <<(QDataStream &,ItemProperty & item);
     friend QDataStream & operator >>(QDataStream &,ItemProperty & item);
@@ -120,8 +126,19 @@ struct ItemProperty
 //节点属性
 struct NodePortProperty
 {
+    NodePortProperty()
+    {
+        startItemID = QUuid::createUuid().toString();    //新建对象时创建唯一标识符
+    }
+
+    friend QDataStream & operator <<(QDataStream &,NodePortProperty & item);
+    friend QDataStream & operator >>(QDataStream &,NodePortProperty & item);
+
+    QBrush itemBrush;           //填充颜色
     DragDirect direct;          //保存的方向
     qreal scaleFactor;          //拖入的位置相当于当前一边所在的比例
+    QString parentItemID;       //父控件的ID(解析后寻找停靠点)
+    QString startItemID;        //在用于非直线的控件时，只用startItemId标识当前控件(用于箭头寻找父节点)
 };
 
 //暂存一个剪切时的控件信息

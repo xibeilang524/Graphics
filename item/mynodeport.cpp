@@ -12,6 +12,45 @@
 
 using namespace Graphics;
 
+QDataStream & operator <<(QDataStream & dataStream,NodePortProperty & prop)
+{
+    dataStream<<prop.itemBrush<<prop.direct
+             <<prop.scaleFactor<<prop.startItemID<<prop.parentItemID;
+    return dataStream;
+}
+
+QDataStream & operator >>(QDataStream & dataStream,NodePortProperty & prop)
+{
+    int direct;
+
+    dataStream>>prop.itemBrush>>direct
+             >>prop.scaleFactor>>prop.startItemID>>prop.parentItemID;
+
+    prop.direct = (DragDirect)direct;
+
+    return dataStream;
+}
+
+QDataStream & operator <<(QDataStream & dataStream,MyNodePort * nodePort)
+{
+    int type = nodePort->type;
+    dataStream<<type<<nodePort->nodeProperty;
+
+    return dataStream;
+}
+
+QDataStream & operator >>(QDataStream & dataStream,MyNodePort * nodePort)
+{
+    int type;
+    NodePortProperty property;
+
+    dataStream>>type>>property;
+
+    nodePort->type = (GraphicsType)type;
+    nodePort->nodeProperty = property;
+    return dataStream;
+}
+
 MyNodePort::MyNodePort(MyItem *parentItem):
     parentMyItem(parentItem),
     QGraphicsObject(parentItem)
@@ -20,6 +59,9 @@ MyNodePort::MyNodePort(MyItem *parentItem):
     setFlag(QGraphicsItem::ItemIsSelectable,true);
 
     radius = 13;
+    type = GRA_NODE_PORT;
+
+    nodeProperty.parentItemID = parentItem->getProperty().startItemID;     //保存父节点的ID号
 
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);
 
@@ -31,7 +73,7 @@ MyNodePort::MyNodePort(MyItem *parentItem):
 //设置端口拖入的方向
 void MyNodePort::setDragDirect(DragDirect direct)
 {
-    this->dragDirect = direct;
+    nodeProperty.direct = direct;
 }
 
 //设置显示的中心点
@@ -43,7 +85,7 @@ void MyNodePort::setPos(const QPointF &pos)
 //设置拖入位置与拖入边长度的比例
 void MyNodePort::setScaleFactor(qreal scaleFactor)
 {
-    this->scaleFactor = scaleFactor;
+    nodeProperty.scaleFactor = scaleFactor;
 }
 
 QRectF MyNodePort::boundingRect()const
@@ -58,7 +100,7 @@ void MyNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     painter->save();
 
-    painter->setBrush(property.itemBrush);
+    painter->setBrush(nodeProperty.itemBrush);
 
     painter->drawRect(boundRect);
 
@@ -165,9 +207,15 @@ QPolygonF MyNodePort::getScenePolygon()
 //设置控件的样式属性
 void MyNodePort::setProperty(ItemProperty property)
 {
-    this->property = property;
+    nodeProperty.itemBrush = property.itemBrush;
 
     update();
+}
+
+//更新节点属性
+void MyNodePort::setNodeProperty(NodePortProperty prop)
+{
+    this->nodeProperty = prop;
 }
 
 MyNodePort::~MyNodePort()

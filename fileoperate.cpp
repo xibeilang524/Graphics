@@ -5,6 +5,7 @@
 #include "./item/myitem.h"
 #include "./item/myarrow.h"
 #include "./item/mytextitem.h"
+#include "./item/mynodeport.h"
 #include "global.h"
 
 #include <QFile>
@@ -51,6 +52,7 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
     foreach(QGraphicsItem * item,items)
     {
         QString itemName = typeid(*item).name();
+
         if(itemName == typeid(MyItem).name())
         {
             MyItem * myItem = dynamic_cast<MyItem *>(item);
@@ -66,12 +68,21 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
             MyTextItem * myItem = dynamic_cast<MyTextItem *>(item);
             stream<<myItem;
         }
+        else if(itemName == typeid(MyNodePort).name())
+        {
+            MyNodePort * myItem = dynamic_cast<MyNodePort *>(item);
+            stream<<myItem;
+        }
     }
     file.close();
     return RETURN_OK;
 }
 
-ReturnType FileOperate::openFile(QString fileName,QList<CutInfo> &items)
+/**
+ *本地解析文件,因端口NodePort的属性NodePortProperty是单独保存，需要依照类型来判断读取
+*读取完成后，直接将端口进行装配至每个Item中,使得调用层无需知晓具体的细节部分
+*/
+ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
 {
     QFile file(fileName);
     if(!file.open(QFile::ReadWrite))
@@ -89,13 +100,46 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo> &items)
         return FILE_ILLEGAL;
     }
 
+    QList<NodePortProperty > localNodePorts;
+
+    //文件分类读取
     while(!stream.atEnd())
     {
-        CutInfo info;
         int type;
-        stream>>type>>info.itemProperty;
-        info.graphicsType = (GraphicsType)type;
-        items.push_back(info);
+        stream>>type;
+
+        GraphicsType gtype = (GraphicsType)type;
+
+        if(gtype == GRA_NODE_PORT)
+        {
+            NodePortProperty nodeProperty;
+            stream>>nodeProperty;
+            localNodePorts.push_back(nodeProperty);
+        }
+        else
+        {
+            CutInfo * info = new CutInfo;
+            stream>>info->itemProperty;
+            info->graphicsType = (GraphicsType)type;
+            items.push_back(info);
+        }
     }
+
+    //端口装配
+    if(localNodePorts.size() > 0)
+    {
+        for(int i = 0;i<localNodePorts.size();i++)
+        {
+            for(int j = 0; j < items.size() ;j++)
+            {
+                if(items.at(j)->itemProperty.startItemID == localNodePorts.at(i).parentItemID)
+                {
+                    NodePortProperty prop = localNodePorts.at(i);
+                    items.at(j)->nodeProperties.push_back(prop);
+                }
+            }
+        }
+    }
+
     return RETURN_OK;
 }

@@ -11,6 +11,7 @@
 **20160919:wey:添加右键删除事件
 **             添加右键编辑功能
 **             增加连线功能
+**20160920:wey:增加本地保存
 *************************************************/
 #ifndef MYNODEPORT_H
 #define MYNODEPORT_H
@@ -20,6 +21,8 @@
 
 #include "ItemHeader.h"
 #include "../Header.h"
+
+#include <QDataStream>
 
 class QMenu;
 class MyItem;
@@ -39,17 +42,24 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     void setDragDirect(DragDirect direct);
-    DragDirect getDragDirect(){return this->dragDirect;}
+    DragDirect getDragDirect(){return this->nodeProperty.direct;}
 
     void setScaleFactor(qreal scaleFactor);
-    qreal getScaleFactor(){return this->scaleFactor;}
+    qreal getScaleFactor(){return this->nodeProperty.scaleFactor;}
 
     void setProperty(ItemProperty property);
-    ItemProperty getProperty(){return this->property;}
+
+    GraphicsType getType()const{return this->type;}
+
+    void setNodeProperty(NodePortProperty prop);
+    NodePortProperty  getNodeProperty(){return this->nodeProperty;}
 
     QPolygonF getScenePolygon();
 
     MyItem * getParentItem(){return this->parentMyItem;}
+
+    friend QDataStream & operator >>(QDataStream & ,MyNodePort *);
+    friend QDataStream & operator <<(QDataStream & ,MyNodePort *);
 
     void addArrow(MyArrow * arrow);
     void removeArrows();
@@ -77,11 +87,9 @@ private:
     QRectF boundRect;
     int radius;
 
-    DragDirect dragDirect;
+    GraphicsType  type;                //节点类型
 
-    qreal scaleFactor;                 //拖入的位置相当于当前一边所在的比例
-
-    ItemProperty property;             //保存当前属性
+    NodePortProperty nodeProperty;     //端口属性
 
     QMenu * nodePortRightMenu;         //端口右键菜单，支持删除
 

@@ -36,6 +36,9 @@ QRectF RotateLine::boundingRect()const
 
 void RotateLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
+    Q_UNUSED(option)
+    Q_UNUSED(widget)
+
     painter->save();
 
     painter->setPen(Qt::black);

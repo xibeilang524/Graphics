@@ -1198,6 +1198,12 @@ void MyItem::updateRotation(int rotateValue)
     emit propHasChanged(property);
 }
 
+//重新设定控件的UUID编号，同时更新子节点的父索引值【谨慎使用】
+void MyItem::resetItemUUID()
+{
+    property.createUUID();
+}
+
 MyItem::~MyItem()
 {
     foreach (MyNodePort* node, ports)
