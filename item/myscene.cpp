@@ -187,7 +187,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     {
         MyTextItem  * item = new MyTextItem(cutInfo.graphicsType,rightMenu);
         connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
-        connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
+//        connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
         item->setTextInteractionFlags(Qt::TextEditorInteraction);
         item->setProperty(cutInfo.itemProperty);
@@ -347,7 +347,6 @@ int MyScene::findItemById(QList<MyNodePort *> &localNode, QString Id)
             index = i;
             break;
         }
-
     }
     return index;
 }

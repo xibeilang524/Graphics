@@ -537,6 +537,9 @@ void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
         }
 
         createProp(itemPos,direct,scaleFactor);
+
+        setSelected(false);
+
         isDragging = false;
     }
 }

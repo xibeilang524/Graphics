@@ -3,12 +3,12 @@ HEADERS += \
     item/myscene.h \
     item/myitem.h \
     item/myarrow.h \
-    item/dragpoint.h \
     item/ItemHeader.h \
     item/mytextitem.h \
     item/mypathitem.h \
     item/mynodeport.h \
-    item/mygraphicsview.h
+    item/mygraphicsview.h \
+    item/dragpoint.h
 
 SOURCES += \
     item/rotateline.cpp \
