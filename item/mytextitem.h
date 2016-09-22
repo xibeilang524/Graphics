@@ -38,6 +38,9 @@ public:
 
     void setZValue(qreal z);
 
+    void setPos(const QPointF &pos);
+    void setPos(qreal x, qreal y);
+
     QRectF getBoundRect();
 
     friend QDataStream & operator <<(QDataStream &,MyTextItem * item);

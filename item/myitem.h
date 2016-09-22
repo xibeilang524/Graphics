@@ -23,8 +23,8 @@
 **             增加尺寸或者移动端口更新端口连线
 **             增加拖入状态切换，允许时选中控件否则取消选择。
 **20160920:wey:增加对拖入端口标绘位置十字星
-**20150921:wey:修复移动控件后，修改样式位置发生微小偏移
-**
+**20160921:wey:修复移动控件后，修改样式位置发生微小偏移
+**20160922:wey:添加控件锁定、解锁功能
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -84,6 +84,9 @@ public:
 
     void resetPolygon();                   //重新设定多边形
     void setDragPointVisible(bool flag);
+
+    void setMoveable(bool lockState);
+    bool isMoveable(){return this->property.isMoveable;}
 
     void resetItemUUID();                  //重新设定控件的UUID编号，同时更新子节点的父索引值
 

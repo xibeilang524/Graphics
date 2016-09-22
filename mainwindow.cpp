@@ -115,11 +115,17 @@ void MainWindow::createActionAndMenus()
     MyAction * rotateRightAction = ActionManager::instance()->crateAction(Constants::ROTATE_RIGHT_ID,QIcon(":/images/rotateRight.png"),"右转90°");
     ActionManager::instance()->registerAction(rotateRightAction,this,SLOT(rotateItem()));
 
-    MyAction * bringFrontAction = ActionManager::instance()->crateAction(Constants::BRING_FRONT_ID,QIcon(":/images/bringtofront.png"),"置于顶层");
+    MyAction * bringFrontAction = ActionManager::instance()->crateAction(Constants::BRING_FRONT_ID,QIcon(":/images/sendtoback.png"),"置于顶层");
     ActionManager::instance()->registerAction(bringFrontAction,this,SLOT(bringZItem()));
 
-    MyAction * bringBackAction = ActionManager::instance()->crateAction(Constants::BRING_BACK_ID,QIcon(":/images/sendtoback.png"),"置于底层");
+    MyAction * bringBackAction = ActionManager::instance()->crateAction(Constants::BRING_BACK_ID,QIcon(":/images/bringtofront.png"),"置于底层");
     ActionManager::instance()->registerAction(bringBackAction,this,SLOT(bringZItem()));
+
+    MyAction * lockAction = ActionManager::instance()->crateAction(Constants::LOCK_ID,QIcon(":/images/lock.png"),"锁定");
+    ActionManager::instance()->registerAction(lockAction,this,SLOT(lockAndunlockItem()));
+
+    MyAction * unlockAction = ActionManager::instance()->crateAction(Constants::UNLOCK_ID,QIcon(":/images/unlock.png"),"解锁");
+    ActionManager::instance()->registerAction(unlockAction,this,SLOT(lockAndunlockItem()));
 
     MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::DELETE_ID,QIcon(":/images/delete.png"),"删除");
     ActionManager::instance()->registerAction(deleteAction,this,SLOT(deleteItem()));
@@ -138,6 +144,8 @@ void MainWindow::createActionAndMenus()
     editMenu->addAction(rotateRightAction);
     editMenu->addAction(bringFrontAction);
     editMenu->addAction(bringBackAction);
+    editMenu->addAction(lockAction);
+    editMenu->addAction(unlockAction);
     editMenu->addAction(deleteAction);
 
     QMenu * itemMenu = menuBar()->addMenu("条目(&I)");
@@ -350,6 +358,7 @@ void MainWindow::copyItem()
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->toPlainText();
+            cutTmpInfo.nodeProperties.clear();
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
         }
     }
@@ -506,6 +515,42 @@ void MainWindow::deleteItem()
     scene->update();
 }
 
+//锁定与解锁
+void MainWindow::lockAndunlockItem()
+{
+    QString objName = QObject::sender()->objectName();
+
+    bool moveable = false;
+
+    if(objName == QString(Constants::LOCK_ID))
+    {
+        moveable = false;
+    }
+    else if(objName == QString(Constants::UNLOCK_ID))
+    {
+        moveable = true;
+    }
+
+    ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(moveable);
+    ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!moveable);
+
+    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
+
+    if(selectedItems.size() > 0)
+    {
+        foreach (QGraphicsItem * item, selectedItems)
+        {
+            QString itemName = typeid(*item).name();
+            if(itemName == typeid(MyItem).name())
+            {
+                MyItem * tmp = dynamic_cast<MyItem*>(item);
+                tmp->setMoveable(moveable);
+            }
+        }
+        scene->update();
+    }
+}
+
 //编辑文本
 void MainWindow::editTextItem()
 {
@@ -605,6 +650,8 @@ void MainWindow::resetEditActionState(bool state)
     ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(state);
     ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(state);
     ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(state);
+    ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(state);
+    ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(state);
 }
 
 //当在scene中右击时，将item工具栏中的状态恢复至箭头状态
@@ -636,6 +683,8 @@ void MainWindow::updateActions()
         ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(false);
     }
     else if(selectedSize == 1)
@@ -648,6 +697,8 @@ void MainWindow::updateActions()
         ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
 
         QString itemName = typeid(*(scene->selectedItems().first())).name();
@@ -656,6 +707,9 @@ void MainWindow::updateActions()
         {
             MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
             property = myItem->getProperty();
+            bool lock = myItem->isMoveable();
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(lock);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!lock);
         }
         else if(itemName == typeid(MyTextItem).name())
         {
@@ -683,7 +737,51 @@ void MainWindow::updateActions()
         ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
+
+        int myItemNum = 0;
+        int myItemLockNum = 0;
+        int myItemUnLockNum = 0;
+
+        foreach (QGraphicsItem * item, scene->selectedItems())
+        {
+            QString itemName = typeid(*item).name();
+            if(itemName == typeid(MyItem).name())
+            {
+                myItemNum ++;
+
+                MyItem * myItem = dynamic_cast<MyItem *>(item);
+                if(myItem->isMoveable())
+                {
+                    myItemUnLockNum++;
+                }
+                else
+                {
+                    myItemLockNum++;
+                }
+            }
+        }
+
+        //全部没锁定
+        if(myItemLockNum == myItemNum)
+        {
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
+        }
+        //全部锁定
+        else if(myItemUnLockNum == myItemNum)
+        {
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
+        }
+        //锁定一部分
+        else
+        {
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
+        }
     }
 
     scene->update();
@@ -733,6 +831,10 @@ void MainWindow::createContextMenu()
     rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
     rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
     rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
+    rightMenu->addSeparator();
+    rightMenu->addAction(ActionManager::instance()->action(Constants::LOCK_ID));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
+    rightMenu->addSeparator();
     rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
 
 }
@@ -767,6 +869,8 @@ void MainWindow::createToolBar()
     editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::LOCK_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
 
     QToolBar * sceneBar = addToolBar("Scene");

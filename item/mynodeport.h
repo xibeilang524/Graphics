@@ -60,6 +60,8 @@ public:
 
     void updatePortID(QString portId);
 
+    void setMoveable(bool isMoveable);
+
     friend QDataStream & operator >>(QDataStream & ,MyNodePort *);
     friend QDataStream & operator <<(QDataStream & ,MyNodePort *);
 
@@ -88,6 +90,7 @@ private:
 
     QRectF boundRect;
     int radius;
+    bool isMoveable;                   //是否支持移动，用于父窗口锁定
 
     GraphicsType  type;                //节点类型
 

@@ -86,11 +86,11 @@ struct ItemProperty
         isNeedBrush = true;
         isNeedBorder = true;
         isFont = false;
+        isMoveable = true;
         rotateDegree = 0;
         itemPen.setWidth(1);
         alphaValue = 100;
         zValue = 0;
-
         createUUID();
     }
 
@@ -108,7 +108,6 @@ struct ItemProperty
 
     bool isNeedBrush;        //为ture时表示需要笔刷填充
     QBrush itemBrush;
-
     bool isNeedBorder;       //为true时表示是否需要边框
     QPen   itemPen;
 
@@ -118,13 +117,14 @@ struct ItemProperty
 
     bool isFont;             //是否为字体
     QString content;         //文字内容
-
     QFont  itemFont;
     QColor fontColor;        //字体颜色
 
     qreal zValue;            //深度值
 
     LineType lineType;       //线条的类型
+
+    bool isMoveable;         //是否被锁定
 };
 
 //节点属性

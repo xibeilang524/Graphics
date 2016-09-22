@@ -28,5 +28,8 @@
         <file>images/vectorLine.png</file>
         <file>images/nodePort.png</file>
         <file>images/edit.png</file>
+        <file>images/lock.png</file>
+        <file>images/unlock.png</file>
+        <file>images/itemLock.png</file>
     </qresource>
 </RCC>

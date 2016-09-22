@@ -18,6 +18,7 @@
 **20160919:wey:剪切、复制增加对端口功能
 **20160920:wey:调整工具栏，将控件点击创建统一改成拖入创建
 **             修复删除nodeport线条奔溃问题
+**20160922:wey:添加控件、端口的锁定/解锁功能
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -63,7 +64,7 @@ private slots:
     void rotateItem();
     void bringZItem();
     void deleteItem();
-
+    void lockAndunlockItem();
     void editTextItem();
 
     void addItem();

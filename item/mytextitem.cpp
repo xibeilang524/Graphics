@@ -104,6 +104,23 @@ void MyTextItem::setZValue(qreal z)
     QGraphicsTextItem::setZValue(z);
 }
 
+//覆写此方法用于在拷贝时将位置信息更新
+void MyTextItem::setPos(const QPointF &pos)
+{
+    property.itemRect.x = pos.x();
+    property.itemRect.y = pos.y();
+
+    QGraphicsTextItem::setPos(pos);
+}
+
+void MyTextItem::setPos(qreal x, qreal y)
+{
+    property.itemRect.x = x;
+    property.itemRect.y = y;
+
+    QGraphicsTextItem::setPos(x,y);
+}
+
 //从item中更新字体样式
 void MyTextItem::updateFont(QFont font)
 {

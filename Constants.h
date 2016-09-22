@@ -22,6 +22,8 @@ const char ROTATE_RIGHT_ID[] = "Constants.RotateRight";
 const char BRING_FRONT_ID[] = "Constants.BringFront";
 const char BRING_BACK_ID[] = "Constants.BringBack";
 const char DELETE_ID[] = "Constants.Delte";
+const char LOCK_ID[] = "Constants.Lock";
+const char UNLOCK_ID[] = "Constants.UnLock";
 
 //¿Ø¼þ
 const char ARROW_ID[] = "Constants.Arrow";

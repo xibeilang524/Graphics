@@ -56,7 +56,8 @@ MyNodePort::MyNodePort(MyItem *parentItem):
     QGraphicsObject(parentItem)
 {
 //    setFlag(QGraphicsItem::ItemIsMovable,true);
-    setFlag(QGraphicsItem::ItemIsSelectable,true);
+
+    setFlag(QGraphicsItem::ItemIsSelectable,parentItem->isMoveable());
 
     radius = 13;
     type = GRA_NODE_PORT;
@@ -68,6 +69,8 @@ MyNodePort::MyNodePort(MyItem *parentItem):
     initNodePortRightMenu();
     connect(this,SIGNAL(deletePort(MyNodePort*)),parentItem,SLOT(procDeleteNodePort(MyNodePort*)));
     connect(this,SIGNAL(editPort(MyNodePort*)),parentItem,SLOT(procEditNodePort(MyNodePort*)));
+
+    isMoveable = true;
 }
 
 //设置端口拖入的方向
@@ -222,6 +225,13 @@ void MyNodePort::updatePortID(QString portId)
 void MyNodePort::setNodeProperty(NodePortProperty prop)
 {
     this->nodeProperty = prop;
+}
+
+//设置是否可以移动
+void MyNodePort::setMoveable(bool isMoveable)
+{
+    isMoveable = isMoveable;
+    setFlag(QGraphicsItem::ItemIsSelectable,isMoveable);
 }
 
 MyNodePort::~MyNodePort()

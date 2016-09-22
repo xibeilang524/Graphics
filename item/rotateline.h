@@ -6,7 +6,7 @@
 **Others: 1：用于控制控件的旋转
 **
 **修改历史:
-**
+**20160922:wey:添加状态锁定，锁定后图标改变
 *************************************************/
 #ifndef ROTATELINE_H
 #define ROTATELINE_H
@@ -22,6 +22,8 @@ class RotateLine : public QGraphicsObject
 public:
     RotateLine(QGraphicsItem * parent = 0);
     ~RotateLine();
+
+    void setMoveable(bool moveable);
 
     QRectF boundingRect()const;
 
@@ -45,6 +47,7 @@ private:
 
     int rotateDegree;
     bool hasSelected;
+    bool isMoveable;
 
     QPixmap pixmap;
 };

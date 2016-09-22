@@ -16,13 +16,11 @@ RotateLine::RotateLine(QGraphicsItem *parent):
 {
     boundRect = QRectF(-ROTATE_WIDTH/2,-ROTATE_WIDTH/2,ROTATE_WIDTH,ROTATE_WIDTH);
 
-    if(pixmap.load(":/img/rotate32.png"))
-    {
-        int normalSize = ROTATE_WIDTH;
-        pixmap = pixmap.scaled(normalSize,normalSize);
-    }
+    pixmap.load(":/images/itemLock.png");
 
-    setFlags(ItemIsSelectable /*| ItemIsMovable*/);
+    isMoveable = true;
+
+    setFlags(ItemIsSelectable);
 
     setAcceptHoverEvents(true);
 
@@ -34,6 +32,12 @@ QRectF RotateLine::boundingRect()const
     return boundRect;
 }
 
+//设置控件是否锁定
+void RotateLine::setMoveable(bool moveable)
+{
+    isMoveable = moveable;
+}
+
 void RotateLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
@@ -43,19 +47,15 @@ void RotateLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     painter->setPen(Qt::black);
 
-    int posX = boundRect.center().x();
-    int posY = boundingRect().bottomRight().y();
-
-    painter->setBrush(Qt::blue);
-    painter->drawRect(boundRect);
-
-//    painter->drawRect(QRectF(posX-ROTATE_SQUARE_WIDTH/2,posY-ROTATE_SQUARE_WIDTH,ROTATE_SQUARE_WIDTH,ROTATE_SQUARE_WIDTH));
-
-    int pixW = ROTATE_WIDTH - ROTATE_SQUARE_WIDTH;
-    posX = posX - pixW/2;
-    posY = boundingRect().topLeft().y();
-
-//    painter->drawPixmap(QRectF(posX,posY,pixW,pixW),pixmap,pixmap.rect());
+    if(!isMoveable)
+    {
+        painter->drawPixmap(QRectF(-pixmap.width()/2,-pixmap.height()/2,pixmap.width(),pixmap.height()),pixmap,pixmap.rect());
+    }
+    else
+    {
+        painter->setBrush(Qt::blue);
+        painter->drawRect(boundRect);
+    }
 
     painter->restore();
 }
