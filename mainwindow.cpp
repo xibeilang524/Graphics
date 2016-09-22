@@ -5,10 +5,7 @@
 #include <QAction>
 #include <QToolBar>
 #include <QActionGroup>
-#include <QComboBox>
 #include <QVBoxLayout>
-#include <QKeyEvent>
-#include <QClipboard>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStatusBar>
@@ -16,20 +13,14 @@
 
 #include "actionmanager.h"
 #include "item/myscene.h"
-#include "./item/myitem.h"
-#include "./item/myarrow.h"
-#include "./item/mytextitem.h"
 #include "./item/mygraphicsview.h"
-#include "./item/mynodeport.h"
 #include "./SelfWidget/myslider.h"
 #include "./SelfWidget/righttoolbox.h"
-#include "./SelfWidget/mytextinput.h"
 #include "./SelfWidget/lefticonwidget.h"
 #include "fileoperate.h"
 #include "global.h"
 #include "util.h"
 
-//#include "typeinfo.h"
 #include "typeinfo"
 
 using namespace Graphics;
@@ -41,23 +32,19 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setWindowTitle("模型工具");
 
-    rightMenu = NULL;
     mySlider = NULL;
     rightToolBox = NULL;
     leftIconWidget = NULL;
-    scene = NULL;
     view = NULL;
     GlobalItemZValue = 0;
 
-    createActionAndMenus();
-
-    createContextMenu();
-
     createSceneAndView();
 
+    createActionAndMenus();
     createToolBar();
-
     createStatusBar();
+
+    view->addContextMenuItem();
 
     showMaximized();
 
@@ -104,40 +91,40 @@ void MainWindow::createActionAndMenus()
 
     MyAction * cutAction = ActionManager::instance()->crateAction(Constants::CUT_ID,QIcon(":/images/cut.png"),"剪切");
     cutAction->setShortcut(QKeySequence("Ctrl+X"));
-    ActionManager::instance()->registerAction(cutAction,this,SLOT(cutItem()));
+    ActionManager::instance()->registerAction(cutAction,MyGraphicsView::instance(),SLOT(cutItem()));
 
     MyAction * copyAction = ActionManager::instance()->crateAction(Constants::COPY_ID,QIcon(":/images/copy.png"),"复制");
     copyAction->setShortcut(QKeySequence("Ctrl+C"));
-    ActionManager::instance()->registerAction(copyAction,this,SLOT(copyItem()));
+    ActionManager::instance()->registerAction(copyAction,MyGraphicsView::instance(),SLOT(copyItem()));
 
     MyAction * pasteAction = ActionManager::instance()->crateAction(Constants::PASTE_ID,QIcon(":/images/paste.png"),"粘贴");
     pasteAction->setShortcut(QKeySequence("Ctrl+V"));
-    ActionManager::instance()->registerAction(pasteAction,this,SLOT(pasteItem()));
+    ActionManager::instance()->registerAction(pasteAction,MyGraphicsView::instance(),SLOT(pasteItem()));
 
     MyAction * rotateLeftAction = ActionManager::instance()->crateAction(Constants::ROTATE_LEFT_ID,QIcon(":/images/rotateLeft.png"),"左转90°");
-    ActionManager::instance()->registerAction(rotateLeftAction,this,SLOT(rotateItem()));
+    ActionManager::instance()->registerAction(rotateLeftAction,MyGraphicsView::instance(),SLOT(rotateItem()));
 
     MyAction * rotateRightAction = ActionManager::instance()->crateAction(Constants::ROTATE_RIGHT_ID,QIcon(":/images/rotateRight.png"),"右转90°");
-    ActionManager::instance()->registerAction(rotateRightAction,this,SLOT(rotateItem()));
+    ActionManager::instance()->registerAction(rotateRightAction,MyGraphicsView::instance(),SLOT(rotateItem()));
 
     MyAction * bringFrontAction = ActionManager::instance()->crateAction(Constants::BRING_FRONT_ID,QIcon(":/images/sendtoback.png"),"置于顶层");
-    ActionManager::instance()->registerAction(bringFrontAction,this,SLOT(bringZItem()));
+    ActionManager::instance()->registerAction(bringFrontAction,MyGraphicsView::instance(),SLOT(bringZItem()));
 
     MyAction * bringBackAction = ActionManager::instance()->crateAction(Constants::BRING_BACK_ID,QIcon(":/images/bringtofront.png"),"置于底层");
-    ActionManager::instance()->registerAction(bringBackAction,this,SLOT(bringZItem()));
+    ActionManager::instance()->registerAction(bringBackAction,MyGraphicsView::instance(),SLOT(bringZItem()));
 
     MyAction * lockAction = ActionManager::instance()->crateAction(Constants::LOCK_ID,QIcon(":/images/lock.png"),"锁定");
-    ActionManager::instance()->registerAction(lockAction,this,SLOT(lockAndunlockItem()));
+    ActionManager::instance()->registerAction(lockAction,MyGraphicsView::instance(),SLOT(lockAndunlockItem()));
 
     MyAction * unlockAction = ActionManager::instance()->crateAction(Constants::UNLOCK_ID,QIcon(":/images/unlock.png"),"解锁");
-    ActionManager::instance()->registerAction(unlockAction,this,SLOT(lockAndunlockItem()));
+    ActionManager::instance()->registerAction(unlockAction,MyGraphicsView::instance(),SLOT(lockAndunlockItem()));
 
     MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::DELETE_ID,QIcon(":/images/delete.png"),"删除");
-    ActionManager::instance()->registerAction(deleteAction,this,SLOT(deleteItem()));
+    ActionManager::instance()->registerAction(deleteAction,MyGraphicsView::instance(),SLOT(deleteItem()));
 
     MyAction * editTextAction = ActionManager::instance()->crateAction(Constants::EDIT_TEXT_ID,QIcon(":/images/editText.png"),"编辑文本");
     editTextAction->setShortcut(QKeySequence("Ctrl+T"));
-    ActionManager::instance()->registerAction(editTextAction,this,SLOT(editTextItem()));
+    ActionManager::instance()->registerAction(editTextAction,MyGraphicsView::instance(),SLOT(editTextItem()));
 
     editMenu->addAction(editTextAction);
     editMenu->addSeparator();
@@ -156,44 +143,44 @@ void MainWindow::createActionAndMenus()
     QMenu * itemMenu = menuBar()->addMenu("条目(&I)");
 
     MyAction * arrowAction = ActionManager::instance()->crateAction(Constants::ARROW_ID,QIcon(":/images/pointer.png"),"箭头");
-    ActionManager::instance()->registerAction(arrowAction,this,SLOT(addItem()),true);
+    ActionManager::instance()->registerAction(arrowAction,this,SLOT(recordClickedItem()),true);
     arrowAction->setType(GRA_NONE);
     arrowAction->setChecked(true);
 
 //    MyAction * squareAction = ActionManager::instance()->crateAction(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形");
-//    ActionManager::instance()->registerAction(squareAction,this,SLOT(addItem()),true);
+//    ActionManager::instance()->registerAction(squareAction,this,SLOT(recordClickedItem()),true);
 //    squareAction->setType(GRA_SQUARE);
 
 //    MyAction * rectAction = ActionManager::instance()->crateAction(Constants::RECT_ID,QIcon(":/images/rectange.png"),"矩形");
-//    ActionManager::instance()->registerAction(rectAction,this,SLOT(addItem()),true);
+//    ActionManager::instance()->registerAction(rectAction,this,SLOT(recordClickedItem()),true);
 //    rectAction->setType(GRA_RECT);
 
 //    MyAction * roundRectAction = ActionManager::instance()->crateAction(Constants::ROUNDRECT_ID,QIcon(":/images/roundedrect.png"),"圆角矩形");
-//    ActionManager::instance()->registerAction(roundRectAction,this,SLOT(addItem()),true);
+//    ActionManager::instance()->registerAction(roundRectAction,this,SLOT(recordClickedItem()),true);
 //    roundRectAction->setType(GRA_ROUND_RECT);
 
 //    MyAction * circleAction = ActionManager::instance()->crateAction(Constants::CIRCLE_ID,QIcon(":/images/circle.png"),"圆");
-//    ActionManager::instance()->registerAction(circleAction,this,SLOT(addItem()),true);
+//    ActionManager::instance()->registerAction(circleAction,this,SLOT(recordClickedItem()),true);
 //    circleAction->setType(GRA_CIRCLE);
 
 //    MyAction * ellipseAction = ActionManager::instance()->crateAction(Constants::ELLIPSE_ID,QIcon(":/images/ellipse.png"),"椭圆");
-//    ActionManager::instance()->registerAction(ellipseAction,this,SLOT(addItem()),true);
+//    ActionManager::instance()->registerAction(ellipseAction,this,SLOT(recordClickedItem()),true);
 //    ellipseAction->setType(GRA_ELLIPSE);
 
 //    MyAction * polygonAction = ActionManager::instance()->crateAction(Constants::POLYGON_ID,QIcon(":/images/diamonds.png"),"菱形");
-//    ActionManager::instance()->registerAction(polygonAction,this,SLOT(addItem()),true);
+//    ActionManager::instance()->registerAction(polygonAction,this,SLOT(recordClickedItem()),true);
 //    polygonAction->setType(GRA_POLYGON);
 
     MyAction * lineAction = ActionManager::instance()->crateAction(Constants::LINE_ID,QIcon(":/images/linepointer.png"),"线条");
-    ActionManager::instance()->registerAction(lineAction,this,SLOT(addItem()),true);
+    ActionManager::instance()->registerAction(lineAction,this,SLOT(recordClickedItem()),true);
     lineAction->setType(GRA_LINE);
 
     MyAction * vectorLineAction = ActionManager::instance()->crateAction(Constants::VECTOR_LINE_ID,QIcon(":/images/vectorLine.png"),"连接线");
-    ActionManager::instance()->registerAction(vectorLineAction,this,SLOT(addItem()),true);
+    ActionManager::instance()->registerAction(vectorLineAction,this,SLOT(recordClickedItem()),true);
     vectorLineAction->setType(GRA_VECTOR_LINE);
 
     MyAction * textAction = ActionManager::instance()->crateAction(Constants::TEXT_ID,QIcon(":/images/text.png"),"文字");
-    ActionManager::instance()->registerAction(textAction,this,SLOT(addItem()),true);
+    ActionManager::instance()->registerAction(textAction,this,SLOT(recordClickedItem()),true);
     textAction->setType(GRA_TEXT);
 
     //用于控制一组中只有一个状态被选中
@@ -233,7 +220,7 @@ void MainWindow::fileOpen()
 {
     respRestItemAction();
 
-    if(scene->items().size()>0)
+    if(MyGraphicsView::instance()->scene()->items().size()>0)
     {
         fileClear();
     }
@@ -249,12 +236,12 @@ void MainWindow::fileOpen()
         }
         else if(returnType == RETURN_OK)
         {
-            scene->addItem(cutInfos);
+            MyGraphicsView::instance()->scene()->addItem(cutInfos);
 
             respShowStatusInfo("文件解析完成!");
         }
     }
-    scene->update();
+    MyGraphicsView::instance()->scene()->update();
 }
 
 //保存当前所添加的控件
@@ -265,7 +252,7 @@ void MainWindow::fileSave()
     QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
     if(!saveFileName.isEmpty())
     {
-        ReturnType  result = FileOperate::instance()->saveFile(saveFileName,scene->items());
+        ReturnType  result = FileOperate::instance()->saveFile(saveFileName,MyGraphicsView::instance()->scene()->items());
         if(result == RETURN_OK)
         {
             respShowStatusInfo("文件保存成功!");
@@ -281,7 +268,7 @@ void MainWindow::fileClear()
     int result = QMessageBox::warning(this,"警告","是否清空场景的内容?",QMessageBox::Yes,QMessageBox::No);
     if(result == QMessageBox::Yes)
     {
-        scene->clear();
+        view->clearItems();
         respItemSizeChanged(0);
         resetEditActionState(false);
         Util::resetGlobalZValue();
@@ -293,296 +280,8 @@ void MainWindow::exitApp()
     qApp->exit();
 }
 
-//目前支持一个控件的剪切，只支持除箭头以外控件操作
-void MainWindow::cutItem()
-{
-    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
-
-    if(selectedItems.size() == 1)
-    {
-        QString itemName = typeid(*(selectedItems.first())).name();
-
-        if(itemName == typeid(MyItem).name())
-        {
-            MyItem * item = dynamic_cast<MyItem *>(scene->selectedItems().first());
-
-            cutTmpInfo.graphicsType = item->getType();
-            cutTmpInfo.itemProperty = item->getProperty();
-            cutTmpInfo.content = item->getText();
-            foreach (MyNodePort * node, item->getNodePorts())
-            {
-                NodePortProperty  props;
-                props.direct = node->getDragDirect();
-                props.scaleFactor = node->getScaleFactor();
-                cutTmpInfo.nodeProperties.push_back(props);
-            }
-            deleteItem();
-            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
-        }
-        else if(itemName == typeid(MyTextItem).name())
-        {
-            MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
-
-            cutTmpInfo.graphicsType = item->getType();
-            cutTmpInfo.itemProperty = item->getProperty();
-            delete item;
-            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
-        }
-    }
-}
-
-//复制Item，支持对其样式的、端口的复制
-void MainWindow::copyItem()
-{
-    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
-
-    if(selectedItems.size() == 1)
-    {
-        QString itemName = typeid(*(selectedItems.first())).name();
-
-        if(itemName == typeid(MyItem).name())
-        {
-            MyItem * item = dynamic_cast<MyItem *>(scene->selectedItems().first());
-
-            cutTmpInfo.graphicsType = item->getType();
-            cutTmpInfo.itemProperty = item->getProperty();
-            cutTmpInfo.content = item->getText();
-            cutTmpInfo.nodeProperties.clear();
-            foreach (MyNodePort * node, item->getNodePorts())
-            {
-                NodePortProperty  props;
-                props.direct = node->getDragDirect();
-                props.scaleFactor = node->getScaleFactor();
-                cutTmpInfo.nodeProperties.push_back(props);
-            }
-            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
-        }
-        else if(itemName == typeid(MyTextItem).name())
-        {
-            MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
-
-            cutTmpInfo.graphicsType = item->getType();
-            cutTmpInfo.itemProperty = item->getProperty();
-            cutTmpInfo.content = item->toPlainText();
-            cutTmpInfo.nodeProperties.clear();
-            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
-        }
-    }
-}
-
-void MainWindow::pasteItem()
-{
-    scene->addItem(cutTmpInfo,true);
-}
-
-void MainWindow::rotateItem()
-{
-    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
-
-    if(selectedItems.size() !=  1)
-    {
-        return;
-    }
-
-    MyItem * graphicsTmp = dynamic_cast<MyItem *>(scene->selectedItems().first());
-
-    QString objName = QObject::sender()->objectName();
-    if(objName == QString(Constants::ROTATE_LEFT_ID))
-    {
-        graphicsTmp->updateRotation(-90);
-    }
-    else if(objName == QString(Constants::ROTATE_RIGHT_ID))
-    {
-        graphicsTmp->updateRotation(90);
-    }
-    graphicsTmp->setRotation(graphicsTmp->getProperty().rotateDegree);
-}
-
-void MainWindow::bringZItem()
-{
-    if (scene->selectedItems().isEmpty())
-    {
-         return;
-    }
-
-    QGraphicsItem *selectedItem = scene->selectedItems().first();
-//    QList<QGraphicsItem *> overlapItems = selectedItem->collidingItems();     //找到与当前item有重合的items
-    QList<QGraphicsItem * > allItems = scene->items();
-
-    bool isFront = false;
-    QString objName = QObject::sender()->objectName();
-    if(objName == QString(Constants::BRING_FRONT_ID))
-    {
-        isFront = true;
-    }
-
-    qreal zValue = 0;
-    foreach (QGraphicsItem *item, allItems)
-    {
-         if(isFront)
-         {
-             if (item->zValue() >= zValue)
-             {
-                 zValue = item->zValue() + 0.1;
-             }
-         }
-         else
-         {
-             if (item->zValue() <= zValue)
-             {
-                 zValue = item->zValue() - 0.1;
-             }
-         }
-     }
-    QString itemName = typeid(*selectedItem).name();
-    if(itemName == typeid(MyItem).name())
-    {
-        MyItem * tmp = dynamic_cast<MyItem *>(selectedItem);
-        tmp->setZValue(zValue);
-    }
-    else if(itemName == typeid(MyTextItem).name())
-    {
-        MyTextItem * tmp = dynamic_cast<MyTextItem *>(selectedItem);
-        tmp->setZValue(zValue);
-    }
-}
-
-//还需要从scene中删除item
-void MainWindow::deleteItem()
-{
-    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
-
-    foreach(QGraphicsItem * item, selectedItems)
-    {
-        QString itemName = typeid(*item).name();
-        if(itemName == typeid(MyArrow).name())
-        {
-            MyArrow * tmp = dynamic_cast<MyArrow *>(item);
-
-            if(tmp->getLineType() == LINE_MYITEM)
-            {
-                tmp->getStartItem()->removeArrow(tmp);
-                tmp->getEndItem()->removeArrow(tmp);
-            }
-            else if(tmp->getLineType() == LINE_NODEPORT)
-            {
-                tmp->getStartNodePort()->removeArrow(tmp);
-                tmp->getEndNodePort()->removeArrow(tmp);
-            }
-            scene->removeItem(tmp);
-
-            delete tmp;
-        }
-    }
-
-    selectedItems = scene->selectedItems();
-
-    foreach (QGraphicsItem * item, selectedItems)
-    {
-        QString itemName = typeid(*item).name();
-        if(itemName == typeid(MyItem).name())
-        {
-            MyItem * tmp = dynamic_cast<MyItem *>(item);
-            tmp->removeArrows();
-            scene->removeItem(tmp);
-            delete tmp;
-        }
-    }
-
-    selectedItems = scene->selectedItems();
-
-    foreach (QGraphicsItem * item, selectedItems)
-    {
-        QString itemName = typeid(*item).name();
-        if(itemName == typeid(MyTextItem).name())
-        {
-            MyTextItem * tmp = dynamic_cast<MyTextItem *>(item);
-            scene->removeItem(tmp);
-            delete tmp;
-        }
-    }
-
-    selectedItems = scene->selectedItems();
-
-    foreach (QGraphicsItem * item, selectedItems)
-    {
-        QString itemName = typeid(*item).name();
-        if(itemName == typeid(MyNodePort).name())
-        {
-            MyNodePort * tmp = dynamic_cast<MyNodePort *>(item);
-            tmp->removeArrows();
-            //从父类集合中删除
-            tmp->getParentItem()->removeNodePort(tmp);
-            scene->removeItem(tmp);
-            delete tmp;
-        }
-    }
-
-    scene->update();
-}
-
-//锁定与解锁
-void MainWindow::lockAndunlockItem()
-{
-    QString objName = QObject::sender()->objectName();
-
-    bool moveable = false;
-
-    if(objName == QString(Constants::LOCK_ID))
-    {
-        moveable = false;
-    }
-    else if(objName == QString(Constants::UNLOCK_ID))
-    {
-        moveable = true;
-    }
-
-    ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(moveable);
-    ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!moveable);
-
-    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
-
-    if(selectedItems.size() > 0)
-    {
-        foreach (QGraphicsItem * item, selectedItems)
-        {
-            QString itemName = typeid(*item).name();
-            if(itemName == typeid(MyItem).name())
-            {
-                MyItem * tmp = dynamic_cast<MyItem*>(item);
-                tmp->setMoveable(moveable);
-            }
-        }
-        scene->update();
-    }
-}
-
-//编辑文本
-void MainWindow::editTextItem()
-{
-    QList<QGraphicsItem *> selectedItems = scene->selectedItems();
-    if(selectedItems.size() == 1)
-    {
-        QString itemName = typeid(*(selectedItems.first())).name();
-
-        if(itemName == typeid(MyItem).name())
-        {
-            MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
-
-            MyTextInput textInput(this);
-
-            textInput.setTex(item->getText());
-            textInput.exec();
-
-            item->setText(textInput.getText());
-
-            //当修改文字后，需要重新将信息发送至右侧的工具栏。
-            emit initToolBox(selectedItems.size(),item->getProperty());
-        }
-    }
-}
-
-void MainWindow::addItem()
+//获取点击控件的类型
+void MainWindow::recordClickedItem()
 {
     MyAction * tmpAction = dynamic_cast<MyAction *>(QObject::sender());
     if(tmpAction)
@@ -597,26 +296,13 @@ void MainWindow::createSceneAndView()
     QWidget * centralWidget = new QWidget;
     QHBoxLayout * layout = new QHBoxLayout;
 
-    SceneWidth = SceneHeight = 5000;
-
-    scene = new MyScene(rightMenu);
-    scene->setSceneRect(0,0,SceneWidth,SceneHeight);
-
-    connect(scene,SIGNAL(resetItemAction()),this,SLOT(respRestItemAction()));
-    connect(scene, SIGNAL(selectionChanged()),this, SLOT(updateActions()));
-    connect(scene,SIGNAL(deleteKeyPress()),this,SLOT(deleteItem()));
-    connect(scene,SIGNAL(itemSizeChanged(int)),this,SLOT(respItemSizeChanged(int)));
-
     view = new MyGraphicsView(this);
-    view->setScene(scene);
-//    view->setDragMode(QGraphicsView::RubberBandDrag);   //此行添加后会导致scene无法捕获mousemove事件
-//    view->setRenderHints(QPainter::Antialiasing| QPainter::TextAntialiasing);
 
     rightToolBox = new RightToolBox;
-    connect(this,SIGNAL(initToolBox(int,ItemProperty)),rightToolBox,SLOT(respInitToolBox(int,ItemProperty)));
-    connect(rightToolBox,SIGNAL(updateProperty(ItemProperty)),this,SLOT(respPropertyUpdate(ItemProperty)));
-    connect(rightToolBox,SIGNAL(deleteCurrItem()),this,SLOT(deleteItem()));
-    connect(scene,SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
+    connect(view,SIGNAL(initToolBox(int,ItemProperty)),rightToolBox,SLOT(respInitToolBox(int,ItemProperty)));
+    connect(rightToolBox,SIGNAL(updateProperty(ItemProperty)),MyGraphicsView::instance(),SLOT(respPropertyUpdate(ItemProperty)));
+    connect(rightToolBox,SIGNAL(deleteCurrItem()),MyGraphicsView::instance(),SLOT(deleteItem()));
+    connect(view,SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
 
     leftIconWidget = new LeftIconWidget;
 
@@ -638,7 +324,7 @@ void MainWindow::respItemSizeChanged(int size)
 
     ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(actionEnabled);
 
-    if(scene->selectedItems().size() > 0)
+    if(view->scene()->selectedItems().size() > 0)
     {
         resetEditActionState(actionEnabled);
     }
@@ -662,188 +348,6 @@ void MainWindow::resetEditActionState(bool state)
 void MainWindow::respRestItemAction()
 {
     ActionManager::instance()->action(Constants::ARROW_ID)->setChecked(true);
-}
-
-//当选择的item状态改变后，更新action
-void MainWindow::updateActions()
-{
-    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
-
-    int selectedSize = scene->selectedItems().size();
-
-    ItemProperty  property;
-
-    if(selectedSize == 0)
-    {
-        ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
-
-        ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(false);
-    }
-    else if(selectedSize == 1)
-    {
-        ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(true);
-        ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(true);
-        ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(true);
-
-        ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(true);
-        ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(true);
-        ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(true);
-        ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(true);
-        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
-        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
-        ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
-
-        QString itemName = typeid(*(scene->selectedItems().first())).name();
-
-        if(itemName == typeid(MyItem).name())
-        {
-            MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
-            property = myItem->getProperty();
-            bool lock = myItem->isMoveable();
-            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(lock);
-            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!lock);
-        }
-        else if(itemName == typeid(MyTextItem).name())
-        {
-            MyTextItem * textItem = dynamic_cast<MyTextItem *>(scene->selectedItems().first());
-            property = textItem->getProperty();
-        }
-        else if(itemName == typeid(MyArrow).name())
-        {
-            MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
-            property = arrowItem->getProperty();
-        }
-        else if(itemName == typeid(MyNodePort).name())
-        {
-//            MyNodePort  * nodePort = dynamic_cast<MyNodePort *>(scene->selectedItems().first());
-//            property = nodePort->getProperty();
-        }
-    }
-    else
-    {
-        ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
-
-        ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
-        ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
-
-        int myItemNum = 0;
-        int myItemLockNum = 0;
-        int myItemUnLockNum = 0;
-
-        foreach (QGraphicsItem * item, scene->selectedItems())
-        {
-            QString itemName = typeid(*item).name();
-            if(itemName == typeid(MyItem).name())
-            {
-                myItemNum ++;
-
-                MyItem * myItem = dynamic_cast<MyItem *>(item);
-                if(myItem->isMoveable())
-                {
-                    myItemUnLockNum++;
-                }
-                else
-                {
-                    myItemLockNum++;
-                }
-            }
-        }
-
-        //全部没锁定
-        if(myItemLockNum == myItemNum)
-        {
-            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
-            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
-        }
-        //全部锁定
-        else if(myItemUnLockNum == myItemNum)
-        {
-            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
-            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
-        }
-        //锁定一部分
-        else
-        {
-            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
-            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
-        }
-    }
-
-    scene->update();
-
-    emit initToolBox(selectedSize,property);
-}
-
-//更新item的属性
-void MainWindow::respPropertyUpdate(ItemProperty property)
-{
-    if(scene->selectedItems().size() == 1)
-    {
-        QString itemName = typeid(*(scene->selectedItems().first())).name();
-
-        if(itemName == typeid(MyItem).name())
-        {
-            MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
-            if(property.isMoveable)
-            {
-                myItem->setProperty(property);
-            }
-        }
-        else if(itemName == typeid(MyTextItem).name())
-        {
-            MyTextItem * textItem = dynamic_cast<MyTextItem *>(scene->selectedItems().first());
-            textItem->setProperty(property);
-        }
-        else if(itemName == typeid(MyArrow).name())
-        {
-            MyArrow  * arrowItem = dynamic_cast<MyArrow *>(scene->selectedItems().first());
-            arrowItem->setProperty(property);
-        }
-
-        scene->update();
-    }
-}
-
-//创建右键菜单，作为每个相具有的功能
-void MainWindow::createContextMenu()
-{
-    rightMenu = new QMenu;
-
-    rightMenu->addAction(ActionManager::instance()->action(Constants::EDIT_TEXT_ID));
-    rightMenu->addSeparator();
-    rightMenu->addAction(ActionManager::instance()->action(Constants::CUT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::COPY_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
-    rightMenu->addSeparator();
-    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
-    rightMenu->addSeparator();
-    rightMenu->addAction(ActionManager::instance()->action(Constants::LOCK_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
-    rightMenu->addSeparator();
-    rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
-
 }
 
 //创建工具栏
@@ -883,7 +387,7 @@ void MainWindow::createToolBar()
     QToolBar * sceneBar = addToolBar("Scene");
 
     mySlider = new MySlider;
-    connect(mySlider,SIGNAL(scaleView(int)),this,SLOT(sceneScaled(int)));
+    connect(mySlider,SIGNAL(scaleView(int)),MyGraphicsView::instance(),SLOT(sceneScaled(int)));
     sceneBar->addWidget(mySlider);
 }
 
@@ -898,17 +402,6 @@ void MainWindow::createStatusBar()
 void MainWindow::respShowStatusInfo(QString text)
 {
     statusBar()->showMessage(text);
-}
-
-//切换视图缩放
-void MainWindow::sceneScaled(int currScale)
-{
-//     double newScale = currScale.left(currScale.indexOf(tr("%"))).toDouble() / 100.0;
-     double newScale = currScale/100.0;
-     QMatrix oldMatrix = view->matrix();
-     view->resetMatrix();
-     view->translate(oldMatrix.dx(), oldMatrix.dy());
-     view->scale(newScale, newScale);
 }
 
 MainWindow::~MainWindow()
@@ -929,12 +422,6 @@ MainWindow::~MainWindow()
     {
         delete rightToolBox;
         rightToolBox = NULL;
-    }
-
-    if(scene)
-    {
-        delete scene;
-        scene = NULL;
     }
 
     if(view)

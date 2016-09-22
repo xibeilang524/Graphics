@@ -19,6 +19,7 @@
 **20160920:wey:调整工具栏，将控件点击创建统一改成拖入创建
 **             修复删除nodeport线条奔溃问题
 **20160922:wey:添加控件、端口的锁定/解锁功能
+**             对MainWindow和MyGraphicsView进行了重构，使得两者功能相对独立【！！！】
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -28,7 +29,6 @@
 #include "Header.h"
 
 class MyGraphicsView;
-class MyScene;
 class QActionGroup;
 class MySlider;
 class RightToolBox;
@@ -47,7 +47,6 @@ public:
     ~MainWindow();
 
 signals:
-    void initToolBox(int selectedNum,ItemProperty property);
     void updateProperty(ItemProperty property);
 
 private slots:
@@ -56,29 +55,13 @@ private slots:
     void fileSave();
     void fileClear();
     void exitApp();
-
-    void cutItem();
-    void copyItem();
-    void pasteItem();
-
-    void rotateItem();
-    void bringZItem();
-    void deleteItem();
-    void lockAndunlockItem();
-    void editTextItem();
-
-    void addItem();
-
+    void recordClickedItem();
     void respRestItemAction();
-    void updateActions();
-    void sceneScaled(int currScale);
-    void respPropertyUpdate(ItemProperty property);
     void respItemSizeChanged(int size);
 
 private:
     void createActionAndMenus();
     void createSceneAndView();
-    void createContextMenu();
     void createToolBar();
     void createStatusBar();
     void respShowStatusInfo(QString);
@@ -86,10 +69,7 @@ private:
 
     Ui::MainWindow *ui;
 
-    MyScene * scene;
     MyGraphicsView * view;
-
-    QMenu * rightMenu;
 
     QActionGroup * itemGroup;
 

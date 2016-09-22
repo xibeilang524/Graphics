@@ -15,8 +15,13 @@
 
 #include <QGraphicsView>
 
+#include "../Header.h"
+
 class MyNodePort;
 class NodeEditDialog;
+class MyScene;
+class MainWindow;
+class QMenu;
 
 class MyGraphicsView : public QGraphicsView
 {
@@ -24,20 +29,52 @@ class MyGraphicsView : public QGraphicsView
 public:
     static MyGraphicsView * instance();
 
-    MyGraphicsView(QWidget * parent = 0);
+    MyGraphicsView(MainWindow * parent = 0);
     ~MyGraphicsView();
 
     void showNodePortEdit(MyNodePort * nodePort);
+
+    void clearItems();
+    void addContextMenuItem();
+
+    MyScene * scene();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
 
+signals:
+    void initToolBox(int selectedNum,ItemProperty property);
+    void itemPropChanged(ItemProperty);
+
+private slots:
+    void cutItem();
+    void copyItem();
+    void pasteItem();
+
+    void rotateItem();
+    void bringZItem();
+    void lockAndunlockItem();
+    void deleteItem();
+
+    void sceneScaled(int currScale);
+    void updateActions();
+    void editTextItem();
+    void respPropertyUpdate(ItemProperty property);
+
 private:
+
+    void initView();
+
     static MyGraphicsView * viewManager;
 
     NodeEditDialog * nodeEdit;
+    MyScene * myScene;
+    MainWindow * parentWindow;
+    QMenu * rightMenu;
+
+    CutInfo cutTmpInfo;               //±£¥ÊºÙ«––≈œ¢
 };
 
 #endif // MYGRAPHICSVIEW_H
