@@ -15,6 +15,11 @@
 #define ICON_WIDTH  60    //Í¼±êµÄ¿í¸ß
 #define ICON_HEIGHT 60
 
+#include <QString>
+#include "typeinfo"
+
+#define TYPE_ID(a) typeid(a).name()
+
 #include <QBrush>
 #include <QPen>
 #include <QFont>

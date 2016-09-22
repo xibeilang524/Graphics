@@ -8,10 +8,9 @@
 
 #include "myscene.h"
 #include "../SelfWidget/nodeeditdialog.h"
-#include "./SelfWidget/mytextinput.h"
+#include "../SelfWidget/mytextinput.h"
 #include "../Header.h"
 #include "../global.h"
-#include "myscene.h"
 #include "../mainwindow.h"
 #include "../actionmanager.h"
 #include "../Constants.h"
@@ -158,9 +157,9 @@ void MyGraphicsView::cutItem()
 
     if(selectedItems.size() == 1)
     {
-        QString itemName = typeid(*(selectedItems.first())).name();
+        QString itemName = TYPE_ID(*(selectedItems.first()));
 
-        if(itemName == typeid(MyItem).name())
+        if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem *>(myScene->selectedItems().first());
 
@@ -177,7 +176,7 @@ void MyGraphicsView::cutItem()
             deleteItem();
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
         }
-        else if(itemName == typeid(MyTextItem).name())
+        else if(itemName == TYPE_ID(MyTextItem))
         {
             MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
 
@@ -196,9 +195,9 @@ void MyGraphicsView::copyItem()
 
     if(selectedItems.size() == 1)
     {
-        QString itemName = typeid(*(selectedItems.first())).name();
+        QString itemName = TYPE_ID(*(selectedItems.first()));
 
-        if(itemName == typeid(MyItem).name())
+        if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem *>(myScene->selectedItems().first());
 
@@ -215,7 +214,7 @@ void MyGraphicsView::copyItem()
             }
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
         }
-        else if(itemName == typeid(MyTextItem).name())
+        else if(itemName == TYPE_ID(MyTextItem))
         {
             MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
 
@@ -240,8 +239,8 @@ void MyGraphicsView::deleteItem()
 
     foreach(QGraphicsItem * item, selectedItems)
     {
-        QString itemName = typeid(*item).name();
-        if(itemName == typeid(MyArrow).name())
+        QString itemName = TYPE_ID(*item);
+        if(itemName == TYPE_ID(MyArrow))
         {
             MyArrow * tmp = dynamic_cast<MyArrow *>(item);
 
@@ -265,8 +264,8 @@ void MyGraphicsView::deleteItem()
 
     foreach (QGraphicsItem * item, selectedItems)
     {
-        QString itemName = typeid(*item).name();
-        if(itemName == typeid(MyItem).name())
+        QString itemName = TYPE_ID(*item);
+        if(itemName == TYPE_ID(MyItem))
         {
             MyItem * tmp = dynamic_cast<MyItem *>(item);
             tmp->removeArrows();
@@ -279,8 +278,8 @@ void MyGraphicsView::deleteItem()
 
     foreach (QGraphicsItem * item, selectedItems)
     {
-        QString itemName = typeid(*item).name();
-        if(itemName == typeid(MyTextItem).name())
+        QString itemName = TYPE_ID(*item);
+        if(itemName == TYPE_ID(MyTextItem))
         {
             MyTextItem * tmp = dynamic_cast<MyTextItem *>(item);
             myScene->removeItem(tmp);
@@ -292,8 +291,8 @@ void MyGraphicsView::deleteItem()
 
     foreach (QGraphicsItem * item, selectedItems)
     {
-        QString itemName = typeid(*item).name();
-        if(itemName == typeid(MyNodePort).name())
+        QString itemName = TYPE_ID(*item);
+        if(itemName == TYPE_ID(MyNodePort))
         {
             MyNodePort * tmp = dynamic_cast<MyNodePort *>(item);
             tmp->removeArrows();
@@ -317,20 +316,30 @@ void MyGraphicsView::rotateItem()
         return;
     }
 
-    MyItem * graphicsTmp = dynamic_cast<MyItem *>(myScene->selectedItems().first());
+    QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
 
-    QString objName = QObject::sender()->objectName();
-    if(objName == QString(Constants::ROTATE_LEFT_ID))
+    if(itemName == TYPE_ID(MyItem))
     {
-        graphicsTmp->updateRotation(-90);
+        MyItem * graphicsTmp = dynamic_cast<MyItem *>(myScene->selectedItems().first());
+
+        QString objName = QObject::sender()->objectName();
+        if(objName == QString(Constants::ROTATE_LEFT_ID))
+        {
+            graphicsTmp->updateRotation(-90);
+        }
+        else if(objName == QString(Constants::ROTATE_RIGHT_ID))
+        {
+            graphicsTmp->updateRotation(90);
+        }
+        graphicsTmp->setRotation(graphicsTmp->getProperty().rotateDegree);
     }
-    else if(objName == QString(Constants::ROTATE_RIGHT_ID))
+    else
     {
-        graphicsTmp->updateRotation(90);
+
     }
-    graphicsTmp->setRotation(graphicsTmp->getProperty().rotateDegree);
 }
 
+//ÖÃ¶¥»òÖÃÓÚµ×²ã
 void MyGraphicsView::bringZItem()
 {
     if (myScene->selectedItems().isEmpty())
@@ -367,13 +376,13 @@ void MyGraphicsView::bringZItem()
              }
          }
      }
-    QString itemName = typeid(*selectedItem).name();
-    if(itemName == typeid(MyItem).name())
+    QString itemName = TYPE_ID(*selectedItem);
+    if(itemName == TYPE_ID(MyItem))
     {
         MyItem * tmp = dynamic_cast<MyItem *>(selectedItem);
         tmp->setZValue(zValue);
     }
-    else if(itemName == typeid(MyTextItem).name())
+    else if(itemName == TYPE_ID(MyTextItem))
     {
         MyTextItem * tmp = dynamic_cast<MyTextItem *>(selectedItem);
         tmp->setZValue(zValue);
@@ -405,8 +414,8 @@ void MyGraphicsView::lockAndunlockItem()
     {
         foreach (QGraphicsItem * item, selectedItems)
         {
-            QString itemName = typeid(*item).name();
-            if(itemName == typeid(MyItem).name())
+            QString itemName = TYPE_ID(*item);
+            if(itemName == TYPE_ID(MyItem))
             {
                 MyItem * tmp = dynamic_cast<MyItem*>(item);
                 tmp->setMoveable(moveable);
@@ -421,9 +430,9 @@ void MyGraphicsView::respPropertyUpdate(ItemProperty property)
 {
     if(myScene->selectedItems().size() == 1)
     {
-        QString itemName = typeid(*(myScene->selectedItems().first())).name();
+        QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
 
-        if(itemName == typeid(MyItem).name())
+        if(itemName == TYPE_ID(MyItem))
         {
             MyItem * myItem = dynamic_cast<MyItem *>(myScene->selectedItems().first());
             if(property.isMoveable)
@@ -431,12 +440,12 @@ void MyGraphicsView::respPropertyUpdate(ItemProperty property)
                 myItem->setProperty(property);
             }
         }
-        else if(itemName == typeid(MyTextItem).name())
+        else if(itemName == TYPE_ID(MyTextItem))
         {
             MyTextItem * textItem = dynamic_cast<MyTextItem *>(myScene->selectedItems().first());
             textItem->setProperty(property);
         }
-        else if(itemName == typeid(MyArrow).name())
+        else if(itemName == TYPE_ID(MyArrow))
         {
             MyArrow  * arrowItem = dynamic_cast<MyArrow *>(myScene->selectedItems().first());
             arrowItem->setProperty(property);
@@ -497,9 +506,9 @@ void MyGraphicsView::updateActions()
         ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
 
-        QString itemName = typeid(*(myScene->selectedItems().first())).name();
+        QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
 
-        if(itemName == typeid(MyItem).name())
+        if(itemName == TYPE_ID(MyItem))
         {
             MyItem * myItem = dynamic_cast<MyItem *>(myScene->selectedItems().first());
             property = myItem->getProperty();
@@ -507,17 +516,17 @@ void MyGraphicsView::updateActions()
             ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(lock);
             ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!lock);
         }
-        else if(itemName == typeid(MyTextItem).name())
+        else if(itemName == TYPE_ID(MyTextItem))
         {
             MyTextItem * textItem = dynamic_cast<MyTextItem *>(myScene->selectedItems().first());
             property = textItem->getProperty();
         }
-        else if(itemName == typeid(MyArrow).name())
+        else if(itemName == TYPE_ID(MyArrow))
         {
             MyArrow  * arrowItem = dynamic_cast<MyArrow *>(myScene->selectedItems().first());
             property = arrowItem->getProperty();
         }
-        else if(itemName == typeid(MyNodePort).name())
+        else if(itemName == TYPE_ID(MyNodePort))
         {
 //            MyNodePort  * nodePort = dynamic_cast<MyNodePort *>(myScene->selectedItems().first());
 //            property = nodePort->getProperty();
@@ -543,8 +552,8 @@ void MyGraphicsView::updateActions()
 
         foreach (QGraphicsItem * item, myScene->selectedItems())
         {
-            QString itemName = typeid(*item).name();
-            if(itemName == typeid(MyItem).name())
+            QString itemName = TYPE_ID(*item);
+            if(itemName == TYPE_ID(MyItem))
             {
                 myItemNum ++;
 
@@ -591,9 +600,9 @@ void MyGraphicsView::editTextItem()
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
     if(selectedItems.size() == 1)
     {
-        QString itemName = typeid(*(selectedItems.first())).name();
+        QString itemName = TYPE_ID(*(selectedItems.first()));
 
-        if(itemName == typeid(MyItem).name())
+        if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
 

@@ -51,30 +51,27 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
 
     foreach(QGraphicsItem * item,items)
     {
-        QString itemName = typeid(*item).name();
+        QString itemName = TYPE_ID(*item);
 
-        if(itemName == typeid(MyItem).name())
+        if(itemName == TYPE_ID(MyItem))
         {
             MyItem * myItem = dynamic_cast<MyItem *>(item);
             stream<<myItem;
         }
-        else if(itemName == typeid(MyArrow).name())
+        else if(itemName == TYPE_ID(MyArrow))
         {
             MyArrow * myItem = dynamic_cast<MyArrow *>(item);
             stream<<myItem;
-
-//            qDebug()<<myItem->getProperty().startItemID<<"_arrow_"<<myItem->getProperty().endItemID<<"_"<<__FUNCTION__;
         }
-        else if(itemName == typeid(MyTextItem).name())
+        else if(itemName == TYPE_ID(MyTextItem))
         {
             MyTextItem * myItem = dynamic_cast<MyTextItem *>(item);
             stream<<myItem;
         }
-        else if(itemName == typeid(MyNodePort).name())
+        else if(itemName == TYPE_ID(MyNodePort))
         {
             MyNodePort * myItem = dynamic_cast<MyNodePort *>(item);
             stream<<myItem;
-//            qDebug()<< myItem->getNodeProperty().startItemID<<"_______"<<__FUNCTION__;
         }
     }
     file.close();

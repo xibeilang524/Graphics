@@ -113,10 +113,10 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         if (startItems.count() > 0 && endItems.count() > 0 &&
             startItems.first() != endItems.first())
         {
-            QString firstItemId = typeid(* startItems.first()).name();
-            QString secondItemId = typeid(* endItems.first()).name();
+            QString firstItemId = TYPE_ID(* startItems.first());
+            QString secondItemId = TYPE_ID(* endItems.first());
 
-            if(firstItemId == typeid(MyItem).name() && secondItemId == typeid(MyItem).name())
+            if(firstItemId == TYPE_ID(MyItem) && secondItemId == TYPE_ID(MyItem))
             {
                 MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
                 MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
@@ -131,7 +131,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                     arrow->updatePosition();
                 }
             }
-            else if(firstItemId == typeid(MyNodePort).name() && secondItemId == typeid(MyNodePort).name())
+            else if(firstItemId == TYPE_ID(MyNodePort) && secondItemId == TYPE_ID(MyNodePort))
             {
                 MyNodePort *startItem = qgraphicsitem_cast<MyNodePort *>(startItems.first());
                 MyNodePort *endItem = qgraphicsitem_cast<MyNodePort *>(endItems.first());

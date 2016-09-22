@@ -47,7 +47,7 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
              <<prop.alphaValue<<prop.rotateDegree
               <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor
                <<prop.zValue<<lineType<<prop.isMoveable;
-    qDebug()<<prop.zValue;
+
     return stream;
 }
 
