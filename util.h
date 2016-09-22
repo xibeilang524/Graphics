@@ -11,6 +11,8 @@ class Util
 public:
     static void setWidgetColor(QWidget * widget,QColor & color);
     static QString getFontInfo(QFont font);
+    static qreal getGlobalZValue();
+    static void  resetGlobalZValue();
 };
 
 #endif // UTIL_H

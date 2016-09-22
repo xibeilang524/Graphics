@@ -226,6 +226,8 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
             item->setPos(QPointF(cutInfo.itemProperty.itemRect.x,cutInfo.itemProperty.itemRect.y));
         }
 
+        item->setMoveable(cutInfo.itemProperty.isMoveable);
+
         //本地打开时，由于创建时会产生新的ID，但需要手动的更新
         foreach(NodePortProperty prop,cutInfo.nodeProperties)
         {

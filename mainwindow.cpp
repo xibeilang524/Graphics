@@ -27,6 +27,7 @@
 #include "./SelfWidget/lefticonwidget.h"
 #include "fileoperate.h"
 #include "global.h"
+#include "util.h"
 
 //#include "typeinfo.h"
 #include "typeinfo"
@@ -46,6 +47,7 @@ MainWindow::MainWindow(QWidget *parent) :
     leftIconWidget = NULL;
     scene = NULL;
     view = NULL;
+    GlobalItemZValue = 0;
 
     createActionAndMenus();
 
@@ -62,6 +64,9 @@ MainWindow::MainWindow(QWidget *parent) :
     respItemSizeChanged(0);
 
     resetEditActionState(false);
+
+    ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+    ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
 }
 
 //创建窗口的菜单栏，绑定响应事件
@@ -279,6 +284,7 @@ void MainWindow::fileClear()
         scene->clear();
         respItemSizeChanged(0);
         resetEditActionState(false);
+        Util::resetGlobalZValue();
     }
 }
 
@@ -650,8 +656,6 @@ void MainWindow::resetEditActionState(bool state)
     ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(state);
     ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(state);
     ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(state);
-    ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(state);
-    ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(state);
 }
 
 //当在scene中右击时，将item工具栏中的状态恢复至箭头状态
@@ -799,7 +803,10 @@ void MainWindow::respPropertyUpdate(ItemProperty property)
         if(itemName == typeid(MyItem).name())
         {
             MyItem * myItem = dynamic_cast<MyItem *>(scene->selectedItems().first());
-            myItem->setProperty(property);
+            if(property.isMoveable)
+            {
+                myItem->setProperty(property);
+            }
         }
         else if(itemName == typeid(MyTextItem).name())
         {

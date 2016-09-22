@@ -47,7 +47,7 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
              <<prop.alphaValue<<prop.rotateDegree
               <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor
                <<prop.zValue<<lineType<<prop.isMoveable;
-
+    qDebug()<<prop.zValue;
     return stream;
 }
 
@@ -230,11 +230,8 @@ void MyItem::setPos(const QPointF &pos)
 
 void MyItem::setZValue(qreal z)
 {
-    if(property.isMoveable)
-    {
-        property.zValue = z;
-        QGraphicsPolygonItem::setZValue(z);
-    }
+    property.zValue = z;
+    QGraphicsPolygonItem::setZValue(z);
 }
 
 QString MyItem::getText()
@@ -245,12 +242,9 @@ QString MyItem::getText()
 //更新文字信息，同时更新textItem在item中的位置
 void MyItem::setText(QString text)
 {
-    if(property.isMoveable)
-    {
-        property.content = text;
-        myTextItem->setPlainText(text);
-        myTextItem->setPos(-myTextItem->getBoundRect().width()/2,-myTextItem->getBoundRect().height()/2);
-    }
+    property.content = text;
+    myTextItem->setPlainText(text);
+    myTextItem->setPos(-myTextItem->getBoundRect().width()/2,-myTextItem->getBoundRect().height()/2);
 }
 
 void MyItem::updateRotateLinePos()
@@ -816,7 +810,6 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
     {
     }
 
-
     return QGraphicsPolygonItem::itemChange(change,value);
 }
 
@@ -1139,33 +1132,30 @@ void MyItem::procRotate(MouseType mouseType,int degree)
 //设置控件的样式属性
 void MyItem::setProperty(ItemProperty property)
 {
-    if(property.isMoveable)
+    this->property = property;
+    setBrush(property.itemBrush);
+
+    setRotation(property.rotateDegree);
+    setZValue(property.zValue);
+    setPos(QPointF (property.itemRect.x,property.itemRect.y));
+
+    resetPolygon();
+
+    myTextItem->setPlainText(property.content);
+    myTextItem->updateFont(property.itemFont);
+    myTextItem->setDefaultTextColor(property.fontColor);
+    setText(myTextItem->toPlainText());
+
+    setFlag(QGraphicsItem::ItemIsMovable,property.isMoveable);
+
+    foreach (MyNodePort * node, ports)
     {
-        this->property = property;
-        setBrush(property.itemBrush);
-
-        setRotation(property.rotateDegree);
-        setZValue(property.zValue);
-        setPos(QPointF (property.itemRect.x,property.itemRect.y));
-
-        resetPolygon();
-
-        myTextItem->setPlainText(property.content);
-        myTextItem->updateFont(property.itemFont);
-        myTextItem->setDefaultTextColor(property.fontColor);
-        setText(myTextItem->toPlainText());
-
-        setFlag(QGraphicsItem::ItemIsMovable,property.isMoveable);
-
-        foreach (MyNodePort * node, ports)
-        {
-            node->setProperty(property);
-        }
-
-        rotateLine->setMoveable(property.isMoveable);
-
-        parentScene->update();
+        node->setProperty(property);
     }
+
+    rotateLine->setMoveable(property.isMoveable);
+
+    parentScene->update();
 }
 
 //本地打开文件后，对控件进行重新设定
@@ -1235,12 +1225,9 @@ void MyItem::resetPolygon()
 //左旋转或者右旋转后更新当前属性的旋转角度值
 void MyItem::updateRotation(int rotateValue)
 {
-    if(property.isMoveable)
-    {
-        property.rotateDegree += rotateValue;
-        property.rotateDegree = property.rotateDegree%360;
-        emit propHasChanged(property);
-    }
+    property.rotateDegree += rotateValue;
+    property.rotateDegree = property.rotateDegree%360;
+    emit propHasChanged(property);
 }
 
 //重新设定控件的UUID编号，同时更新子节点的父索引值【谨慎使用】
