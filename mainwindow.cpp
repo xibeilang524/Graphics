@@ -89,6 +89,12 @@ void MainWindow::createActionAndMenus()
 
     QMenu * editMenu = menuBar()->addMenu("±à¼­(&E)");
 
+    MyAction * undoAction = ActionManager::instance()->crateAction(Constants::UNDO_ID,QIcon(":/images/undo.png"),"³·Ïú");
+    ActionManager::instance()->registerAction(undoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
+
+    MyAction * redoAction = ActionManager::instance()->crateAction(Constants::REDO_ID,QIcon(":/images/redo.png"),"ÖØ×ö");
+    ActionManager::instance()->registerAction(redoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
+
     MyAction * cutAction = ActionManager::instance()->crateAction(Constants::CUT_ID,QIcon(":/images/cut.png"),"¼ôÇÐ");
     cutAction->setShortcut(QKeySequence("Ctrl+X"));
     ActionManager::instance()->registerAction(cutAction,MyGraphicsView::instance(),SLOT(cutItem()));
@@ -382,6 +388,8 @@ void MainWindow::createToolBar()
     itemBar->addAction(ActionManager::instance()->action(Constants::VECTOR_LINE_ID));
 
     QToolBar * editBar = addToolBar("Edit");
+    editBar->addAction(ActionManager::instance()->action(Constants::UNDO_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::REDO_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::CUT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::COPY_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::PASTE_ID));

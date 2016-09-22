@@ -55,6 +55,7 @@ signals:
     void itemPropChanged(ItemProperty);
 
 private slots:
+    void undoAndRedoItem();
     void cutItem();
     void copyItem();
     void pasteItem();

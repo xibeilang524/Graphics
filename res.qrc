@@ -34,5 +34,7 @@
         <file>images/drageunable.png</file>
         <file>images/itemLock.png</file>
         <file>images/clearPaste.png</file>
+        <file>images/redo.png</file>
+        <file>images/undo.png</file>
     </qresource>
 </RCC>

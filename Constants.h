@@ -11,6 +11,8 @@ const char OPEN_ID[] = "Constants.Open";
 const char CLEAR_ID[] = "Constants.Clear";
 const char EXIT_ID[] = "Constants.Exit";
 
+const char UNDO_ID[] = "Constants.Undo";
+const char REDO_ID[] = "Constants.Redo";
 const char CUT_ID[] = "Constants.Cut";
 const char COPY_ID[] = "Constants.Copy";
 const char PASTE_ID[] = "Constants.Paste";

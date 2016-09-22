@@ -86,6 +86,8 @@ void MyGraphicsView::addContextMenuItem()
     rightMenu->addSeparator();
     rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
 
+    viewRightMenu->addAction(ActionManager::instance()->action(Constants::UNDO_ID));
+    viewRightMenu->addAction(ActionManager::instance()->action(Constants::REDO_ID));
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::CLEAR_PASTE_ID));
     viewRightMenu->addSeparator();
@@ -226,6 +228,12 @@ void MyGraphicsView::showNodePortEdit(MyNodePort *nodePort)
     }
     nodeEdit->initNodeInfo(nodePort);
     nodeEdit->exec();
+}
+
+//撤销、前进
+void MyGraphicsView::undoAndRedoItem()
+{
+
 }
 
 //目前支持一个控件的剪切，只支持除箭头以外控件操作
