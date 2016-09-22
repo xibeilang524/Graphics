@@ -189,6 +189,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     selectedPen.setStyle(Qt::DashLine);
     selectedPen.setWidth(selectedPenWidth);
 
+    //八个角度的缩放点
     leftTopPoint = new DragPoint(TOP_LEFT,this);
     rightTopPoint = new DragPoint(TOP_RIGHT,this);
     leftBottomPoint = new DragPoint(BOTTOM_LEFT,this);
@@ -199,15 +200,18 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     rightPoint = new DragPoint(MIDDLE_RIGHT,this);
     bottomPoint = new DragPoint(BOTTOM_MIDDLE,this);
 
+    //旋转线条
     rotateLine = new RotateLine(this);
     connect(rotateLine,SIGNAL(rotateItem(MouseType,int)),this,SLOT(procRotate(MouseType,int)));
     updateRotateLinePos();
 
+    //文字信息
     myTextItem = new MyTextItem(GRA_TEXT,menu,this);
 
     myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
     myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);
     myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
+    myTextItem->cleartText();
 
     setAcceptHoverEvents(true);
     setDragPointVisible(false);
@@ -348,21 +352,30 @@ void MyItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MyItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+    //【修复移动控件后，修改样式位置发生微小偏移】
+    getRealTimePos();
     emit updateSceneDraw();
-
-    property.itemRect.x = this->x();
-    property.itemRect.y = this->y();
-    property.itemRect.width = this->boundingRect().width();
-    property.itemRect.height = this->boundingRect().height();
-    emit propHasChanged(property);
 
     QGraphicsPolygonItem::mouseMoveEvent(event);
 }
 
 void MyItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
+    getRealTimePos();
     emit updateSceneDraw();
+
     QGraphicsPolygonItem::mouseReleaseEvent(event);
+}
+
+//在鼠标事件中获取实时的位置并更新至右侧面板
+void MyItem::getRealTimePos()
+{
+    property.itemRect.x = this->x();
+    property.itemRect.y = this->y();
+    property.itemRect.width = this->boundingRect().width();
+    property.itemRect.height = this->boundingRect().height();
+
+    emit propHasChanged(property);
 }
 
 void MyItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)

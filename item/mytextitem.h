@@ -7,7 +7,8 @@
 **        2：支持样式的设定，如文字字体的格式
 **
 **修改历史:
-**
+**20160921:wey:修复输入文字无法换行问题
+**             添加文字初始信息提示并选中状态
 *************************************************/
 #ifndef MYTEXTITEM_H
 #define MYTEXTITEM_H
@@ -31,6 +32,7 @@ public:
     ItemProperty getProperty(){return this->property;}
 
     void updateFont(QFont font);
+    void cleartText();
 
     GraphicsType getType(){return this->type;}
 

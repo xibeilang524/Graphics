@@ -69,6 +69,10 @@ void LeftIconWidget::initListItems()
     polygon->setData(Qt::UserRole,(int)GRA_POLYGON);
     polygonWidget->addItem(polygon);
 
+    MyListItem * text = ListItemManager::instance()->createListItem(Constants::TEXT_ID,QIcon(":/images/text.png"),"文字",polygonWidget);
+    text->setData(Qt::UserRole,(int)GRA_TEXT);
+    polygonWidget->addItem(text);
+
     //插入节点
     MyListItem * nodePort = ListItemManager::instance()->createListItem(Constants::NODE_PORT_ID,QIcon(":/images/nodePort.png"),"端口",nodeWidget);
     nodePort->setData(Qt::UserRole,(int)GRA_NODE_PORT);

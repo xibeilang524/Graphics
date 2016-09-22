@@ -74,6 +74,7 @@ void MyGraphicsView::dropEvent(QDropEvent *event)
 
         int graphicsType;
         stream>>graphicsType;
+
         if(graphicsType == GRA_LINE || graphicsType == GRA_VECTOR_LINE || graphicsType == GRA_NODE_PORT)
         {
             QGraphicsView::dropEvent(event);

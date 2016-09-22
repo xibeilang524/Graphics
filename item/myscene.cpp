@@ -313,11 +313,23 @@ void MyScene::addItem(QList<CutInfo *> &cutInfos)
 
 void MyScene::addItem(GraphicsType type, QPointF pos)
 {
-    MyItem * myItem = new MyItem(type,rightMenu,this);
-    myItem->setPos(pos);
-    connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-    connect(myItem,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
-    addItem(myItem);
+    if(type == GRA_TEXT)
+    {
+        MyTextItem  * item = new MyTextItem(type,rightMenu);
+        connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
+
+        item->setPos(pos);
+        item->setSelected(true);
+        addItem(item);
+    }
+    else
+    {
+        MyItem * myItem = new MyItem(type,rightMenu,this);
+        myItem->setPos(pos);
+        connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+        connect(myItem,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
+        addItem(myItem);
+    }
 }
 
 //添加箭头时，找出箭头的父节点

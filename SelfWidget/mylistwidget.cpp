@@ -57,6 +57,9 @@ void MyListWidget::startDrag(Qt::DropActions supportedActions)
              case GRA_POLYGON:
                                 pixmap.load(":/images/diamonds.png");
                                 break;
+             case GRA_TEXT:
+                                pixmap.load(":/images/text.png");
+                                break;
              case GRA_NODE_PORT:
                                 pixmap.load(":/images/nodePort.png");
                                 break;

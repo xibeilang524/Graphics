@@ -23,6 +23,8 @@
 **             增加尺寸或者移动端口更新端口连线
 **             增加拖入状态切换，允许时选中控件否则取消选择。
 **20160920:wey:增加对拖入端口标绘位置十字星
+**20150921:wey:修复移动控件后，修改样式位置发生微小偏移
+**
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -117,6 +119,7 @@ protected:
 private:
     void updateRotateLinePos();
     void procResizeNodePort();
+    void getRealTimePos();
     qreal getPointToRectMinDistance(QRectF rect,QPointF point);
     void getRangeValue(qreal maxValue,qreal minValue,qreal & currValue);
     MyNodePort * createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);

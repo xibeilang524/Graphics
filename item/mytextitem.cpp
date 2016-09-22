@@ -3,6 +3,8 @@
 #include <QFocusEvent>
 #include <QMenu>
 #include <QGraphicsSceneMouseEvent>
+#include <QTextCursor>
+#include <QTextDocument>
 #include <QDebug>
 
 QDataStream & operator <<(QDataStream &stream,MyTextItem * item)
@@ -34,11 +36,20 @@ MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent,
 {
     property.isFont = true;
     property.itemFont = QFont("黑体",15);
+    property.content = "输入文字...";
     setFont(property.itemFont);
 
     setTextInteractionFlags(Qt::TextEditorInteraction);
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
+
+    QTextCursor cursor = textCursor();
+
+    cursor.insertText(property.content);
+    //从当前位置一个一个[KeepAnchor]的移动到开始位置[Start]
+    cursor.movePosition(QTextCursor::Start, QTextCursor::MoveAnchor);
+    cursor.movePosition(QTextCursor::End, QTextCursor::KeepAnchor);
+    setTextCursor(cursor);
 }
 
 void MyTextItem::focusOutEvent(QFocusEvent *event)
@@ -106,6 +117,13 @@ QRectF MyTextItem::getBoundRect()
     //获取字符串的宽度
     QFontMetricsF metrics = property.itemFont;
     return metrics.boundingRect(toPlainText());
+}
+
+//当作为其它控件的一部分时，无需显示文字信息
+void MyTextItem::cleartText()
+{
+    property.content = "";
+    setPlainText(property.content);
 }
 
 QVariant MyTextItem::itemChange(GraphicsItemChange change, const QVariant &value)
