@@ -9,6 +9,8 @@
 **20160919:wey:添加单利模式
 **             添加端口编辑页面
 **20160920:wey:修复拖入端口放置在控件上无效问题
+**20160922:wey:增加设置view是否拖拽
+**             增加清空剪切板功能
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -43,6 +45,10 @@ protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
     void dropEvent(QDropEvent *event);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
+    void mouseReleaseEvent(QMouseEvent *event);
+    void contextMenuEvent(QContextMenuEvent *event);
 
 signals:
     void initToolBox(int selectedNum,ItemProperty property);
@@ -52,11 +58,13 @@ private slots:
     void cutItem();
     void copyItem();
     void pasteItem();
+    void clearPasteItem();
 
     void rotateItem();
     void bringZItem();
     void lockAndunlockItem();
     void deleteItem();
+    void setViewDragEnable(bool enable);
 
     void sceneScaled(int currScale);
     void updateActions();
@@ -64,7 +72,6 @@ private slots:
     void respPropertyUpdate(ItemProperty property);
 
 private:
-
     void initView();
 
     static MyGraphicsView * viewManager;
@@ -73,8 +80,13 @@ private:
     MyScene * myScene;
     MainWindow * parentWindow;
     QMenu * rightMenu;
+    QMenu * viewRightMenu;            //窗口的右键菜单
 
     CutInfo cutTmpInfo;               //保存剪切信息
+
+    QPoint pressPoint,movePoint;
+    bool isMoving;
+    bool viewIsDragable;              //窗口是否可以平移
 };
 
 #endif // MYGRAPHICSVIEW_H

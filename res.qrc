@@ -30,6 +30,9 @@
         <file>images/edit.png</file>
         <file>images/lock.png</file>
         <file>images/unlock.png</file>
+        <file>images/dragable.png</file>
+        <file>images/drageunable.png</file>
         <file>images/itemLock.png</file>
+        <file>images/clearPaste.png</file>
     </qresource>
 </RCC>

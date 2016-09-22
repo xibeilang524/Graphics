@@ -14,6 +14,7 @@ const char EXIT_ID[] = "Constants.Exit";
 const char CUT_ID[] = "Constants.Cut";
 const char COPY_ID[] = "Constants.Copy";
 const char PASTE_ID[] = "Constants.Paste";
+const char CLEAR_PASTE_ID[] = "Constants.ClearPaste";
 
 const char EDIT_TEXT_ID[] = "Constants.EditText";
 
@@ -24,6 +25,7 @@ const char BRING_BACK_ID[] = "Constants.BringBack";
 const char DELETE_ID[] = "Constants.Delte";
 const char LOCK_ID[] = "Constants.Lock";
 const char UNLOCK_ID[] = "Constants.UnLock";
+const char DRAG_ABLE_ID[] = "Constants.Dragable";
 
 //¿Ø¼þ
 const char ARROW_ID[] = "Constants.Arrow";

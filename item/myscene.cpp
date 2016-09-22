@@ -84,12 +84,16 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         path.moveTo(0,0);
         path.lineTo(event->scenePos());
         insertTmpPath->setPath(path);
-        qDebug()<<event->scenePos();
     }
     else
     {
+        if(selectedItems().size() == 0)
+        {
+
+        }
+
         QGraphicsScene::mouseMoveEvent(event);
-    }
+    }    
 }
 
 void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)

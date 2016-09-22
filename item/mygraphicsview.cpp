@@ -4,6 +4,8 @@
 #include <QMimeData>
 #include <QDataStream>
 #include <QMenu>
+#include <QMouseEvent>
+#include <QScrollBar>
 #include <QDebug>
 
 #include "myscene.h"
@@ -35,6 +37,8 @@ MyGraphicsView::MyGraphicsView(MainWindow * parent):
     viewManager = this;
 
     nodeEdit = NULL;
+    isMoving = false;
+    viewIsDragable = true;
 
     setAcceptDrops(true);
     initView();
@@ -50,6 +54,7 @@ void MyGraphicsView::initView()
     SceneWidth = SceneHeight = 5000;
 
     rightMenu = new QMenu;
+    viewRightMenu = new QMenu;
 
     myScene = new MyScene(rightMenu);
     myScene->setSceneRect(0,0,SceneWidth,SceneHeight);
@@ -80,6 +85,79 @@ void MyGraphicsView::addContextMenuItem()
     rightMenu->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
     rightMenu->addSeparator();
     rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
+
+    viewRightMenu->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
+    viewRightMenu->addAction(ActionManager::instance()->action(Constants::CLEAR_PASTE_ID));
+    viewRightMenu->addSeparator();
+    viewRightMenu->addAction(ActionManager::instance()->action(Constants::DRAG_ABLE_ID));
+}
+
+//设置view是否可以拖拽
+void MyGraphicsView::setViewDragEnable(bool enable)
+{
+    viewIsDragable = enable;
+    if(enable)
+    {
+        ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setIcon(QIcon(":/images/dragable.png"));
+        ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setText("窗口允许拖拽");
+    }
+    else
+    {
+        ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setIcon(QIcon(":/images/drageunable.png"));
+        ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setText("窗口禁止拖拽");
+    }
+}
+
+void MyGraphicsView::mousePressEvent(QMouseEvent *event)
+{
+    if(viewIsDragable)
+    {
+        pressPoint = event->pos();
+
+        isMoving = true;
+
+        setCursor(Qt::ClosedHandCursor);
+    }
+
+    QGraphicsView::mousePressEvent(event);
+}
+
+void MyGraphicsView::mouseMoveEvent(QMouseEvent *event)
+{
+    if(viewIsDragable && scene()->selectedItems().size() == 0 && isMoving &&CurrAddGraType == GRA_NONE)
+    {
+        movePoint = event->pos();
+
+        QPoint tmpPoint = movePoint - pressPoint;
+
+        horizontalScrollBar()->setValue(horizontalScrollBar()->value()-tmpPoint.x());
+        verticalScrollBar()->setValue(verticalScrollBar()->value()-tmpPoint.y());
+
+        pressPoint = movePoint;
+    }
+
+    QGraphicsView::mouseMoveEvent(event);
+}
+
+void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event)
+{
+    isMoving = false;
+    setCursor(Qt::ArrowCursor);
+    QGraphicsView::mouseReleaseEvent(event);
+}
+
+//右键菜单事件【先判断scene当前鼠标点下是否存在item，如果没有view再响应】
+void MyGraphicsView::contextMenuEvent(QContextMenuEvent *event)
+{
+    QPointF scenePos = mapToScene(event->pos().x(),event->pos().y());
+    int curItemSize = myScene->items(scenePos).size();
+
+    QGraphicsView::contextMenuEvent(event);
+
+    if(curItemSize == 0)
+    {
+        viewRightMenu->exec(mapToGlobal(event->pos()));
+    }
 }
 
 //左侧控件拖入，对拖入的类型进行判断
@@ -175,6 +253,7 @@ void MyGraphicsView::cutItem()
             }
             deleteItem();
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
+            ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(true);
         }
         else if(itemName == TYPE_ID(MyTextItem))
         {
@@ -184,6 +263,7 @@ void MyGraphicsView::cutItem()
             cutTmpInfo.itemProperty = item->getProperty();
             delete item;
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
+            ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(true);
         }
     }
 }
@@ -213,6 +293,7 @@ void MyGraphicsView::copyItem()
                 cutTmpInfo.nodeProperties.push_back(props);
             }
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
+            ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(true);
         }
         else if(itemName == TYPE_ID(MyTextItem))
         {
@@ -223,13 +304,22 @@ void MyGraphicsView::copyItem()
             cutTmpInfo.content = item->toPlainText();
             cutTmpInfo.nodeProperties.clear();
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
+            ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(true);
         }
     }
 }
 
+//黏贴
 void MyGraphicsView::pasteItem()
 {
     myScene->addItem(cutTmpInfo,true);
+}
+
+//清空剪切板
+void MyGraphicsView::clearPasteItem()
+{
+    ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(false);
+    ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(false);
 }
 
 //还需要从scene中删除item

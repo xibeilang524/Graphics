@@ -101,6 +101,10 @@ void MainWindow::createActionAndMenus()
     pasteAction->setShortcut(QKeySequence("Ctrl+V"));
     ActionManager::instance()->registerAction(pasteAction,MyGraphicsView::instance(),SLOT(pasteItem()));
 
+    MyAction * clearPasteAction = ActionManager::instance()->crateAction(Constants::CLEAR_PASTE_ID,QIcon(":/images/clearPaste.png"),"Çå¿Õ¼ôÇĞ°å");
+    ActionManager::instance()->registerAction(clearPasteAction,MyGraphicsView::instance(),SLOT(clearPasteItem()));
+    ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(false);
+
     MyAction * rotateLeftAction = ActionManager::instance()->crateAction(Constants::ROTATE_LEFT_ID,QIcon(":/images/rotateLeft.png"),"×ó×ª90¡ã");
     ActionManager::instance()->registerAction(rotateLeftAction,MyGraphicsView::instance(),SLOT(rotateItem()));
 
@@ -139,6 +143,11 @@ void MainWindow::createActionAndMenus()
     editMenu->addAction(lockAction);
     editMenu->addAction(unlockAction);
     editMenu->addAction(deleteAction);
+
+
+    MyAction * dragAbleAction = ActionManager::instance()->crateAction(Constants::DRAG_ABLE_ID,QIcon(":/images/dragable.png"),"´°¿ÚÔÊĞíÍÏ×§");
+    ActionManager::instance()->registerAction(dragAbleAction,MyGraphicsView::instance(),SLOT(setViewDragEnable(bool)),true);
+    ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setChecked(true);
 
     QMenu * itemMenu = menuBar()->addMenu("ÌõÄ¿(&I)");
 
@@ -376,6 +385,7 @@ void MainWindow::createToolBar()
     editBar->addAction(ActionManager::instance()->action(Constants::CUT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::COPY_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::CLEAR_PASTE_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
@@ -388,6 +398,9 @@ void MainWindow::createToolBar()
 
     mySlider = new MySlider;
     connect(mySlider,SIGNAL(scaleView(int)),MyGraphicsView::instance(),SLOT(sceneScaled(int)));
+
+    sceneBar->addAction(ActionManager::instance()->action(Constants::DRAG_ABLE_ID));
+    sceneBar->addSeparator();
     sceneBar->addWidget(mySlider);
 }
 
