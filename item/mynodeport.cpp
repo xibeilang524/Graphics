@@ -61,6 +61,8 @@ MyNodePort::MyNodePort(MyItem *parentItem):
 
     radius = 13;
     type = GRA_NODE_PORT;
+    nextDirect = DRAG_NONE;
+    arrivalLimitRang = false;
 
     nodeProperty.parentItemID = parentItem->getProperty().startItemID;     //保存父节点的ID号
 
@@ -77,6 +79,19 @@ MyNodePort::MyNodePort(MyItem *parentItem):
 void MyNodePort::setDragDirect(DragDirect direct)
 {
     nodeProperty.direct = direct;
+}
+
+//到达拐点
+void MyNodePort::setNextDirect(DragDirect direct)
+{
+    this->nextDirect = direct;
+    arrivalLimitRang = true;
+}
+
+//设置是否已经到达边界点
+void MyNodePort::setArrivalLimitRang(bool flag)
+{
+    arrivalLimitRang = flag;
 }
 
 //设置显示的中心点

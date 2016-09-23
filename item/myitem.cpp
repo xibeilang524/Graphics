@@ -657,6 +657,7 @@ void MyItem::procPortChanged(MouseType type, QPointF currPoint)
         {
             QPointF newPoint;
             qreal tmpX,tmpY;
+            DragRange  range = DRAG_RANG_NONE;
 
             switch(tmpPort->getDragDirect())
             {
@@ -664,29 +665,178 @@ void MyItem::procPortChanged(MouseType type, QPointF currPoint)
                               {
                                    tmpX = boundRect.topLeft().x();
                                    tmpY = tmpPort->pos().y() + currPoint.y();
-                                   getRangeValue(boundRect.bottomLeft().y(),boundRect.topLeft().y(),tmpY);
+                                   //到达线段的边界
+                                   bool flag = tmpPort->isArrivalLimitRang();
+                                   //到达边界后，
+                                   if(flag)
+                                   {
+                                       if(currPoint.x()>=MOVE_LIMIT_RANG)
+                                       {
+                                           if(tmpPort->getNextDirect() == DRAG_TOP)
+                                           {
+                                               tmpPort->setDragDirect(DRAG_TOP);
+                                               tmpPort->setPos(boundRect.topLeft());
+                                           }
+                                           else if(tmpPort->getNextDirect() == DRAG_BOTTOM)
+                                           {
+                                               tmpPort->setDragDirect(DRAG_BOTTOM);
+                                               tmpPort->setPos(boundRect.bottomLeft());
+                                           }
+                                       }
+                                       else
+                                       {
+                                           tmpPort->setArrivalLimitRang(false);
+                                       }
+                                       return;
+                                   }
+                                   else
+                                   {
+                                       if(getRangeValue(boundRect.bottomLeft().y(),boundRect.topLeft().y(),tmpY,range))
+                                       {
+                                           if(range == DRAG_RANG_MAX)
+                                           {
+                                               tmpPort->setNextDirect(DRAG_BOTTOM);
+                                           }
+                                           else if(range == DRAG_RANG_MIN)
+                                           {
+                                               tmpPort->setNextDirect(DRAG_TOP);
+                                           }
+                                       }
+                                   }
                               }
                                break;
                 case DRAG_TOP:
                               {
                                    tmpX = tmpPort->pos().x() + currPoint.x();
-                                   getRangeValue(boundRect.topRight().x(),boundRect.topLeft().x(),tmpX);
-
                                    tmpY = boundRect.topLeft().y();
+
+                                   //到达线段的边界
+                                   bool flag = tmpPort->isArrivalLimitRang();
+                                   //到达边界后，
+                                   if(flag)
+                                   {
+                                       if(currPoint.y()>=MOVE_LIMIT_RANG)
+                                       {
+                                           if(tmpPort->getNextDirect() == DRAG_RIGHT)
+                                           {
+                                               tmpPort->setDragDirect(DRAG_RIGHT);
+                                               tmpPort->setPos(boundRect.topRight());
+                                           }
+                                           else if(tmpPort->getNextDirect() == DRAG_LEFT)
+                                           {
+                                               tmpPort->setDragDirect(DRAG_LEFT);
+                                               tmpPort->setPos(boundRect.topLeft());
+                                           }
+                                       }
+                                       else
+                                       {
+                                           tmpPort->setArrivalLimitRang(false);
+                                       }
+                                       return;
+                                   }
+                                   else
+                                   {
+                                       if(getRangeValue(boundRect.topRight().x(),boundRect.topLeft().x(),tmpX,range))
+                                       {
+                                           if(range == DRAG_RANG_MAX)
+                                           {
+                                               tmpPort->setNextDirect(DRAG_RIGHT);
+                                           }
+                                           else if(range == DRAG_RANG_MIN)
+                                           {
+                                               tmpPort->setNextDirect(DRAG_LEFT);
+                                           }
+                                       }
+                                   }
                               }
                                break;
                 case DRAG_RIGHT:
                               {
                                    tmpX = boundRect.topRight().x();
                                    tmpY = tmpPort->pos().y() + currPoint.y();
-                                   getRangeValue(boundRect.bottomRight().y(),boundRect.topRight().y(),tmpY);
+                                   //到达线段的边界
+                                   bool flag = tmpPort->isArrivalLimitRang();
+                                   //到达边界后，
+                                   if(flag)
+                                   {
+                                       if(-currPoint.x()>=MOVE_LIMIT_RANG)
+                                       {
+                                           if(tmpPort->getNextDirect() == DRAG_BOTTOM)
+                                           {
+                                               tmpPort->setDragDirect(DRAG_BOTTOM);
+                                               tmpPort->setPos(boundRect.bottomRight());
+                                           }
+                                           else if(tmpPort->getNextDirect() == DRAG_TOP)
+                                           {
+                                               tmpPort->setDragDirect(DRAG_TOP);
+                                               tmpPort->setPos(boundRect.topRight());
+                                           }
+                                       }
+                                       else
+                                       {
+                                           tmpPort->setArrivalLimitRang(false);
+                                       }
+                                       return;
+                                   }
+                                   else
+                                   {
+                                       if(getRangeValue(boundRect.bottomRight().y(),boundRect.topRight().y(),tmpY,range))
+                                       {
+                                           if(range == DRAG_RANG_MAX)
+                                           {
+                                               tmpPort->setNextDirect(DRAG_BOTTOM);
+                                           }
+                                           else if(range == DRAG_RANG_MIN)
+                                           {
+                                               tmpPort->setNextDirect(DRAG_TOP);
+                                           }
+                                       }
+                                   }
                               }
                                break;
                 case DRAG_BOTTOM:
                               {
                                    tmpX = tmpPort->pos().x() + currPoint.x();
-                                   getRangeValue(boundRect.bottomRight().x(),boundRect.bottomLeft().x(),tmpX);
                                    tmpY = boundRect.bottomLeft().y();
+
+                                   //到达线段的边界
+                                   bool flag = tmpPort->isArrivalLimitRang();
+                                   //到达边界后，
+                                   if(flag)
+                                   {
+                                       if(-currPoint.y()>=MOVE_LIMIT_RANG)
+                                       {
+                                           if(tmpPort->getNextDirect() == DRAG_RIGHT)
+                                           {
+                                               tmpPort->setDragDirect(DRAG_RIGHT);
+                                               tmpPort->setPos(boundRect.bottomRight());
+                                           }
+                                           else if(tmpPort->getNextDirect() == DRAG_LEFT)
+                                           {
+                                               tmpPort->setDragDirect(DRAG_LEFT);
+                                               tmpPort->setPos(boundRect.bottomLeft());
+                                           }
+                                       }
+                                       else
+                                       {
+                                           tmpPort->setArrivalLimitRang(false);
+                                       }
+                                       return;
+                                   }
+                                   else
+                                   {
+                                       if(getRangeValue(boundRect.bottomRight().x(),boundRect.bottomLeft().x(),tmpX,range))
+                                       {
+                                           if(range == DRAG_RANG_MAX)
+                                           {
+                                               tmpPort->setNextDirect(DRAG_RIGHT);
+                                           }
+                                           else if(range == DRAG_RANG_MIN)
+                                           {
+                                               tmpPort->setNextDirect(DRAG_LEFT);
+                                           }
+                                       }
+                                   }
                               }
                                break;
             }
@@ -758,17 +908,22 @@ void MyItem::procEditNodePort(MyNodePort *nodePort)
     MyGraphicsView::instance()->showNodePortEdit(nodePort);
 }
 
-//将当前值和最大及最小值相比较，只能在此范围内
-void MyItem::getRangeValue(qreal maxValue, qreal minValue, qreal &currValue)
+//将当前值和最大及最小值相比较，只能在此范围内,到达最大或最小值的边界时，返回用于设置改变方向
+bool MyItem::getRangeValue(qreal maxValue, qreal minValue, qreal &currValue, DragRange& range)
 {
     if(currValue >= maxValue)
     {
         currValue = maxValue;
+        range = DRAG_RANG_MAX;
+        return true;
     }
     else if(currValue <= minValue)
     {
         currValue = minValue;
+        range = DRAG_RANG_MIN;
+        return true;
     }
+    return false;
 }
 
 //设置是否拖拽点和旋转点是否可见

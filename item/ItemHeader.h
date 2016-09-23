@@ -43,6 +43,7 @@ enum LineType
 #define ROTATE_WIDTH   5
 #define ROTATE_SQUARE_WIDTH 5
 #define ALLOW_DROP_RANGE 10             //控件拖入后允许放下的范围
+#define MOVE_LIMIT_RANG  5              //端口移动至拐点后，如果往另外方向移动，那么需要判断鼠标在此方向上的值至少大于此宏
 
 
 #endif // HEADER_H

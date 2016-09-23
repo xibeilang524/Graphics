@@ -44,6 +44,12 @@ public:
     void setDragDirect(DragDirect direct);
     DragDirect getDragDirect(){return this->nodeProperty.direct;}
 
+    void setNextDirect(DragDirect direct);
+    DragDirect getNextDirect(){return this->nextDirect;}
+
+    bool isArrivalLimitRang(){return this->arrivalLimitRang;}
+    void setArrivalLimitRang(bool flag);
+
     void setScaleFactor(qreal scaleFactor);
     qreal getScaleFactor(){return this->nodeProperty.scaleFactor;}
 
@@ -95,12 +101,15 @@ private:
     GraphicsType  type;                //节点类型
 
     NodePortProperty nodeProperty;     //端口属性
+    DragDirect nextDirect;             //端口到达拐点时，此变量会被赋值，鼠标在下一时刻移动时会参考当前方向以及下个方向
+    bool arrivalLimitRang;             //端口是否到达线段的端点
 
     QMenu * nodePortRightMenu;         //端口右键菜单，支持删除
 
     QList<MyArrow *> arrows;           //保存添加的箭头
 
     MyItem * parentMyItem;             //父节点
+
 };
 
 #endif // MYNODEPORT_H

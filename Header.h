@@ -63,6 +63,14 @@ enum DragDirect
     DRAG_BOTTOM
 };
 
+//端口到达两端后，用于区分到达哪一端
+enum DragRange
+{
+    DRAG_RANG_NONE,
+    DRAG_RANG_MAX,
+    DRAG_RANG_MIN
+};
+
 //记录当前item在scene中的x、y、w、h值
 struct MyRect
 {

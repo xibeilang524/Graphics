@@ -25,6 +25,7 @@
 **20160920:wey:增加对拖入端口标绘位置十字星
 **20160921:wey:修复移动控件后，修改样式位置发生微小偏移
 **20160922:wey:添加控件锁定、解锁功能
+**20160923:wey:添加端口四个边任意移动功能【！！！】
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -124,7 +125,7 @@ private:
     void procResizeNodePort();
     void getRealTimePos();
     qreal getPointToRectMinDistance(QRectF rect,QPointF point);
-    void getRangeValue(qreal maxValue,qreal minValue,qreal & currValue);
+    bool getRangeValue(qreal maxValue, qreal minValue, qreal & currValue, DragRange &range);
     MyNodePort * createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);
     DragDirect getDropDirect(const QPointF &currPoint);
 
