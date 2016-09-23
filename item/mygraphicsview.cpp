@@ -7,6 +7,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QDebug>
+#include <QKeyEvent>
 
 #include "myscene.h"
 #include "../SelfWidget/nodeeditdialog.h"
@@ -38,6 +39,7 @@ MyGraphicsView::MyGraphicsView(MainWindow * parent):
 
     nodeEdit = NULL;
     isMoving = false;
+    isCtrlPressed = false;
     viewIsDragable = true;
 
     setAcceptDrops(true);
@@ -108,6 +110,45 @@ void MyGraphicsView::setViewDragEnable(bool enable)
     {
         ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setIcon(QIcon(":/images/drageunable.png"));
         ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setText("窗口禁止拖拽");
+    }
+}
+
+void MyGraphicsView::keyPressEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Control)
+    {
+        isCtrlPressed = true;
+    }
+    QGraphicsView::keyPressEvent(event);
+}
+
+void MyGraphicsView::keyReleaseEvent(QKeyEvent *event)
+{
+    if(event->key() == Qt::Key_Control)
+    {
+        isCtrlPressed = false;
+    }
+    QGraphicsView::keyReleaseEvent(event);
+}
+
+//鼠标滚轮事件，结合键盘Ctrl事件进行视图的缩放
+void MyGraphicsView::wheelEvent(QWheelEvent *event)
+{
+    if(isCtrlPressed)
+    {
+        int direct = event->delta();
+        if(direct > 0)
+        {
+            emit zoomIn();
+        }
+        else if(direct < 0)
+        {
+            emit zoomOut();
+        }
+    }
+    else
+    {
+        QGraphicsView::wheelEvent(event);
     }
 }
 
@@ -215,6 +256,7 @@ void MyGraphicsView::dropEvent(QDropEvent *event)
         }
         else
         {
+            myScene->clearSelection();
             myScene->addItem((GraphicsType)graphicsType,mapToScene(event->pos()));
         }
     }
@@ -519,6 +561,11 @@ void MyGraphicsView::lockAndunlockItem()
                 MyItem * tmp = dynamic_cast<MyItem*>(item);
                 tmp->setMoveable(moveable);
             }
+            else if(itemName == TYPE_ID(MyTextItem))
+            {
+                MyTextItem * tmp = dynamic_cast<MyTextItem*>(item);
+                tmp->setMoveable(moveable);
+            }
         }
         myScene->update();
     }
@@ -567,12 +614,6 @@ void MyGraphicsView::sceneScaled(int currScale)
 //当选择的item状态改变后，更新action
 void MyGraphicsView::updateActions()
 {
-//    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
-//    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
-//    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
-//    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
-//    rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
-
     int selectedSize = myScene->selectedItems().size();
 
     ItemProperty  property;
@@ -619,11 +660,25 @@ void MyGraphicsView::updateActions()
         {
             MyTextItem * textItem = dynamic_cast<MyTextItem *>(myScene->selectedItems().first());
             property = textItem->getProperty();
+
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         }
         else if(itemName == TYPE_ID(MyArrow))
         {
             MyArrow  * arrowItem = dynamic_cast<MyArrow *>(myScene->selectedItems().first());
             property = arrowItem->getProperty();
+
+            ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
+
+            ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         }
         else if(itemName == TYPE_ID(MyNodePort))
         {

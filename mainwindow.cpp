@@ -408,6 +408,8 @@ void MainWindow::createToolBar()
 
     mySlider = new MySlider;
     connect(mySlider,SIGNAL(scaleView(int)),MyGraphicsView::instance(),SLOT(sceneScaled(int)));
+    connect(view,SIGNAL(zoomIn()),mySlider,SLOT(respZoomIn()));
+    connect(view,SIGNAL(zoomOut()),mySlider,SLOT(respZoomOut()));
 
     sceneBar->addAction(ActionManager::instance()->action(Constants::DRAG_ABLE_ID));
     sceneBar->addSeparator();

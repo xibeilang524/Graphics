@@ -41,6 +41,9 @@ public:
     void setPos(const QPointF &pos);
     void setPos(qreal x, qreal y);
 
+    void setMoveable(bool lockState);
+    bool isMoveable(){return this->property.isMoveable;}
+
     QRectF getBoundRect();
 
     friend QDataStream & operator <<(QDataStream &,MyTextItem * item);
@@ -63,6 +66,7 @@ private:
     ItemProperty property;
 
     QMenu * menu;
+    QPixmap pixmap;
 };
 
 #endif // MYTEXTITEM_H

@@ -25,6 +25,8 @@ protected:
 private slots:
     void respButtClick();
     void respSliderChanged(int);
+    void respZoomIn();
+    void respZoomOut();
 
 private:
     void setLabelText(int value);
@@ -39,7 +41,6 @@ private:
 
     QSlider * slider;
     QLabel * label;
-
 };
 
 #endif // MYSLIDER_H

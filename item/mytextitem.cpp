@@ -1,6 +1,7 @@
 #include "mytextitem.h"
 
 #include <QFocusEvent>
+#include <QPainter>
 #include <QMenu>
 #include <QGraphicsSceneMouseEvent>
 #include <QTextCursor>
@@ -42,6 +43,8 @@ MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent,
     setTextInteractionFlags(Qt::TextEditorInteraction);
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
+
+    pixmap.load(":/images/itemLock.png");
 
     QTextCursor cursor = textCursor();
 
@@ -119,6 +122,14 @@ void MyTextItem::setPos(qreal x, qreal y)
     property.itemRect.y = y;
 
     QGraphicsTextItem::setPos(x,y);
+}
+
+//设置字体是否可以拖动
+void MyTextItem::setMoveable(bool lockState)
+{
+    this->property.isMoveable = lockState;
+
+    setFlag(QGraphicsItem::ItemIsMovable,lockState);
 }
 
 //从item中更新字体样式

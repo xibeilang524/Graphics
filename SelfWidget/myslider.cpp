@@ -29,14 +29,14 @@ void MySlider::initWidget()
     subButt->setFixedSize(25,25);
     subButt->setObjectName("subButt");
     subButt->setToolTip("缩小");
-    connect(subButt,SIGNAL(clicked()),this,SLOT(respButtClick()));
+    connect(subButt,SIGNAL(clicked()),this,SLOT(respZoomOut()));
 
     addButt = new QPushButton(this);
     addButt->setText("+");
     addButt->setFixedSize(25,25);
     addButt->setObjectName("addButt");
     addButt->setToolTip("放大");
-    connect(addButt,SIGNAL(clicked()),this,SLOT(respButtClick()));
+    connect(addButt,SIGNAL(clicked()),this,SLOT(respZoomIn()));
 
     slider = new QSlider(Qt::Horizontal,this);
     slider->setMinimum(minValue);
@@ -61,38 +61,46 @@ void MySlider::initWidget()
     this->setLayout(layout);
 }
 
-//响应鼠标点击事件
-void MySlider::respButtClick()
+//放大
+void MySlider::respZoomIn()
 {
-    QString objName = QObject::sender()->objectName();
     if(currValue < minValue || currValue > maxValue)
     {
         return;
     }
-
-    if(objName == "subButt")
+    if(currValue < minValue || currValue > maxValue)
     {
-        if(currValue % step !=0)
-        {
-            currValue = (currValue/step)*step;
-        }
-        else
-        {
-            currValue -= step;
-        }
+        return;
     }
-    else if(objName == "addButt")
+    if(currValue % step !=0)
     {
-        if(currValue % step !=0)
-        {
-            currValue = (currValue/step+1)*step;
-        }
-        else
-        {
-            currValue += step;
-        }
+        currValue = (currValue/step+1)*step;
+    }
+    else
+    {
+        currValue += step;
     }
 
+    respButtClick();
+}
+
+//缩小
+void MySlider::respZoomOut()
+{
+    if(currValue % step !=0)
+    {
+        currValue = (currValue/step)*step;
+    }
+    else
+    {
+        currValue -= step;
+    }
+    respButtClick();
+}
+
+//响应鼠标点击事件
+void MySlider::respButtClick()
+{
     if(currValue < minValue)
     {
         currValue = minValue;

@@ -11,6 +11,8 @@
 **20160920:wey:修复拖入端口放置在控件上无效问题
 **20160922:wey:增加设置view是否拖拽
 **             增加清空剪切板功能
+**20160923:wey:增加拖入清除控件选择
+**             增加Ctrl+滚轮缩小视图
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -49,10 +51,15 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
+    void wheelEvent(QWheelEvent *event);
+    void keyPressEvent(QKeyEvent *event);
+    void keyReleaseEvent(QKeyEvent *event);
 
 signals:
     void initToolBox(int selectedNum,ItemProperty property);
     void itemPropChanged(ItemProperty);
+    void zoomIn();
+    void zoomOut();
 
 private slots:
     void undoAndRedoItem();
@@ -88,6 +95,7 @@ private:
     QPoint pressPoint,movePoint;
     bool isMoving;
     bool viewIsDragable;              //窗口是否可以平移
+    bool isCtrlPressed;               //Crtrl键是否被按下
 };
 
 #endif // MYGRAPHICSVIEW_H
