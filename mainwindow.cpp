@@ -91,9 +91,11 @@ void MainWindow::createActionAndMenus()
 
     MyAction * undoAction = ActionManager::instance()->crateAction(Constants::UNDO_ID,QIcon(":/images/undo.png"),"³·Ïú");
     ActionManager::instance()->registerAction(undoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
+    ActionManager::instance()->action(Constants::UNDO_ID)->setEnabled(false);
 
     MyAction * redoAction = ActionManager::instance()->crateAction(Constants::REDO_ID,QIcon(":/images/redo.png"),"ÖØ×ö");
     ActionManager::instance()->registerAction(redoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
+    ActionManager::instance()->action(Constants::REDO_ID)->setEnabled(false);
 
     MyAction * cutAction = ActionManager::instance()->crateAction(Constants::CUT_ID,QIcon(":/images/cut.png"),"¼ôÇÐ");
     cutAction->setShortcut(QKeySequence("Ctrl+X"));

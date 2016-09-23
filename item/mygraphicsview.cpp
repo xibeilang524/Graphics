@@ -88,6 +88,7 @@ void MyGraphicsView::addContextMenuItem()
 
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::UNDO_ID));
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::REDO_ID));
+    viewRightMenu->addSeparator();
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::CLEAR_PASTE_ID));
     viewRightMenu->addSeparator();
