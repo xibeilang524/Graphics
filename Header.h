@@ -83,6 +83,14 @@ enum SpiltDirect
     SPLIT_BOTTOM
 };
 
+//锁定的状态
+enum ItemLockState
+{
+    ITEM_ALL_LOCK,             //全部锁定
+    ITEM_NOT_ALL_LOCK,         //部分锁定/部分未锁定
+    ITEM_ALL_UNLOCK            //全部未锁定
+};
+
 //记录当前item在scene中的x、y、w、h值
 struct MyRect
 {

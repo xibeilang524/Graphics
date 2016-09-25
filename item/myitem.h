@@ -119,6 +119,7 @@ protected:
     void dragMoveEvent(QGraphicsSceneDragDropEvent *event);
     void dragLeaveEvent(QGraphicsSceneDragDropEvent *event);
     void dropEvent(QGraphicsSceneDragDropEvent *event);
+    void keyPressEvent(QKeyEvent *event);
 
 private:
     void updateRotateLinePos();

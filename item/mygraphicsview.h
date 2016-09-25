@@ -73,6 +73,7 @@ private slots:
     void lockAndunlockItem();
     void deleteItem();
     void setViewDragEnable(bool enable);
+    void respCtrlLockKeyPress();
 
     void sceneScaled(int currScale);
     void updateActions();
@@ -81,6 +82,8 @@ private slots:
 
 private:
     void initView();
+    void getSelectedLockState();
+    void setSelectedItemLockState(bool flag);
 
     static MyGraphicsView * viewManager;
 
@@ -96,6 +99,8 @@ private:
     bool isMoving;
     bool viewIsDragable;              //窗口是否可以平移
     bool isCtrlPressed;               //Crtrl键是否被按下
+
+    ItemLockState lockState;          //选择控件锁定状态
 };
 
 #endif // MYGRAPHICSVIEW_H

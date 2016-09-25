@@ -154,7 +154,6 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
     else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
     {
-
     }
     insertTmpLine = 0;
     insertTmpPath = NULL;
@@ -166,6 +165,14 @@ void MyScene::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_Delete)
     {
         emit deleteKeyPress();
+    }
+    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_L)
+    {
+        emit ctrlLockKeyPress();
+    }
+    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_U)
+    {
+        emit ctrlUnLockKeyPress();
     }
     QGraphicsScene::keyPressEvent(event);
 }

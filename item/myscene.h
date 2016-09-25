@@ -13,6 +13,7 @@
 **20160921:wey:修复拷贝、剪切控件ID同步复制未更新问题
 **             修复添加文字后无法换行、及输入卡顿问题【scene未处理的键盘事件要交由系统处理】
 **             添加拖入文字
+**20160925:wey:增加键盘对锁定(Ctrl+L)/解锁(Ctrl+U)的支持
 *************************************************/
 #ifndef MYSCENE_H
 #define MYSCENE_H
@@ -42,6 +43,8 @@ public:
 signals:
     void resetItemAction();
     void deleteKeyPress();
+    void ctrlLockKeyPress();
+    void ctrlUnLockKeyPress();
     void itemSizeChanged(int size);
     void itemPropChanged(ItemProperty);
 

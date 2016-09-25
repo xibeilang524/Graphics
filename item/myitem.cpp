@@ -11,6 +11,7 @@
 #include <QGraphicsSceneDragDropEvent>
 #include <QMimeData>
 #include <QUrl>
+#include <QKeyEvent>
 
 #include "myarrow.h"
 #include "mytextitem.h"
@@ -1404,6 +1405,13 @@ void MyItem::setMoveable(bool lockState)
     {
         node->setMoveable(lockState);
     }
+}
+
+//¼üÅÌÊÂ¼ş
+void MyItem::keyPressEvent(QKeyEvent *event)
+{
+    qDebug()<<event->key();
+    QGraphicsPolygonItem::keyPressEvent(event);
 }
 
 MyItem::~MyItem()

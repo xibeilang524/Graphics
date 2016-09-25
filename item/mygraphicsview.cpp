@@ -41,6 +41,7 @@ MyGraphicsView::MyGraphicsView(MainWindow * parent):
     isMoving = false;
     isCtrlPressed = false;
     viewIsDragable = true;
+    lockState = ITEM_ALL_UNLOCK;
 
     setAcceptDrops(true);
     initView();
@@ -66,6 +67,8 @@ void MyGraphicsView::initView()
     connect(myScene,SIGNAL(resetItemAction()),parentWindow,SLOT(respRestItemAction()));
     connect(myScene, SIGNAL(selectionChanged()),this, SLOT(updateActions()));
     connect(myScene,SIGNAL(deleteKeyPress()),this,SLOT(deleteItem()));
+    connect(myScene,SIGNAL(ctrlLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
+    connect(myScene,SIGNAL(ctrlUnLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
     connect(myScene,SIGNAL(itemSizeChanged(int)),parentWindow,SLOT(respItemSizeChanged(int)));
     connect(myScene,SIGNAL(itemPropChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
 }
@@ -531,6 +534,33 @@ void MyGraphicsView::bringZItem()
     }
 }
 
+//键盘快捷键Ctrl+L/U(快速锁定/解锁)
+void MyGraphicsView::respCtrlLockKeyPress()
+{
+    QString objName = QObject::sender()->objectName();
+
+    getSelectedLockState();
+
+    if(objName == QString(Constants::LOCK_ID))
+    {
+        if(lockState == ITEM_NOT_ALL_LOCK || lockState == ITEM_ALL_UNLOCK)
+        {
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
+            setSelectedItemLockState(true);
+        }
+    }
+    else if(objName == QString(Constants::UNLOCK_ID))
+    {
+        if(lockState == ITEM_ALL_LOCK)
+        {
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
+            setSelectedItemLockState(false);
+        }
+    }
+}
+
 //锁定与解锁
 void MyGraphicsView::lockAndunlockItem()
 {
@@ -550,6 +580,12 @@ void MyGraphicsView::lockAndunlockItem()
     ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(moveable);
     ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!moveable);
 
+    setSelectedItemLockState(moveable);
+}
+
+//设置选中控件锁定状态
+void MyGraphicsView::setSelectedItemLockState(bool flag)
+{
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
     if(selectedItems.size() > 0)
@@ -560,12 +596,12 @@ void MyGraphicsView::lockAndunlockItem()
             if(itemName == TYPE_ID(MyItem))
             {
                 MyItem * tmp = dynamic_cast<MyItem*>(item);
-                tmp->setMoveable(moveable);
+                tmp->setMoveable(flag);
             }
             else if(itemName == TYPE_ID(MyTextItem))
             {
                 MyTextItem * tmp = dynamic_cast<MyTextItem*>(item);
-                tmp->setMoveable(moveable);
+                tmp->setMoveable(flag);
             }
         }
         myScene->update();
@@ -653,9 +689,11 @@ void MyGraphicsView::updateActions()
         {
             MyItem * myItem = dynamic_cast<MyItem *>(myScene->selectedItems().first());
             property = myItem->getProperty();
-            bool lock = myItem->isMoveable();
-            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(lock);
-            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!lock);
+
+//            bool lock = myItem->isMoveable();
+//            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(lock);
+//            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!lock);
+            getSelectedLockState();
         }
         else if(itemName == TYPE_ID(MyTextItem))
         {
@@ -701,52 +739,62 @@ void MyGraphicsView::updateActions()
         ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
 
-        int myItemNum = 0;
-        int myItemLockNum = 0;
-        int myItemUnLockNum = 0;
-
-        foreach (QGraphicsItem * item, myScene->selectedItems())
-        {
-            QString itemName = TYPE_ID(*item);
-            if(itemName == TYPE_ID(MyItem))
-            {
-                myItemNum ++;
-
-                MyItem * myItem = dynamic_cast<MyItem *>(item);
-                if(myItem->isMoveable())
-                {
-                    myItemUnLockNum++;
-                }
-                else
-                {
-                    myItemLockNum++;
-                }
-            }
-        }
-
-        //全部没锁定
-        if(myItemLockNum == myItemNum)
-        {
-            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
-            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
-        }
-        //全部锁定
-        else if(myItemUnLockNum == myItemNum)
-        {
-            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
-            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
-        }
-        //锁定一部分
-        else
-        {
-            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
-            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
-        }
+        //获取锁定状态
+        getSelectedLockState();
     }
 
     myScene->update();
 
     emit initToolBox(selectedSize,property);
+}
+
+//获取选择的item锁定的状态
+void MyGraphicsView::getSelectedLockState()
+{
+    int myItemNum = 0;
+    int myItemLockNum = 0;
+    int myItemUnLockNum = 0;
+
+    foreach (QGraphicsItem * item, myScene->selectedItems())
+    {
+        QString itemName = TYPE_ID(*item);
+        if(itemName == TYPE_ID(MyItem))
+        {
+            myItemNum ++;
+
+            MyItem * myItem = dynamic_cast<MyItem *>(item);
+            if(myItem->isMoveable())
+            {
+                myItemUnLockNum++;
+            }
+            else
+            {
+                myItemLockNum++;
+            }
+        }
+    }
+
+    //全部没锁定
+    if(myItemLockNum == myItemNum)
+    {
+        lockState = ITEM_ALL_UNLOCK;
+        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
+    }
+    //全部锁定
+    else if(myItemUnLockNum == myItemNum)
+    {
+        lockState = ITEM_ALL_LOCK;
+        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
+    }
+    //锁定一部分
+    else
+    {
+        lockState = ITEM_NOT_ALL_LOCK;
+        ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
+    }
 }
 
 //编辑文本

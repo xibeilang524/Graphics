@@ -127,9 +127,11 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(bringBackAction,MyGraphicsView::instance(),SLOT(bringZItem()));
 
     MyAction * lockAction = ActionManager::instance()->crateAction(Constants::LOCK_ID,QIcon(":/images/lock.png"),"Ëø¶¨");
+    lockAction->setShortcut(QKeySequence("Ctrl+L"));
     ActionManager::instance()->registerAction(lockAction,MyGraphicsView::instance(),SLOT(lockAndunlockItem()));
 
     MyAction * unlockAction = ActionManager::instance()->crateAction(Constants::UNLOCK_ID,QIcon(":/images/unlock.png"),"½âËø");
+    unlockAction->setShortcut(QKeySequence("Ctrl+U"));
     ActionManager::instance()->registerAction(unlockAction,MyGraphicsView::instance(),SLOT(lockAndunlockItem()));
 
     MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::DELETE_ID,QIcon(":/images/delete.png"),"É¾³ý");

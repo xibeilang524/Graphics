@@ -20,6 +20,7 @@
 **             修复删除nodeport线条奔溃问题
 **20160922:wey:添加控件、端口的锁定/解锁功能
 **             对MainWindow和MyGraphicsView进行了重构，使得两者功能相对独立【！！！】
+**20160925:wey:增加左右工具栏可显示隐藏
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
