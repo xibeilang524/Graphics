@@ -36,5 +36,9 @@
         <file>images/clearPaste.png</file>
         <file>images/redo.png</file>
         <file>images/undo.png</file>
+        <file>images/fullscreen.png</file>
+        <file>images/exit_fullscreen.png</file>
+        <file>images/about.png</file>
+        <file>images/getsupport.png</file>
     </qresource>
 </RCC>

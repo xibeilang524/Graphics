@@ -4,6 +4,7 @@
 #include <QTextCodec>
 
 #include "actionmanager.h"
+#include "SelfWidget/hidesplit.h"
 #include "global.h"
 
 int main(int argc, char *argv[])
@@ -17,6 +18,7 @@ int main(int argc, char *argv[])
     SaveFileHeadFlag = "RGVISIO";
 
     ActionManager actionManager;
+    SplitManager splitManager;
     MainWindow w;
     w.show();
     

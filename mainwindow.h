@@ -21,6 +21,7 @@
 **20160922:wey:添加控件、端口的锁定/解锁功能
 **             对MainWindow和MyGraphicsView进行了重构，使得两者功能相对独立【！！！】
 **20160925:wey:增加左右工具栏可显示隐藏
+**             增加控件和帮助菜单栏
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -51,6 +52,9 @@ public:
 signals:
     void updateProperty(ItemProperty property);
 
+protected:
+    void keyPressEvent(QKeyEvent *event);
+
 private slots:
     void fileNew();
     void fileOpen();
@@ -60,6 +64,10 @@ private slots:
     void recordClickedItem();
     void respRestItemAction();
     void respItemSizeChanged(int size);
+    void switchFullScreen();
+    void hideSubWidget();
+    void getTecSupport();
+    void showAbout();
 
 private:
     void createActionAndMenus();

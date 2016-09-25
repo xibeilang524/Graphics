@@ -84,6 +84,7 @@ void HideSplit::setContainerVisible()
         visibleFlag = true;
         this->setFixedWidth(fixWidth);
     }
+
     ui->container->setVisible(visibleFlag);
 }
 
@@ -99,17 +100,6 @@ QWidget * HideSplit::getContainer()
     return ui->container;
 }
 
-//Ôö¼Ó
-HideSplit * HideSplit::addWidget(SpiltDirect direct, QWidget *widget)
-{
-    HideSplit * split = new HideSplit(direct);
-
-    widget->setParent(split->getContainer());
-    split->addWidget(widget);
-
-    return split;
-}
-
 void HideSplit::addWidget(QWidget *widget)
 {
     QBoxLayout * boxLayout = qobject_cast<QBoxLayout * >(ui->container->layout());
@@ -123,3 +113,42 @@ HideSplit::~HideSplit()
 {
    delete ui;
 }
+
+
+SplitManager* SplitManager::manger = NULL;
+
+SplitManager::SplitManager()
+{
+    manger = this;
+}
+
+SplitManager * SplitManager::instance()
+{
+    return manger;
+}
+
+//Ìí¼Ó
+HideSplit * SplitManager::addSplit(QString Id, SpiltDirect direct, QWidget *widget)
+{
+    if(maps.contains(Id))
+    {
+        return maps.value(Id);
+    }
+    HideSplit * split = new HideSplit(direct);
+
+    widget->setParent(split->getContainer());
+    split->addWidget(widget);
+    maps.insert(Id,split);
+
+    return split;
+}
+
+HideSplit * SplitManager::split(QString Id)
+{
+    if(maps.contains(Id))
+    {
+        return maps.value(Id);
+    }
+    return NULL;
+}
+

@@ -9,6 +9,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QStatusBar>
+#include <QKeyEvent>
 #include <QDebug>
 
 #include "actionmanager.h"
@@ -155,12 +156,11 @@ void MainWindow::createActionAndMenus()
     editMenu->addAction(unlockAction);
     editMenu->addAction(deleteAction);
 
-
     MyAction * dragAbleAction = ActionManager::instance()->crateAction(Constants::DRAG_ABLE_ID,QIcon(":/images/dragable.png"),"窗口允许拖拽");
     ActionManager::instance()->registerAction(dragAbleAction,MyGraphicsView::instance(),SLOT(setViewDragEnable(bool)),true);
     ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setChecked(true);
 
-    QMenu * itemMenu = menuBar()->addMenu("条目(&I)");
+    QMenu * itemMenu = menuBar()->addMenu("类型(&I)");
 
     MyAction * arrowAction = ActionManager::instance()->crateAction(Constants::ARROW_ID,QIcon(":/images/pointer.png"),"箭头");
     ActionManager::instance()->registerAction(arrowAction,this,SLOT(recordClickedItem()),true);
@@ -227,6 +227,100 @@ void MainWindow::createActionAndMenus()
     itemMenu->addAction(textAction);
     itemMenu->addAction(lineAction);
     itemMenu->addAction(vectorLineAction);
+
+    QMenu * widgetMenu = menuBar()->addMenu("窗口(&W)");
+    //【窗口菜单栏】
+    MyAction * fullScreenAction = ActionManager::instance()->crateAction(Constants::FULL_SCREEN_ID,QIcon(":/images/fullscreen.png"),"全屏");
+    fullScreenAction->setShortcut(QKeySequence("Ctrl+Shift+F11"));
+    ActionManager::instance()->registerAction(fullScreenAction,this,SLOT(switchFullScreen()));
+
+    MyAction * hideIconAction = ActionManager::instance()->crateAction(Constants::HIDE_ICON_ID,QIcon(":/images/editText.png"),"隐藏左侧控件区");
+    hideIconAction->setShortcut(QKeySequence("Alt+L"));
+    ActionManager::instance()->registerAction(hideIconAction,this,SLOT(hideSubWidget()));
+
+    MyAction * hideToolAction = ActionManager::instance()->crateAction(Constants::HIDE_TOOL_ID,QIcon(":/images/editText.png"),"隐藏属性编辑区");
+    hideToolAction->setShortcut(QKeySequence("Alt+R"));
+    ActionManager::instance()->registerAction(hideToolAction,this,SLOT(hideSubWidget()));
+
+    widgetMenu->addAction(fullScreenAction);
+    widgetMenu->addAction(hideIconAction);
+    widgetMenu->addAction(hideToolAction);
+
+    QMenu * helpMenu = menuBar()->addMenu("帮助(&H)");
+    //【帮助菜单栏】
+    MyAction * supportAction = ActionManager::instance()->crateAction(Constants::TEC_SUPPORT_ID,QIcon(":/images/getsupport.png"),"技术支持");
+    supportAction->setShortcut(QKeySequence("Ctrl+Q"));
+    ActionManager::instance()->registerAction(supportAction,this,SLOT(getTecSupport()));
+
+    MyAction * aboutAction = ActionManager::instance()->crateAction(Constants::ABOUT_ID,QIcon(":/images/about.png"),"关于");
+    aboutAction->setShortcut(QKeySequence("Ctrl+P"));
+    ActionManager::instance()->registerAction(aboutAction,this,SLOT(showAbout()));
+
+    helpMenu->addAction(supportAction);
+    helpMenu->addAction(aboutAction);
+}
+
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    //全屏/非全屏
+    if(event->modifiers() == Qt::ControlModifier && event->modifiers() == Qt::ShiftModifier && event->key() == Qt::Key_F11)
+    {
+        switchFullScreen();
+    }
+    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_L)
+    {
+        SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
+    }
+    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_R)
+    {
+        SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+    }
+
+    QMainWindow::keyPressEvent(event);
+}
+
+//切换全屏
+void MainWindow::switchFullScreen()
+{
+    if(isFullScreen())
+    {
+        showMaximized();
+        ActionManager::instance()->action(Constants::FULL_SCREEN_ID)->setIcon(QIcon(":/images/fullscreen.png"));
+        ActionManager::instance()->action(Constants::FULL_SCREEN_ID)->setText("全屏");
+    }
+    else
+    {
+        showFullScreen();
+        ActionManager::instance()->action(Constants::FULL_SCREEN_ID)->setIcon(QIcon(":/images/exit_fullscreen.png"));
+        ActionManager::instance()->action(Constants::FULL_SCREEN_ID)->setText("退出全屏");
+    }
+}
+
+//显示/隐藏左右的控件
+void MainWindow::hideSubWidget()
+{
+    QString objName = QObject::sender()->objectName();
+
+    if(objName == QString(Constants::HIDE_ICON_ID))
+    {
+        SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
+    }
+    else if(objName == QString(Constants::HIDE_TOOL_ID))
+    {
+        SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+    }
+}
+
+//获取技术支持
+void MainWindow::getTecSupport()
+{
+
+}
+
+//显示关于
+void MainWindow::showAbout()
+{
+    qApp->aboutQt();
 }
 
 //新建空白空间
@@ -328,16 +422,13 @@ void MainWindow::createSceneAndView()
     connect(rightToolBox,SIGNAL(deleteCurrItem()),MyGraphicsView::instance(),SLOT(deleteItem()));
     connect(MyGraphicsView::instance(),SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
 
-    HideSplit * iconSplit = HideSplit::addWidget(SPLIT_RIGHT,leftIconWidget);
-    iconSplit->setFixedWidth(162);
-
-    HideSplit * toolSplit = HideSplit::addWidget(SPLIT_LEFT,rightToolBox);
-    toolSplit->setFixedWidth(310);
-
-    layout->addWidget(iconSplit);
+    layout->addWidget(SplitManager::instance()->addSplit(QString(Constants::HIDE_ICON_ID),SPLIT_RIGHT,leftIconWidget));
     layout->addWidget(view);
-    layout->addWidget(toolSplit);
+    layout->addWidget(SplitManager::instance()->addSplit(QString(Constants::HIDE_TOOL_ID),SPLIT_LEFT,rightToolBox));
     centralWidget->setLayout(layout);
+
+    SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setFixedWidth(162);
+    SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setFixedWidth(310);
 
     this->setCentralWidget(centralWidget);
 }

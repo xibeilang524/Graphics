@@ -12,6 +12,7 @@
 #define HIDESPLIT_H
 
 #include <QWidget>
+#include <QMap>
 
 #include "../Header.h"
 
@@ -26,8 +27,6 @@ class HideSplit : public QWidget
 public:
     explicit HideSplit(SpiltDirect direct = SPLIT_LEFT,QWidget *parent = 0);
 
-    static HideSplit *addWidget(SpiltDirect direct,QWidget * widget);
-
     void setFixedWidth(int w);
 
     void addWidget(QWidget * widget);
@@ -35,7 +34,7 @@ public:
 
     ~HideSplit();
 
-private slots:
+public slots:
     void setContainerVisible();
     
 private:
@@ -44,7 +43,21 @@ private:
     Ui::HideSplit *ui;
     SpiltDirect splitDirect;        //隐藏工具栏和容器的位置关系
     int fixWidth;
+};
 
+class SplitManager : public QObject
+{
+    Q_OBJECT
+public:
+    SplitManager();
+    static SplitManager * instance();
+    HideSplit * addSplit(QString Id,SpiltDirect direct,QWidget * widget);
+    HideSplit * split(QString Id);
+
+private:
+    static SplitManager * manger;
+
+    QMap<QString,HideSplit*> maps;
 };
 
 #endif // HIDESPLIT_H

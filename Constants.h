@@ -18,6 +18,7 @@ const char COPY_ID[] = "Constants.Copy";
 const char PASTE_ID[] = "Constants.Paste";
 const char CLEAR_PASTE_ID[] = "Constants.ClearPaste";
 
+//¿Ø¼þ±à¼­
 const char EDIT_TEXT_ID[] = "Constants.EditText";
 
 const char ROTATE_LEFT_ID[] = "Constants.RotateLeft";
@@ -45,6 +46,15 @@ const char NODE_PORT_ID[] = "Constants.NodePort";
 //¶Ë¿ÚÓÒ¼ü²Ëµ¥
 const char NODE_DELETE_ID[] = "Constants.Node.Delete";
 const char NODE_EDIT_ID[] = "Constanta.Node.Edit";
+
+//¡¾¿Ø¼þ¡¿
+const char FULL_SCREEN_ID[] = "Constanta.FullScreen";
+const char HIDE_ICON_ID[] = "Constanta.HideIcon";
+const char HIDE_TOOL_ID[] = "Constanta.HideToolBox";
+
+//¡¾°ïÖú¡¿
+const char TEC_SUPPORT_ID[] = "Constanta.TecSupport";
+const char ABOUT_ID[] = "Constanta.About";
 
 } // namespace StyleAssisant
 } // namespace Constants
