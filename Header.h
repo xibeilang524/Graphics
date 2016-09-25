@@ -7,6 +7,7 @@
 **
 **修改历史:
 **20160913:wey:调整类型格式定义为qreal
+**20160925:wey:增加隐藏控件位置关系SpiltDirect
 *************************************************/
 #ifndef HEADER_H
 #define HEADER_H
@@ -14,6 +15,7 @@
 #define PI 3.141592653
 #define ICON_WIDTH  60    //图标的宽高
 #define ICON_HEIGHT 60
+#define LAYOUT_SPACING  1  //布局管理器中两控件间的距离
 
 #include <QString>
 #include "typeinfo"
@@ -69,6 +71,16 @@ enum DragRange
     DRAG_RANG_NONE,
     DRAG_RANG_MAX,
     DRAG_RANG_MIN
+};
+
+//分割栏与控件的位置关系
+enum SpiltDirect
+{
+    SPLIT_NONE,
+    SPLIT_LEFT,
+    SPLIT_TOP,
+    SPLIT_RIGHT,
+    SPLIT_BOTTOM
 };
 
 //记录当前item在scene中的x、y、w、h值

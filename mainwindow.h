@@ -33,6 +33,7 @@ class QActionGroup;
 class MySlider;
 class RightToolBox;
 class LeftIconWidget;
+class HideSplit;
 
 namespace Ui {
 class MainWindow;
@@ -68,14 +69,12 @@ private:
     void resetEditActionState(bool state);
 
     Ui::MainWindow *ui;
-
-    MyGraphicsView * view;
-
     QActionGroup * itemGroup;
 
     MySlider * mySlider;
-    RightToolBox * rightToolBox;
+    MyGraphicsView * view;
     LeftIconWidget * leftIconWidget;
+    RightToolBox * rightToolBox;
 
     CutInfo cutTmpInfo;               //±£¥ÊºÙ«––≈œ¢
 };

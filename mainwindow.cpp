@@ -15,8 +15,9 @@
 #include "item/myscene.h"
 #include "./item/mygraphicsview.h"
 #include "./SelfWidget/myslider.h"
-#include "./SelfWidget/righttoolbox.h"
 #include "./SelfWidget/lefticonwidget.h"
+#include "./SelfWidget/hidesplit.h"
+#include "./SelfWidget/righttoolbox.h"
 #include "fileoperate.h"
 #include "global.h"
 #include "util.h"
@@ -33,8 +34,8 @@ MainWindow::MainWindow(QWidget *parent) :
     setWindowTitle("模型工具");
 
     mySlider = NULL;
-    rightToolBox = NULL;
     leftIconWidget = NULL;
+    rightToolBox = NULL;
     view = NULL;
     GlobalItemZValue = 0;
 
@@ -312,20 +313,28 @@ void MainWindow::createSceneAndView()
 {
     QWidget * centralWidget = new QWidget;
     QHBoxLayout * layout = new QHBoxLayout;
+    layout->setContentsMargins(1,1,1,1);
+    layout->setSpacing(LAYOUT_SPACING);
 
     view = new MyGraphicsView(this);
 
-    rightToolBox = new RightToolBox;
-    connect(view,SIGNAL(initToolBox(int,ItemProperty)),rightToolBox,SLOT(respInitToolBox(int,ItemProperty)));
-    connect(rightToolBox,SIGNAL(updateProperty(ItemProperty)),MyGraphicsView::instance(),SLOT(respPropertyUpdate(ItemProperty)));
-    connect(rightToolBox,SIGNAL(deleteCurrItem()),MyGraphicsView::instance(),SLOT(deleteItem()));
-    connect(view,SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
-
     leftIconWidget = new LeftIconWidget;
 
-    layout->addWidget(leftIconWidget);
+    rightToolBox = new RightToolBox;
+    connect(MyGraphicsView::instance(),SIGNAL(initToolBox(int,ItemProperty)),rightToolBox,SLOT(respInitToolBox(int,ItemProperty)));
+    connect(rightToolBox,SIGNAL(updateProperty(ItemProperty)),MyGraphicsView::instance(),SLOT(respPropertyUpdate(ItemProperty)));
+    connect(rightToolBox,SIGNAL(deleteCurrItem()),MyGraphicsView::instance(),SLOT(deleteItem()));
+    connect(MyGraphicsView::instance(),SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
+
+    HideSplit * iconSplit = HideSplit::addWidget(SPLIT_RIGHT,leftIconWidget);
+    iconSplit->setFixedWidth(162);
+
+    HideSplit * toolSplit = HideSplit::addWidget(SPLIT_LEFT,rightToolBox);
+    toolSplit->setFixedWidth(310);
+
+    layout->addWidget(iconSplit);
     layout->addWidget(view);
-    layout->addWidget(rightToolBox);
+    layout->addWidget(toolSplit);
     centralWidget->setLayout(layout);
 
     this->setCentralWidget(centralWidget);
@@ -441,12 +450,6 @@ MainWindow::~MainWindow()
     {
         delete leftIconWidget;
         leftIconWidget = NULL;
-    }
-
-    if(rightToolBox)
-    {
-        delete rightToolBox;
-        rightToolBox = NULL;
     }
 
     if(view)

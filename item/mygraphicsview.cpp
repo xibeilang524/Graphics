@@ -44,6 +44,7 @@ MyGraphicsView::MyGraphicsView(MainWindow * parent):
 
     setAcceptDrops(true);
     initView();
+    setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
 }
 
 MyScene * MyGraphicsView::scene()

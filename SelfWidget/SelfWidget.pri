@@ -5,7 +5,8 @@ HEADERS += \
     SelfWidget/lefticonwidget.h \
     SelfWidget/listitemmanager.h \
     SelfWidget/mylistwidget.h \
-    SelfWidget/nodeeditdialog.h
+    SelfWidget/nodeeditdialog.h \
+    SelfWidget/hidesplit.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -14,9 +15,11 @@ SOURCES += \
     SelfWidget/lefticonwidget.cpp \
     SelfWidget/listitemmanager.cpp \
     SelfWidget/mylistwidget.cpp \
-    SelfWidget/nodeeditdialog.cpp
+    SelfWidget/nodeeditdialog.cpp \
+    SelfWidget/hidesplit.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
     SelfWidget/mytextinput.ui \
-    SelfWidget/nodeeditdialog.ui
+    SelfWidget/nodeeditdialog.ui \
+    SelfWidget/hidesplit.ui
