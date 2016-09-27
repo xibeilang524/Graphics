@@ -820,6 +820,17 @@ void MyGraphicsView::editTextItem()
             //当修改文字后，需要重新将信息发送至右侧的工具栏。
             emit initToolBox(selectedItems.size(),item->getProperty());
         }
+        else if(itemName == TYPE_ID(MyArrow))
+        {
+            MyArrow * item = dynamic_cast<MyArrow*>(selectedItems.first());
+
+            MyTextInput textInput(this);
+
+            textInput.setTex(item->getText());
+            textInput.exec();
+
+            item->setText(textInput.getText());
+        }
     }
 }
 

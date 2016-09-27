@@ -11,6 +11,8 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
+    QApplication::addLibraryPath("./plugins");
+
     QTextCodec * codec = QTextCodec::codecForName("GB2312");
     QTextCodec::setCodecForCStrings(codec);
 

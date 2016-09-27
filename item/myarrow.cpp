@@ -7,6 +7,7 @@
 
 #include "myitem.h"
 #include "mynodeport.h"
+#include "mytextitem.h"
 
 #include "math.h"
 
@@ -49,6 +50,8 @@ MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     property.endItemID = endItem->getProperty().startItemID;
 
     property.lineType = LINE_MYITEM;
+
+    createTextItem();
 }
 
 MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *parent):
@@ -65,6 +68,18 @@ MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *pa
     property.endItemID = endItem->getNodeProperty().startItemID;
 
     property.lineType = LINE_NODEPORT;
+
+    createTextItem();
+}
+
+//创建文字
+void MyArrow::createTextItem()
+{
+    myTextItem = new MyTextItem(GRA_TEXT,NULL,this);
+    myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
+    myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);
+    myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
+    myTextItem->cleartText();
 }
 
 QRectF MyArrow::boundingRect()const
@@ -206,6 +221,8 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
         painter->drawLine(myLine);
     }
 
+    myTextItem->setCentralPos((line().p1()+line().p2())/2);
+
     painter->restore();
 }
 
@@ -222,6 +239,29 @@ void MyArrow::updatePosition()
         QLineF line(mapFromItem(startItem, 0, 0), mapFromItem(endItem, 0, 0));
         setLine(line);
     }
+}
+
+//双击编辑文字信息
+void MyArrow::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit editMe();
+    QGraphicsLineItem::mouseDoubleClickEvent(event);
+}
+
+QString MyArrow::getText()
+{
+    return myTextItem->toPlainText();
+}
+
+//更新文字信息，同时更新textItem在item中的位置
+void MyArrow::setText(QString text)
+{
+    property.content = text;
+    myTextItem->setPlainText(text);
+
+    QRectF rectF = myTextItem->getBoundRect();
+
+    myTextItem->setPos(-rectF.width()/2,-rectF.height()/2);
 }
 
 MyArrow::~MyArrow()

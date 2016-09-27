@@ -129,6 +129,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 if(startItem && endItem)
                 {
                     MyArrow *arrow = new MyArrow(startItem, endItem);
+                    connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
                     startItem->addArrow(arrow);
                     endItem->addArrow(arrow);
                     arrow->setZValue(-1000.0);
@@ -144,6 +145,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 if(startItem && endItem)
                 {
                     MyArrow *arrow = new MyArrow(startItem, endItem);
+                    connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
                     startItem->addArrow(arrow);
                     endItem->addArrow(arrow);
                     arrow->setZValue(-1000.0);

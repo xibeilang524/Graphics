@@ -86,8 +86,11 @@ void MyTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void MyTextItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    setSelected(true);
-    menu->exec(event->screenPos());
+    if(menu)
+    {
+        setSelected(true);
+        menu->exec(event->screenPos());
+    }
 }
 
 void MyTextItem::setProperty(ItemProperty property)
@@ -122,6 +125,15 @@ void MyTextItem::setPos(qreal x, qreal y)
     property.itemRect.y = y;
 
     QGraphicsTextItem::setPos(x,y);
+}
+
+//将Text的中心设置在此点上
+void MyTextItem::setCentralPos(QPointF pos)
+{
+    qreal realx = pos.x() - getBoundRect().width()/2;
+    qreal realy = pos.y() - getBoundRect().height()/2;
+
+    setPos(realx,realy);
 }
 
 //设置字体是否可以拖动

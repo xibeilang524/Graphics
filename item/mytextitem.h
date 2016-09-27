@@ -41,6 +41,10 @@ public:
 
     void setPos(const QPointF &pos);
     void setPos(qreal x, qreal y);
+    void setCentralPos(QPointF pos);
+
+    QString getText();
+    void setText(QString text);
 
     void setMoveable(bool lockState);
     bool isMoveable(){return this->property.isMoveable;}

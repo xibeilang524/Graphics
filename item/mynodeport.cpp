@@ -59,7 +59,7 @@ MyNodePort::MyNodePort(MyItem *parentItem):
 
     setFlag(QGraphicsItem::ItemIsSelectable,parentItem->isMoveable());
 
-    radius = 13;
+    radius = 8;
     type = GRA_NODE_PORT;
     nextDirect = DRAG_NONE;
     arrivalLimitRang = false;
