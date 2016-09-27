@@ -25,6 +25,7 @@ FileOperate * FileOperate::instance()
     if(!fileOperate)
     {
         fileOperate = new FileOperate();
+
     }
     return fileOperate;
 }

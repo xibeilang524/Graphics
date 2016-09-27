@@ -45,17 +45,21 @@ void LeftIconWidget::initWidget()
 void LeftIconWidget::initListItems()
 {
     //插入多边形
-    MyListItem * square = ListItemManager::instance()->createListItem(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形",polygonWidget);
-    square->setData(Qt::UserRole,(int)GRA_SQUARE);
-    polygonWidget->addItem(square);
+    MyListItem * roundRect = ListItemManager::instance()->createListItem(Constants::ROUNDRECT_ID,QIcon(":/images/roundedrect.png"),"开始/结束",polygonWidget);
+    roundRect->setData(Qt::UserRole,(int)GRA_ROUND_RECT);
+    polygonWidget->addItem(roundRect);
 
-    MyListItem * rect = ListItemManager::instance()->createListItem(Constants::RECT_ID,QIcon(":/images/rectange.png"),"矩形",polygonWidget);
+    MyListItem * rect = ListItemManager::instance()->createListItem(Constants::RECT_ID,QIcon(":/images/rectange.png"),"流程",polygonWidget);
     rect->setData(Qt::UserRole,(int)GRA_RECT);
     polygonWidget->addItem(rect);
 
-    MyListItem * roundRect = ListItemManager::instance()->createListItem(Constants::ROUNDRECT_ID,QIcon(":/images/roundedrect.png"),"圆角矩形",polygonWidget);
-    roundRect->setData(Qt::UserRole,(int)GRA_ROUND_RECT);
-    polygonWidget->addItem(roundRect);
+    MyListItem * polygon = ListItemManager::instance()->createListItem(Constants::POLYGON_ID,QIcon(":/images/diamonds.png"),"判定",polygonWidget);
+    polygon->setData(Qt::UserRole,(int)GRA_POLYGON);
+    polygonWidget->addItem(polygon);
+
+    MyListItem * square = ListItemManager::instance()->createListItem(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形",polygonWidget);
+    square->setData(Qt::UserRole,(int)GRA_SQUARE);
+    polygonWidget->addItem(square);
 
     MyListItem * circle = ListItemManager::instance()->createListItem(Constants::CIRCLE_ID,QIcon(":/images/circle.png"),"圆",polygonWidget);
     circle->setData(Qt::UserRole,(int)GRA_CIRCLE);
@@ -64,10 +68,6 @@ void LeftIconWidget::initListItems()
     MyListItem * ellipse = ListItemManager::instance()->createListItem(Constants::ELLIPSE_ID,QIcon(":/images/ellipse.png"),"椭圆",polygonWidget);
     ellipse->setData(Qt::UserRole,(int)GRA_ELLIPSE);
     polygonWidget->addItem(ellipse);
-
-    MyListItem * polygon = ListItemManager::instance()->createListItem(Constants::POLYGON_ID,QIcon(":/images/diamonds.png"),"菱形",polygonWidget);
-    polygon->setData(Qt::UserRole,(int)GRA_POLYGON);
-    polygonWidget->addItem(polygon);
 
     MyListItem * text = ListItemManager::instance()->createListItem(Constants::TEXT_ID,QIcon(":/images/text.png"),"文字",polygonWidget);
     text->setData(Qt::UserRole,(int)GRA_TEXT);

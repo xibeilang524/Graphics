@@ -144,6 +144,8 @@ void MainWindow::createActionAndMenus()
 
     editMenu->addAction(editTextAction);
     editMenu->addSeparator();
+    editMenu->addAction(undoAction);
+    editMenu->addAction(redoAction);
     editMenu->addAction(cutAction);
     editMenu->addAction(copyAction);
     editMenu->addAction(pasteAction);
@@ -234,11 +236,11 @@ void MainWindow::createActionAndMenus()
     fullScreenAction->setShortcut(QKeySequence("Ctrl+Shift+F11"));
     ActionManager::instance()->registerAction(fullScreenAction,this,SLOT(switchFullScreen()));
 
-    MyAction * hideIconAction = ActionManager::instance()->crateAction(Constants::HIDE_ICON_ID,QIcon(":/images/editText.png"),"Òþ²Ø×ó²à¿Ø¼þÇø");
+    MyAction * hideIconAction = ActionManager::instance()->crateAction(Constants::HIDE_ICON_ID,QIcon(""),"Òþ²Ø×ó²à¿Ø¼þÇø");
     hideIconAction->setShortcut(QKeySequence("Alt+L"));
     ActionManager::instance()->registerAction(hideIconAction,this,SLOT(hideSubWidget()));
 
-    MyAction * hideToolAction = ActionManager::instance()->crateAction(Constants::HIDE_TOOL_ID,QIcon(":/images/editText.png"),"Òþ²ØÊôÐÔ±à¼­Çø");
+    MyAction * hideToolAction = ActionManager::instance()->crateAction(Constants::HIDE_TOOL_ID,QIcon(""),"Òþ²ØÊôÐÔ±à¼­Çø");
     hideToolAction->setShortcut(QKeySequence("Alt+R"));
     ActionManager::instance()->registerAction(hideToolAction,this,SLOT(hideSubWidget()));
 

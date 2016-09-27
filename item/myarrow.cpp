@@ -48,6 +48,7 @@ MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     property.endItemID = endItem->getProperty().startItemID;
 
     property.lineType = LINE_MYITEM;
+
 }
 
 MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *parent):

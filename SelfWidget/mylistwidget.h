@@ -12,9 +12,11 @@ public:
 
 protected:
     void startDrag(Qt::DropActions supportedActions);
+    void mousePressEvent(QMouseEvent *event);
+    void mouseMoveEvent(QMouseEvent *event);
 
 private:
-
+    QPoint startPressPoint;
 };
 
 #endif // MYLISTWIDGET_H

@@ -141,7 +141,8 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
             //т╡пн
             case GRA_CIRCLE:
                                {
-                                   boundRect = QRectF(-radius,-radius,2*radius,2*radius);
+                                   factor = 0.5;
+                                   boundRect = QRectF(-factor*radius,-factor*radius,radius,radius);
                                    QPainterPath path;
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
@@ -164,8 +165,9 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
             case GRA_POLYGON:
                                factor = 0.5;
                                boundRect = QRectF(-radius,-factor*radius,2*radius,radius);
-                               itemPolygon<<QPointF(-radius,-factor*radius)<<QPointF(0.5*radius,-factor*radius)<<
-                                         QPointF(radius,factor*radius)<<QPointF(-0.5*radius,factor*radius);
+
+                               itemPolygon<<QPointF(-radius,0)<<QPointF(0,-factor*radius)<<
+                                         QPointF(radius,0)<<QPointF(0,factor*radius);
 
 //                               property.itemBrush = QBrush(Qt::gray);
                                break;
