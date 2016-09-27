@@ -57,6 +57,10 @@ void LeftIconWidget::initListItems()
     polygon->setData(Qt::UserRole,(int)GRA_POLYGON);
     polygonWidget->addItem(polygon);
 
+    MyListItem * paralleogram = ListItemManager::instance()->createListItem(Constants::PARALLEOGRAM_ID,QIcon(":/images/parallelogram.png"),"输入输出",polygonWidget);
+    paralleogram->setData(Qt::UserRole,(int)GRA_PARALLELOGRAM);
+    polygonWidget->addItem(paralleogram);
+
     MyListItem * square = ListItemManager::instance()->createListItem(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形",polygonWidget);
     square->setData(Qt::UserRole,(int)GRA_SQUARE);
     polygonWidget->addItem(square);

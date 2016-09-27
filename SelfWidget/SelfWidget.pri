@@ -6,7 +6,8 @@ HEADERS += \
     SelfWidget/listitemmanager.h \
     SelfWidget/mylistwidget.h \
     SelfWidget/nodeeditdialog.h \
-    SelfWidget/hidesplit.h
+    SelfWidget/hidesplit.h \
+    SelfWidget/mylinecombobox.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -16,7 +17,8 @@ SOURCES += \
     SelfWidget/listitemmanager.cpp \
     SelfWidget/mylistwidget.cpp \
     SelfWidget/nodeeditdialog.cpp \
-    SelfWidget/hidesplit.cpp
+    SelfWidget/hidesplit.cpp \
+    SelfWidget/mylinecombobox.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \

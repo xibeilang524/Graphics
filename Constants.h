@@ -38,6 +38,7 @@ const char ROUNDRECT_ID[] = "Constants.RoundRect";
 const char CIRCLE_ID[] = "Constants.Circle";
 const char ELLIPSE_ID[] = "Constants.Ellipse";
 const char POLYGON_ID[] = "Constants.Polygon";
+const char PARALLEOGRAM_ID[] = "Constants.Parallelogram";
 const char LINE_ID[] =  "Constants.Line";
 const char VECTOR_LINE_ID[] =  "Constants.VectorLine";
 const char TEXT_ID[] =  "Constants.Text";

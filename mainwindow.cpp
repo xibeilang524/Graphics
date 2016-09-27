@@ -19,6 +19,7 @@
 #include "./SelfWidget/lefticonwidget.h"
 #include "./SelfWidget/hidesplit.h"
 #include "./SelfWidget/righttoolbox.h"
+#include "./SelfWidget/MyLineComboBox.h"
 #include "fileoperate.h"
 #include "global.h"
 #include "util.h"
@@ -42,6 +43,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     createSceneAndView();
 
+    createLineComboBox();
     createActionAndMenus();
     createToolBar();
     createStatusBar();
@@ -471,6 +473,19 @@ void MainWindow::respRestItemAction()
     ActionManager::instance()->action(Constants::ARROW_ID)->setChecked(true);
 }
 
+//创建线条自定义下拉框，如果不需要使用文字，那么直接添加NULL
+void MainWindow::createLineComboBox()
+{
+    startLineBox = new MyLineComboBox;
+    startLineBox->addItem(QIcon(":/images/arrow/leftLine.png"),NULL);
+    startLineBox->addItem(QIcon(":/images/arrow/leftArrow.png"),NULL);
+    startLineBox->addItem(QIcon(":/images/arrow/leftSolidTriangle.png"),NULL);
+    endLineBox = new MyLineComboBox;
+    endLineBox->addItem(QIcon(":/images/arrow/rightLine.png"),NULL);
+    endLineBox->addItem(QIcon(":/images/arrow/rightArrow.png"),NULL);
+    endLineBox->addItem(QIcon(":/images/arrow/rightSolidTriangle.png"),NULL);
+}
+
 //创建工具栏
 void MainWindow::createToolBar()
 {
@@ -505,6 +520,8 @@ void MainWindow::createToolBar()
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::LOCK_ID));
+    editBar->addWidget(startLineBox);
+    editBar->addWidget(endLineBox);
     editBar->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
 

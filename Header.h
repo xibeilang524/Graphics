@@ -8,6 +8,8 @@
 **修改历史:
 **20160913:wey:调整类型格式定义为qreal
 **20160925:wey:增加隐藏控件位置关系SpiltDirect
+**20160927:wey:添加线条类型AddLineType
+**             添加拖入类型为平行四边形
 *************************************************/
 #ifndef HEADER_H
 #define HEADER_H
@@ -49,6 +51,7 @@ enum GraphicsType
     GRA_CIRCLE,
     GRA_ELLIPSE,
     GRA_POLYGON,
+    GRA_PARALLELOGRAM,   //平行四边形
     GRA_LINE,
     GRA_VECTOR_LINE,
     GRA_TEXT,
@@ -89,6 +92,15 @@ enum ItemLockState
     ITEM_ALL_LOCK,             //全部锁定
     ITEM_NOT_ALL_LOCK,         //部分锁定/部分未锁定
     ITEM_ALL_UNLOCK            //全部未锁定
+};
+
+//线条的类型
+enum AddLineType
+{
+    LINE_NONE_TYPE,
+    LINE_HORIZONTAL,
+    LINE_ARROW,
+    LINE_SOLID_TRIANGLE
 };
 
 //记录当前item在scene中的x、y、w、h值

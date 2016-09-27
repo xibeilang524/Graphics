@@ -43,6 +43,7 @@ MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
 
     type = GRA_LINE;
     property.itemBrush = QBrush(Qt::black);
+    property.itemPen = QPen(Qt::black,2);
     //直线保存两端控件的引用
     property.startItemID = startItem->getProperty().startItemID;
     property.endItemID = endItem->getProperty().startItemID;

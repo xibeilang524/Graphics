@@ -40,5 +40,12 @@
         <file>images/exit_fullscreen.png</file>
         <file>images/about.png</file>
         <file>images/getsupport.png</file>
+        <file>images/arrow/leftArrow.png</file>
+        <file>images/arrow/leftLine.png</file>
+        <file>images/arrow/leftSolidTriangle.png</file>
+        <file>images/arrow/rightArrow.png</file>
+        <file>images/arrow/rightLine.png</file>
+        <file>images/arrow/rightSolidTriangle.png</file>
+        <file>images/parallelogram.png</file>
     </qresource>
 </RCC>

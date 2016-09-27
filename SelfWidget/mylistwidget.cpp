@@ -69,6 +69,9 @@ void MyListWidget::mouseMoveEvent(QMouseEvent *event)
             case GRA_NODE_PORT:
                                pixmap.load(":/images/nodePort.png");
                                break;
+            case GRA_PARALLELOGRAM:
+                               pixmap.load(":/images/parallelogram.png");
+                               break;
         }
 
         pixmap = pixmap.scaled(ICON_WIDTH,ICON_HEIGHT);

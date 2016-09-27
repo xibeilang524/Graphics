@@ -23,7 +23,8 @@
 #define QCOS(a) qCos(a*PI/180)
 #define QSIN(a) qSin(a*PI/180)
 
-#define CROSS_RADIUS 8    //绘制拖入十字星半径
+#define CROSS_RADIUS 8        //绘制拖入十字星半径
+#define VER_HOR_SCALE 0.5     //控件竖直和水平的长度比例，用于绘制矩形等非等边图形
 
 //对MyRect的输出进行重载
 QDataStream & operator <<(QDataStream &stream,MyRect & rect)
@@ -97,7 +98,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     QObject(parent1),
     QGraphicsPolygonItem(parent2)
 {
-    radius = 100;
+    radius = 60;
     isDragging = false;            //默认无拖入
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -106,8 +107,6 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 
     prepareGeometryChange();
 
-    float factor;
-
     switch(currItemType)
     {
             //正方形
@@ -115,62 +114,54 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
                                itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
                                       QPointF(radius,radius)<<QPointF(-radius,radius);
-
-//                               property.itemBrush = QBrush(Qt::red);
                                break;
             //矩形
             case GRA_RECT:
-                               factor = 0.5;
-                               boundRect = QRectF(-radius,-factor*radius,2*radius,radius);
-                               itemPolygon<<QPointF(-radius,-factor*radius)<<QPointF(radius,-factor*radius)<<
-                                       QPointF(radius,factor*radius)<<QPointF(-radius,factor*radius);
-
-//                               property.itemBrush = QBrush(Qt::blue);
+                               boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
+                               itemPolygon<<QPointF(-radius,-VER_HOR_SCALE*radius)<<QPointF(radius,-VER_HOR_SCALE*radius)<<
+                                       QPointF(radius,VER_HOR_SCALE*radius)<<QPointF(-radius,VER_HOR_SCALE*radius);
                                break;
            //圆角矩形
            case GRA_ROUND_RECT:
                               {
-                                  boundRect = QRectF(-radius,-0.5*radius,2*radius,radius);
+                                  boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
                                   QPainterPath path;
                                   path.addRoundedRect(boundRect,10,10);
                                   itemPolygon = path.toFillPolygon();
-
-//                                  property.itemBrush = QBrush(Qt::yellow);
                               }
                               break;
             //圆形
             case GRA_CIRCLE:
                                {
-                                   factor = 0.5;
-                                   boundRect = QRectF(-factor*radius,-factor*radius,radius,radius);
+                                   boundRect = QRectF(-VER_HOR_SCALE*radius,-VER_HOR_SCALE*radius,radius,radius);
                                    QPainterPath path;
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
-
-//                                   property.itemBrush = QBrush(Qt::darkCyan);
                                }
                                break;
             //椭圆
             case GRA_ELLIPSE:
                                {
-                                   boundRect = QRectF(-radius,-0.5*radius,2*radius,radius);
+                                   boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
                                    QPainterPath path;
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
-
-//                                   property.itemBrush = QBrush(Qt::darkMagenta);
                                }
                                break;
             //菱形
             case GRA_POLYGON:
-                               factor = 0.5;
-                               boundRect = QRectF(-radius,-factor*radius,2*radius,radius);
+                               boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
 
-                               itemPolygon<<QPointF(-radius,0)<<QPointF(0,-factor*radius)<<
-                                         QPointF(radius,0)<<QPointF(0,factor*radius);
-
-//                               property.itemBrush = QBrush(Qt::gray);
+                               itemPolygon<<QPointF(-radius,0)<<QPointF(0,-VER_HOR_SCALE*radius)<<
+                                         QPointF(radius,0)<<QPointF(0,VER_HOR_SCALE*radius);
                                break;
+            //平行四边形
+            case GRA_PARALLELOGRAM:
+                              boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
+
+                              itemPolygon<<QPointF(-VER_HOR_SCALE*radius,-VER_HOR_SCALE*radius)<<QPointF(radius,-VER_HOR_SCALE*radius)<<
+                                        QPointF(VER_HOR_SCALE*radius,VER_HOR_SCALE*radius)<<QPointF(-radius,VER_HOR_SCALE*radius);
+                              break;
     }
 
     setPolygon(itemPolygon);
@@ -1102,8 +1093,14 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                             break;
                         case GRA_POLYGON:
                             itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(0.5*tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-0.5*tmpX,tmpY);
+                            itemPolygon<<QPointF(-tmpX,0)<<QPointF(0,-tmpY)<<
+                                    QPointF(tmpX,0)<<QPointF(0,tmpY);
+                            hasProcessed = true;
+                            break;
+                        case GRA_PARALLELOGRAM:
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-VER_HOR_SCALE*tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(VER_HOR_SCALE*tmpX,tmpY)<<QPointF(-tmpX,tmpY);
                             hasProcessed = true;
                             break;
                     }
@@ -1184,8 +1181,14 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                             break;
                         case GRA_POLYGON:
                             itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(0.5*tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-0.5*tmpX,tmpY);
+                            itemPolygon<<QPointF(-tmpX,0)<<QPointF(0,-tmpY)<<
+                                    QPointF(tmpX,0)<<QPointF(0,tmpY);
+                            hasProcessed = true;
+                            break;
+                        case GRA_PARALLELOGRAM:
+                            itemPolygon.clear();
+                            itemPolygon<<QPointF(-VER_HOR_SCALE*tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(VER_HOR_SCALE*tmpX,tmpY)<<QPointF(-tmpX,tmpY);
                             hasProcessed = true;
                             break;
                     }
@@ -1368,8 +1371,15 @@ void MyItem::resetPolygon()
             //菱形
             case GRA_POLYGON:
                             {
-                               itemPolygon<<QPointF(-tx,-ty)<<QPointF(0.5*tx,-ty)<<
-                                      QPointF(tx,ty)<<QPointF(-0.5*tx,ty);
+                               itemPolygon<<QPointF(-tx,0)<<QPointF(0,-ty)<<
+                                      QPointF(tx,0)<<QPointF(0,ty);
+                            }
+                               break;
+            //菱形
+            case GRA_PARALLELOGRAM:
+                            {
+                               itemPolygon<<QPointF(-VER_HOR_SCALE*tx,-ty)<<QPointF(tx,-ty)<<
+                                      QPointF(VER_HOR_SCALE*tx,ty)<<QPointF(-tx,ty);
                             }
                                break;
     }
