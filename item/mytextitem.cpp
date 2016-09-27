@@ -36,7 +36,7 @@ MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent,
     QGraphicsTextItem(parent,scene)
 {
     property.isFont = true;
-    property.itemFont = QFont("黑体",15);
+    property.itemFont = QFont("黑体",FONT_DEAFULT_PIX);
     property.content = "输入文字...";
     setFont(property.itemFont);
 
@@ -143,8 +143,35 @@ void MyTextItem::updateFont(QFont font)
 QRectF MyTextItem::getBoundRect()
 {
     //获取字符串的宽度
-    QFontMetricsF metrics = property.itemFont;
-    return metrics.boundingRect(toPlainText());
+    QFontMetricsF metrics(property.itemFont);
+
+    QStringList source = toPlainText().split("\n");
+
+    qreal totalHeight = 0;
+    qreal maxWidth = -1;
+
+    foreach (QString s, source)
+    {
+        int tmpWidth = metrics.width(s);
+        if(tmpWidth > maxWidth)
+        {
+            maxWidth = tmpWidth;
+        }
+        totalHeight += metrics.height();
+    }
+
+    QRectF rectF;
+
+    rectF.setWidth(maxWidth);
+    rectF.setHeight(totalHeight);
+
+    return rectF;
+}
+
+void MyTextItem::keyPressEvent(QKeyEvent *event)
+{
+//    emit updateTextGeometry();
+    QGraphicsTextItem::keyPressEvent(event);
 }
 
 //当作为其它控件的一部分时，无需显示文字信息

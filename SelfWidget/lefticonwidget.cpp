@@ -33,7 +33,7 @@ void LeftIconWidget::initWidget()
 
     initListItems();
 
-    toolBox->addItem(polygonWidget,"Polygon");
+    toolBox->addItem(polygonWidget,"Á÷³ÌÍ¼");
     toolBox->addItem(nodeWidget,"Nodes");
 
     mainLayout->addWidget(toolBox);

@@ -9,7 +9,7 @@ MyLineComboBox::MyLineComboBox()
     setStyleSheet("QComboBox{ height:23px;\
                   }\
                   QComboBox QAbstractItemView::item{\
-                  height:30px;selection-background-color: lightgray;\
+                  width:150px;height:30px;selection-background-color: lightgray;\
                  }");
     setSizeAdjustPolicy(QComboBox::AdjustToContents);
 }

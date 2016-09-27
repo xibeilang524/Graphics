@@ -64,6 +64,7 @@ private:
     ItemProperty property;
 
     QRectF boundRect;
+
 };
 
 #endif // MYARROW_H

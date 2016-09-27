@@ -47,5 +47,6 @@
         <file>images/arrow/rightLine.png</file>
         <file>images/arrow/rightSolidTriangle.png</file>
         <file>images/parallelogram.png</file>
+        <file>images/backgroundRole.png</file>
     </qresource>
 </RCC>

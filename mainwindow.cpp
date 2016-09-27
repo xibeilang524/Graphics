@@ -520,9 +520,9 @@ void MainWindow::createToolBar()
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::LOCK_ID));
+    editBar->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
     editBar->addWidget(startLineBox);
     editBar->addWidget(endLineBox);
-    editBar->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
 
     QToolBar * sceneBar = addToolBar("Scene");

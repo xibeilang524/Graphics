@@ -15,9 +15,10 @@
 #define HEADER_H
 
 #define PI 3.141592653
-#define ICON_WIDTH  60    //图标的宽高
+#define ICON_WIDTH  60          //图标的宽高
 #define ICON_HEIGHT 60
-#define LAYOUT_SPACING  1  //布局管理器中两控件间的距离
+#define LAYOUT_SPACING  1       //布局管理器中两控件间的距离
+#define FONT_DEAFULT_PIX  9     //字体初始化大小
 
 #include <QString>
 #include "typeinfo"

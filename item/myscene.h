@@ -14,6 +14,7 @@
 **             修复添加文字后无法换行、及输入卡顿问题【scene未处理的键盘事件要交由系统处理】
 **             添加拖入文字
 **20160925:wey:增加键盘对锁定(Ctrl+L)/解锁(Ctrl+U)的支持
+**20160927:wey:增加自定义背景
 *************************************************/
 #ifndef MYSCENE_H
 #define MYSCENE_H
@@ -47,6 +48,7 @@ signals:
     void ctrlUnLockKeyPress();
     void itemSizeChanged(int size);
     void itemPropChanged(ItemProperty);
+    void editCurrItem();
 
 private slots:
     void respTextLostFocus(MyTextItem * item);
@@ -60,6 +62,8 @@ protected:
 private:
     int findItemById(QList<MyItem *> &localItem, QString Id);
     int findItemById(QList<MyNodePort *> &localNode, QString Id);
+    void addMyItemConnect(MyItem * item);
+    void addMyTextConnect(MyTextItem  * item);
 
     QMenu * rightMenu;
 

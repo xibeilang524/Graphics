@@ -71,6 +71,7 @@ void MyGraphicsView::initView()
     connect(myScene,SIGNAL(ctrlUnLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
     connect(myScene,SIGNAL(itemSizeChanged(int)),parentWindow,SLOT(respItemSizeChanged(int)));
     connect(myScene,SIGNAL(itemPropChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
+    connect(myScene,SIGNAL(editCurrItem()),this,SLOT(editTextItem()));
 }
 
 //³õÊ¼»¯ÓÒ¼ü²Ëµ¥

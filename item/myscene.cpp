@@ -21,6 +21,8 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
     CurrAddGraType =  GRA_NONE;
     insertTmpLine = NULL;
     insertTmpPath = NULL;
+
+    setBackgroundBrush(QPixmap(":/images/backgroundRole.png"));
 }
 
 void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
@@ -197,7 +199,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     if(cutInfo.graphicsType == GRA_TEXT)
     {
         MyTextItem  * item = new MyTextItem(cutInfo.graphicsType,rightMenu);
-        connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
+        addMyTextConnect(item);
 //        connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
         item->setTextInteractionFlags(Qt::TextEditorInteraction);
@@ -218,8 +220,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     else if(cutInfo.graphicsType != GRA_NONE && cutInfo.graphicsType != GRA_LINE)
     {
         MyItem * item = new MyItem(cutInfo.graphicsType,rightMenu,this);
-        connect(item,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-        connect(item,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
+        addMyItemConnect(item);
 
         item->setText(cutInfo.content);
         item->setProperty(cutInfo.itemProperty);
@@ -328,8 +329,7 @@ void MyScene::addItem(GraphicsType type, QPointF pos)
     if(type == GRA_TEXT)
     {
         MyTextItem  * item = new MyTextItem(type,rightMenu);
-        connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
-
+        addMyTextConnect(item);
         item->setPos(pos);
         item->setSelected(true);
         addItem(item);
@@ -338,10 +338,23 @@ void MyScene::addItem(GraphicsType type, QPointF pos)
     {
         MyItem * myItem = new MyItem(type,rightMenu,this);
         myItem->setPos(pos);
-        connect(myItem,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-        connect(myItem,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
+        addMyItemConnect(myItem);
         addItem(myItem);
     }
+}
+
+//建立MyItem的信号槽关系
+void MyScene::addMyItemConnect(MyItem * item)
+{
+    connect(item,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+    connect(item,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
+    connect(item,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+}
+
+//建立MyText的信号槽关系
+void MyScene::addMyTextConnect(MyTextItem  * item)
+{
+    connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
 }
 
 //添加箭头时，找出箭头的父节点

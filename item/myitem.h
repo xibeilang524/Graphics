@@ -99,6 +99,7 @@ public:
 
 signals:
     void updateSceneDraw();
+    void editMe();
     void propHasChanged(ItemProperty);
 
 private slots:
@@ -109,12 +110,14 @@ private slots:
 
     void procDeleteNodePort(MyNodePort * nodePort);
     void procEditNodePort(MyNodePort * nodePort);
+    void procUpdateTextGeometry();
 
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
     void mouseMoveEvent(QGraphicsSceneMouseEvent *event);
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);

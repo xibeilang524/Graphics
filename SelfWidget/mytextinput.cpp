@@ -14,12 +14,13 @@ MyTextInput::MyTextInput(QWidget *parent) :
 
 void MyTextInput::setTex(QString text)
 {
-    ui->content->setText(text);
+    ui->content->clear();
+    ui->content->setPlainText(text);
 }
 
 QString MyTextInput::getText()
 {
-    return ui->content->text();
+    return ui->content->toPlainText();
 }
 
 MyTextInput::~MyTextInput()

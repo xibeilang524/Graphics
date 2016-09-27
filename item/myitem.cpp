@@ -174,7 +174,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     property.itemRect.width = boundRect.width();
     property.itemRect.height = boundRect.height();
 
-    property.itemFont = QFont("黑体",15);
+    property.itemFont = QFont("黑体",FONT_DEAFULT_PIX);
 
     currMouseType = MOUSE_NONE;
     isNeedBorder = false;
@@ -183,6 +183,20 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     selectedPen.setColor(Qt::black);
     selectedPen.setStyle(Qt::DashLine);
     selectedPen.setWidth(selectedPenWidth);
+
+    //旋转线条
+    rotateLine = new RotateLine(this);
+    connect(rotateLine,SIGNAL(rotateItem(MouseType,int)),this,SLOT(procRotate(MouseType,int)));
+    updateRotateLinePos();
+
+    //文字信息
+    myTextItem = new MyTextItem(GRA_TEXT,menu,this);
+    connect(myTextItem,SIGNAL(updateTextGeometry()),this,SLOT(procUpdateTextGeometry()));
+
+    myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
+    myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);
+    myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
+    myTextItem->cleartText();
 
     //八个角度的缩放点
     leftTopPoint = new DragPoint(TOP_LEFT,this);
@@ -194,19 +208,6 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     leftPoint = new DragPoint(MIDDLE_LEFT,this);
     rightPoint = new DragPoint(MIDDLE_RIGHT,this);
     bottomPoint = new DragPoint(BOTTOM_MIDDLE,this);
-
-    //旋转线条
-    rotateLine = new RotateLine(this);
-    connect(rotateLine,SIGNAL(rotateItem(MouseType,int)),this,SLOT(procRotate(MouseType,int)));
-    updateRotateLinePos();
-
-    //文字信息
-    myTextItem = new MyTextItem(GRA_TEXT,menu,this);
-
-    myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
-    myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);
-    myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
-    myTextItem->cleartText();
 
     setAcceptHoverEvents(true);
     setDragPointVisible(false);
@@ -238,7 +239,17 @@ void MyItem::setText(QString text)
 {
     property.content = text;
     myTextItem->setPlainText(text);
-    myTextItem->setPos(-myTextItem->getBoundRect().width()/2,-myTextItem->getBoundRect().height()/2);
+
+    QRectF rectF = myTextItem->getBoundRect();
+
+    myTextItem->setPos(-rectF.width()/2,-rectF.height()/2);
+}
+
+//动态调整输入字符框的位置尺寸
+void MyItem::procUpdateTextGeometry()
+{
+    QRectF rectF = myTextItem->getBoundRect();
+    myTextItem->setPos(-rectF.width()/2,-rectF.height()/2);
 }
 
 void MyItem::updateRotateLinePos()
@@ -359,6 +370,15 @@ void MyItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     emit updateSceneDraw();
 
     QGraphicsPolygonItem::mouseReleaseEvent(event);
+}
+
+//双击编辑文字信息
+void MyItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    emit editMe();
+    QGraphicsPolygonItem::mouseDoubleClickEvent(event);
+
+//    myTextItem->setTextInteractionFlags(Qt::TextEditorInteraction);
 }
 
 //在鼠标事件中获取实时的位置并更新至右侧面板
