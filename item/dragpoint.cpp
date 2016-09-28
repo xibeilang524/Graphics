@@ -21,28 +21,128 @@ DragPoint::DragPoint(const PointType pointType, MyItem *parent):
 
     setAcceptHoverEvents(true);
 
+    switch(pointType)
+    {
+        case TOP_LEFT:
+        case BOTTOM_RIGHT: cursorShape = Qt::SizeFDiagCursor;
+             break;
+        case TOP_MIDDLE:
+        case BOTTOM_MIDDLE: cursorShape = Qt::SizeVerCursor;
+            break;
+        case TOP_RIGHT:
+        case BOTTOM_LEFT: cursorShape = Qt::SizeBDiagCursor;
+            break;
+        case MIDDLE_LEFT:
+        case MIDDLE_RIGHT: cursorShape = Qt::SizeHorCursor;
+            break;
+    }
+
     connect(this,SIGNAL(resizeItemSize()),parent,SLOT(procResizeItem()));
     connect(this,SIGNAL(currMouseState(MouseType,PointType,QPointF)),parent,SLOT(procMouseState(MouseType,PointType,QPointF)));
 }
 
+//动态根据角度更新鼠标的样式
+void DragPoint::updateDragPointHoverCursor(qreal parentRotateDegree)
+{
+    parentRotateDegree = (int)parentRotateDegree % 180;
+
+    if(parentRotateDegree >=0 && parentRotateDegree < 30 )
+    {
+        switch(pointType)
+        {
+            case TOP_LEFT:
+            case BOTTOM_RIGHT: cursorShape = Qt::SizeFDiagCursor;
+                 break;
+            case TOP_MIDDLE:
+            case BOTTOM_MIDDLE: cursorShape = Qt::SizeVerCursor;
+                break;
+            case TOP_RIGHT:
+            case BOTTOM_LEFT: cursorShape = Qt::SizeBDiagCursor;
+                break;
+            case MIDDLE_LEFT:
+            case MIDDLE_RIGHT: cursorShape = Qt::SizeHorCursor;
+                break;
+        }
+    }
+    else if(parentRotateDegree >=30 && parentRotateDegree < 60)
+    {
+        switch(pointType)
+        {
+            case TOP_LEFT:
+            case BOTTOM_RIGHT: cursorShape = Qt::SizeVerCursor;
+                 break;
+            case TOP_MIDDLE:
+            case BOTTOM_MIDDLE: cursorShape = Qt::SizeBDiagCursor;
+                break;
+            case TOP_RIGHT:
+            case BOTTOM_LEFT: cursorShape = Qt::SizeHorCursor;
+                break;
+            case MIDDLE_LEFT:
+            case MIDDLE_RIGHT: cursorShape = Qt::SizeFDiagCursor;
+                break;
+        }
+    }
+    else if(parentRotateDegree >=60 && parentRotateDegree < 120)
+    {
+        switch(pointType)
+        {
+            case TOP_LEFT:
+            case BOTTOM_RIGHT: cursorShape = Qt::SizeBDiagCursor;
+                 break;
+            case TOP_MIDDLE:
+            case BOTTOM_MIDDLE: cursorShape = Qt::SizeHorCursor;
+                break;
+            case TOP_RIGHT:
+            case BOTTOM_LEFT: cursorShape = Qt::SizeFDiagCursor;
+                break;
+            case MIDDLE_LEFT:
+            case MIDDLE_RIGHT: cursorShape = Qt::SizeVerCursor;
+                break;
+        }
+    }
+    else if(parentRotateDegree >=120 && parentRotateDegree < 150)
+    {
+        switch(pointType)
+        {
+            case TOP_LEFT:
+            case BOTTOM_RIGHT: cursorShape = Qt::SizeHorCursor;
+                 break;
+            case TOP_MIDDLE:
+            case BOTTOM_MIDDLE: cursorShape = Qt::SizeFDiagCursor;
+                break;
+            case TOP_RIGHT:
+            case BOTTOM_LEFT: cursorShape = Qt::SizeVerCursor;
+                break;
+            case MIDDLE_LEFT:
+            case MIDDLE_RIGHT: cursorShape = Qt::SizeBDiagCursor;
+                break;
+        }
+    }
+    else if(parentRotateDegree >=150 && parentRotateDegree <= 180)
+    {
+        switch(pointType)
+        {
+            case TOP_LEFT:
+            case BOTTOM_RIGHT: cursorShape = Qt::SizeFDiagCursor;
+                 break;
+            case TOP_MIDDLE:
+            case BOTTOM_MIDDLE: cursorShape = Qt::SizeVerCursor;
+                break;
+            case TOP_RIGHT:
+            case BOTTOM_LEFT: cursorShape = Qt::SizeBDiagCursor;
+                break;
+            case MIDDLE_LEFT:
+            case MIDDLE_RIGHT: cursorShape = Qt::SizeHorCursor;
+                break;
+        }
+    }
+}
+
+//改变鼠标的样式
 void DragPoint::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
     Q_UNUSED(event)
-    switch(pointType)
-    {
-        case TOP_LEFT:
-        case BOTTOM_RIGHT:setCursor(Qt::SizeFDiagCursor);
-             break;
-        case TOP_MIDDLE:
-        case BOTTOM_MIDDLE:setCursor(Qt::SizeVerCursor);
-            break;
-        case TOP_RIGHT:
-        case BOTTOM_LEFT:setCursor(Qt::SizeBDiagCursor);
-            break;
-        case MIDDLE_LEFT:
-        case MIDDLE_RIGHT: setCursor(Qt::SizeHorCursor);
-            break;
-    }
+    setCursor(cursorShape);
 }
 
 void DragPoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)

@@ -37,7 +37,7 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 signals:
-    void rotateItem(MouseType,int);
+    void rotateItem(MouseType,qreal);
 
 private:
     QGraphicsItem * parentItem;
@@ -45,7 +45,7 @@ private:
 
     QPointF startPoint;
 
-    int rotateDegree;
+    qreal rotateDegree;
     bool hasSelected;
     bool isMoveable;
 

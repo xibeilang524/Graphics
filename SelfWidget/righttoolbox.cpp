@@ -393,11 +393,11 @@ void RightToolBox::degreeChange()
 
     if(objname==ui->degreeM->objectName())
     {
-        degree = (degree<=-360)?-360:--degree;
+        degree = (degree<=ROTATE_MIN_DEGREE)?ROTATE_MIN_DEGREE:--degree;
     }
     else
     {
-        degree = (degree>=360)?360:++degree;
+        degree = (degree>=ROTATE_MAX_DEGREE)?ROTATE_MAX_DEGREE:++degree;
     }
 
     changeDegree(degree);

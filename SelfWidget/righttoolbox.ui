@@ -52,7 +52,7 @@
 </string>
         </property>
         <property name="currentIndex">
-         <number>0</number>
+         <number>1</number>
         </property>
         <widget class="QWidget" name="tab">
          <attribute name="title">
@@ -1644,7 +1644,7 @@ QPushButton#posYP:pressed{
                       <item>
                        <widget class="QDial" name="dial">
                         <property name="minimum">
-                         <number>-360</number>
+                         <number>0</number>
                         </property>
                         <property name="maximum">
                          <number>360</number>

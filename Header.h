@@ -19,6 +19,8 @@
 #define ICON_HEIGHT 60
 #define LAYOUT_SPACING  1       //布局管理器中两控件间的距离
 #define FONT_DEAFULT_PIX  9     //字体初始化大小
+#define ROTATE_MIN_DEGREE 0     //旋转的最小角度
+#define ROTATE_MAX_DEGREE 360   //旋转的最大角度
 
 #include <QString>
 #include "typeinfo"

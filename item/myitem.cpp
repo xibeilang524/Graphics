@@ -103,6 +103,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
+    setFlag(QGraphicsItem::ItemSendsGeometryChanges,true);
     setAcceptDrops(true);
 
     prepareGeometryChange();
@@ -186,7 +187,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 
     //旋转线条
     rotateLine = new RotateLine(this);
-    connect(rotateLine,SIGNAL(rotateItem(MouseType,int)),this,SLOT(procRotate(MouseType,int)));
+    connect(rotateLine,SIGNAL(rotateItem(MouseType,qreal)),this,SLOT(procRotate(MouseType,qreal)));
     updateRotateLinePos();
 
     //文字信息
@@ -971,16 +972,23 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
             isNeedBorder = false;
         }
     }
-    else if(change  == QGraphicsItem::ItemPositionChange && scene())
+    else if(change == QGraphicsItem::ItemRotationHasChanged && scene())
     {
+        leftTopPoint->updateDragPointHoverCursor(rotation());
+        rightTopPoint->updateDragPointHoverCursor(rotation());
+        leftBottomPoint->updateDragPointHoverCursor(rotation());
+        rightBottomPoint->updateDragPointHoverCursor(rotation());
 
-    }
-    else if(change == QGraphicsItem::ItemPositionHasChanged && scene())
-    {
+        topPoint->updateDragPointHoverCursor(rotation());
+        leftPoint->updateDragPointHoverCursor(rotation());
+        rightPoint->updateDragPointHoverCursor(rotation());
+        bottomPoint->updateDragPointHoverCursor(rotation());
     }
 
     return QGraphicsPolygonItem::itemChange(change,value);
 }
+
+//根据旋转的角度动态改变拖拽点鼠标悬停时的样式
 
 //左上、右上、左下、右下在缩放时要按照比例进行
 //上、左、右、下在缩放时只按改变一边长度
@@ -1292,7 +1300,7 @@ void MyItem::procResizeNodePort()
 }
 
 //处理旋转控件旋转后角度的设置
-void MyItem::procRotate(MouseType mouseType,int degree)
+void MyItem::procRotate(MouseType mouseType,qreal degree)
 {
     currMouseType = mouseType;
 
@@ -1307,7 +1315,7 @@ void MyItem::procRotate(MouseType mouseType,int degree)
         setSelected(true);
     }
 
-    emit propHasChanged(property);
+//    emit propHasChanged(property);
 }
 
 //设置控件的样式属性

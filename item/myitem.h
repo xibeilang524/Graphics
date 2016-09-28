@@ -104,7 +104,7 @@ signals:
 
 private slots:
     void procResizeItem();
-    void procRotate(MouseType mouseType, int degree);
+    void procRotate(MouseType mouseType, qreal degree);
     void procMouseState(MouseType, PointType pointType, QPointF currPos);
     void procPortChanged(MouseType type, QPointF currPoint);
 

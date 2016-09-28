@@ -76,7 +76,7 @@ void RotateLine::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     startPoint = event->pos();
 
-//    qDebug()<<startPoint.x()<<"============"<<startPoint.y();
+    qDebug()<<pos();
 
     emit rotateItem(MOUSE_PRESS,0);
     QGraphicsObject::mousePressEvent(event);
@@ -84,43 +84,45 @@ void RotateLine::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qreal posY = event->pos().y();
-    qreal posX = event->pos().x();
+//    qreal posY = mapToParent(event->pos()).y();
+//    qreal posX = mapToParent(event->pos()).x();
+
+    qreal posY = mapToParent(event->pos()).y();
+    qreal posX = mapToParent(event->pos()).x();
+
+    qDebug()<<mapToParent(event->pos())<<"__"<<event->pos();
 
     if(posX == 0)
     {
         return;
     }
+
     qreal tmpValue = posY / posX;
 
     rotateDegree = ATAN(tmpValue) ;
 
     if(posX >=0 && posY>0)
     {
-//        rotateDegree += 90;
+        rotateDegree += 90;
     }
     else if(posX >=0 && posY<0)
     {
-        rotateDegree = 360 + rotateDegree;
+        rotateDegree = 90 + rotateDegree;
     }
     else if(posX < 0 && posY<0)
     {
-        rotateDegree = 180 + rotateDegree;
+        rotateDegree = 270 + rotateDegree;
     }
     else if(posX < 0 && posY>0)
     {
-        rotateDegree = 180 + rotateDegree;
+        rotateDegree = 270 + rotateDegree;
     }
 
     qDebug()<<rotateDegree;
 
-    QPointF tmpPoint = mapFromScene(event->pos());
-
-    qDebug()<< rotateDegree<<"==="<<posX<<"=="<<posY<<"__"<<tmpPoint.x()<<"--"<<tmpPoint.y();
-
     emit rotateItem(MOUSE_MOVE,rotateDegree);
 
-    startPoint = event->pos();
+//    startPoint = event->pos();
 
     QGraphicsObject::mouseMoveEvent(event);
 }

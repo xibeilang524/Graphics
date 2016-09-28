@@ -6,7 +6,7 @@
 **Others: 1：用于缩放控件
 **
 **修改历史:
-**
+**20160928:wey:增加随父控件旋转角度变化，动态切换悬停的鼠标样式
 *************************************************/
 #ifndef DRAGPOINT_H
 #define DRAGPOINT_H
@@ -28,6 +28,8 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
+    void updateDragPointHoverCursor(qreal parentRotateDegree);
+
 signals:
     void currMouseState(MouseType,PointType,QPointF);
     void resizeItemSize();
@@ -48,6 +50,8 @@ private:
     int radius;
 
     PointType pointType;
+
+    Qt::CursorShape cursorShape;
 };
 
 #endif // DRAGPOINT_H
