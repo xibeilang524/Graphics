@@ -14,13 +14,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    actionmanager.cpp \
     global.cpp \
     util.cpp \
     fileoperate.cpp
 
 HEADERS  += mainwindow.h \
-    actionmanager.h \
     Constants.h \
     Header.h \
     global.h \
@@ -29,9 +27,11 @@ HEADERS  += mainwindow.h \
 
 include($$PWD\SelfWidget\SelfWidget.pri)
 include($$PWD\item\item.pri)
-
+include($$PWD\manager\manager.pri)
 
 FORMS    += mainwindow.ui
 
 RESOURCES += \
     res.qrc
+
+OTHER_FILES +=

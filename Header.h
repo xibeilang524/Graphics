@@ -100,10 +100,9 @@ enum ItemLockState
 //线条的类型
 enum AddLineType
 {
-    LINE_NONE_TYPE,
-    LINE_HORIZONTAL,
-    LINE_ARROW,
-    LINE_SOLID_TRIANGLE
+    LINE_HORIZONTAL,           //直线
+    LINE_ARROW,                //箭头
+    LINE_SOLID_TRIANGLE        //实心三角箭头
 };
 
 //记录当前item在scene中的x、y、w、h值
@@ -139,6 +138,8 @@ struct ItemProperty
         itemPen.setWidth(1);
         alphaValue = 100;
         zValue = 0;
+        startLineType = LINE_HORIZONTAL;
+        endLineType = LINE_HORIZONTAL;
         createUUID();
     }
 
@@ -154,25 +155,27 @@ struct ItemProperty
     friend QDataStream & operator <<(QDataStream &,ItemProperty & item);
     friend QDataStream & operator >>(QDataStream &,ItemProperty & item);
 
-    bool isNeedBrush;        //为ture时表示需要笔刷填充
+    bool isNeedBrush;               //为ture时表示需要笔刷填充
     QBrush itemBrush;
-    bool isNeedBorder;       //为true时表示是否需要边框
+    bool isNeedBorder;              //为true时表示是否需要边框
     QPen   itemPen;
 
     MyRect itemRect;
-    int    alphaValue;       //透明度值
+    int    alphaValue;              //透明度值
     int    rotateDegree;
 
-    bool isFont;             //是否为字体
-    QString content;         //文字内容
+    bool isFont;                    //是否为字体
+    QString content;                //文字内容
     QFont  itemFont;
-    QColor fontColor;        //字体颜色
+    QColor fontColor;               //字体颜色
 
-    qreal zValue;            //深度值
+    qreal zValue;                   //深度值
 
-    LineType lineType;       //线条的类型
+    LineType lineType;              //线条的类型
+    AddLineType startLineType;      //起始线条类型
+    AddLineType endLineType;        //终止线条类型
 
-    bool isMoveable;         //是否被锁定
+    bool isMoveable;                //是否被锁定
 };
 
 //节点属性

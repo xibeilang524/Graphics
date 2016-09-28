@@ -6,22 +6,7 @@
 
 #include "Constants.h"
 #include "Header.h"
-
-class Id
-{
-public:
-    Id(const char *name);
-
-    friend bool operator<(const Id & id1,const Id & id2);
-    friend bool operator==(const Id & id1,const Id & id2);
-
-    QString getIdName()const {return this->idName;}
-
-    ~Id();
-
-private:
-    QString idName;
-};
+#include "id.h"
 
 class MyAction : public QAction
 {
@@ -42,9 +27,9 @@ private:
 #include <QMap>
 class MyItem;
 
-class ActionManager : public QObject
+class ActionManager
 {
-    Q_OBJECT
+
 public:
     ActionManager();
     static ActionManager * instance();

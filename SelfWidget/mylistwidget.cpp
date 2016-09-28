@@ -5,7 +5,7 @@
 #include <QMouseEvent>
 #include <QDebug>
 
-#include "listitemmanager.h"
+#include "../manager/listitemmanager.h"
 #include "../Header.h"
 
 MyListWidget::MyListWidget(QWidget *parent):

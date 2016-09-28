@@ -4,7 +4,7 @@
 #include <QListWidgetItem>
 #include <QObject>
 
-#include "../actionmanager.h"
+#include "Id.h"
 
 class MyListItem: public QListWidgetItem
 {
@@ -16,9 +16,9 @@ public:
     ~MyListItem();
 };
 
-class ListItemManager : public QObject
+class ListItemManager
 {
-    Q_OBJECT
+
 public:
     ListItemManager();
     static ListItemManager * instance();

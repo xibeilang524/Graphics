@@ -15,7 +15,8 @@
 #include "../Header.h"
 #include "../global.h"
 #include "../mainwindow.h"
-#include "../actionmanager.h"
+#include "../manager/actionmanager.h"
+#include "../manager/mylinecombobox.h"
 #include "../Constants.h"
 #include "mytextitem.h"
 #include "myarrow.h"
@@ -670,9 +671,14 @@ void MyGraphicsView::updateActions()
         ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(false);
+//        ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID)->setEnabled(false);
+//        ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID)->setEnabled(false);
+
     }
     else if(selectedSize == 1)
     {
+        QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
+
         ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(true);
@@ -684,17 +690,13 @@ void MyGraphicsView::updateActions()
         ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
-
-        QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
+        ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID)->setEnabled(false);
+        ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID)->setEnabled(false);
 
         if(itemName == TYPE_ID(MyItem))
         {
             MyItem * myItem = dynamic_cast<MyItem *>(myScene->selectedItems().first());
             property = myItem->getProperty();
-
-//            bool lock = myItem->isMoveable();
-//            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(lock);
-//            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(!lock);
             getSelectedLockState();
         }
         else if(itemName == TYPE_ID(MyTextItem))
@@ -709,6 +711,8 @@ void MyGraphicsView::updateActions()
         {
             MyArrow  * arrowItem = dynamic_cast<MyArrow *>(myScene->selectedItems().first());
             property = arrowItem->getProperty();
+            AddLineType startType = arrowItem->getStartLineType();
+            AddLineType endType = arrowItem->getEndLineType();
 
             ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
             ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
@@ -720,11 +724,25 @@ void MyGraphicsView::updateActions()
             ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
             ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
             ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
+
+            ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID)->updateIndex((int)startType);
+            ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID)->updateIndex((int)endType);
+
+            ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID)->setEnabled(true);
+            ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID)->setEnabled(true);
         }
         else if(itemName == TYPE_ID(MyNodePort))
         {
-//            MyNodePort  * nodePort = dynamic_cast<MyNodePort *>(myScene->selectedItems().first());
-//            property = nodePort->getProperty();
+            ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
+
+            ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         }
     }
     else
@@ -739,6 +757,8 @@ void MyGraphicsView::updateActions()
         ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
+        ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID)->setEnabled(false);
+        ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(true);
 
         //获取锁定状态
@@ -796,6 +816,29 @@ void MyGraphicsView::getSelectedLockState()
         lockState = ITEM_NOT_ALL_LOCK;
         ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(true);
         ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(true);
+    }
+}
+
+//设置选中线条的样式
+void MyGraphicsView::setSelectedLineType(int type)
+{
+    if(myScene->selectedItems().size() == 1)
+    {
+        QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
+        if(itemName == TYPE_ID(MyArrow))
+        {
+            MyArrow  * arrowItem = dynamic_cast<MyArrow *>(myScene->selectedItems().first());
+
+            QString objName = QObject::sender()->objectName();
+            if(objName == QString(Constants::LEFT_LINE_ID))
+            {
+                arrowItem->setStartLineType(type);
+            }
+            else if(objName == QString(Constants::RIGHT_LINE_ID))
+            {
+                arrowItem->setEndLineType(type);
+            }
+        }
     }
 }
 

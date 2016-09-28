@@ -4,10 +4,10 @@
 #include <QHBoxLayout>
 #include <QDebug>
 
-#include "listitemmanager.h"
+#include "../manager/listitemmanager.h"
 #include "mylistwidget.h"
-#include "listitemmanager.h"
 #include "../Constants.h"
+#include "../Header.h"
 
 using namespace Graphics;
 

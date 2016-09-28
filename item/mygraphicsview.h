@@ -13,6 +13,7 @@
 **             增加清空剪切板功能
 **20160923:wey:增加拖入清除控件选择
 **             增加Ctrl+滚轮缩小视图
+**20160928:wey:增加更新选中线条类型
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -79,6 +80,7 @@ private slots:
     void updateActions();
     void editTextItem();
     void respPropertyUpdate(ItemProperty property);
+    void setSelectedLineType(int type);
 
 private:
     void initView();

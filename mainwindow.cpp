@@ -12,14 +12,14 @@
 #include <QKeyEvent>
 #include <QDebug>
 
-#include "actionmanager.h"
+#include "./manager/actionmanager.h"
 #include "item/myscene.h"
 #include "./item/mygraphicsview.h"
 #include "./SelfWidget/myslider.h"
 #include "./SelfWidget/lefticonwidget.h"
 #include "./SelfWidget/hidesplit.h"
 #include "./SelfWidget/righttoolbox.h"
-#include "./SelfWidget/MyLineComboBox.h"
+#include "./manager/MyLineComboBox.h"
 #include "fileoperate.h"
 #include "global.h"
 #include "util.h"
@@ -476,14 +476,21 @@ void MainWindow::respRestItemAction()
 //创建线条自定义下拉框，如果不需要使用文字，那么直接添加NULL
 void MainWindow::createLineComboBox()
 {
-    startLineBox = new MyLineComboBox;
+    MyLineComboBox * startLineBox = ComboBoxManager::instance()->addItem(Constants::LEFT_LINE_ID);
+    MyLineComboBox * endLineBox = ComboBoxManager::instance()->addItem(Constants::RIGHT_LINE_ID);
+
     startLineBox->addItem(QIcon(":/images/arrow/leftLine.png"),NULL);
     startLineBox->addItem(QIcon(":/images/arrow/leftArrow.png"),NULL);
     startLineBox->addItem(QIcon(":/images/arrow/leftSolidTriangle.png"),NULL);
-    endLineBox = new MyLineComboBox;
+
     endLineBox->addItem(QIcon(":/images/arrow/rightLine.png"),NULL);
     endLineBox->addItem(QIcon(":/images/arrow/rightArrow.png"),NULL);
     endLineBox->addItem(QIcon(":/images/arrow/rightSolidTriangle.png"),NULL);
+
+    connect(startLineBox,SIGNAL(indexChanged(int)),MyGraphicsView::instance(),SLOT(setSelectedLineType(int)));
+    connect(endLineBox,SIGNAL(indexChanged(int)),MyGraphicsView::instance(),SLOT(setSelectedLineType(int)));
+    startLineBox->setEnabled(false);
+    endLineBox->setEnabled(false);
 }
 
 //创建工具栏
@@ -521,8 +528,8 @@ void MainWindow::createToolBar()
     editBar->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::LOCK_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
-    editBar->addWidget(startLineBox);
-    editBar->addWidget(endLineBox);
+    editBar->addWidget(ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID));
+    editBar->addWidget(ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
 
     QToolBar * sceneBar = addToolBar("Scene");

@@ -29,6 +29,8 @@ const char DELETE_ID[] = "Constants.Delte";
 const char LOCK_ID[] = "Constants.Lock";
 const char UNLOCK_ID[] = "Constants.UnLock";
 const char DRAG_ABLE_ID[] = "Constants.Dragable";
+const char LEFT_LINE_ID[] = "Constants.LeftLine";
+const char RIGHT_LINE_ID[] = "Constants.RightLine";
 
 //¿Ø¼þ
 const char ARROW_ID[] = "Constants.Arrow";

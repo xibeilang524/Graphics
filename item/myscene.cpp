@@ -130,6 +130,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 {
                     MyArrow *arrow = new MyArrow(startItem, endItem);
                     connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+                    connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
                     startItem->addArrow(arrow);
                     endItem->addArrow(arrow);
                     arrow->setZValue(-1000.0);
@@ -146,6 +147,8 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 {
                     MyArrow *arrow = new MyArrow(startItem, endItem);
                     connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+                    connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+
                     startItem->addArrow(arrow);
                     endItem->addArrow(arrow);
                     arrow->setZValue(-1000.0);
@@ -276,6 +279,8 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
                 MyItem * endItem = localItems.at(endIndex);
 
                 MyArrow *arrow = new MyArrow(startItem, endItem);
+                connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+                connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
 
                 startItem->addArrow(arrow);
                 endItem->addArrow(arrow);
@@ -298,6 +303,8 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
                 MyNodePort * endNode = localNodeports.at(endIndex);
 
                 MyArrow *arrow = new MyArrow(startNode, endNode);
+                connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+                connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
 
                 startNode->addArrow(arrow);
                 endNode->addArrow(arrow);

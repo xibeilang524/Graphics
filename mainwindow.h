@@ -36,7 +36,6 @@ class MySlider;
 class RightToolBox;
 class LeftIconWidget;
 class HideSplit;
-class MyLineComboBox;
 
 namespace Ui {
 class MainWindow;
@@ -83,8 +82,6 @@ private:
     QActionGroup * itemGroup;
 
     MySlider * mySlider;
-    MyLineComboBox * startLineBox;
-    MyLineComboBox * endLineBox;
     MyGraphicsView * view;
     LeftIconWidget * leftIconWidget;
     RightToolBox * rightToolBox;

@@ -111,6 +111,20 @@ void MyArrow::setProperty(ItemProperty property)
     update();
 }
 
+//设置起点的条类型
+void MyArrow::setStartLineType(int type)
+{
+    this->property.startLineType = (AddLineType)type;
+    emit updateSceneDraw();
+}
+
+//设置终点的条类型
+void MyArrow::setEndLineType(int type)
+{
+    this->property.endLineType = (AddLineType)type;
+    emit updateSceneDraw();
+}
+
 void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
@@ -121,35 +135,14 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     if(property.lineType == LINE_MYITEM && startItem && endItem)
     {
         QLineF centerLine(startItem->pos(), endItem->pos());
-        QPolygonF endPolygon = endItem->polygon();
-        //将polygons中item的坐标系转换成scene的坐标系，支持即使控件旋转后依然可以保持箭头指向某一边
-        QPointF p1 = endItem->mapToScene(endPolygon.first());
-        QPointF p2;
-        QPointF intersectPoint;
-        QLineF polyLine;
-        //计算起点多边形的中点和终点多边形的交点
-        for (int i = 1; i <= endPolygon.count(); ++i)
-        {
-            //最后一个需要和第一个进行连线
-            if(i == endPolygon.count())
-            {
-                p1 = endItem->mapToScene(endPolygon.first());
-            }
-            else
-            {
-                p2 = endItem->mapToScene(endPolygon.at(i));
-            }
+//        qDebug()<<centerLine;
+        QPointF endCrossPoint;
+        countItemCrossPoint(true,endItem->polygon(),centerLine,endCrossPoint);
 
-            polyLine = QLineF(p1, p2);
-            QLineF::IntersectType intersectType = polyLine.intersect(centerLine, &intersectPoint);
-            if (intersectType == QLineF::BoundedIntersection)
-            {
-                break;
-            }
-            p1 = p2;
-        }
-        //将交点和起点作为线段的端点
-        setLine(QLineF(intersectPoint, startItem->pos()));
+        QPointF startCrossPoint;
+        countItemCrossPoint(false,startItem->polygon(),centerLine,startCrossPoint);
+
+        setLine(QLineF(endCrossPoint,startCrossPoint));
     }
     else if(property.lineType == LINE_NODEPORT && startNodePort && endNodePort)
     {
@@ -157,65 +150,52 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
         QPointF startPoint = startNodePort->getParentItem()->mapToScene(startNodePort->pos());
         QPointF endPoint = endNodePort->getParentItem()->mapToScene(endNodePort->pos());
 
-        painter->setPen(Qt::black);
         QLineF centerLine(startPoint, endPoint);
 
-        //获取终点端口各顶点在scene中的坐标
-        QPolygonF polygon = endNodePort->getScenePolygon();
+        QPointF endCrossPoint;
+        countNodeCrossPoint(endNodePort->getScenePolygon(),centerLine,endCrossPoint);
 
-        QPointF p1 = polygon.first();
-        QPointF p2;
-        QPointF intersectPoint;
-        QLineF polyLine;
-        //计算起点多边形的中点和终点多边形的交点
-        for (int i = 1; i <= polygon.count(); ++i)
-        {
-            //最后一个需要和第一个进行连线
-            if(i == polygon.count())
-            {
-                p1 = polygon.first();
-            }
-            else
-            {
-                p2 = polygon.at(i);
-            }
+        QPointF startCrossPoint;
+        countNodeCrossPoint(startNodePort->getScenePolygon(),centerLine,startCrossPoint);
 
-            polyLine = QLineF(p1, p2);
-            QLineF::IntersectType intersectType = polyLine.intersect(centerLine, &intersectPoint);
-            if (intersectType == QLineF::BoundedIntersection)
-            {
-                break;
-            }
-            p1 = p2;
-        }
-
-        setLine(QLineF(intersectPoint,startPoint));
-        painter->drawLine(line());
+        setLine(QLineF(endCrossPoint,startCrossPoint));
     }
 
-    //绘制箭头
-    qreal arrowSize = 20;
+    painter->setPen(property.itemPen);
+    painter->drawLine(line());
 
-    double angle = ::acos(line().dx() / line().length());
-    if (line().dy() >= 0)
+    //起点
+    if(property.startLineType == LINE_HORIZONTAL)
     {
-        angle = (Pi * 2) - angle;
+
+    }
+    else if(property.startLineType == LINE_ARROW)
+    {
+
+    }
+    else if(property.startLineType == LINE_SOLID_TRIANGLE)
+    {
+        QPolygonF polygon = countArrowPolygon(line().p2(),true);
+        painter->setBrush(property.itemBrush);
+        painter->drawPolygon(polygon);
     }
 
-        QPointF arrowP1 = line().p1() + QPointF(sin(angle + Pi / 3) * arrowSize,
-                                        cos(angle + Pi / 3) * arrowSize);
-        QPointF arrowP2 = line().p1() + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,
-                                        cos(angle + Pi - Pi / 3) * arrowSize);
+    //终点
+    if(property.endLineType == LINE_HORIZONTAL)
+    {
 
-        arrowHead.clear();
-        //p1()线段的起点
-        arrowHead << line().p1() << arrowP1 << arrowP2;
+    }
+    else if(property.endLineType == LINE_ARROW)
+    {
 
-        painter->setPen(property.itemPen);
-        painter->drawLine(line());
+    }
+    else if(property.endLineType == LINE_SOLID_TRIANGLE)
+    {
+        QPolygonF polygon = countArrowPolygon(line().p1(),false);
 
         painter->setBrush(property.itemBrush);
-        painter->drawPolygon(arrowHead);
+        painter->drawPolygon(polygon);
+    }
 
     if (isSelected())
     {
@@ -230,6 +210,105 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     myTextItem->setCentralPos((line().p1()+line().p2())/2);
 
     painter->restore();
+}
+
+//计算箭头
+QPolygonF MyArrow::countArrowPolygon(QPointF startPoint,bool isStart)
+{
+    qreal arrowSize = 15;
+
+    double angle = ::acos(line().dx() / line().length());
+
+    if (line().dy() >= 0)
+    {
+        angle = (Pi * 2) - angle;
+    }
+
+    QPointF arrowP1,arrowP2;
+
+    if(isStart)
+    {
+        arrowP1 = startPoint - QPointF(sin(angle + Pi / 3) * arrowSize,cos(angle + Pi / 3) * arrowSize);
+        arrowP2 = startPoint - QPointF(sin(angle + Pi - Pi / 3) * arrowSize,cos(angle + Pi - Pi / 3) * arrowSize);
+    }
+    else
+    {
+        arrowP1 = startPoint + QPointF(sin(angle + Pi / 3) * arrowSize,cos(angle + Pi / 3) * arrowSize);
+        arrowP2 = startPoint + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,cos(angle + Pi - Pi / 3) * arrowSize);
+    }
+    QPolygonF  polygon;
+    polygon << startPoint << arrowP1 << arrowP2;
+
+    return polygon;
+}
+
+//计算端口交叉点的坐标
+void MyArrow::countNodeCrossPoint(QPolygonF polygon,QLineF centerLine,QPointF &endIntersectPoint)
+{
+    QPointF p1 = polygon.first();
+    QPointF p2;
+    QLineF polyLine;
+    //计算起点多边形的中点和终点多边形的交点
+    for (int i = 1; i <= polygon.count(); ++i)
+    {
+        //最后一个需要和第一个进行连线
+        if(i == polygon.count())
+        {
+            p1 = polygon.first();
+        }
+        else
+        {
+            p2 = polygon.at(i);
+        }
+
+        polyLine = QLineF(p1, p2);
+        QLineF::IntersectType intersectType = polyLine.intersect(centerLine, &endIntersectPoint);
+        if (intersectType == QLineF::BoundedIntersection)
+        {
+            break;
+        }
+        p1 = p2;
+    }
+}
+
+//计算交叉点的坐标
+void MyArrow::countItemCrossPoint(bool isStart , QPolygonF polygon,QLineF centerLine,QPointF &intersectPoint)
+{
+    //将polygons中item的坐标系转换成scene的坐标系，支持即使控件旋转后依然可以保持箭头指向某一边
+    MyItem * tmpItem;
+    if(isStart)
+    {
+        tmpItem = startItem;
+    }
+    else
+    {
+        tmpItem = endItem;
+    }
+
+    QPointF p1 = tmpItem->mapToScene(polygon.first());
+    QPointF p2;
+    QLineF polyLine;
+    //计算起点多边形的中点和终点多边形的交点
+    for (int i = 1; i <= polygon.count(); ++i)
+    {
+        //最后一个需要和第一个进行连线
+        if(i == polygon.count())
+        {
+            p1 = tmpItem->mapToScene(polygon.first());
+        }
+        else
+        {
+            p2 = tmpItem->mapToScene(polygon.at(i));
+        }
+
+        polyLine = QLineF(p1, p2);
+        QLineF::IntersectType intersectType = polyLine.intersect(centerLine, &intersectPoint);
+        if (intersectType == QLineF::BoundedIntersection)
+        {
+            break;
+        }
+        p1 = p2;
+    }
 }
 
 //更新线段的位置

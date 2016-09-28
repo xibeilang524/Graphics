@@ -39,16 +39,46 @@ QDataStream & operator >>(QDataStream &stream,MyRect & rect)
     return stream;
 }
 
+QDataStream & operator <<(QDataStream &stream,LineType & type)
+{
+    int tmp = (int)type;
+    stream<<tmp;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream &stream,LineType & type)
+{
+    int tmp;
+    stream>>tmp;
+    type = (LineType)tmp;
+    return stream;
+}
+
+QDataStream & operator <<(QDataStream &stream,AddLineType & type)
+{
+    int tmp = (int)type;
+    stream<<tmp;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream &stream,AddLineType & type)
+{
+    int tmp;
+    stream>>tmp;
+    type = (AddLineType)tmp;
+    return stream;
+}
+
 ////写入属性
 QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 {
-    int lineType = (int)prop.lineType;
     stream<<prop.startItemID<<prop.endItemID
            <<prop.isNeedBrush<<prop.itemBrush
             <<prop.isNeedBorder<<prop.itemPen<<prop.itemRect
              <<prop.alphaValue<<prop.rotateDegree
               <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor
-               <<prop.zValue<<lineType<<prop.isMoveable;
+               <<prop.zValue<<prop.lineType<<prop.startLineType<<prop.endLineType
+                <<prop.isMoveable;
 
     return stream;
 }
@@ -56,15 +86,13 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 ////读属性
 QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
 {
-    int lineType = 0;
     stream>>prop.startItemID>>prop.endItemID
            >>prop.isNeedBrush>>prop.itemBrush
             >>prop.isNeedBorder>>prop.itemPen>>prop.itemRect
              >>prop.alphaValue>>prop.rotateDegree
               >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor
-               >>prop.zValue>>lineType>>prop.isMoveable;
-
-    prop.lineType = (LineType)lineType;
+               >>prop.zValue>>prop.lineType>>prop.startLineType>>prop.endLineType
+                >>prop.isMoveable;
 
     return stream;
 }
@@ -1030,6 +1058,8 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
         qreal tmpX,tmpY,tmpW,tmpH;
         //移动后中心点的x、y
         qreal centerX,centerY;
+        //当前旋转的角度
+        qreal rotateDegree = rotation();
 
         qreal  factor = w / h;
 
@@ -1050,8 +1080,17 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                         tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
-                        centerX = rightBottomX - tmpW/2;
-                        centerY = rightBottomY - tmpH/2;
+                        if(rotateDegree == 0)
+                        {
+                            centerX = rightBottomX - tmpW/2;
+                            centerY = rightBottomY - tmpH/2;
+                        }
+                        else
+                        {
+                            centerX = rightBottomX - (tmpW/2)*QCOS(rotateDegree);
+                            centerY = rightBottomY - (tmpH/2)*QSIN(rotateDegree);
+                        }
+//                        qDebug()<<px<<"_"<<py<<"_"<<tmpW<<"_"<<tmpH<<"__"<<centerX<<"__"<<centerY<<"__"<<rightBottomX<<"__"<<rightBottomY;
                         prepareGeometryChange();
                         boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
                     }

@@ -11,6 +11,7 @@
 **20160908:wey:支持控件旋转后，箭头依然与控件边相连
 **20160920:wey:添加端口箭头绘制
 **20160927:wey:添加文字信息
+**20160928:wey:添加对箭头类型的切换
 *************************************************/
 #ifndef MYARROW_H
 #define MYARROW_H
@@ -20,7 +21,6 @@
 #include <QDataStream>
 
 #include "../Header.h"
-#include "ItemHeader.h"
 
 #include <QObject>
 
@@ -45,6 +45,12 @@ public:
     MyItem * getStartItem() const{ return startItem; }
     MyItem * getEndItem() const{ return endItem; }
 
+    AddLineType getStartLineType(){return this->property.startLineType;}
+    void setStartLineType(int type);
+
+    AddLineType getEndLineType(){return this->property.endLineType;}
+    void setEndLineType(int type);
+
     MyNodePort * getStartNodePort() const{return this->startNodePort;}
     MyNodePort * getEndNodePort() const{return this->endNodePort;}
 
@@ -61,11 +67,16 @@ public:
 
 signals:
     void editMe();
+    void updateSceneDraw();
 
 protected:
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 
 private:
+    void countNodeCrossPoint(QPolygonF polygon,QLineF centerLine,QPointF &endIntersectPoint);
+    void countItemCrossPoint(bool isStart, QPolygonF polygon, QLineF centerLine, QPointF &endIntersectPoint);
+    QPolygonF countArrowPolygon(QPointF startPoint, bool isStart);
+
     void createTextItem();
 
     MyItem  * startItem;

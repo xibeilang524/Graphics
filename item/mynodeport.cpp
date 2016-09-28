@@ -8,7 +8,7 @@
 
 #include "myitem.h"
 #include "myarrow.h"
-#include "../actionmanager.h"
+#include "../manager/actionmanager.h"
 
 using namespace Graphics;
 

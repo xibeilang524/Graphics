@@ -3,7 +3,7 @@
 
 #include <QTextCodec>
 
-#include "actionmanager.h"
+#include "./manager/actionmanager.h"
 #include "SelfWidget/hidesplit.h"
 #include "global.h"
 

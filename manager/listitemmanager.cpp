@@ -66,7 +66,6 @@ MyListItem* ListItemManager::createListItem(const char *name, QListWidget *paren
         return listItemMap.value(name);
     }
     MyListItem * item  = new MyListItem(parent);
-
     listItemMap.insert(Id(name),item);
 
     return item;
