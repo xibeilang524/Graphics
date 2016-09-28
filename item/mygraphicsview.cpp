@@ -159,7 +159,7 @@ void MyGraphicsView::wheelEvent(QWheelEvent *event)
 
 void MyGraphicsView::mousePressEvent(QMouseEvent *event)
 {
-    if(viewIsDragable)
+    if(viewIsDragable && myScene->selectedItems().size()==0 )
     {
         pressPoint = event->pos();
 
@@ -188,11 +188,12 @@ void MyGraphicsView::mouseMoveEvent(QMouseEvent *event)
     QGraphicsView::mouseMoveEvent(event);
 }
 
+//先交由系统处理，在控件上鼠标释放时，控件先捕获。
 void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 {
+    QGraphicsView::mouseReleaseEvent(event);
     isMoving = false;
     setCursor(Qt::ArrowCursor);
-    QGraphicsView::mouseReleaseEvent(event);
 }
 
 //右键菜单事件【先判断scene当前鼠标点下是否存在item，如果没有view再响应】

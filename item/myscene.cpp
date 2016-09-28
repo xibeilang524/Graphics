@@ -157,6 +157,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     }
     else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
     {
+
     }
     insertTmpLine = 0;
     insertTmpPath = NULL;
@@ -279,6 +280,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
                 startItem->addArrow(arrow);
                 endItem->addArrow(arrow);
                 arrow->setZValue(-1000.0);
+                arrow->setProperty(cutInfo.itemProperty);
 
                 arrow->updatePosition();
                 addItem(arrow);
@@ -300,6 +302,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
                 startNode->addArrow(arrow);
                 endNode->addArrow(arrow);
                 arrow->setZValue(-1000.0);
+                arrow->setProperty(cutInfo.itemProperty);
 
                 arrow->updatePosition();
                 addItem(arrow);

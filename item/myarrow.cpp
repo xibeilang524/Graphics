@@ -63,6 +63,7 @@ MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *pa
 
     type = GRA_LINE;
     property.itemBrush = QBrush(Qt::black);
+    property.itemPen = QPen(Qt::black,2);
     //直线保存两端控件的引用
     property.startItemID = startItem->getNodeProperty().startItemID;
     property.endItemID = endItem->getNodeProperty().startItemID;
@@ -98,10 +99,15 @@ QPainterPath MyArrow::shape()const
     return path;
 }
 
+//更新样式属性
 void MyArrow::setProperty(ItemProperty property)
 {
     this->property = property;
-
+    myTextItem->setProperty(property);
+    if(property.content.size() > 0)
+    {
+        setText(property.content);
+    }
     update();
 }
 
