@@ -75,6 +75,7 @@ protected:
 private:
     void countNodeCrossPoint(QPolygonF polygon,QLineF centerLine,QPointF &endIntersectPoint);
     void countItemCrossPoint(bool isStart, QPolygonF polygon, QLineF centerLine, QPointF &endIntersectPoint);
+    void countArrowPoint(bool isStart, QPointF &startPoint, QPointF &point1, QPointF &point2);
     QPolygonF countArrowPolygon(QPointF startPoint, bool isStart);
 
     void createTextItem();

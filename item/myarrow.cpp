@@ -12,6 +12,7 @@
 #include "math.h"
 
 const qreal Pi = 3.14;
+#define ARROW_SIZE 15
 
 QDataStream & operator <<(QDataStream &stream,MyArrow * item)
 {
@@ -171,7 +172,10 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     }
     else if(property.startLineType == LINE_ARROW)
     {
-
+        QPointF arrowP1,arrowP2;
+        countArrowPoint(true,line().p2(),arrowP1,arrowP2);
+        painter->drawLine(line().p2(),arrowP1);
+        painter->drawLine(line().p2(),arrowP2);
     }
     else if(property.startLineType == LINE_SOLID_TRIANGLE)
     {
@@ -187,7 +191,10 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     }
     else if(property.endLineType == LINE_ARROW)
     {
-
+        QPointF arrowP1,arrowP2;
+        countArrowPoint(false,line().p1(),arrowP1,arrowP2);
+        painter->drawLine(line().p1(),arrowP1);
+        painter->drawLine(line().p1(),arrowP2);
     }
     else if(property.endLineType == LINE_SOLID_TRIANGLE)
     {
@@ -215,8 +222,17 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 //计算箭头
 QPolygonF MyArrow::countArrowPolygon(QPointF startPoint,bool isStart)
 {
-    qreal arrowSize = 15;
+    QPointF arrowP1,arrowP2;
+    countArrowPoint(isStart,startPoint,arrowP1,arrowP2);
 
+    QPolygonF  polygon;
+    polygon << startPoint << arrowP1 << arrowP2;
+
+    return polygon;
+}
+
+void MyArrow::countArrowPoint(bool isStart,QPointF & startPoint,QPointF & point1, QPointF & point2)
+{
     double angle = ::acos(line().dx() / line().length());
 
     if (line().dy() >= 0)
@@ -224,22 +240,16 @@ QPolygonF MyArrow::countArrowPolygon(QPointF startPoint,bool isStart)
         angle = (Pi * 2) - angle;
     }
 
-    QPointF arrowP1,arrowP2;
-
     if(isStart)
     {
-        arrowP1 = startPoint - QPointF(sin(angle + Pi / 3) * arrowSize,cos(angle + Pi / 3) * arrowSize);
-        arrowP2 = startPoint - QPointF(sin(angle + Pi - Pi / 3) * arrowSize,cos(angle + Pi - Pi / 3) * arrowSize);
+        point1 = startPoint - QPointF(sin(angle + Pi / 3) * ARROW_SIZE,cos(angle + Pi / 3) * ARROW_SIZE);
+        point2 = startPoint - QPointF(sin(angle + Pi - Pi / 3) * ARROW_SIZE,cos(angle + Pi - Pi / 3) * ARROW_SIZE);
     }
     else
     {
-        arrowP1 = startPoint + QPointF(sin(angle + Pi / 3) * arrowSize,cos(angle + Pi / 3) * arrowSize);
-        arrowP2 = startPoint + QPointF(sin(angle + Pi - Pi / 3) * arrowSize,cos(angle + Pi - Pi / 3) * arrowSize);
+        point1 = startPoint + QPointF(sin(angle + Pi / 3) * ARROW_SIZE,cos(angle + Pi / 3) * ARROW_SIZE);
+        point2 = startPoint + QPointF(sin(angle + Pi - Pi / 3) * ARROW_SIZE,cos(angle + Pi - Pi / 3) * ARROW_SIZE);
     }
-    QPolygonF  polygon;
-    polygon << startPoint << arrowP1 << arrowP2;
-
-    return polygon;
 }
 
 //计算端口交叉点的坐标
