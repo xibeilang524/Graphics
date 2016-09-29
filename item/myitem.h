@@ -136,7 +136,8 @@ private:
     MyNodePort * createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);
     DragDirect getDropDirect(const QPointF &currPoint);
     qreal getLoopMaxSidLength(qreal width, qreal height);
-
+    void setInitalPolygon(QRectF boundRect, qreal tx, qreal ty, qreal tw, qreal th);
+    void initComponentItem();
     int radius;
 
     GraphicsType currItemType;

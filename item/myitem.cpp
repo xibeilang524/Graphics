@@ -26,6 +26,7 @@
 #define CROSS_RADIUS 8        //绘制拖入十字星半径
 #define POINT_FIVE   0.5      //控件竖直和水平的长度比例，用于绘制矩形等非等边图形
 #define POINT_TWO_FIVE 0.25
+#define POINT_ONE_EIGHTH 0.125
 #define ANNOTATION_SHORT_LINE  7     //注解短边的长度
 #define MAX_LOOP_RADIUS    25        //注解短边最大长度
 
@@ -136,95 +137,35 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     setFlag(QGraphicsItem::ItemIsSelectable,true);
     setFlag(QGraphicsItem::ItemSendsGeometryChanges,true);
     setAcceptDrops(true);
+    setAcceptHoverEvents(true);
 
     prepareGeometryChange();
 
     switch(currItemType)
     {
-            //正方形
-            case GRA_SQUARE:
-                               boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
-                               itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)<<
-                                      QPointF(radius,radius)<<QPointF(-radius,radius);
-                               break;
-            //矩形
-            case GRA_RECT:
-            case GRA_ANNOTATION:
-            case GAR_PARALLE:
-                               boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
-                               itemPolygon<<QPointF(-radius,-POINT_FIVE*radius)<<QPointF(radius,-POINT_FIVE*radius)<<
-                                       QPointF(radius,POINT_FIVE*radius)<<QPointF(-radius,POINT_FIVE*radius);
-                               break;
-           //圆角矩形
-           case GRA_ROUND_RECT:
-                              {
-                                  boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
-                                  QPainterPath path;
-                                  path.addRoundedRect(boundRect,10,10);
-                                  itemPolygon = path.toFillPolygon();
-                              }
-                              break;
-            //圆形
-            case GRA_CIRCLE:
-                               {
-                                   boundRect = QRectF(-POINT_FIVE*radius,-POINT_FIVE*radius,radius,radius);
-                                   QPainterPath path;
-                                   path.addEllipse(boundRect);
-                                   itemPolygon = path.toFillPolygon();
-                               }
-                               break;
-            //椭圆
-            case GRA_ELLIPSE:
-                               {
-                                   boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
-                                   QPainterPath path;
-                                   path.addEllipse(boundRect);
-                                   itemPolygon = path.toFillPolygon();
-                               }
-                               break;
-            //菱形
-            case GRA_POLYGON:
-                               boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
-
-                               itemPolygon<<QPointF(-radius,0)<<QPointF(0,-POINT_FIVE*radius)<<
-                                         QPointF(radius,0)<<QPointF(0,POINT_FIVE*radius);
-                               break;
-            //平行四边形
-            case GRA_PARALLELOGRAM:
-                              boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
-
-                              itemPolygon<<QPointF(-POINT_FIVE*radius,-POINT_FIVE*radius)<<QPointF(radius,-POINT_FIVE*radius)<<
-                                        QPointF(POINT_FIVE*radius,POINT_FIVE*radius)<<QPointF(-radius,POINT_FIVE*radius);
-                              break;
-
-            //循环上限
-            case GRA_LOOP_UP:
-                            {
-                                boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
-
-                                qreal loopWith = getLoopMaxSidLength(2*radius,radius);
-
-                                itemPolygon<<QPointF(-radius+loopWith,-POINT_FIVE*radius)<<QPointF(radius-loopWith,-POINT_FIVE*radius)
-                                            <<QPointF(radius,-POINT_FIVE*radius+loopWith)<<QPointF(radius,POINT_FIVE*radius)
-                                             <<QPointF(-radius,POINT_FIVE*radius)<<QPointF(-radius,-POINT_FIVE*radius+loopWith);
-                            }
-                              break;
-
-           //循环下限
-           case GRA_LOOP_DOWN:
-                            {
-                                boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
-
-                                qreal loopWith = getLoopMaxSidLength(2*radius,radius);
-
-                                itemPolygon<<QPointF(-radius,-POINT_FIVE*radius)<<QPointF(radius,-POINT_FIVE*radius)
-                                            <<QPointF(radius,POINT_FIVE*radius-loopWith)<<QPointF(radius-loopWith,POINT_FIVE*radius)
-                                             <<QPointF(-radius+loopWith,POINT_FIVE*radius)<<QPointF(-radius,POINT_FIVE*radius-loopWith);
-                            }
-                              break;
+        case GRA_SQUARE:
+                           boundRect = QRectF(-radius,-radius,2*radius,2*radius);   //设置范围时同时也默认指定了其中心点坐标(0,0)
+                           break;
+        case GRA_RECT:
+        case GRA_ANNOTATION:
+        case GRA_ROUND_RECT:
+        case GRA_ELLIPSE:
+        case GRA_POLYGON:
+        case GRA_PARALLELOGRAM:
+        case GRA_LOOP_UP:
+        case GRA_LOOP_DOWN:
+                             boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
+                             break;
+        case GRA_CIRCLE:
+                             boundRect = QRectF(-POINT_FIVE*radius,-POINT_FIVE*radius,radius,radius);
+                             break;
+        case GAR_PARALLE:
+                             boundRect = QRectF(-radius,-POINT_ONE_EIGHTH*radius,2*radius,POINT_TWO_FIVE*radius);
+                             break;
     }
+    //【!!初始化不同类型图形】
+    setInitalPolygon(boundRect,boundRect.width()/2,boundRect.height()/2,boundRect.width(),boundRect.height());
 
-    setPolygon(itemPolygon);
     setBrush(property.itemBrush);
 
     property.isMoveable = true;         //默认可以移动
@@ -244,13 +185,19 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     selectedPen.setStyle(Qt::DashLine);
     selectedPen.setWidth(selectedPenWidth);
 
+    initComponentItem();
+}
+
+//初始化子控件
+void MyItem::initComponentItem()
+{
     //旋转线条
     rotateLine = new RotateLine(this);
     connect(rotateLine,SIGNAL(rotateItem(MouseType,qreal)),this,SLOT(procRotate(MouseType,qreal)));
     updateRotateLinePos();
 
     //文字信息
-    myTextItem = new MyTextItem(GRA_TEXT,menu,this);
+    myTextItem = new MyTextItem(GRA_TEXT,rightMenu,this);
     connect(myTextItem,SIGNAL(updateTextGeometry()),this,SLOT(procUpdateTextGeometry()));
 
     myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
@@ -269,9 +216,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     rightPoint = new DragPoint(MIDDLE_RIGHT,this);
     bottomPoint = new DragPoint(BOTTOM_MIDDLE,this);
 
-    setAcceptHoverEvents(true);
     setDragPointVisible(false);
-
     procResizeItem();
 }
 
@@ -483,11 +428,16 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     rightMenu->exec(event->screenPos());
 }
 
-//拖入事件
+//拖入事件(注释/并行不允许拖入)
 void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 {
     if(event->mimeData()->hasFormat("MyItem"))
     {
+        if(currItemType == GRA_ANNOTATION || currItemType == GAR_PARALLE)
+        {
+             event->ignore();
+             return;
+        }
         QByteArray array = event->mimeData()->data("MyItem");
         QDataStream stream(&array, QIODevice::ReadOnly);//流，读数据
 
@@ -1496,6 +1446,16 @@ void MyItem::resetPolygon()
     prepareGeometryChange();
     boundRect = QRectF(-tx,-ty,tw,th);
 
+    setInitalPolygon(boundRect,tx,ty,tw,th);
+
+    procResizeItem();
+    updateRotateLinePos();
+    procResizeNodePort();
+}
+
+//设置初始的多边形
+void MyItem::setInitalPolygon(QRectF boundRect,qreal tx,qreal ty,qreal tw,qreal th)
+{
     itemPolygon.clear();
 
     switch(currItemType)
@@ -1570,10 +1530,6 @@ void MyItem::resetPolygon()
                                break;
     }
     setPolygon(itemPolygon);
-
-    procResizeItem();
-    updateRotateLinePos();
-    procResizeNodePort();
 }
 
 //左旋转或者右旋转后更新当前属性的旋转角度值

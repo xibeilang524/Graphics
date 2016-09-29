@@ -13,7 +13,8 @@
 **20160927:wey:添加文字信息
 **20160928:wey:添加对箭头类型的切换
 **20150929:wey:修复缩放控件时导致箭头长度不变问题
-**
+**             修复箭头方向不正确问题
+**             添加鼠标进入和离开改变样式，方便状态显示
 *************************************************/
 #ifndef MYARROW_H
 #define MYARROW_H
@@ -72,6 +73,8 @@ signals:
     void updateSceneDraw();
 
 protected:
+    void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
+    void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
 
 private:

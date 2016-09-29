@@ -3,6 +3,7 @@
 #include <QPainter>
 #include <QRectF>
 #include <QLineF>
+#include <QCursor>
 #include <QDebug>
 
 #include "myitem.h"
@@ -82,6 +83,8 @@ void MyArrow::createTextItem()
     myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);
     myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
     myTextItem->cleartText();
+
+    setAcceptHoverEvents(true);
 }
 
 QRectF MyArrow::boundingRect()const
@@ -159,7 +162,7 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
         QPointF startCrossPoint;
         countNodeCrossPoint(startNodePort->getScenePolygon(),centerLine,startCrossPoint);
 
-        setLine(QLineF(endCrossPoint,startCrossPoint));
+        setLine(QLineF(startCrossPoint,endCrossPoint));
     }
 
     painter->setPen(property.itemPen);
@@ -173,13 +176,14 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     else if(property.startLineType == LINE_ARROW)
     {
         QPointF arrowP1,arrowP2;
-        countArrowPoint(true,line().p2(),arrowP1,arrowP2);
-        painter->drawLine(line().p2(),arrowP1);
-        painter->drawLine(line().p2(),arrowP2);
+        countArrowPoint(false,line().p1(),arrowP1,arrowP2);
+        painter->drawLine(line().p1(),arrowP1);
+        painter->drawLine(line().p1(),arrowP2);
     }
     else if(property.startLineType == LINE_SOLID_TRIANGLE)
     {
-        QPolygonF polygon = countArrowPolygon(line().p2(),true);
+        QPolygonF polygon = countArrowPolygon(line().p1(),false);
+
         painter->setBrush(property.itemBrush);
         painter->drawPolygon(polygon);
     }
@@ -192,14 +196,13 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     else if(property.endLineType == LINE_ARROW)
     {
         QPointF arrowP1,arrowP2;
-        countArrowPoint(false,line().p1(),arrowP1,arrowP2);
-        painter->drawLine(line().p1(),arrowP1);
-        painter->drawLine(line().p1(),arrowP2);
+        countArrowPoint(true,line().p2(),arrowP1,arrowP2);
+        painter->drawLine(line().p2(),arrowP1);
+        painter->drawLine(line().p2(),arrowP2);
     }
     else if(property.endLineType == LINE_SOLID_TRIANGLE)
     {
-        QPolygonF polygon = countArrowPolygon(line().p1(),false);
-
+        QPolygonF polygon = countArrowPolygon(line().p2(),true);
         painter->setBrush(property.itemBrush);
         painter->drawPolygon(polygon);
     }
@@ -341,6 +344,19 @@ void MyArrow::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     emit editMe();
     QGraphicsLineItem::mouseDoubleClickEvent(event);
+}
+
+// Û±ÍΩ¯»Î
+void MyArrow::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
+{
+    setCursor(Qt::PointingHandCursor);
+    QGraphicsLineItem::hoverEnterEvent(event);
+}
+
+void MyArrow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
+{
+    setCursor(Qt::ArrowCursor);
+    QGraphicsLineItem::hoverLeaveEvent(event);
 }
 
 QString MyArrow::getText()

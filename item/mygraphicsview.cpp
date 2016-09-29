@@ -344,7 +344,6 @@ void MyGraphicsView::copyItem()
             cutTmpInfo.content = item->getText();
             cutTmpInfo.nodeProperties.clear();
 
-            qDebug()<<item->getType();
             foreach (MyNodePort * node, item->getNodePorts())
             {
                 NodePortProperty  props;

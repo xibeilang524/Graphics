@@ -11,6 +11,7 @@
 #include "mytextitem.h"
 #include "mypathitem.h"
 #include "mynodeport.h"
+#include "../util.h"
 
 #include "typeinfo.h"
 
@@ -21,6 +22,7 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
     CurrAddGraType =  GRA_NONE;
     insertTmpLine = NULL;
     insertTmpPath = NULL;
+    isLocalFileOpened = false;
 
     setBackgroundBrush(QPixmap(":/images/backgroundRole.png"));
 }
@@ -142,6 +144,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 MyArrow *arrow = new MyArrow(startItem, endItem);
                 connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
                 connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+
                 startItem->addArrow(arrow);
                 endItem->addArrow(arrow);
                 arrow->setZValue(-1000.0);
@@ -220,6 +223,13 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
 //        connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
         item->setTextInteractionFlags(Qt::TextEditorInteraction);
+
+        //不是本地打开，需要手动的为每个图层指定一个纵向深度值。为了下次打开时候可以按照保存样式恢复
+        if(!isLocalFileOpened)
+        {
+            cutInfo.itemProperty.zValue = Util::getGlobalZValue();
+        }
+
         item->setProperty(cutInfo.itemProperty);
         if(isCopy)
         {
@@ -238,6 +248,11 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     {
         MyItem * item = new MyItem(cutInfo.graphicsType,rightMenu,this);
         addMyItemConnect(item);
+
+        if(!isLocalFileOpened)
+        {
+            cutInfo.itemProperty.zValue = Util::getGlobalZValue();
+        }
 
         item->setText(cutInfo.content);
         item->setProperty(cutInfo.itemProperty);
@@ -335,14 +350,32 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
 ///**Input:
 ///**Output:
 ///**Return:
-///**Others:
+///**Others:20160929:wey:调整对直线的解析，将直线放在其它控件之后添加
 ///****************************************************/
 void MyScene::addItem(QList<CutInfo *> &cutInfos)
 {
+    isLocalFileOpened = true;
+
+    QList<CutInfo *> lines;
+
     foreach (CutInfo * cutInfo, cutInfos)
+    {
+        if(cutInfo->graphicsType == GRA_LINE)
+        {
+            lines.push_back(cutInfo);
+        }
+        else
+        {
+            addItem(*cutInfo);
+        }
+    }
+
+    foreach (CutInfo * cutInfo, lines)
     {
         addItem(*cutInfo);
     }
+
+    isLocalFileOpened = false;
     localItems.clear();
     localNodeports.clear();
 }
@@ -352,6 +385,10 @@ void MyScene::addItem(GraphicsType type, QPointF pos)
     if(type == GRA_TEXT)
     {
         MyTextItem  * item = new MyTextItem(type,rightMenu);
+        if(!isLocalFileOpened)
+        {
+            item->setZValue(Util::getGlobalZValue());
+        }
         addMyTextConnect(item);
         item->setPos(pos);
         item->setSelected(true);
@@ -360,6 +397,10 @@ void MyScene::addItem(GraphicsType type, QPointF pos)
     else
     {
         MyItem * myItem = new MyItem(type,rightMenu,this);
+        if(!isLocalFileOpened)
+        {
+            myItem->setZValue(Util::getGlobalZValue());
+        }
         myItem->setPos(pos);
         addMyItemConnect(myItem);
         addItem(myItem);

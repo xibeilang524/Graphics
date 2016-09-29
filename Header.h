@@ -48,21 +48,21 @@ enum ReturnType
 enum GraphicsType
 {
     GRA_NONE,
-    GRA_SQUARE,
-    GRA_RECT,
-    GRA_ROUND_RECT,
-    GRA_CIRCLE,
-    GRA_ELLIPSE,
-    GRA_POLYGON,
+    GRA_SQUARE,          //正方形
+    GRA_RECT,            //矩形
+    GRA_ROUND_RECT,      //圆角矩形
+    GRA_CIRCLE,          //圆
+    GRA_ELLIPSE,         //椭圆
+    GRA_POLYGON,         //菱形
     GRA_PARALLELOGRAM,   //平行四边形
     GRA_LOOP_UP,         //循环上限
     GRA_LOOP_DOWN,       //循环下限
     GRA_ANNOTATION,      //注解
     GAR_PARALLE,         //并行
-    GRA_LINE,
-    GRA_VECTOR_LINE,
-    GRA_TEXT,
-    GRA_NODE_PORT
+    GRA_LINE,            //直线
+    GRA_VECTOR_LINE,     //折线
+    GRA_TEXT,            //文本
+    GRA_NODE_PORT        //端口
 };
 
 //拖入端口的方向

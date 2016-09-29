@@ -12,7 +12,6 @@
 #include <QDataStream>
 #include <QDebug>
 
-//#include "typeinfo.h"
 #include "typeinfo"
 
 FileOperate::FileOperate()
@@ -82,6 +81,7 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
 /**
  *本地解析文件,因端口NodePort的属性NodePortProperty是单独保存，需要依照类型来判断读取
 *读取完成后，直接将端口进行装配至每个Item中,使得调用层无需知晓具体的细节部分
+*同时记录加载文件中最大的Zvalue，再新添加item时，会置于所有层的顶部
 */
 ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
 {
@@ -103,6 +103,8 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
 
     QList<NodePortProperty > localNodePorts;
 
+    qreal maxZvalue = 0;
+
     //文件分类读取
     while(!stream.atEnd())
     {
@@ -122,9 +124,18 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
             CutInfo * info = new CutInfo;
             stream>>info->itemProperty;
             info->graphicsType = (GraphicsType)type;
+
+            if(info->itemProperty.zValue > maxZvalue)
+            {
+                maxZvalue = info->itemProperty.zValue;
+            }
+
             items.push_back(info);
         }
     }
+
+    //【记录打开文件中最大的深度】
+    GlobalItemZValue = maxZvalue;
 
     //端口装配
     if(localNodePorts.size() > 0)
