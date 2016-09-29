@@ -24,7 +24,10 @@
 #define QSIN(a) qSin(a*PI/180)
 
 #define CROSS_RADIUS 8        //绘制拖入十字星半径
-#define VER_HOR_SCALE 0.5     //控件竖直和水平的长度比例，用于绘制矩形等非等边图形
+#define POINT_FIVE   0.5      //控件竖直和水平的长度比例，用于绘制矩形等非等边图形
+#define POINT_TWO_FIVE 0.25
+#define ANNOTATION_SHORT_LINE  7     //注解短边的长度
+#define MAX_LOOP_RADIUS    25        //注解短边最大长度
 
 //对MyRect的输出进行重载
 QDataStream & operator <<(QDataStream &stream,MyRect & rect)
@@ -146,14 +149,16 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                break;
             //矩形
             case GRA_RECT:
-                               boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
-                               itemPolygon<<QPointF(-radius,-VER_HOR_SCALE*radius)<<QPointF(radius,-VER_HOR_SCALE*radius)<<
-                                       QPointF(radius,VER_HOR_SCALE*radius)<<QPointF(-radius,VER_HOR_SCALE*radius);
+            case GRA_ANNOTATION:
+            case GAR_PARALLE:
+                               boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
+                               itemPolygon<<QPointF(-radius,-POINT_FIVE*radius)<<QPointF(radius,-POINT_FIVE*radius)<<
+                                       QPointF(radius,POINT_FIVE*radius)<<QPointF(-radius,POINT_FIVE*radius);
                                break;
            //圆角矩形
            case GRA_ROUND_RECT:
                               {
-                                  boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
+                                  boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
                                   QPainterPath path;
                                   path.addRoundedRect(boundRect,10,10);
                                   itemPolygon = path.toFillPolygon();
@@ -162,7 +167,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
             //圆形
             case GRA_CIRCLE:
                                {
-                                   boundRect = QRectF(-VER_HOR_SCALE*radius,-VER_HOR_SCALE*radius,radius,radius);
+                                   boundRect = QRectF(-POINT_FIVE*radius,-POINT_FIVE*radius,radius,radius);
                                    QPainterPath path;
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
@@ -171,7 +176,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
             //椭圆
             case GRA_ELLIPSE:
                                {
-                                   boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
+                                   boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
                                    QPainterPath path;
                                    path.addEllipse(boundRect);
                                    itemPolygon = path.toFillPolygon();
@@ -179,17 +184,43 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
                                break;
             //菱形
             case GRA_POLYGON:
-                               boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
+                               boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
 
-                               itemPolygon<<QPointF(-radius,0)<<QPointF(0,-VER_HOR_SCALE*radius)<<
-                                         QPointF(radius,0)<<QPointF(0,VER_HOR_SCALE*radius);
+                               itemPolygon<<QPointF(-radius,0)<<QPointF(0,-POINT_FIVE*radius)<<
+                                         QPointF(radius,0)<<QPointF(0,POINT_FIVE*radius);
                                break;
             //平行四边形
             case GRA_PARALLELOGRAM:
-                              boundRect = QRectF(-radius,-VER_HOR_SCALE*radius,2*radius,radius);
+                              boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
 
-                              itemPolygon<<QPointF(-VER_HOR_SCALE*radius,-VER_HOR_SCALE*radius)<<QPointF(radius,-VER_HOR_SCALE*radius)<<
-                                        QPointF(VER_HOR_SCALE*radius,VER_HOR_SCALE*radius)<<QPointF(-radius,VER_HOR_SCALE*radius);
+                              itemPolygon<<QPointF(-POINT_FIVE*radius,-POINT_FIVE*radius)<<QPointF(radius,-POINT_FIVE*radius)<<
+                                        QPointF(POINT_FIVE*radius,POINT_FIVE*radius)<<QPointF(-radius,POINT_FIVE*radius);
+                              break;
+
+            //循环上限
+            case GRA_LOOP_UP:
+                            {
+                                boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
+
+                                qreal loopWith = getLoopMaxSidLength(2*radius,radius);
+
+                                itemPolygon<<QPointF(-radius+loopWith,-POINT_FIVE*radius)<<QPointF(radius-loopWith,-POINT_FIVE*radius)
+                                            <<QPointF(radius,-POINT_FIVE*radius+loopWith)<<QPointF(radius,POINT_FIVE*radius)
+                                             <<QPointF(-radius,POINT_FIVE*radius)<<QPointF(-radius,-POINT_FIVE*radius+loopWith);
+                            }
+                              break;
+
+           //循环下限
+           case GRA_LOOP_DOWN:
+                            {
+                                boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
+
+                                qreal loopWith = getLoopMaxSidLength(2*radius,radius);
+
+                                itemPolygon<<QPointF(-radius,-POINT_FIVE*radius)<<QPointF(radius,-POINT_FIVE*radius)
+                                            <<QPointF(radius,POINT_FIVE*radius-loopWith)<<QPointF(radius-loopWith,POINT_FIVE*radius)
+                                             <<QPointF(-radius+loopWith,POINT_FIVE*radius)<<QPointF(-radius,POINT_FIVE*radius-loopWith);
+                            }
                               break;
     }
 
@@ -198,7 +229,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 
     property.isMoveable = true;         //默认可以移动
     property.itemBrush = QBrush(Qt::white);
-    property.itemPen = QPen(Qt::black,1,Qt::SolidLine);
+    property.itemPen = QPen(Qt::black,2,Qt::SolidLine);
 
     property.itemRect.width = boundRect.width();
     property.itemRect.height = boundRect.height();
@@ -341,7 +372,21 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
         painter->setBrush(property.itemBrush);
     }
 
-    painter->drawPolygon(itemPolygon);
+    if(currItemType == GRA_ANNOTATION)
+    {
+        painter->drawLine(boundRect.topLeft(),QPointF(boundRect.topLeft().x()+ANNOTATION_SHORT_LINE,boundRect.topLeft().y()));
+        painter->drawLine(boundRect.topLeft(),boundRect.bottomLeft());
+        painter->drawLine(boundRect.bottomLeft(),QPointF(boundRect.bottomLeft().x()+ANNOTATION_SHORT_LINE,boundRect.bottomLeft().y()));
+    }
+    else if(currItemType == GAR_PARALLE)
+    {
+        painter->drawLine(boundRect.topLeft(),boundRect.topRight());
+        painter->drawLine(boundRect.bottomLeft(),boundRect.bottomRight());
+    }
+    else
+    {
+        painter->drawPolygon(itemPolygon);
+    }
 
     //绘制外部接口拖入至本控件时的位置状态
     if(isDragging)
@@ -1069,6 +1114,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 
         switch(pointType)
         {
+            //控件四个角上点
             case TOP_LEFT:
             case TOP_RIGHT:
             case BOTTOM_LEFT:
@@ -1132,6 +1178,8 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     {
                         case GRA_SQUARE:
                         case GRA_RECT:
+                        case GRA_ANNOTATION:
+                        case GAR_PARALLE:
                             itemPolygon.clear();
                             itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
                                     QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
@@ -1166,13 +1214,38 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                             break;
                         case GRA_PARALLELOGRAM:
                             itemPolygon.clear();
-                            itemPolygon<<QPointF(-VER_HOR_SCALE*tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(VER_HOR_SCALE*tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+                            itemPolygon<<QPointF(-POINT_FIVE*tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(POINT_FIVE*tmpX,tmpY)<<QPointF(-tmpX,tmpY);
                             hasProcessed = true;
+                            break;
+                        case GRA_LOOP_UP:
+                            {
+                                itemPolygon.clear();
+
+                                qreal loopWith = getLoopMaxSidLength(tmpW,tmpH);
+
+                                itemPolygon<<QPointF(-tmpX+loopWith,-tmpY)<<QPointF(tmpX-loopWith,-tmpY)
+                                            <<QPointF(tmpX,-tmpY+loopWith)<<QPointF(tmpX,tmpY)
+                                             <<QPointF(-tmpX,tmpY)<<QPointF(-tmpX,-tmpY+loopWith);
+                                hasProcessed = true;
+                            }
+                            break;
+                        case GRA_LOOP_DOWN:
+                            {
+                                itemPolygon.clear();
+
+                                qreal loopWith = getLoopMaxSidLength(tmpW,tmpH);
+
+                                itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)
+                                            <<QPointF(tmpX,tmpY-loopWith)<<QPointF(tmpX-loopWith,tmpY)
+                                             <<QPointF(-tmpX+loopWith,tmpY)<<QPointF(-tmpX,tmpY-loopWith);
+                                hasProcessed = true;
+                            }
                             break;
                     }
                     break;
                 }
+            //控件四边的中点
             case MIDDLE_RIGHT:
             case MIDDLE_LEFT:
             case TOP_MIDDLE:
@@ -1225,6 +1298,8 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 
                     switch(currItemType)
                     {
+                        case GRA_ANNOTATION:
+                        case GAR_PARALLE:
                         case GRA_RECT:
                             itemPolygon.clear();
                             itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
@@ -1254,9 +1329,33 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                             break;
                         case GRA_PARALLELOGRAM:
                             itemPolygon.clear();
-                            itemPolygon<<QPointF(-VER_HOR_SCALE*tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(VER_HOR_SCALE*tmpX,tmpY)<<QPointF(-tmpX,tmpY);
+                            itemPolygon<<QPointF(-POINT_FIVE*tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
+                                    QPointF(POINT_FIVE*tmpX,tmpY)<<QPointF(-tmpX,tmpY);
                             hasProcessed = true;
+                            break;
+                        case GRA_LOOP_UP:
+                            {
+                                itemPolygon.clear();
+
+                                qreal loopWith = getLoopMaxSidLength(tmpW,tmpH);
+
+                                itemPolygon<<QPointF(-tmpX+loopWith,-tmpY)<<QPointF(tmpX-loopWith,-tmpY)
+                                            <<QPointF(tmpX,-tmpY+loopWith)<<QPointF(tmpX,tmpY)
+                                             <<QPointF(-tmpX,tmpY)<<QPointF(-tmpX,-tmpY+loopWith);
+                                hasProcessed = true;
+                            }
+                            break;
+                        case GRA_LOOP_DOWN:
+                            {
+                                itemPolygon.clear();
+
+                                qreal loopWith = getLoopMaxSidLength(tmpW,tmpH);
+
+                                itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)
+                                            <<QPointF(tmpX,tmpY-loopWith)<<QPointF(tmpX-loopWith,tmpY)
+                                             <<QPointF(-tmpX+loopWith,tmpY)<<QPointF(-tmpX,tmpY-loopWith);
+                                hasProcessed = true;
+                            }
                             break;
                     }
                     break;
@@ -1408,6 +1507,8 @@ void MyItem::resetPolygon()
                                break;
             //矩形
             case GRA_RECT:
+            case GRA_ANNOTATION:
+            case GAR_PARALLE:
                                itemPolygon<<QPointF(-tx,-ty)<<QPointF(tx,-ty)<<
                                        QPointF(tx,ty)<<QPointF(-tx,ty);
                                break;
@@ -1442,11 +1543,29 @@ void MyItem::resetPolygon()
                                       QPointF(tx,0)<<QPointF(0,ty);
                             }
                                break;
-            //菱形
+            //平行四边形
             case GRA_PARALLELOGRAM:
                             {
-                               itemPolygon<<QPointF(-VER_HOR_SCALE*tx,-ty)<<QPointF(tx,-ty)<<
-                                      QPointF(VER_HOR_SCALE*tx,ty)<<QPointF(-tx,ty);
+                               itemPolygon<<QPointF(-POINT_FIVE*tx,-ty)<<QPointF(tx,-ty)<<
+                                      QPointF(POINT_FIVE*tx,ty)<<QPointF(-tx,ty);
+                            }
+                               break;
+            //循环上限
+            case GRA_LOOP_UP:
+                            {
+                                qreal loopWith = getLoopMaxSidLength(tw,th);
+                                itemPolygon<<QPointF(-tx+loopWith,-ty)<<QPointF(tx-loopWith,-ty)
+                                            <<QPointF(tx,-ty+loopWith)<<QPointF(tx,ty)
+                                             <<QPointF(-tx,ty)<<QPointF(-tx,-ty+loopWith);
+                            }
+                               break;
+            //循环下限
+            case GRA_LOOP_DOWN:
+                            {
+                                qreal loopWith = getLoopMaxSidLength(tw,th);
+                                itemPolygon<<QPointF(-tx,-ty)<<QPointF(tx,-ty)
+                                            <<QPointF(tx,ty-loopWith)<<QPointF(tx-loopWith,ty)
+                                             <<QPointF(-tx+loopWith,ty)<<QPointF(-tx,ty-loopWith);
                             }
                                break;
     }
@@ -1489,8 +1608,33 @@ void MyItem::setMoveable(bool lockState)
 //键盘事件
 void MyItem::keyPressEvent(QKeyEvent *event)
 {
-    qDebug()<<event->key();
     QGraphicsPolygonItem::keyPressEvent(event);
+}
+
+//计算循环上限的一边的最大长度
+qreal MyItem::getLoopMaxSidLength(qreal width,qreal height)
+{
+    qreal realWidth;
+    qreal halfWidth = width / 2;
+    qreal halfHeight = height / 2;
+
+    if(halfHeight >= MAX_LOOP_RADIUS)
+    {
+        realWidth = MAX_LOOP_RADIUS;
+    }
+    else if(halfWidth >= MAX_LOOP_RADIUS)
+    {
+        realWidth = MAX_LOOP_RADIUS;
+    }
+    else if(halfWidth > halfHeight)
+    {
+        realWidth = halfHeight;
+    }
+    else
+    {
+        realWidth = realWidth;
+    }
+    return realWidth;
 }
 
 MyItem::~MyItem()

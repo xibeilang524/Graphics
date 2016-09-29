@@ -55,6 +55,10 @@ enum GraphicsType
     GRA_ELLIPSE,
     GRA_POLYGON,
     GRA_PARALLELOGRAM,   //平行四边形
+    GRA_LOOP_UP,         //循环上限
+    GRA_LOOP_DOWN,       //循环下限
+    GRA_ANNOTATION,      //注解
+    GAR_PARALLE,         //并行
     GRA_LINE,
     GRA_VECTOR_LINE,
     GRA_TEXT,

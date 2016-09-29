@@ -135,14 +135,15 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
 
     if(property.lineType == LINE_MYITEM && startItem && endItem)
     {
+        //将两控件的中心点直接相连，分别计算其与两个控件交点
         QLineF centerLine(startItem->pos(), endItem->pos());
-        QPointF endCrossPoint;
-        countItemCrossPoint(true,endItem->polygon(),centerLine,endCrossPoint);
-
         QPointF startCrossPoint;
-        countItemCrossPoint(false,startItem->polygon(),centerLine,startCrossPoint);
+        countItemCrossPoint(true,startItem->polygon(),centerLine,startCrossPoint);
 
-        setLine(QLineF(endCrossPoint,startCrossPoint));
+        QPointF endCrossPoint;
+        countItemCrossPoint(false,endItem->polygon(),centerLine,endCrossPoint);
+
+        setLine(QLineF(startCrossPoint,endCrossPoint));
     }
     else if(property.lineType == LINE_NODEPORT && startNodePort && endNodePort)
     {

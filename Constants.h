@@ -45,6 +45,10 @@ const char LINE_ID[] =  "Constants.Line";
 const char VECTOR_LINE_ID[] =  "Constants.VectorLine";
 const char TEXT_ID[] =  "Constants.Text";
 const char NODE_PORT_ID[] = "Constants.NodePort";
+const char ANNOTATION_ID[] = "Constants.Annotation";
+const char PARALLEL_ID[] = "Constants.Parallel";
+const char LOOP_DOWN_ID[] = "Constants.LoopDown";
+const char LOOP_UP_ID[] = "Constants.LoopUp";
 
 //¶Ë¿ÚÓÒ¼ü²Ëµ¥
 const char NODE_DELETE_ID[] = "Constants.Node.Delete";

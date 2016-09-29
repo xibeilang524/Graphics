@@ -28,7 +28,7 @@
 **20160923:wey:添加端口四个边任意移动功能【！！！】
 **20160927:wey:添加平行四边形
 **             修复对菱形拖拽时形状改变问题
-**
+**             添加循环上限、循环下限、并行、注解
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -135,6 +135,7 @@ private:
     bool getRangeValue(qreal maxValue, qreal minValue, qreal & currValue, DragRange &range);
     MyNodePort * createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);
     DragDirect getDropDirect(const QPointF &currPoint);
+    qreal getLoopMaxSidLength(qreal width, qreal height);
 
     int radius;
 

@@ -72,6 +72,18 @@ void MyListWidget::mouseMoveEvent(QMouseEvent *event)
             case GRA_PARALLELOGRAM:
                                pixmap.load(":/images/parallelogram.png");
                                break;
+            case GRA_LOOP_UP:
+                               pixmap.load(":/images/loop_up.png");
+                               break;
+            case GRA_LOOP_DOWN:
+                               pixmap.load(":/images/loop_down.png");
+                               break;
+            case GRA_ANNOTATION:
+                               pixmap.load(":/images/annotation.png");
+                               break;
+            case GAR_PARALLE:
+                               pixmap.load(":/images/parallel.png");
+                               break;
         }
 
         pixmap = pixmap.scaled(ICON_WIDTH,ICON_HEIGHT);

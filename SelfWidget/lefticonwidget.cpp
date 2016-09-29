@@ -61,6 +61,22 @@ void LeftIconWidget::initListItems()
     paralleogram->setData(Qt::UserRole,(int)GRA_PARALLELOGRAM);
     polygonWidget->addItem(paralleogram);
 
+    MyListItem * loopUp = ListItemManager::instance()->createListItem(Constants::LOOP_UP_ID,QIcon(":/images/loop_up.png"),"循环上限",polygonWidget);
+    loopUp->setData(Qt::UserRole,(int)GRA_LOOP_UP);
+    polygonWidget->addItem(loopUp);
+
+    MyListItem * loopDown = ListItemManager::instance()->createListItem(Constants::LOOP_DOWN_ID,QIcon(":/images/loop_down.png"),"循环下限",polygonWidget);
+    loopDown->setData(Qt::UserRole,(int)GRA_LOOP_DOWN);
+    polygonWidget->addItem(loopDown);
+
+    MyListItem * parallel = ListItemManager::instance()->createListItem(Constants::PARALLEL_ID,QIcon(":/images/parallel.png"),"并  行",polygonWidget);
+    parallel->setData(Qt::UserRole,(int)GAR_PARALLE);
+    polygonWidget->addItem(parallel);
+
+    MyListItem * annotation = ListItemManager::instance()->createListItem(Constants::ANNOTATION_ID,QIcon(":/images/annotation.png"),"注  解",polygonWidget);
+    annotation->setData(Qt::UserRole,(int)GRA_ANNOTATION);
+    polygonWidget->addItem(annotation);
+
     MyListItem * square = ListItemManager::instance()->createListItem(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形",polygonWidget);
     square->setData(Qt::UserRole,(int)GRA_SQUARE);
     polygonWidget->addItem(square);
