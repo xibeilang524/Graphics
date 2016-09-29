@@ -134,7 +134,7 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(lockAction,MyGraphicsView::instance(),SLOT(lockAndunlockItem()));
 
     MyAction * unlockAction = ActionManager::instance()->crateAction(Constants::UNLOCK_ID,QIcon(":/images/unlock.png"),"½âËø");
-    unlockAction->setShortcut(QKeySequence("Ctrl+U"));
+    unlockAction->setShortcut(QKeySequence("Ctrl+Shift+L"));
     ActionManager::instance()->registerAction(unlockAction,MyGraphicsView::instance(),SLOT(lockAndunlockItem()));
 
     MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::DELETE_ID,QIcon(":/images/delete.png"),"É¾³ý");

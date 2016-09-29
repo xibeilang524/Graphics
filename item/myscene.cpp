@@ -97,6 +97,7 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
     }    
 }
 
+//在拖拽产生直线时，可能鼠标按在控件的Text上，那么需要进一步的判断
 void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     if(CurrAddGraType == GRA_LINE && insertTmpLine)
@@ -111,7 +112,6 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         {
             endItems.removeFirst();
         }
-
         removeItem(insertTmpLine);
         delete insertTmpLine;
 
@@ -121,22 +121,32 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             QString firstItemId = TYPE_ID(* startItems.first());
             QString secondItemId = TYPE_ID(* endItems.first());
 
-            if(firstItemId == TYPE_ID(MyItem) && secondItemId == TYPE_ID(MyItem))
-            {
-                MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
-                MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
+            MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
+            MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
 
-                if(startItem && endItem)
-                {
-                    MyArrow *arrow = new MyArrow(startItem, endItem);
-                    connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
-                    connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-                    startItem->addArrow(arrow);
-                    endItem->addArrow(arrow);
-                    arrow->setZValue(-1000.0);
-                    addItem(arrow);
-                    arrow->updatePosition();
-                }
+            if(firstItemId == TYPE_ID(MyTextItem) && startItems.size() > 1)
+            {
+                firstItemId = TYPE_ID(* startItems.at(1));
+                startItem = qgraphicsitem_cast<MyItem *>(startItems.at(1));
+            }
+
+            if(secondItemId == TYPE_ID(MyTextItem) && endItems.size() > 1)
+            {
+                secondItemId = TYPE_ID(* endItems.at(1));
+                endItem = qgraphicsitem_cast<MyItem *>(endItems.at(1));
+            }
+
+            if(firstItemId == TYPE_ID(MyItem) && secondItemId == TYPE_ID(MyItem) &&
+                    startItem && endItem)
+            {
+                MyArrow *arrow = new MyArrow(startItem, endItem);
+                connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+                connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+                startItem->addArrow(arrow);
+                endItem->addArrow(arrow);
+                arrow->setZValue(-1000.0);
+                addItem(arrow);
+                arrow->updatePosition();
             }
             else if(firstItemId == TYPE_ID(MyNodePort) && secondItemId == TYPE_ID(MyNodePort))
             {
@@ -162,7 +172,8 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     {
 
     }
-    insertTmpLine = 0;
+
+    insertTmpLine = NULL;
     insertTmpPath = NULL;
     QGraphicsScene::mouseReleaseEvent(event);
 }
@@ -177,7 +188,7 @@ void MyScene::keyPressEvent(QKeyEvent *event)
     {
         emit ctrlLockKeyPress();
     }
-    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_U)
+    else if(event->modifiers() == Qt::ControlModifier && event->modifiers() == Qt::ShiftModifier && event->key() == Qt::Key_L)
     {
         emit ctrlUnLockKeyPress();
     }

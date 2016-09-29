@@ -136,7 +136,6 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     if(property.lineType == LINE_MYITEM && startItem && endItem)
     {
         QLineF centerLine(startItem->pos(), endItem->pos());
-//        qDebug()<<centerLine;
         QPointF endCrossPoint;
         countItemCrossPoint(true,endItem->polygon(),centerLine,endCrossPoint);
 
