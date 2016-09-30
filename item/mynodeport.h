@@ -12,11 +12,13 @@
 **             添加右键编辑功能
 **             增加连线功能
 **20160920:wey:增加本地保存
+**20160930:wey:调整父类QGraphicsPolygonItem
 *************************************************/
 #ifndef MYNODEPORT_H
 #define MYNODEPORT_H
 
-#include <QGraphicsObject>
+#include <QGraphicsPolygonItem>
+#include <QObject>
 #include <QBrush>
 
 #include "ItemHeader.h"
@@ -28,11 +30,11 @@ class QMenu;
 class MyItem;
 class MyArrow;
 
-class MyNodePort : public QGraphicsObject
+class MyNodePort : public QObject, public QGraphicsPolygonItem
 {
     Q_OBJECT
 public:
-    MyNodePort(MyItem * parentItem);
+    MyNodePort(MyItem * parentItem,QObject * parent1 = 0);
     ~MyNodePort();
 
     QRectF boundingRect() const;
@@ -109,6 +111,7 @@ private:
     QList<MyArrow *> arrows;           //保存添加的箭头
 
     MyItem * parentMyItem;             //父节点
+    QPolygonF polygon;                 //多边形
 
 };
 

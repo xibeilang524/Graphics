@@ -78,6 +78,7 @@ private:
     QList<MyNodePort*> localNodeports;
 
     bool isLocalFileOpened;            //是否是本地文件打开
+    bool isDragLine;                   //是否处于添加线条状态
 };
 
 #endif // MYSCENE_H

@@ -51,9 +51,10 @@ QDataStream & operator >>(QDataStream & dataStream,MyNodePort * nodePort)
     return dataStream;
 }
 
-MyNodePort::MyNodePort(MyItem *parentItem):
+MyNodePort::MyNodePort(MyItem *parentItem, QObject *parent1):
     parentMyItem(parentItem),
-    QGraphicsObject(parentItem)
+    QObject(parent1),
+    QGraphicsPolygonItem(parentItem)
 {
 //    setFlag(QGraphicsItem::ItemIsMovable,true);
 
@@ -66,7 +67,13 @@ MyNodePort::MyNodePort(MyItem *parentItem):
 
     nodeProperty.parentItemID = parentItem->getProperty().startItemID;     //保存父节点的ID号
 
+    prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);
+
+    polygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
+             <<QPointF(radius,radius)<<QPointF(-radius,radius);
+
+    setPolygon(polygon);
 
     initNodePortRightMenu();
     connect(this,SIGNAL(deletePort(MyNodePort*)),parentItem,SLOT(procDeleteNodePort(MyNodePort*)));
@@ -97,7 +104,7 @@ void MyNodePort::setArrivalLimitRang(bool flag)
 //设置显示的中心点
 void MyNodePort::setPos(const QPointF &pos)
 {
-    QGraphicsObject::setPos(pos);
+    QGraphicsPolygonItem::setPos(pos);
 }
 
 //设置拖入位置与拖入边长度的比例
@@ -120,7 +127,7 @@ void MyNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     painter->setBrush(nodeProperty.itemBrush);
 
-    painter->drawRect(boundRect);
+    painter->drawPolygon(polygon);
 
     painter->restore();
 }
@@ -128,25 +135,25 @@ void MyNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 void MyNodePort::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit portPosChanged(MOUSE_PRESS,event->pos());
-    QGraphicsObject::mousePressEvent(event);
+    QGraphicsPolygonItem::mousePressEvent(event);
 }
 
 void MyNodePort::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     emit portPosChanged(MOUSE_MOVE,event->pos());
-    QGraphicsObject::mouseMoveEvent(event);
+    QGraphicsPolygonItem::mouseMoveEvent(event);
 }
 
 void MyNodePort::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     emit portPosChanged(MOUSE_RELEASE,event->pos());
-    QGraphicsObject::mouseReleaseEvent(event);
+    QGraphicsPolygonItem::mouseReleaseEvent(event);
 }
 
 void MyNodePort::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
     emit editPort(this);
-    QGraphicsObject::mouseDoubleClickEvent(event);
+    QGraphicsPolygonItem::mouseDoubleClickEvent(event);
 }
 
 void MyNodePort::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

@@ -11,17 +11,18 @@
 #ifndef DRAGLINEPOINT_H
 #define DRAGLINEPOINT_H
 
-#include <QGraphicsObject>
+#include <QObject>
+#include <QGraphicsPolygonItem>
 
 #include "ItemHeader.h"
 
 class MyItem;
 
-class DragLinePoint : public QGraphicsObject
+class DragLinePoint : public QObject, public QGraphicsPolygonItem
 {
     Q_OBJECT
 public:
-    DragLinePoint(const PointType pointType, MyItem * parent = 0 );
+    DragLinePoint(const PointType pointType, MyItem * parent1 = 0 ,QObject* parent = 0);
 
     QRectF boundingRect()const;
 
@@ -35,6 +36,7 @@ private:
     QRectF boundRect;
     qreal radius;
     PointType pointType;
+    QPolygonF polygon;
 };
 
 #endif // DRAGLINEPOINT_H

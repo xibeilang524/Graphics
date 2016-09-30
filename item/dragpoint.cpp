@@ -7,12 +7,19 @@
 
 #include "myitem.h"
 
-DragPoint::DragPoint(const PointType pointType, MyItem *parent):
+DragPoint::DragPoint(const PointType pointType, MyItem *parent, QObject *parent1):
     pointType(pointType),
-    QGraphicsObject(parent)
+    QObject(parent1),
+    QGraphicsPolygonItem(parent)
 {
     radius = 2;
+
+    prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,radius *2,radius *2);
+
+    polygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
+            <<QPointF(radius,radius)<<QPointF(-radius,radius);
+    setPolygon(polygon);
 
     setFlags(QGraphicsItem::ItemIsSelectable |
              QGraphicsItem::ItemSendsGeometryChanges |
@@ -164,7 +171,7 @@ void DragPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     painter->setBrush(GLOBAL_ITEM_BRUSH);
 
-    painter->drawRect(boundRect);
+    painter->drawPolygon(polygon);
 
     painter->restore();
 }
@@ -185,24 +192,24 @@ QVariant DragPoint::itemChange(GraphicsItemChange change, const QVariant &value)
 
     }
 
-    return QGraphicsObject::itemChange(change,value);
+    return QGraphicsPolygonItem::itemChange(change,value);
 }
 
 void DragPoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     emit currMouseState(MOUSE_PRESS,pointType,event->pos());
-    QGraphicsItem::mousePressEvent(event);
+    QGraphicsPolygonItem::mousePressEvent(event);
 }
 
 void DragPoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     emit currMouseState(MOUSE_MOVE,pointType,event->pos());
-    QGraphicsItem::mouseMoveEvent(event);
+    QGraphicsPolygonItem::mouseMoveEvent(event);
 }
 
 void DragPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     emit resizeItemSize();
     emit currMouseState(MOUSE_RELEASE,pointType,event->pos());
-    QGraphicsItem::mouseReleaseEvent(event);
+    QGraphicsPolygonItem::mouseReleaseEvent(event);
 }

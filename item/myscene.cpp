@@ -11,6 +11,7 @@
 #include "mytextitem.h"
 #include "mypathitem.h"
 #include "mynodeport.h"
+#include "draglinepoint.h"
 #include "../util.h"
 
 #include "typeinfo.h"
@@ -23,6 +24,7 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
     insertTmpLine = NULL;
     insertTmpPath = NULL;
     isLocalFileOpened = false;
+    isDragLine = false;
 
     setBackgroundBrush(QPixmap(":/images/backgroundRole.png"));
 }
@@ -32,7 +34,16 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     SceneLastClickPoint = event->scenePos();
     if(event->button () == Qt::LeftButton)
     {
-        if(CurrAddGraType == GRA_LINE)
+        if(itemAt(event->scenePos()) && TYPE_ID(*itemAt(event->scenePos())) == TYPE_ID(DragLinePoint))
+        {
+            insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
+            insertTmpLine->setPen(QPen(Qt::red, 2));
+            insertTmpLine->setZValue(1000);
+            addItem(insertTmpLine);
+            isDragLine = true;
+        }
+
+        if(!isDragLine && CurrAddGraType == GRA_LINE)
         {
             insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
             insertTmpLine->setPen(QPen(Qt::red, 2));
@@ -76,9 +87,14 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(CurrAddGraType == GRA_LINE && insertTmpLine)
+//    if(itemAt(event->scenePos()))
+//    {
+//        qDebug()<<TYPE_ID(*itemAt(event->scenePos()));
+//    }
+
+    if((isDragLine||CurrAddGraType == GRA_LINE)&& insertTmpLine)
     {
-        QLineF newLine(insertTmpLine->line().p1(), event->scenePos());
+        QLineF newLine(insertTmpLine->line().p1(), event->scenePos() - QPointF(2,2));
         insertTmpLine->setLine(newLine);
     }
     else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)

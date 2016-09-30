@@ -10,11 +10,18 @@
 
 #define ATAN(degree)  atan(degree)*180/PI
 
-RotateLine::RotateLine(QGraphicsItem *parent):
+RotateLine::RotateLine(QGraphicsItem *parent, QObject *parent1):
     parentItem(parent),
-    QGraphicsObject(parent)
+    QObject(parent1),
+    QGraphicsPolygonItem(parent)
 {
-    boundRect = QRectF(-ROTATE_WIDTH/2,-ROTATE_WIDTH/2,ROTATE_WIDTH,ROTATE_WIDTH);
+    qreal radius = ROTATE_WIDTH/2;
+    prepareGeometryChange();
+    boundRect = QRectF(-radius,-radius,2*radius,2*radius);
+
+    polygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
+            <<QPointF(radius,radius)<<QPointF(-radius,radius);
+    setPolygon(polygon);
 
     pixmap.load(":/images/itemLock.png");
 
@@ -54,7 +61,7 @@ void RotateLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     else
     {
         painter->setBrush(Qt::blue);
-        painter->drawRect(boundRect);
+        painter->drawPolygon(polygon);
     }
 
     painter->restore();
@@ -62,24 +69,22 @@ void RotateLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 void RotateLine::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-//    this->setCursor(QCursor(pixmap));
-    QGraphicsObject::hoverEnterEvent(event);
+    this->setCursor(Qt::PointingHandCursor);
+    QGraphicsPolygonItem::hoverEnterEvent(event);
 }
 
 void RotateLine::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     this->setCursor(Qt::ArrowCursor);
-    QGraphicsObject::hoverLeaveEvent(event);
+    QGraphicsPolygonItem::hoverLeaveEvent(event);
 }
 
 void RotateLine::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     startPoint = event->pos();
 
-    qDebug()<<pos();
-
     emit rotateItem(MOUSE_PRESS,0);
-    QGraphicsObject::mousePressEvent(event);
+    QGraphicsPolygonItem::mousePressEvent(event);
 }
 
 void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
@@ -124,13 +129,13 @@ void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 //    startPoint = event->pos();
 
-    QGraphicsObject::mouseMoveEvent(event);
+    QGraphicsPolygonItem::mouseMoveEvent(event);
 }
 
 void RotateLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
     emit rotateItem(MOUSE_RELEASE,0);
-    QGraphicsObject::mouseReleaseEvent(event);
+    QGraphicsPolygonItem::mouseReleaseEvent(event);
 }
 
 

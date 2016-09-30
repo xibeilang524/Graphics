@@ -7,20 +7,22 @@
 **
 **修改历史:
 **20160922:wey:添加状态锁定，锁定后图标改变
+**20160930:wey:调整父类至QGraphicsPolygonItem
 *************************************************/
 #ifndef ROTATELINE_H
 #define ROTATELINE_H
 
-#include <QGraphicsObject>
+#include <QObject>
+#include <QGraphicsPolygonItem>
 #include <QPixmap>
 
 #include "ItemHeader.h"
 
-class RotateLine : public QGraphicsObject
+class RotateLine : public QObject, public QGraphicsPolygonItem
 {
     Q_OBJECT
 public:
-    RotateLine(QGraphicsItem * parent = 0);
+    RotateLine(QGraphicsItem * parent = 0,QObject * parent1 = 0);
     ~RotateLine();
 
     void setMoveable(bool moveable);
@@ -44,6 +46,8 @@ private:
     QRectF boundRect;
 
     QPointF startPoint;
+
+    QPolygonF polygon;
 
     qreal rotateDegree;
     bool hasSelected;

@@ -7,21 +7,23 @@
 **
 **修改历史:
 **20160928:wey:增加随父控件旋转角度变化，动态切换悬停的鼠标样式
+**20160930:wey:调整父类成QGraphicsPolygonItem
 *************************************************/
 #ifndef DRAGPOINT_H
 #define DRAGPOINT_H
 
-#include <QGraphicsObject>
+#include <QObject>
+#include <QGraphicsPolygonItem>
 
 #include "ItemHeader.h"
 
 class MyItem;
 
-class DragPoint : public QGraphicsObject
+class DragPoint : public QObject, public QGraphicsPolygonItem
 {
     Q_OBJECT
 public:
-    DragPoint(const PointType pointType, MyItem * parent = 0 );
+    DragPoint(const PointType pointType, MyItem * parent = 0 ,QObject * parent1 = 0);
     void updatePos(PointType type,QPointF point);
 
     QRectF boundingRect()const;
@@ -46,12 +48,10 @@ protected:
 
 private:
     QRectF boundRect;
-
     qreal radius;
-
     PointType pointType;
-
     Qt::CursorShape cursorShape;
+    QPolygonF polygon;
 };
 
 #endif // DRAGPOINT_H

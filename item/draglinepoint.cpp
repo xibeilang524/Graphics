@@ -6,12 +6,20 @@
 
 #include "myitem.h"
 
-DragLinePoint::DragLinePoint(const PointType pointType, MyItem *parent):
+DragLinePoint::DragLinePoint(const PointType pointType, MyItem *parent1, QObject *parent):
     pointType(pointType),
-    QGraphicsObject(parent)
+    QObject(parent),
+    QGraphicsPolygonItem(parent1)
 {
     radius = 2;
+
+    prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,radius *2,radius *2);
+
+    QPainterPath path;
+    path.addEllipse(boundRect);
+    polygon = path.toFillPolygon();
+    setPolygon(polygon);
 
     setFlags(QGraphicsItem::ItemIsSelectable |
              QGraphicsItem::ItemSendsGeometryChanges |
@@ -33,7 +41,7 @@ void DragLinePoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
     painter->setBrush(GLOBAL_ITEM_BRUSH);
 
-    painter->drawEllipse(boundRect);
+    painter->drawPolygon(polygon);
 
     painter->restore();
 }
