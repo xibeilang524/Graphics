@@ -3,6 +3,7 @@
 #include <QGraphicsSceneMouseEvent>
 #include <QGraphicsSceneHoverEvent>
 #include <QGraphicsSceneContextMenuEvent>
+#include <QCursor>
 #include <QPainter>
 #include <QMenu>
 #include <QDebug>
@@ -17,6 +18,10 @@
 #include "mytextitem.h"
 #include "mynodeport.h"
 #include "mygraphicsview.h"
+#include "dragpoint.h"
+#include "rotateline.h"
+#include "draglinepoint.h"
+#include "../global.h"
 
 #include "qmath.h"
 
@@ -132,6 +137,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 {
     radius = 60;
     isDragging = false;            //默认无拖入
+    isPrepareLine = false;
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -166,16 +172,16 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     //【!!初始化不同类型图形】
     setInitalPolygon(boundRect,boundRect.width()/2,boundRect.height()/2,boundRect.width(),boundRect.height());
 
-    setBrush(property.itemBrush);
-
     property.isMoveable = true;         //默认可以移动
-    property.itemBrush = QBrush(Qt::white);
+    property.itemBrush = QBrush(GLOBAL_ITEM_BRUSH);
     property.itemPen = QPen(Qt::black,2,Qt::SolidLine);
 
     property.itemRect.width = boundRect.width();
     property.itemRect.height = boundRect.height();
 
     property.itemFont = QFont("黑体",FONT_DEAFULT_PIX);
+
+    setBrush(property.itemBrush);
 
     currMouseType = MOUSE_NONE;
     isNeedBorder = false;
@@ -205,16 +211,17 @@ void MyItem::initComponentItem()
     myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
     myTextItem->cleartText();
 
-    //八个角度的缩放点
+    //四个顶点的拖拽点
     leftTopPoint = new DragPoint(TOP_LEFT,this);
     rightTopPoint = new DragPoint(TOP_RIGHT,this);
     leftBottomPoint = new DragPoint(BOTTOM_LEFT,this);
     rightBottomPoint = new DragPoint(BOTTOM_RIGHT,this);
 
-    topPoint = new DragPoint(TOP_MIDDLE,this);
-    leftPoint = new DragPoint(MIDDLE_LEFT,this);
-    rightPoint = new DragPoint(MIDDLE_RIGHT,this);
-    bottomPoint = new DragPoint(BOTTOM_MIDDLE,this);
+    //四边中点的直线绘制点
+    topLinePoint = new DragLinePoint(TOP_MIDDLE,this);
+    leftLinePoint = new DragLinePoint(MIDDLE_LEFT,this);
+    rightLinePoint = new DragLinePoint(MIDDLE_RIGHT,this);
+    bottomLinePoint = new DragLinePoint(BOTTOM_MIDDLE,this);
 
     setDragPointVisible(false);
     procResizeItem();
@@ -333,6 +340,22 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
         painter->drawPolygon(itemPolygon);
     }
 
+    //线条绘制状态下，鼠标进入控件，进行样式的改变。
+    if(isPrepareLine)
+    {
+        painter->save();
+        painter->setPen(QPen(Qt::green,2));
+        painter->drawRect(boundRect);
+
+        painter->setPen(QPen(Qt::gray,5));
+        painter->drawPoint(boundRect.topLeft().x(),0);
+        painter->drawPoint(boundRect.topRight().x(),0);
+        painter->drawPoint(0,boundRect.topLeft().y());
+        painter->drawPoint(0,boundRect.bottomRight().y());
+
+        painter->restore();
+    }
+
     //绘制外部接口拖入至本控件时的位置状态
     if(isDragging)
     {
@@ -366,7 +389,7 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
 
 void MyItem::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(event->buttons() == Qt::LeftButton)
+    if(event->buttons() == Qt::LeftButton && CurrAddGraType != GRA_LINE && CurrAddGraType != GRA_VECTOR_LINE)
     {
         setDragPointVisible(true);
     }
@@ -411,13 +434,36 @@ void MyItem::getRealTimePos()
     emit propHasChanged(property);
 }
 
+//鼠标进入控件
 void MyItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
+    if(CurrAddGraType == GRA_LINE || CurrAddGraType == GRA_VECTOR_LINE)
+    {
+        isPrepareLine = true;
+        update();
+    }
+    if(!isSelected())
+    {
+        setDragLineVisible(true);
+    }
+
+    setCursor(Qt::SizeAllCursor);
     QGraphicsPolygonItem::hoverEnterEvent(event);
 }
 
 void MyItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
+    if(CurrAddGraType == GRA_LINE || CurrAddGraType == GRA_VECTOR_LINE)
+    {
+        isPrepareLine = false;
+        update();
+    }
+    if(!isSelected())
+    {
+        setDragLineVisible(false);
+    }
+
+    setCursor(Qt::ArrowCursor);
     QGraphicsPolygonItem::hoverLeaveEvent(event);
 }
 
@@ -972,12 +1018,18 @@ void MyItem::setDragPointVisible(bool flag)
     leftBottomPoint->setVisible(flag);
     rightBottomPoint->setVisible(flag);
 
-    topPoint->setVisible(flag);
-    leftPoint->setVisible(flag);
-    rightPoint->setVisible(flag);
-    bottomPoint->setVisible(flag);
-
     rotateLine->setVisible(flag);
+
+    setDragLineVisible(flag);
+}
+
+//设置连接线拖拽点是否可见
+void MyItem::setDragLineVisible(bool isVisible)
+{
+    topLinePoint->setVisible(isVisible);
+    leftLinePoint->setVisible(isVisible);
+    rightLinePoint->setVisible(isVisible);
+    bottomLinePoint->setVisible(isVisible);
 }
 
 QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -1001,11 +1053,6 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
         rightTopPoint->updateDragPointHoverCursor(rotation());
         leftBottomPoint->updateDragPointHoverCursor(rotation());
         rightBottomPoint->updateDragPointHoverCursor(rotation());
-
-        topPoint->updateDragPointHoverCursor(rotation());
-        leftPoint->updateDragPointHoverCursor(rotation());
-        rightPoint->updateDragPointHoverCursor(rotation());
-        bottomPoint->updateDragPointHoverCursor(rotation());
     }
 
     return QGraphicsPolygonItem::itemChange(change,value);
@@ -1056,7 +1103,8 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
         //当前旋转的角度
         qreal rotateDegree = rotation();
 
-        qreal  factor = w / h;
+        //【201609230控件四角不按比例缩放】
+//        qreal  factor = w / h;
 
         QPainterPath path;
 
@@ -1073,7 +1121,8 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     if(pointType ==  TOP_LEFT)
                     {
                         tmpW = w - px;
-                        tmpH = tmpW /factor;
+                        tmpH = h - py;
+//                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
                         if(rotateDegree == 0)
@@ -1093,7 +1142,8 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     else if(pointType ==  TOP_RIGHT)
                     {
                         tmpW = w + px;
-                        tmpH = tmpW /factor;
+                        tmpH = h - py;
+//                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
                         centerX = leftBottomX + tmpW/2;
@@ -1104,7 +1154,8 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     else if(pointType ==  BOTTOM_LEFT)
                     {
                         tmpW = w - px;
-                        tmpH = tmpW /factor;
+                        tmpH = h + py;
+//                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
                         centerX = rightTopX - tmpW/2;
@@ -1115,7 +1166,8 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     else if(pointType ==  BOTTOM_RIGHT)
                     {
                         tmpW = w + px;
-                        tmpH = tmpW /factor;
+                        tmpH = h + py;
+//                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
                         centerX = leftTopX + tmpW/2;
@@ -1195,121 +1247,6 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     }
                     break;
                 }
-            //控件四边的中点
-            case MIDDLE_RIGHT:
-            case MIDDLE_LEFT:
-            case TOP_MIDDLE:
-            case BOTTOM_MIDDLE:
-                {
-                    if(currItemType == GRA_SQUARE ||currItemType == GRA_CIRCLE)
-                    {
-                        break;
-                    }
-                    if(pointType ==  MIDDLE_RIGHT)
-                    {
-                        tmpW = w + px /** QCOS(property.rotateDegree)*/;
-                        tmpX = tmpW/2;
-                        tmpY = h/2;
-                        centerX = leftTopX + tmpX;
-                        centerY = leftTopY + tmpY;
-                        prepareGeometryChange();
-                        boundRect = QRectF(-tmpX,-tmpY,tmpW,h);
-                    }
-                    else if(pointType ==  MIDDLE_LEFT)
-                    {
-                        tmpW = w - px;
-                        tmpX = tmpW/2;
-                        tmpY = h/2;
-                        centerX = rightBottomX - tmpW/2;
-                        centerY = rightBottomY - tmpY;
-                        prepareGeometryChange();
-                        boundRect = QRectF(-tmpX,-tmpY,tmpW,h);
-                    }
-                    else if(pointType ==  TOP_MIDDLE)
-                    {
-                        tmpH = h - py;
-                        tmpX = w/2;
-                        tmpY = tmpH/2;
-                        centerX = rightBottomX - w/2;
-                        centerY = rightBottomY - tmpH/2;
-                        prepareGeometryChange();
-                        boundRect = QRectF(-tmpX,-tmpY,w,tmpH);
-                    }
-                    else if(pointType ==  BOTTOM_MIDDLE)
-                    {
-                        tmpH = h + py;
-                        tmpX = w/2;
-                        tmpY = tmpH/2;
-                        centerX = leftTopX + tmpX;
-                        centerY = leftTopY + tmpY;
-                        prepareGeometryChange();
-                        boundRect = QRectF(-tmpX,-tmpY,w,tmpH);
-                    }
-
-                    switch(currItemType)
-                    {
-                        case GRA_ANNOTATION:
-                        case GAR_PARALLE:
-                        case GRA_RECT:
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-                            hasProcessed = true;
-                            break;
-
-                        case GRA_ROUND_RECT:
-                            itemPolygon.clear();
-
-                            path.addRoundedRect(boundRect,10,10);
-                            itemPolygon = path.toFillPolygon();
-                            hasProcessed = true;
-                            break;
-
-                        case GRA_ELLIPSE:
-                            itemPolygon.clear();
-                            path.addEllipse(boundRect);
-                            itemPolygon = path.toFillPolygon();
-                            hasProcessed = true;
-                            break;
-                        case GRA_POLYGON:
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-tmpX,0)<<QPointF(0,-tmpY)<<
-                                    QPointF(tmpX,0)<<QPointF(0,tmpY);
-                            hasProcessed = true;
-                            break;
-                        case GRA_PARALLELOGRAM:
-                            itemPolygon.clear();
-                            itemPolygon<<QPointF(-POINT_FIVE*tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
-                                    QPointF(POINT_FIVE*tmpX,tmpY)<<QPointF(-tmpX,tmpY);
-                            hasProcessed = true;
-                            break;
-                        case GRA_LOOP_UP:
-                            {
-                                itemPolygon.clear();
-
-                                qreal loopWith = getLoopMaxSidLength(tmpW,tmpH);
-
-                                itemPolygon<<QPointF(-tmpX+loopWith,-tmpY)<<QPointF(tmpX-loopWith,-tmpY)
-                                            <<QPointF(tmpX,-tmpY+loopWith)<<QPointF(tmpX,tmpY)
-                                             <<QPointF(-tmpX,tmpY)<<QPointF(-tmpX,-tmpY+loopWith);
-                                hasProcessed = true;
-                            }
-                            break;
-                        case GRA_LOOP_DOWN:
-                            {
-                                itemPolygon.clear();
-
-                                qreal loopWith = getLoopMaxSidLength(tmpW,tmpH);
-
-                                itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)
-                                            <<QPointF(tmpX,tmpY-loopWith)<<QPointF(tmpX-loopWith,tmpY)
-                                             <<QPointF(-tmpX+loopWith,tmpY)<<QPointF(-tmpX,tmpY-loopWith);
-                                hasProcessed = true;
-                            }
-                            break;
-                    }
-                    break;
-                }
         }
 
         if(hasProcessed)
@@ -1343,10 +1280,10 @@ void MyItem::procResizeItem()
     leftBottomPoint->setPos(boundRect.bottomLeft());
     rightBottomPoint->setPos(boundRect.bottomRight());
 
-    topPoint->setPos(QPointF(0,boundRect.topLeft().y()));
-    leftPoint->setPos(QPointF(boundRect.topLeft().x(),0));
-    rightPoint->setPos(QPointF(boundRect.bottomRight().x(),0));
-    bottomPoint->setPos(QPointF(0,boundRect.bottomLeft().y()));
+    topLinePoint->setPos(QPointF(0,boundRect.topLeft().y()));
+    leftLinePoint->setPos(QPointF(boundRect.topLeft().x(),0));
+    rightLinePoint->setPos(QPointF(boundRect.bottomRight().x(),0));
+    bottomLinePoint->setPos(QPointF(0,boundRect.bottomLeft().y()));
 }
 
 //调整拖入端口的位置
@@ -1588,7 +1525,7 @@ qreal MyItem::getLoopMaxSidLength(qreal width,qreal height)
     }
     else
     {
-        realWidth = realWidth;
+        realWidth = halfWidth;
     }
     return realWidth;
 }
@@ -1626,28 +1563,28 @@ MyItem::~MyItem()
         rightBottomPoint = NULL;
     }
 
-    if(topPoint)
+    if(topLinePoint)
     {
-        delete topPoint;
-        topPoint = NULL;
+        delete topLinePoint;
+        topLinePoint = NULL;
     }
 
-    if(leftPoint)
+    if(leftLinePoint)
     {
-        delete leftPoint;
-        leftPoint = NULL;
+        delete leftLinePoint;
+        leftLinePoint = NULL;
     }
 
-    if(rightPoint)
+    if(rightLinePoint)
     {
-        delete rightPoint;
-        rightPoint = NULL;
+        delete rightLinePoint;
+        rightLinePoint = NULL;
     }
 
-    if(bottomPoint)
+    if(bottomLinePoint)
     {
-        delete bottomPoint;
-        bottomPoint = NULL;
+        delete bottomLinePoint;
+        bottomLinePoint = NULL;
     }
 
     if(rotateLine)

@@ -8,7 +8,8 @@ HEADERS += \
     item/mypathitem.h \
     item/mynodeport.h \
     item/mygraphicsview.h \
-    item/dragpoint.h
+    item/dragpoint.h \
+    item/draglinepoint.h
 
 SOURCES += \
     item/rotateline.cpp \
@@ -19,4 +20,5 @@ SOURCES += \
     item/mytextitem.cpp \
     item/mypathitem.cpp \
     item/mynodeport.cpp \
-    item/mygraphicsview.cpp
+    item/mygraphicsview.cpp \
+    item/draglinepoint.cpp

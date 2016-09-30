@@ -47,7 +47,7 @@ protected:
 private:
     QRectF boundRect;
 
-    int radius;
+    qreal radius;
 
     PointType pointType;
 

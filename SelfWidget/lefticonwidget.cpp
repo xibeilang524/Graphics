@@ -73,21 +73,21 @@ void LeftIconWidget::initListItems()
     parallel->setData(Qt::UserRole,(int)GAR_PARALLE);
     polygonWidget->addItem(parallel);
 
+    MyListItem * circle = ListItemManager::instance()->createListItem(Constants::CIRCLE_ID,QIcon(":/images/circle.png"),"页面内引用",polygonWidget);
+    circle->setData(Qt::UserRole,(int)GRA_CIRCLE);
+    polygonWidget->addItem(circle);
+
     MyListItem * annotation = ListItemManager::instance()->createListItem(Constants::ANNOTATION_ID,QIcon(":/images/annotation.png"),"注  解",polygonWidget);
     annotation->setData(Qt::UserRole,(int)GRA_ANNOTATION);
     polygonWidget->addItem(annotation);
 
-    MyListItem * square = ListItemManager::instance()->createListItem(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形",polygonWidget);
-    square->setData(Qt::UserRole,(int)GRA_SQUARE);
-    polygonWidget->addItem(square);
+//    MyListItem * square = ListItemManager::instance()->createListItem(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形",polygonWidget);
+//    square->setData(Qt::UserRole,(int)GRA_SQUARE);
+//    polygonWidget->addItem(square);
 
-    MyListItem * circle = ListItemManager::instance()->createListItem(Constants::CIRCLE_ID,QIcon(":/images/circle.png"),"圆",polygonWidget);
-    circle->setData(Qt::UserRole,(int)GRA_CIRCLE);
-    polygonWidget->addItem(circle);
-
-    MyListItem * ellipse = ListItemManager::instance()->createListItem(Constants::ELLIPSE_ID,QIcon(":/images/ellipse.png"),"椭圆",polygonWidget);
-    ellipse->setData(Qt::UserRole,(int)GRA_ELLIPSE);
-    polygonWidget->addItem(ellipse);
+//    MyListItem * ellipse = ListItemManager::instance()->createListItem(Constants::ELLIPSE_ID,QIcon(":/images/ellipse.png"),"椭圆",polygonWidget);
+//    ellipse->setData(Qt::UserRole,(int)GRA_ELLIPSE);
+//    polygonWidget->addItem(ellipse);
 
     MyListItem * text = ListItemManager::instance()->createListItem(Constants::TEXT_ID,QIcon(":/images/text.png"),"文字",polygonWidget);
     text->setData(Qt::UserRole,(int)GRA_TEXT);

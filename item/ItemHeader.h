@@ -45,5 +45,7 @@ enum LineType
 #define ALLOW_DROP_RANGE 10             //控件拖入后允许放下的范围
 #define MOVE_LIMIT_RANG  5              //端口移动至拐点后，如果往另外方向移动，那么需要判断鼠标在此方向上的值至少大于此宏
 
+#define GLOBAL_ITEM_BRUSH  QColor(255,255,237)   //全局item初始化时笔刷样式
+
 
 #endif // HEADER_H

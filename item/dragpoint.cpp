@@ -11,7 +11,7 @@ DragPoint::DragPoint(const PointType pointType, MyItem *parent):
     pointType(pointType),
     QGraphicsObject(parent)
 {
-    radius = 3;
+    radius = 2;
     boundRect = QRectF(-radius,-radius,radius *2,radius *2);
 
     setFlags(QGraphicsItem::ItemIsSelectable |
@@ -162,9 +162,9 @@ void DragPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
     Q_UNUSED(option)
     painter->save();
 
-    painter->setBrush(Qt::black);
+    painter->setBrush(GLOBAL_ITEM_BRUSH);
 
-    painter->drawEllipse(boundRect);
+    painter->drawRect(boundRect);
 
     painter->restore();
 }

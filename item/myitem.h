@@ -29,6 +29,8 @@
 **20160927:wey:添加平行四边形
 **             修复对菱形拖拽时形状改变问题
 **             添加循环上限、循环下限、并行、注解
+**20160930:wey:调整控件四角不按比例缩放，取消四边中点缩放
+**             添加四边中点用于连接线绘制
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -47,11 +49,10 @@ class QMenu;
 class MyArrow;
 class MyTextItem;
 class MyNodePort;
+class DragLinePoint;
 
 #include <QDataStream>
 
-#include "dragpoint.h"
-#include "rotateline.h"
 #include "../Header.h"
 
 class MyItem : public QObject,public QGraphicsPolygonItem
@@ -138,6 +139,8 @@ private:
     qreal getLoopMaxSidLength(qreal width, qreal height);
     void setInitalPolygon(QRectF boundRect, qreal tx, qreal ty, qreal tw, qreal th);
     void initComponentItem();
+    void setDragLineVisible(bool isVisible);
+
     int radius;
 
     GraphicsType currItemType;
@@ -152,10 +155,10 @@ private:
     DragPoint * leftBottomPoint;
     DragPoint * rightBottomPoint;
 
-    DragPoint * topPoint;
-    DragPoint * leftPoint;
-    DragPoint * rightPoint;
-    DragPoint * bottomPoint;
+    DragLinePoint * topLinePoint;
+    DragLinePoint * leftLinePoint;
+    DragLinePoint * rightLinePoint;
+    DragLinePoint * bottomLinePoint;
 
     MyTextItem * myTextItem;           //文字信息
 
@@ -178,6 +181,7 @@ private:
     DragDirect dragMoveDirect;         //拖动时拖入点在哪个方向上
     QPointF dragMovePoint;             //有拖入时，用于记录拖入移动的点
 
+    bool isPrepareLine;                //是否准备绘制线条，如果是，则在鼠标进入时，在四边的中点绘制允许接入点
 };
 
 #endif // MYITEM_H
