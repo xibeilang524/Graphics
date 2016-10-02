@@ -35,6 +35,7 @@ class MyArrow :public QObject, public QGraphicsLineItem
 {
     Q_OBJECT
 public:
+    MyArrow(QGraphicsItem * parent = 0);
     MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem * parent = 0);
     MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem * parent = 0);
 

@@ -62,7 +62,11 @@ enum GraphicsType
     GRA_LINE,            //直线
     GRA_VECTOR_LINE,     //折线
     GRA_TEXT,            //文本
-    GRA_NODE_PORT        //端口
+    GRA_NODE_PORT,       //端口
+    GRA_DRAG_POINT,      //控件拖拽点
+    GRA_DRAG_LING,       //控件线段拖拽点
+    GRA_ROTATE_POINT,    //控件旋转点
+    GRA_ITEM_INFO        //控件显示信息
 };
 
 //拖入端口的方向

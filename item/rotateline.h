@@ -12,17 +12,16 @@
 #ifndef ROTATELINE_H
 #define ROTATELINE_H
 
-#include <QObject>
-#include <QGraphicsPolygonItem>
 #include <QPixmap>
 
+#include "mysuperitem.h"
 #include "ItemHeader.h"
 
-class RotateLine : public QObject, public QGraphicsPolygonItem
+class RotateLine : public MySuperItem
 {
     Q_OBJECT
 public:
-    RotateLine(QGraphicsItem * parent = 0,QObject * parent1 = 0);
+    RotateLine(GraphicsType type,QGraphicsItem * parent = 0,QObject * parent1 = 0);
     ~RotateLine();
 
     void setMoveable(bool moveable);
@@ -42,12 +41,7 @@ signals:
     void rotateItem(MouseType,qreal);
 
 private:
-    QGraphicsItem * parentItem;
-    QRectF boundRect;
-
     QPointF startPoint;
-
-    QPolygonF polygon;
 
     qreal rotateDegree;
     bool hasSelected;

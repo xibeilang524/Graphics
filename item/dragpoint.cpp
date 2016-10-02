@@ -7,19 +7,18 @@
 
 #include "myitem.h"
 
-DragPoint::DragPoint(const PointType pointType, MyItem *parent, QObject *parent1):
+DragPoint::DragPoint(const PointType pointType, GraphicsType type, MyItem *parent, QObject *parent1):
     pointType(pointType),
-    QObject(parent1),
-    QGraphicsPolygonItem(parent)
+    MySuperItem(type,parent,parent1)
 {
     radius = 2;
 
     prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,radius *2,radius *2);
 
-    polygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
+    itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
             <<QPointF(radius,radius)<<QPointF(-radius,radius);
-    setPolygon(polygon);
+    setPolygon(itemPolygon);
 
     setFlags(QGraphicsItem::ItemIsSelectable |
              QGraphicsItem::ItemSendsGeometryChanges |
@@ -171,7 +170,7 @@ void DragPoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *option,
 
     painter->setBrush(GLOBAL_ITEM_BRUSH);
 
-    painter->drawPolygon(polygon);
+    painter->drawPolygon(itemPolygon);
 
     painter->restore();
 }
@@ -212,4 +211,9 @@ void DragPoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     emit resizeItemSize();
     emit currMouseState(MOUSE_RELEASE,pointType,event->pos());
     QGraphicsPolygonItem::mouseReleaseEvent(event);
+}
+
+DragPoint::~DragPoint()
+{
+
 }

@@ -11,6 +11,7 @@
 #include "mytextitem.h"
 #include "mypathitem.h"
 #include "mynodeport.h"
+#include "myiteminfo.h"
 #include "draglinepoint.h"
 #include "../util.h"
 
@@ -25,6 +26,9 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
     insertTmpPath = NULL;
     isLocalFileOpened = false;
     isDragLine = false;
+    myItemInfo = NULL;
+
+    connect(this,SIGNAL(selectionChanged()),this,SLOT(itemSelectedChanged()));
 
     setBackgroundBrush(QPixmap(":/images/backgroundRole.png"));
 }
@@ -94,7 +98,7 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
     if((isDragLine||CurrAddGraType == GRA_LINE)&& insertTmpLine)
     {
-        QLineF newLine(insertTmpLine->line().p1(), event->scenePos() - QPointF(2,2));
+        QLineF newLine(insertTmpLine->line().p1(), event->scenePos() /*- QPointF(2,2)*/);
         insertTmpLine->setLine(newLine);
     }
     else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
@@ -429,6 +433,8 @@ void MyScene::addMyItemConnect(MyItem * item)
     connect(item,SIGNAL(updateSceneDraw()),this,SLOT(update()));
     connect(item,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
     connect(item,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+    connect(item,SIGNAL(itemPosChanged()),this,SLOT(showItemPosInfo()));
+    connect(item,SIGNAL(itemRotationChanged()),this,SLOT(showItemRotationInfo()));
 }
 
 //建立MyText的信号槽关系
@@ -475,6 +481,104 @@ void MyScene::removeItem(QGraphicsItem *item)
     QGraphicsScene::removeItem(item);
 
     emit itemSizeChanged(items().size());
+}
+
+//显示选中item改变的位置信息
+void MyScene::showItemPosInfo()
+{
+    if(!myItemInfo)
+    {
+        createItemInfo();
+    }
+
+    if(selectedItems().size() == 1 && TYPE_ID(*(selectedItems().first())) == TYPE_ID(MyItem))
+    {
+        QRectF minRect = getHorizonalRoundedRect();
+        myItemInfo->setVisible(true);
+        qreal itemWidth = minRect.width();
+        qreal itemHeight = minRect.height();
+
+        myItemInfo->setPosInfo(minRect.x(),minRect.y());
+        myItemInfo->setPos(minRect.x() + itemWidth/2,minRect.y() + itemHeight + 30);
+    }
+}
+
+//显示选中item改变的旋转信息
+void MyScene::showItemRotationInfo()
+{
+    if(!myItemInfo)
+    {
+        createItemInfo();
+    }
+
+    if(selectedItems().size() == 1 && TYPE_ID(*(selectedItems().first())) == TYPE_ID(MyItem))
+    {
+        QRectF minRect = getHorizonalRoundedRect();
+        myItemInfo->setVisible(true);
+        qreal itemWidth = minRect.width();
+        qreal itemHeight = minRect.height();
+
+        myItemInfo->setRotationInfo(selectedItems().first()->rotation());
+        myItemInfo->setPos(minRect.x() + itemWidth/2,minRect.y() + itemHeight + 30);
+    }
+}
+
+//显示旋转和位置信息
+void MyScene::createItemInfo()
+{
+    myItemInfo = new MyItemInfo(GRA_ITEM_INFO);
+    myItemInfo->setVisible(false);
+
+    addItem(myItemInfo);
+}
+
+//获取最小包围控件的矩形，因旋转后boundRect无法表示rect在scene中的位置
+QRectF MyScene::getHorizonalRoundedRect()
+{
+    QRectF rect;
+    if(selectedItems().size() == 1 && TYPE_ID(*(selectedItems().first()))==TYPE_ID(MyItem))
+    {
+       QGraphicsItem * item =  selectedItems().first();
+       QPointF p1 = item->mapToScene(item->boundingRect().topLeft().x(),item->boundingRect().topLeft().y());
+       QPointF p2 = item->mapToScene(item->boundingRect().topRight().x(),item->boundingRect().topRight().y());
+       QPointF p3 = item->mapToScene(item->boundingRect().bottomLeft().x(),item->boundingRect().bottomLeft().y());
+       QPointF p4 = item->mapToScene(item->boundingRect().bottomRight().x(),item->boundingRect().bottomRight().y());
+
+       qreal minX = p1.x();
+       minX = qMin(minX,p2.x());
+       minX = qMin(minX,p3.x());
+       minX = qMin(minX,p4.x());
+
+       qreal minY = p1.y();
+       minY = qMin(minY,p2.y());
+       minY = qMin(minY,p3.y());
+       minY = qMin(minY,p4.y());
+
+       qreal maxX = p1.x();
+       maxX = qMax(maxX,p2.x());
+       maxX = qMax(maxX,p3.x());
+       maxX = qMax(maxX,p4.x());
+
+       qreal maxY = p1.y();
+       maxY = qMax(maxY,p2.y());
+       maxY = qMax(maxY,p3.y());
+       maxY = qMax(maxY,p4.y());
+
+       rect.setX(minX);
+       rect.setY(minY);
+       rect.setWidth(maxX - minX);
+       rect.setHeight(maxY - minY);
+    }
+    return rect;
+}
+
+//item选择状态改变
+void MyScene::itemSelectedChanged()
+{
+    if(myItemInfo)
+    {
+        myItemInfo->setVisible(false);
+    }
 }
 
 //添加文字后，光标移除，判断内容是否为空，为空则删除

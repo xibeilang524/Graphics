@@ -446,7 +446,7 @@ void MyGraphicsView::deleteItem()
             MyNodePort * tmp = dynamic_cast<MyNodePort *>(item);
             tmp->removeArrows();
             //从父类集合中删除
-            tmp->getParentItem()->removeNodePort(tmp);
+            dynamic_cast<MyItem *>(tmp->getParentItem())->removeNodePort(tmp);
             myScene->removeItem(tmp);
             delete tmp;
         }

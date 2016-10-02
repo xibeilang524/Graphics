@@ -9,7 +9,9 @@ HEADERS += \
     item/mynodeport.h \
     item/mygraphicsview.h \
     item/dragpoint.h \
-    item/draglinepoint.h
+    item/draglinepoint.h \
+    item/mysuperitem.h \
+    item/myiteminfo.h
 
 SOURCES += \
     item/rotateline.cpp \
@@ -21,4 +23,6 @@ SOURCES += \
     item/mypathitem.cpp \
     item/mynodeport.cpp \
     item/mygraphicsview.cpp \
-    item/draglinepoint.cpp
+    item/draglinepoint.cpp \
+    item/mysuperitem.cpp \
+    item/myiteminfo.cpp

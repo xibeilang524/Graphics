@@ -21,8 +21,8 @@
 #include <QObject>
 #include <QBrush>
 
-#include "ItemHeader.h"
 #include "../Header.h"
+#include "mysuperitem.h"
 
 #include <QDataStream>
 
@@ -30,11 +30,11 @@ class QMenu;
 class MyItem;
 class MyArrow;
 
-class MyNodePort : public QObject, public QGraphicsPolygonItem
+class MyNodePort : public MySuperItem
 {
     Q_OBJECT
 public:
-    MyNodePort(MyItem * parentItem,QObject * parent1 = 0);
+    MyNodePort(GraphicsType type, MyItem * parentItem, QObject * parent1 = 0);
     ~MyNodePort();
 
     QRectF boundingRect() const;
@@ -57,14 +57,10 @@ public:
 
     void setProperty(ItemProperty property);
 
-    GraphicsType getType()const{return this->type;}
-
     void setNodeProperty(NodePortProperty prop);
     NodePortProperty  getNodeProperty(){return this->nodeProperty;}
 
     QPolygonF getScenePolygon();
-
-    MyItem * getParentItem(){return this->parentMyItem;}
 
     void updatePortID(QString portId);
 
@@ -95,12 +91,7 @@ private slots:
 
 private:
     void initNodePortRightMenu();
-
-    QRectF boundRect;
-    int radius;
     bool isMoveable;                   //是否支持移动，用于父窗口锁定
-
-    GraphicsType  type;                //节点类型
 
     NodePortProperty nodeProperty;     //端口属性
     DragDirect nextDirect;             //端口到达拐点时，此变量会被赋值，鼠标在下一时刻移动时会参考当前方向以及下个方向
@@ -109,9 +100,6 @@ private:
     QMenu * nodePortRightMenu;         //端口右键菜单，支持删除
 
     QList<MyArrow *> arrows;           //保存添加的箭头
-
-    MyItem * parentMyItem;             //父节点
-    QPolygonF polygon;                 //多边形
 
 };
 

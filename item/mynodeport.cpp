@@ -33,7 +33,7 @@ QDataStream & operator >>(QDataStream & dataStream,NodePortProperty & prop)
 
 QDataStream & operator <<(QDataStream & dataStream,MyNodePort * nodePort)
 {
-    int type = nodePort->type;
+    int type = nodePort->currItemType;
     dataStream<<type<<nodePort->nodeProperty;
 
     return dataStream;
@@ -46,22 +46,18 @@ QDataStream & operator >>(QDataStream & dataStream,MyNodePort * nodePort)
 
     dataStream>>type>>property;
 
-    nodePort->type = (GraphicsType)type;
+    nodePort->currItemType = (GraphicsType)type;
     nodePort->nodeProperty = property;
     return dataStream;
 }
 
-MyNodePort::MyNodePort(MyItem *parentItem, QObject *parent1):
-    parentMyItem(parentItem),
-    QObject(parent1),
-    QGraphicsPolygonItem(parentItem)
+MyNodePort::MyNodePort(GraphicsType type, MyItem *parentItem, QObject *parent1):
+    MySuperItem(type,parentItem,parent1)
 {
-//    setFlag(QGraphicsItem::ItemIsMovable,true);
-
     setFlag(QGraphicsItem::ItemIsSelectable,parentItem->isMoveable());
 
     radius = 8;
-    type = GRA_NODE_PORT;
+    currItemType = GRA_NODE_PORT;
     nextDirect = DRAG_NONE;
     arrivalLimitRang = false;
 
@@ -70,10 +66,10 @@ MyNodePort::MyNodePort(MyItem *parentItem, QObject *parent1):
     prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);
 
-    polygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
+    itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
              <<QPointF(radius,radius)<<QPointF(-radius,radius);
 
-    setPolygon(polygon);
+    setPolygon(itemPolygon);
 
     initNodePortRightMenu();
     connect(this,SIGNAL(deletePort(MyNodePort*)),parentItem,SLOT(procDeleteNodePort(MyNodePort*)));
@@ -127,7 +123,7 @@ void MyNodePort::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     painter->setBrush(nodeProperty.itemBrush);
 
-    painter->drawPolygon(polygon);
+    painter->drawPolygon(itemPolygon);
 
     painter->restore();
 }

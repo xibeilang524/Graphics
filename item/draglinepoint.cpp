@@ -6,10 +6,9 @@
 
 #include "myitem.h"
 
-DragLinePoint::DragLinePoint(const PointType pointType, MyItem *parent1, QObject *parent):
+DragLinePoint::DragLinePoint(const PointType pointType, GraphicsType type, MyItem *parent1, QObject *parent):
     pointType(pointType),
-    QObject(parent),
-    QGraphicsPolygonItem(parent1)
+    MySuperItem(type,parent1,parent)
 {
     radius = 2;
 
@@ -18,8 +17,8 @@ DragLinePoint::DragLinePoint(const PointType pointType, MyItem *parent1, QObject
 
     QPainterPath path;
     path.addEllipse(boundRect);
-    polygon = path.toFillPolygon();
-    setPolygon(polygon);
+    itemPolygon = path.toFillPolygon();
+    setPolygon(itemPolygon);
 
     setFlags(QGraphicsItem::ItemIsSelectable |
              QGraphicsItem::ItemSendsGeometryChanges |
@@ -28,6 +27,7 @@ DragLinePoint::DragLinePoint(const PointType pointType, MyItem *parent1, QObject
     setAcceptHoverEvents(true);
 
 }
+
 QRectF DragLinePoint::boundingRect()const
 {
     return boundRect;
@@ -41,7 +41,7 @@ void DragLinePoint::paint(QPainter *painter, const QStyleOptionGraphicsItem *opt
 
     painter->setBrush(GLOBAL_ITEM_BRUSH);
 
-    painter->drawPolygon(polygon);
+    painter->drawPolygon(itemPolygon);
 
     painter->restore();
 }
@@ -59,3 +59,7 @@ void DragLinePoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     this->setCursor(Qt::ArrowCursor);
 }
 
+DragLinePoint::~DragLinePoint()
+{
+
+}

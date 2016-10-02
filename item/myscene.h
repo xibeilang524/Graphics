@@ -19,6 +19,7 @@
 **             修复控件添加直线，由于鼠标点击在Item的Text上，导致无法添加新直线问题
 **             修复控件打开的深度与保存深度不一致问题
 **             修复文件打开时，存在线条连接不上问题
+**20161002:wey:添加显示item位置和旋转信息MyItemInfo
 *************************************************/
 #ifndef MYSCENE_H
 #define MYSCENE_H
@@ -32,6 +33,7 @@ class MyTextItem;
 class MyItem;
 class MyPathItem;
 class MyNodePort;
+class MyItemInfo;
 
 class MyScene : public QGraphicsScene
 {
@@ -56,6 +58,9 @@ signals:
 
 private slots:
     void respTextLostFocus(MyTextItem * item);
+    void itemSelectedChanged();
+    void showItemRotationInfo();
+    void showItemPosInfo();
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -68,11 +73,14 @@ private:
     int findItemById(QList<MyNodePort *> &localNode, QString Id);
     void addMyItemConnect(MyItem * item);
     void addMyTextConnect(MyTextItem  * item);
+    void createItemInfo();
+    QRectF getHorizonalRoundedRect();
 
     QMenu * rightMenu;
 
     QGraphicsLineItem * insertTmpLine;
     MyPathItem * insertTmpPath;
+    MyItemInfo * myItemInfo;           //控件信息
 
     QList<MyItem*> localItems;
     QList<MyNodePort*> localNodeports;

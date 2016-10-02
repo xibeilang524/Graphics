@@ -37,6 +37,17 @@ QDataStream & operator >>(QDataStream &stream,MyArrow * item)
     return stream;
 }
 
+MyArrow::MyArrow(QGraphicsItem *parent):
+    QGraphicsLineItem(parent)
+{
+    setFlag(QGraphicsItem::ItemIsSelectable, true);
+
+    property.itemBrush = QBrush(Qt::black);
+    property.itemPen = QPen(Qt::black,2);
+
+    createTextItem();
+}
+
 MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
     startItem(startItem),
     endItem(endItem),

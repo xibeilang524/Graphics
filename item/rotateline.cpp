@@ -10,25 +10,24 @@
 
 #define ATAN(degree)  atan(degree)*180/PI
 
-RotateLine::RotateLine(QGraphicsItem *parent, QObject *parent1):
-    parentItem(parent),
-    QObject(parent1),
-    QGraphicsPolygonItem(parent)
+RotateLine::RotateLine(GraphicsType type, QGraphicsItem *parent, QObject *parent1):
+    MySuperItem(type,parent,parent1)
 {
-    qreal radius = ROTATE_WIDTH/2;
+    radius = ROTATE_WIDTH/2;
     prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);
 
-    polygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
+    currItemType = GRA_ROTATE_POINT;
+
+    itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
             <<QPointF(radius,radius)<<QPointF(-radius,radius);
-    setPolygon(polygon);
+    setPolygon(itemPolygon);
 
     pixmap.load(":/images/itemLock.png");
 
     isMoveable = true;
 
     setFlags(ItemIsSelectable);
-
     setAcceptHoverEvents(true);
 
     rotateDegree = 0;
@@ -61,7 +60,7 @@ void RotateLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     else
     {
         painter->setBrush(Qt::blue);
-        painter->drawPolygon(polygon);
+        painter->drawPolygon(itemPolygon);
     }
 
     painter->restore();
@@ -89,9 +88,6 @@ void RotateLine::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-//    qreal posY = mapToParent(event->pos()).y();
-//    qreal posX = mapToParent(event->pos()).x();
-
     qreal posY = mapToParent(event->pos()).y();
     qreal posX = mapToParent(event->pos()).x();
 
@@ -137,7 +133,6 @@ void RotateLine::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     emit rotateItem(MOUSE_RELEASE,0);
     QGraphicsPolygonItem::mouseReleaseEvent(event);
 }
-
 
 RotateLine::~RotateLine()
 {

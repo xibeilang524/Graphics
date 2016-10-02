@@ -35,12 +35,11 @@
 #ifndef MYITEM_H
 #define MYITEM_H
 
-#include <QObject>
-#include <QGraphicsPolygonItem>
 #include <QPolygonF>
 #include <QPen>
 
 #include "ItemHeader.h"
+#include "mysuperitem.h"
 
 class QGraphicsItem;
 class DragPoint;
@@ -55,7 +54,7 @@ class DragLinePoint;
 
 #include "../Header.h"
 
-class MyItem : public QObject,public QGraphicsPolygonItem
+class MyItem : public MySuperItem
 {
     Q_OBJECT
 public:
@@ -71,9 +70,7 @@ public:
     void removeArrow(MyArrow * arrow);
 
     void setProperty(ItemProperty property);
-    ItemProperty getProperty(){return this->property;}
 
-    GraphicsType getType(){return this->currItemType;}
     void updateRotation(int rotateValue);
 
     QString getText();
@@ -102,6 +99,8 @@ signals:
     void updateSceneDraw();
     void editMe();
     void propHasChanged(ItemProperty);
+    void itemPosChanged();
+    void itemRotationChanged();
 
 private slots:
     void procResizeItem();
@@ -141,12 +140,6 @@ private:
     void initComponentItem();
     void setDragLineVisible(bool isVisible);
 
-    int radius;
-
-    GraphicsType currItemType;
-
-    QRectF boundRect;
-
     QPen selectedPen;
     int selectedPenWidth;
 
@@ -170,11 +163,7 @@ private:
     MouseType currMouseType;
 
     QList<MyArrow *> arrows;           //保存添加的箭头
-    QPolygonF itemPolygon;             //当前图形的各个顶点坐标集合
-
     QList<MyNodePort*> ports;          //当前控件端口的集合
-
-    ItemProperty property;             //保存当前属性
 
     bool isNeedBorder;                 //是否需要选中边框
     bool isDragging;                   //是否有拖入，有拖入后在边框显示拖入点

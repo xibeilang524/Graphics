@@ -12,18 +12,17 @@
 #ifndef DRAGPOINT_H
 #define DRAGPOINT_H
 
-#include <QObject>
-#include <QGraphicsPolygonItem>
-
+#include "mysuperitem.h"
 #include "ItemHeader.h"
 
 class MyItem;
 
-class DragPoint : public QObject, public QGraphicsPolygonItem
+class DragPoint : public MySuperItem
 {
     Q_OBJECT
 public:
-    DragPoint(const PointType pointType, MyItem * parent = 0 ,QObject * parent1 = 0);
+    DragPoint(const PointType pointType,GraphicsType type, MyItem * parent = 0 ,QObject * parent1 = 0);
+    ~DragPoint();
     void updatePos(PointType type,QPointF point);
 
     QRectF boundingRect()const;
@@ -47,11 +46,8 @@ protected:
     void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 
 private:
-    QRectF boundRect;
-    qreal radius;
     PointType pointType;
     Qt::CursorShape cursorShape;
-    QPolygonF polygon;
 };
 
 #endif // DRAGPOINT_H

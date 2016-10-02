@@ -129,11 +129,9 @@ QDataStream & operator >>(QDataStream &stream,MyItem * item)
 }
 
 MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, QObject *parent1, QGraphicsItem *parent2):
-    currItemType(itemType),
     rightMenu(menu),
     parentScene(parentScene),
-    QObject(parent1),
-    QGraphicsPolygonItem(parent2)
+    MySuperItem(itemType,parent2,parent1)
 {
     radius = 60;
     isDragging = false;            //默认无拖入
@@ -198,7 +196,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 void MyItem::initComponentItem()
 {
     //旋转线条
-    rotateLine = new RotateLine(this);
+    rotateLine = new RotateLine(GRA_ROTATE_POINT,this);
     connect(rotateLine,SIGNAL(rotateItem(MouseType,qreal)),this,SLOT(procRotate(MouseType,qreal)));
     updateRotateLinePos();
 
@@ -212,16 +210,16 @@ void MyItem::initComponentItem()
     myTextItem->cleartText();
 
     //四个顶点的拖拽点
-    leftTopPoint = new DragPoint(TOP_LEFT,this);
-    rightTopPoint = new DragPoint(TOP_RIGHT,this);
-    leftBottomPoint = new DragPoint(BOTTOM_LEFT,this);
-    rightBottomPoint = new DragPoint(BOTTOM_RIGHT,this);
+    leftTopPoint = new DragPoint(TOP_LEFT,GRA_DRAG_POINT,this);
+    rightTopPoint = new DragPoint(TOP_RIGHT,GRA_DRAG_POINT,this);
+    leftBottomPoint = new DragPoint(BOTTOM_LEFT,GRA_DRAG_POINT,this);
+    rightBottomPoint = new DragPoint(BOTTOM_RIGHT,GRA_DRAG_POINT,this);
 
     //四边中点的直线绘制点
-    topLinePoint = new DragLinePoint(TOP_MIDDLE,this);
-    leftLinePoint = new DragLinePoint(MIDDLE_LEFT,this);
-    rightLinePoint = new DragLinePoint(MIDDLE_RIGHT,this);
-    bottomLinePoint = new DragLinePoint(BOTTOM_MIDDLE,this);
+    topLinePoint = new DragLinePoint(TOP_MIDDLE,GRA_DRAG_LING,this);
+    leftLinePoint = new DragLinePoint(MIDDLE_LEFT,GRA_DRAG_LING,this);
+    rightLinePoint = new DragLinePoint(MIDDLE_RIGHT,GRA_DRAG_LING,this);
+    bottomLinePoint = new DragLinePoint(BOTTOM_MIDDLE,GRA_DRAG_LING,this);
 
     setDragPointVisible(false);
     procResizeItem();
@@ -345,7 +343,7 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     {
         painter->save();
         painter->setPen(QPen(Qt::green,2));
-        painter->drawRect(boundRect);
+        painter->drawPolygon(itemPolygon);
 
         painter->setPen(QPen(Qt::gray,5));
         painter->drawPoint(boundRect.topLeft().x(),0);
@@ -708,7 +706,7 @@ MyNodePort * MyItem::addNodePort(const NodePortProperty &prop)
 
 MyNodePort * MyItem::createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor)
 {
-    MyNodePort * port = new MyNodePort(this);
+    MyNodePort * port = new MyNodePort(GRA_NODE_PORT,this);
     port->setPos(pos);
     port->setDragDirect(direct);
     port->setScaleFactor(scaleFactor);
@@ -1053,8 +1051,13 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
         rightTopPoint->updateDragPointHoverCursor(rotation());
         leftBottomPoint->updateDragPointHoverCursor(rotation());
         rightBottomPoint->updateDragPointHoverCursor(rotation());
-    }
 
+        emit itemRotationChanged();
+    }
+    else if(change == QGraphicsItem::ItemPositionHasChanged)
+    {
+        emit itemPosChanged();
+    }
     return QGraphicsPolygonItem::itemChange(change,value);
 }
 
