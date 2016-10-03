@@ -1,6 +1,8 @@
 #include "util.h"
 
 #include <QWidget>
+#include <QUuid>
+
 #include "global.h"
 
 void Util::setWidgetColor(QWidget *widget, QColor &color)
@@ -28,4 +30,10 @@ qreal Util::getGlobalZValue()
 void Util::resetGlobalZValue()
 {
     GlobalItemZValue = 0;
+}
+
+//获取唯一标识符
+QString Util::getUUID()
+{
+    return QUuid::createUuid().toString();
 }

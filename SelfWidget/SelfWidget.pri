@@ -5,7 +5,9 @@ HEADERS += \
     SelfWidget/lefticonwidget.h \
     SelfWidget/mylistwidget.h \
     SelfWidget/nodeeditdialog.h \
-    SelfWidget/hidesplit.h
+    SelfWidget/hidesplit.h \
+    SelfWidget/mypropertyedit.h \
+    SelfWidget/mypageswitch.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -14,10 +16,13 @@ SOURCES += \
     SelfWidget/lefticonwidget.cpp \
     SelfWidget/mylistwidget.cpp \
     SelfWidget/nodeeditdialog.cpp \
-    SelfWidget/hidesplit.cpp
+    SelfWidget/hidesplit.cpp \
+    SelfWidget/mypropertyedit.cpp \
+    SelfWidget/mypageswitch.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
     SelfWidget/mytextinput.ui \
     SelfWidget/nodeeditdialog.ui \
-    SelfWidget/hidesplit.ui
+    SelfWidget/hidesplit.ui \
+    SelfWidget/mypropertyedit.ui

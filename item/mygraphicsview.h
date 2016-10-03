@@ -14,6 +14,7 @@
 **20160923:wey:增加拖入清除控件选择
 **             增加Ctrl+滚轮缩小视图
 **20160928:wey:增加更新选中线条类型
+**20161003:wey:增加控件属性编辑窗口
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -43,6 +44,8 @@ public:
     void addContextMenuItem();
 
     MyScene * scene();
+    MyScene * addScene(QString id);
+    void showScene(MyScene *scene);
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
@@ -79,6 +82,7 @@ private slots:
     void sceneScaled(int currScale);
     void updateActions();
     void editTextItem();
+    void editPropertyItem();
     void respPropertyUpdate(ItemProperty property);
     void setSelectedLineType(int type);
 

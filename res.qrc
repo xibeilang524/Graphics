@@ -52,5 +52,8 @@
         <file>images/loop_down.png</file>
         <file>images/loop_up.png</file>
         <file>images/parallel.png</file>
+        <file>images/pageFlag.png</file>
+        <file>images/pageClose.png</file>
+        <file>images/pageClose_hover.png</file>
     </qresource>
 </RCC>

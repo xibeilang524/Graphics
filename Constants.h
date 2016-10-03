@@ -20,6 +20,7 @@ const char CLEAR_PASTE_ID[] = "Constants.ClearPaste";
 
 //¿Ø¼þ±à¼­
 const char EDIT_TEXT_ID[] = "Constants.EditText";
+const char PROPERTY_EDIT_ID[] = "Constants.PropertyEdit";
 
 const char ROTATE_LEFT_ID[] = "Constants.RotateLeft";
 const char ROTATE_RIGHT_ID[] = "Constants.RotateRight";

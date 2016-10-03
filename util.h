@@ -13,6 +13,7 @@ public:
     static QString getFontInfo(QFont font);
     static qreal getGlobalZValue();
     static void  resetGlobalZValue();
+    static QString getUUID();
 };
 
 #endif // UTIL_H

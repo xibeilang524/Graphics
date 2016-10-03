@@ -19,6 +19,7 @@
 #include "./SelfWidget/lefticonwidget.h"
 #include "./SelfWidget/hidesplit.h"
 #include "./SelfWidget/righttoolbox.h"
+#include "./SelfWidget/mypageswitch.h"
 #include "./manager/MyLineComboBox.h"
 #include "fileoperate.h"
 #include "global.h"
@@ -58,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
 
     ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
     ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
+    SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
 }
 
 //创建窗口的菜单栏，绑定响应事件
@@ -65,9 +67,9 @@ void MainWindow::createActionAndMenus()
 {
     QMenu * fileMenu = menuBar()->addMenu("文件(&F)");
 
-    MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建");
+    MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工作区");
     newAction->setShortcut(QKeySequence("Ctrl+N"));
-    ActionManager::instance()->registerAction(newAction,this,SLOT(fileOpen()));
+    ActionManager::instance()->registerAction(newAction,MyPageSwitch::instance(),SLOT(addPage()));
 
     MyAction * saveAction = ActionManager::instance()->crateAction(Constants::SAVE_ID,QIcon(":/images/save.png"),"保存");
     saveAction->setShortcut(QKeySequence("Ctrl+S"));
@@ -81,7 +83,7 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(clearAction,this,SLOT(fileClear()));
 
     MyAction * exitAction = ActionManager::instance()->crateAction(Constants::EXIT_ID,"退出");
-    exitAction->setShortcut(QKeySequence("Ctrl+E"));
+    exitAction->setShortcut(QKeySequence("Ctrl+Q"));
     ActionManager::instance()->registerAction(exitAction,this,SLOT(exitApp()));
 
     fileMenu->addAction(newAction);
@@ -144,7 +146,12 @@ void MainWindow::createActionAndMenus()
     editTextAction->setShortcut(QKeySequence("Ctrl+T"));
     ActionManager::instance()->registerAction(editTextAction,MyGraphicsView::instance(),SLOT(editTextItem()));
 
+    MyAction * propertyEditAction = ActionManager::instance()->crateAction(Constants::PROPERTY_EDIT_ID,QIcon(""),"编辑属性");
+    propertyEditAction->setShortcut(QKeySequence("Ctrl+E"));
+    ActionManager::instance()->registerAction(propertyEditAction,MyGraphicsView::instance(),SLOT(editPropertyItem()));
+
     editMenu->addAction(editTextAction);
+//    editMenu->addAction(propertyEditAction);
     editMenu->addSeparator();
     editMenu->addAction(undoAction);
     editMenu->addAction(redoAction);
@@ -253,7 +260,7 @@ void MainWindow::createActionAndMenus()
     QMenu * helpMenu = menuBar()->addMenu("帮助(&H)");
     //【帮助菜单栏】
     MyAction * supportAction = ActionManager::instance()->crateAction(Constants::TEC_SUPPORT_ID,QIcon(":/images/getsupport.png"),"技术支持");
-    supportAction->setShortcut(QKeySequence("Ctrl+Q"));
+//    supportAction->setShortcut(QKeySequence("Ctrl+Q"));
     ActionManager::instance()->registerAction(supportAction,this,SLOT(getTecSupport()));
 
     MyAction * aboutAction = ActionManager::instance()->crateAction(Constants::ABOUT_ID,QIcon(":/images/about.png"),"关于");
@@ -416,7 +423,13 @@ void MainWindow::createSceneAndView()
     layout->setContentsMargins(1,1,1,1);
     layout->setSpacing(LAYOUT_SPACING);
 
+    QVBoxLayout * vLayout = new QVBoxLayout;
+    vLayout->setContentsMargins(1,1,1,1);
     view = new MyGraphicsView(this);
+
+    vLayout->addWidget(MyPageSwitch::instance());
+    vLayout->addWidget(view);
+    MyPageSwitch::instance()->addPage();
 
     leftIconWidget = new LeftIconWidget;
 
@@ -427,7 +440,7 @@ void MainWindow::createSceneAndView()
     connect(MyGraphicsView::instance(),SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
 
     layout->addWidget(SplitManager::instance()->addSplit(QString(Constants::HIDE_ICON_ID),SPLIT_RIGHT,leftIconWidget));
-    layout->addWidget(view);
+    layout->addLayout(vLayout);
     layout->addWidget(SplitManager::instance()->addSplit(QString(Constants::HIDE_TOOL_ID),SPLIT_LEFT,rightToolBox));
     centralWidget->setLayout(layout);
 
@@ -505,12 +518,6 @@ void MainWindow::createToolBar()
     QToolBar * itemBar = addToolBar("Item");
     itemBar->addAction(ActionManager::instance()->action(Constants::ARROW_ID));
     itemBar->addSeparator();
-//    itemBar->addAction(ActionManager::instance()->action(Constants::SQUARE_ID));
-//    itemBar->addAction(ActionManager::instance()->action(Constants::RECT_ID));
-//    itemBar->addAction(ActionManager::instance()->action(Constants::ROUNDRECT_ID));
-//    itemBar->addAction(ActionManager::instance()->action(Constants::CIRCLE_ID));
-//    itemBar->addAction(ActionManager::instance()->action(Constants::ELLIPSE_ID));
-//    itemBar->addAction(ActionManager::instance()->action(Constants::POLYGON_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::TEXT_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::LINE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::VECTOR_LINE_ID));

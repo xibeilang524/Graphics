@@ -218,6 +218,10 @@ void MyScene::keyPressEvent(QKeyEvent *event)
     {
         emit ctrlUnLockKeyPress();
     }
+    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_E)
+    {
+        emit ctrlPropEditKeyPress();
+    }
     QGraphicsScene::keyPressEvent(event);
 }
 

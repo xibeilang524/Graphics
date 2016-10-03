@@ -12,6 +12,7 @@
 #include "myscene.h"
 #include "../SelfWidget/nodeeditdialog.h"
 #include "../SelfWidget/mytextinput.h"
+#include "../SelfWidget/mypropertyedit.h"
 #include "../Header.h"
 #include "../global.h"
 #include "../mainwindow.h"
@@ -60,25 +61,42 @@ void MyGraphicsView::initView()
 
     rightMenu = new QMenu;
     viewRightMenu = new QMenu;
+}
 
-    myScene = new MyScene(rightMenu);
-    myScene->setSceneRect(0,0,SceneWidth,SceneHeight);
-    setScene(myScene);
+//创建新的scene
+MyScene * MyGraphicsView::addScene(QString id)
+{
+    MyScene  * tmpScene = new MyScene(rightMenu);
+    tmpScene->setSceneRect(0,0,SceneWidth,SceneHeight);
+    tmpScene->setId(id);
 
-    connect(myScene,SIGNAL(resetItemAction()),parentWindow,SLOT(respRestItemAction()));
-    connect(myScene, SIGNAL(selectionChanged()),this, SLOT(updateActions()));
-    connect(myScene,SIGNAL(deleteKeyPress()),this,SLOT(deleteItem()));
-    connect(myScene,SIGNAL(ctrlLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
-    connect(myScene,SIGNAL(ctrlUnLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
-    connect(myScene,SIGNAL(itemSizeChanged(int)),parentWindow,SLOT(respItemSizeChanged(int)));
-    connect(myScene,SIGNAL(itemPropChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
-    connect(myScene,SIGNAL(editCurrItem()),this,SLOT(editTextItem()));
+    showScene(tmpScene);
+
+    connect(tmpScene,SIGNAL(resetItemAction()),parentWindow,SLOT(respRestItemAction()));
+    connect(tmpScene, SIGNAL(selectionChanged()),this, SLOT(updateActions()));
+    connect(tmpScene,SIGNAL(deleteKeyPress()),this,SLOT(deleteItem()));
+    connect(tmpScene,SIGNAL(ctrlLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
+    connect(tmpScene,SIGNAL(ctrlUnLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
+    connect(tmpScene,SIGNAL(itemSizeChanged(int)),parentWindow,SLOT(respItemSizeChanged(int)));
+    connect(tmpScene,SIGNAL(itemPropChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
+    connect(tmpScene,SIGNAL(editCurrItem()),this,SLOT(editTextItem()));
+    connect(tmpScene,SIGNAL(ctrlPropEditKeyPress()),this,SLOT(editPropertyItem()));
+
+    return tmpScene;
+}
+
+//设置当前的场景
+void MyGraphicsView::showScene(MyScene *scene)
+{
+    myScene = scene;
+    MyGraphicsView::setScene(myScene);
 }
 
 //初始化右键菜单
 void MyGraphicsView::addContextMenuItem()
 {
     rightMenu->addAction(ActionManager::instance()->action(Constants::EDIT_TEXT_ID));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::PROPERTY_EDIT_ID));
     rightMenu->addSeparator();
     rightMenu->addAction(ActionManager::instance()->action(Constants::CUT_ID));
     rightMenu->addAction(ActionManager::instance()->action(Constants::COPY_ID));
@@ -874,6 +892,25 @@ void MyGraphicsView::editTextItem()
             textInput.exec();
 
             item->setText(textInput.getText());
+        }
+    }
+}
+
+//编辑控件的属性
+void MyGraphicsView::editPropertyItem()
+{
+    QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
+    if(selectedItems.size() == 1)
+    {
+        QString itemName = TYPE_ID(*(selectedItems.first()));
+
+        if(itemName == TYPE_ID(MyItem))
+        {
+            MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+
+            MyPropertyEdit propertyEdi(this);
+
+            propertyEdi.exec();
         }
     }
 }

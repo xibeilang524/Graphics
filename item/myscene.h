@@ -47,6 +47,8 @@ public:
     void addItem(QList<CutInfo *> & cutInfos);
     void addItem(GraphicsType type,QPointF pos);
     void removeItem(QGraphicsItem *item);
+    void setId(QString id){this->uuid = id;}
+    QString getId(){return this->uuid;}
     void clear();
     ~MyScene();
 
@@ -58,6 +60,7 @@ signals:
     void itemSizeChanged(int size);
     void itemPropChanged(ItemProperty);
     void editCurrItem();
+    void ctrlPropEditKeyPress();
 
 private slots:
     void respTextLostFocus(MyTextItem * item);
@@ -91,6 +94,7 @@ private:
     bool isLocalFileOpened;            //是否是本地文件打开
     bool isDragLine;                   //是否处于添加线条状态
     bool isClear;                      //是否在清空状态，用于控制clear()对MyIemInfo的影响
+    QString uuid;
 };
 
 #endif // MYSCENE_H
