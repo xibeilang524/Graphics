@@ -26,7 +26,9 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
     insertTmpPath = NULL;
     isLocalFileOpened = false;
     isDragLine = false;
+    isClear = false;
     myItemInfo = NULL;
+    createItemInfo();
 
     connect(this,SIGNAL(selectionChanged()),this,SLOT(itemSelectedChanged()));
 
@@ -36,6 +38,7 @@ MyScene::MyScene(QMenu *menu, QObject * parent):
 void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     SceneLastClickPoint = event->scenePos();
+
     if(event->button () == Qt::LeftButton)
     {
         if(itemAt(event->scenePos()) && TYPE_ID(*itemAt(event->scenePos())) == TYPE_ID(DragLinePoint))
@@ -433,8 +436,8 @@ void MyScene::addMyItemConnect(MyItem * item)
     connect(item,SIGNAL(updateSceneDraw()),this,SLOT(update()));
     connect(item,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
     connect(item,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
-    connect(item,SIGNAL(itemPosChanged()),this,SLOT(showItemPosInfo()));
-    connect(item,SIGNAL(itemRotationChanged()),this,SLOT(showItemRotationInfo()));
+    connect(item,SIGNAL(itemPosChanged(MyItem *)),this,SLOT(showItemPosInfo(MyItem *)));
+    connect(item,SIGNAL(itemRotationChanged(MyItem *)),this,SLOT(showItemRotationInfo(MyItem *)));
 }
 
 //建立MyText的信号槽关系
@@ -484,43 +487,35 @@ void MyScene::removeItem(QGraphicsItem *item)
 }
 
 //显示选中item改变的位置信息
-void MyScene::showItemPosInfo()
+void MyScene::showItemPosInfo(MyItem * item)
 {
     if(!myItemInfo)
     {
         createItemInfo();
     }
+    QRectF minRect = getHorizonalRoundedRect(item);
+    myItemInfo->setVisible(true);
+    qreal itemWidth = minRect.width();
+    qreal itemHeight = minRect.height();
 
-    if(selectedItems().size() == 1 && TYPE_ID(*(selectedItems().first())) == TYPE_ID(MyItem))
-    {
-        QRectF minRect = getHorizonalRoundedRect();
-        myItemInfo->setVisible(true);
-        qreal itemWidth = minRect.width();
-        qreal itemHeight = minRect.height();
-
-        myItemInfo->setPosInfo(minRect.x(),minRect.y());
-        myItemInfo->setPos(minRect.x() + itemWidth/2,minRect.y() + itemHeight + 30);
-    }
+    myItemInfo->setPosInfo(minRect.x(),minRect.y());
+    myItemInfo->setPos(minRect.x() + itemWidth/2,minRect.y() + itemHeight + 30);
 }
 
 //显示选中item改变的旋转信息
-void MyScene::showItemRotationInfo()
+void MyScene::showItemRotationInfo(MyItem *item)
 {
     if(!myItemInfo)
     {
         createItemInfo();
     }
+    QRectF minRect = getHorizonalRoundedRect(item);
+    myItemInfo->setVisible(true);
+    qreal itemWidth = minRect.width();
+    qreal itemHeight = minRect.height();
 
-    if(selectedItems().size() == 1 && TYPE_ID(*(selectedItems().first())) == TYPE_ID(MyItem))
-    {
-        QRectF minRect = getHorizonalRoundedRect();
-        myItemInfo->setVisible(true);
-        qreal itemWidth = minRect.width();
-        qreal itemHeight = minRect.height();
-
-        myItemInfo->setRotationInfo(selectedItems().first()->rotation());
-        myItemInfo->setPos(minRect.x() + itemWidth/2,minRect.y() + itemHeight + 30);
-    }
+    myItemInfo->setRotationInfo(selectedItems().first()->rotation());
+    myItemInfo->setPos(minRect.x() + itemWidth/2,minRect.y() + itemHeight + 30);
 }
 
 //显示旋转和位置信息
@@ -533,49 +528,51 @@ void MyScene::createItemInfo()
 }
 
 //获取最小包围控件的矩形，因旋转后boundRect无法表示rect在scene中的位置
-QRectF MyScene::getHorizonalRoundedRect()
+QRectF MyScene::getHorizonalRoundedRect(MyItem *item)
 {
     QRectF rect;
-    if(selectedItems().size() == 1 && TYPE_ID(*(selectedItems().first()))==TYPE_ID(MyItem))
+
+    if(!item)
     {
-       QGraphicsItem * item =  selectedItems().first();
-       QPointF p1 = item->mapToScene(item->boundingRect().topLeft().x(),item->boundingRect().topLeft().y());
-       QPointF p2 = item->mapToScene(item->boundingRect().topRight().x(),item->boundingRect().topRight().y());
-       QPointF p3 = item->mapToScene(item->boundingRect().bottomLeft().x(),item->boundingRect().bottomLeft().y());
-       QPointF p4 = item->mapToScene(item->boundingRect().bottomRight().x(),item->boundingRect().bottomRight().y());
-
-       qreal minX = p1.x();
-       minX = qMin(minX,p2.x());
-       minX = qMin(minX,p3.x());
-       minX = qMin(minX,p4.x());
-
-       qreal minY = p1.y();
-       minY = qMin(minY,p2.y());
-       minY = qMin(minY,p3.y());
-       minY = qMin(minY,p4.y());
-
-       qreal maxX = p1.x();
-       maxX = qMax(maxX,p2.x());
-       maxX = qMax(maxX,p3.x());
-       maxX = qMax(maxX,p4.x());
-
-       qreal maxY = p1.y();
-       maxY = qMax(maxY,p2.y());
-       maxY = qMax(maxY,p3.y());
-       maxY = qMax(maxY,p4.y());
-
-       rect.setX(minX);
-       rect.setY(minY);
-       rect.setWidth(maxX - minX);
-       rect.setHeight(maxY - minY);
+        return rect;
     }
+
+    QPointF p1 = item->mapToScene(item->boundingRect().topLeft().x(),item->boundingRect().topLeft().y());
+    QPointF p2 = item->mapToScene(item->boundingRect().topRight().x(),item->boundingRect().topRight().y());
+    QPointF p3 = item->mapToScene(item->boundingRect().bottomLeft().x(),item->boundingRect().bottomLeft().y());
+    QPointF p4 = item->mapToScene(item->boundingRect().bottomRight().x(),item->boundingRect().bottomRight().y());
+
+    qreal minX = p1.x();
+    minX = qMin(minX,p2.x());
+    minX = qMin(minX,p3.x());
+    minX = qMin(minX,p4.x());
+
+    qreal minY = p1.y();
+    minY = qMin(minY,p2.y());
+    minY = qMin(minY,p3.y());
+    minY = qMin(minY,p4.y());
+
+    qreal maxX = p1.x();
+    maxX = qMax(maxX,p2.x());
+    maxX = qMax(maxX,p3.x());
+    maxX = qMax(maxX,p4.x());
+
+    qreal maxY = p1.y();
+    maxY = qMax(maxY,p2.y());
+    maxY = qMax(maxY,p3.y());
+    maxY = qMax(maxY,p4.y());
+
+    rect.setX(minX);
+    rect.setY(minY);
+    rect.setWidth(maxX - minX);
+    rect.setHeight(maxY - minY);
     return rect;
 }
 
-//item选择状态改变
+//item选择状态改变【清空时因此控件是一部分被清空，导致无法访问】
 void MyScene::itemSelectedChanged()
 {
-    if(myItemInfo)
+    if( !isClear && myItemInfo)
     {
         myItemInfo->setVisible(false);
     }
@@ -593,6 +590,16 @@ void MyScene::respTextLostFocus(MyTextItem *item)
         removeItem(item);
         item->deleteLater();
     }
+}
+
+//清空item，但不清除第一个Item(MyItemInfo)【!!!】
+void MyScene::clear()
+{
+    isClear = true;
+    QGraphicsScene::clear();
+    isClear = false;
+
+    myItemInfo = NULL;
 }
 
 MyScene::~MyScene()

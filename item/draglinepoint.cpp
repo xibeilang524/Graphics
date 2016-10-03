@@ -10,7 +10,7 @@ DragLinePoint::DragLinePoint(const PointType pointType, GraphicsType type, MyIte
     pointType(pointType),
     MySuperItem(type,parent1,parent)
 {
-    radius = 2;
+    radius = 3;
 
     prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,radius *2,radius *2);

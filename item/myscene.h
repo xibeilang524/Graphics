@@ -45,6 +45,7 @@ public:
     void addItem(QList<CutInfo *> & cutInfos);
     void addItem(GraphicsType type,QPointF pos);
     void removeItem(QGraphicsItem *item);
+    void clear();
     ~MyScene();
 
 signals:
@@ -59,8 +60,8 @@ signals:
 private slots:
     void respTextLostFocus(MyTextItem * item);
     void itemSelectedChanged();
-    void showItemRotationInfo();
-    void showItemPosInfo();
+    void showItemRotationInfo(MyItem *);
+    void showItemPosInfo(MyItem *);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);
@@ -74,7 +75,7 @@ private:
     void addMyItemConnect(MyItem * item);
     void addMyTextConnect(MyTextItem  * item);
     void createItemInfo();
-    QRectF getHorizonalRoundedRect();
+    QRectF getHorizonalRoundedRect(MyItem *item);
 
     QMenu * rightMenu;
 
@@ -87,6 +88,7 @@ private:
 
     bool isLocalFileOpened;            //是否是本地文件打开
     bool isDragLine;                   //是否处于添加线条状态
+    bool isClear;                      //是否在清空状态，用于控制clear()对MyIemInfo的影响
 };
 
 #endif // MYSCENE_H

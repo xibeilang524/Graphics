@@ -165,7 +165,6 @@ void MyGraphicsView::mousePressEvent(QMouseEvent *event)
         pressPoint = event->pos();
 
         isMoving = true;
-
         setCursor(Qt::ClosedHandCursor);
     }
 

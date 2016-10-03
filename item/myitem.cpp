@@ -460,7 +460,6 @@ void MyItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     {
         setDragLineVisible(false);
     }
-
     setCursor(Qt::ArrowCursor);
     QGraphicsPolygonItem::hoverLeaveEvent(event);
 }
@@ -1052,11 +1051,11 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
         leftBottomPoint->updateDragPointHoverCursor(rotation());
         rightBottomPoint->updateDragPointHoverCursor(rotation());
 
-        emit itemRotationChanged();
+        emit itemRotationChanged(this);
     }
     else if(change == QGraphicsItem::ItemPositionHasChanged)
     {
-        emit itemPosChanged();
+        emit itemPosChanged(this);
     }
     return QGraphicsPolygonItem::itemChange(change,value);
 }

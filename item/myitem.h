@@ -99,8 +99,8 @@ signals:
     void updateSceneDraw();
     void editMe();
     void propHasChanged(ItemProperty);
-    void itemPosChanged();
-    void itemRotationChanged();
+    void itemPosChanged(MyItem  * );
+    void itemRotationChanged(MyItem  *);
 
 private slots:
     void procResizeItem();
