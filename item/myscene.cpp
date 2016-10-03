@@ -69,7 +69,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         {
 //            insertTmpPath = new MyPathItem;
 //            insertTmpPath->setPen(QPen(Qt::blue,2));
-//            insertTmpPath->setPos(event->screenPos());
+//            insertTmpPath->setPos(event->scenePos());
 //            addItem(insertTmpPath);
         }
         else if(CurrAddGraType != GRA_NONE)

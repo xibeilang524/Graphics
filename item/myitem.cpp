@@ -1027,6 +1027,18 @@ void MyItem::setDragLineVisible(bool isVisible)
     leftLinePoint->setVisible(isVisible);
     rightLinePoint->setVisible(isVisible);
     bottomLinePoint->setVisible(isVisible);
+
+    if(currItemType == GRA_ANNOTATION)
+    {
+        topLinePoint->setVisible(false);
+        rightLinePoint->setVisible(false);
+        bottomLinePoint->setVisible(false);
+    }
+    else if(currItemType == GAR_PARALLE)
+    {
+        leftLinePoint->setVisible(false);
+        rightLinePoint->setVisible(false);
+    }
 }
 
 QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -1282,10 +1294,20 @@ void MyItem::procResizeItem()
     leftBottomPoint->setPos(boundRect.bottomLeft());
     rightBottomPoint->setPos(boundRect.bottomRight());
 
-    topLinePoint->setPos(QPointF(0,boundRect.topLeft().y()));
-    leftLinePoint->setPos(QPointF(boundRect.topLeft().x(),0));
-    rightLinePoint->setPos(QPointF(boundRect.bottomRight().x(),0));
-    bottomLinePoint->setPos(QPointF(0,boundRect.bottomLeft().y()));
+    if(currItemType == GRA_PARALLELOGRAM)
+    {
+        topLinePoint->setPos((itemPolygon.at(0).x() + itemPolygon.at(1).x())/2, itemPolygon.at(0).y());
+        rightLinePoint->setPos((itemPolygon.at(1).x() + itemPolygon.at(2).x())/2, 0);
+        bottomLinePoint->setPos((itemPolygon.at(2).x() + itemPolygon.at(3).x())/2, itemPolygon.at(2).y());
+        leftLinePoint->setPos((itemPolygon.at(3).x() + itemPolygon.at(0).x())/2, 0);
+    }
+    else
+    {
+        topLinePoint->setPos(QPointF(0,boundRect.topLeft().y()));
+        leftLinePoint->setPos(QPointF(boundRect.topLeft().x(),0));
+        rightLinePoint->setPos(QPointF(boundRect.bottomRight().x(),0));
+        bottomLinePoint->setPos(QPointF(0,boundRect.bottomLeft().y()));
+    }
 }
 
 //调整拖入端口的位置
