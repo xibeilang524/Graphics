@@ -178,6 +178,7 @@ void MyGraphicsView::wheelEvent(QWheelEvent *event)
 
 void MyGraphicsView::mousePressEvent(QMouseEvent *event)
 {
+    MY_ASSERT(myScene)
     if(viewIsDragable && myScene->selectedItems().size()==0 )
     {
         pressPoint = event->pos();
@@ -191,7 +192,8 @@ void MyGraphicsView::mousePressEvent(QMouseEvent *event)
 
 void MyGraphicsView::mouseMoveEvent(QMouseEvent *event)
 {
-    if(viewIsDragable && scene()->selectedItems().size() == 0 && isMoving &&CurrAddGraType == GRA_NONE)
+    MY_ASSERT(myScene)
+    if(viewIsDragable && myScene->selectedItems().size() == 0 && isMoving &&CurrAddGraType == GRA_NONE)
     {
         movePoint = event->pos();
 
@@ -217,6 +219,7 @@ void MyGraphicsView::mouseReleaseEvent(QMouseEvent *event)
 //右键菜单事件【先判断scene当前鼠标点下是否存在item，如果没有view再响应】
 void MyGraphicsView::contextMenuEvent(QContextMenuEvent *event)
 {
+    MY_ASSERT(myScene)
     QPointF scenePos = mapToScene(event->pos().x(),event->pos().y());
     int curItemSize = myScene->items(scenePos).size();
 
@@ -266,6 +269,7 @@ void MyGraphicsView::dragMoveEvent(QDragMoveEvent *event)
 
 void MyGraphicsView::dropEvent(QDropEvent *event)
 {
+    MY_ASSERT(myScene)
     if(event->mimeData()->hasFormat("MyItem"))
     {
         QByteArray array = event->mimeData()->data("MyItem");
@@ -306,6 +310,7 @@ void MyGraphicsView::undoAndRedoItem()
 //目前支持一个控件的剪切，只支持除箭头以外控件操作
 void MyGraphicsView::cutItem()
 {
+    MY_ASSERT(myScene)
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
     if(selectedItems.size() == 1)
@@ -346,6 +351,7 @@ void MyGraphicsView::cutItem()
 //复制Item，支持对其样式的、端口的复制
 void MyGraphicsView::copyItem()
 {
+    MY_ASSERT(myScene)
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
     if(selectedItems.size() == 1)
@@ -388,6 +394,7 @@ void MyGraphicsView::copyItem()
 //黏贴
 void MyGraphicsView::pasteItem()
 {
+    MY_ASSERT(myScene)
     myScene->addItem(cutTmpInfo,true);
 }
 
@@ -401,6 +408,7 @@ void MyGraphicsView::clearPasteItem()
 //还需要从scene中删除item
 void MyGraphicsView::deleteItem()
 {
+    MY_ASSERT(myScene)
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
     foreach(QGraphicsItem * item, selectedItems)
@@ -475,6 +483,7 @@ void MyGraphicsView::deleteItem()
 //左、右旋转
 void MyGraphicsView::rotateItem()
 {
+    MY_ASSERT(myScene)
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
     if(selectedItems.size() !=  1)
@@ -508,6 +517,7 @@ void MyGraphicsView::rotateItem()
 //置顶或置于底层
 void MyGraphicsView::bringZItem()
 {
+    MY_ASSERT(myScene)
     if (myScene->selectedItems().isEmpty())
     {
          return;
@@ -607,6 +617,7 @@ void MyGraphicsView::lockAndunlockItem()
 //设置选中控件锁定状态
 void MyGraphicsView::setSelectedItemLockState(bool flag)
 {
+    MY_ASSERT(myScene)
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
     if(selectedItems.size() > 0)
@@ -632,6 +643,7 @@ void MyGraphicsView::setSelectedItemLockState(bool flag)
 //更新item的属性
 void MyGraphicsView::respPropertyUpdate(ItemProperty property)
 {
+    MY_ASSERT(myScene)
     if(myScene->selectedItems().size() == 1)
     {
         QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
@@ -672,6 +684,7 @@ void MyGraphicsView::sceneScaled(int currScale)
 //当选择的item状态改变后，更新action
 void MyGraphicsView::updateActions()
 {
+    MY_ASSERT(myScene)
     int selectedSize = myScene->selectedItems().size();
 
     ItemProperty  property;
@@ -791,6 +804,7 @@ void MyGraphicsView::updateActions()
 //获取选择的item锁定的状态
 void MyGraphicsView::getSelectedLockState()
 {
+    MY_ASSERT(myScene)
     int myItemNum = 0;
     int myItemLockNum = 0;
     int myItemUnLockNum = 0;
@@ -840,6 +854,7 @@ void MyGraphicsView::getSelectedLockState()
 //设置选中线条的样式
 void MyGraphicsView::setSelectedLineType(int type)
 {
+    MY_ASSERT(myScene)
     if(myScene->selectedItems().size() == 1)
     {
         QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
@@ -863,6 +878,7 @@ void MyGraphicsView::setSelectedLineType(int type)
 //编辑文本
 void MyGraphicsView::editTextItem()
 {
+    MY_ASSERT(myScene)
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
     if(selectedItems.size() == 1)
     {
@@ -899,6 +915,7 @@ void MyGraphicsView::editTextItem()
 //编辑控件的属性
 void MyGraphicsView::editPropertyItem()
 {
+    MY_ASSERT(myScene)
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
     if(selectedItems.size() == 1)
     {
@@ -918,7 +935,14 @@ void MyGraphicsView::editPropertyItem()
 //清空所有的item
 void MyGraphicsView::clearItems()
 {
+    MY_ASSERT(myScene)
     myScene->clear();
+}
+
+//当删除最后一个工作区后，将scene置为空，并判断
+void MyGraphicsView::deleteScene()
+{
+    myScene = NULL;
 }
 
 MyGraphicsView::~MyGraphicsView()

@@ -32,7 +32,7 @@ void MyPageItem::initWidget()
 
     exitButt = new QPushButton(this);
     connect(exitButt,SIGNAL(clicked()),this,SLOT(deleteMe()));
-    exitButt->setToolTip("关闭当前标签页");
+    exitButt->setToolTip("关闭工作区(Ctrl+W)");
     exitButt->setObjectName("exitButt");
     exitButt->setStyleSheet("QPushButton{border-image:url(:/images/pageClose.png);} \
                              QPushButton::hover{border-image:url(:/images/pageClose_hover.png)}");
@@ -84,7 +84,7 @@ PageManager * PageManager::manager = NULL;
 
 PageManager::PageManager()
 {
-
+    pageCount = 0;
 }
 
 PageManager * PageManager::instance()
@@ -101,4 +101,3 @@ MyPageItem * PageManager::addPageItem()
     MyPageItem * item = new MyPageItem(MyPageSwitch::instance());
     return item;
 }
-

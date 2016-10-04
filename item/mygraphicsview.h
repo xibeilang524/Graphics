@@ -46,6 +46,7 @@ public:
     MyScene * scene();
     MyScene * addScene(QString id);
     void showScene(MyScene *scene);
+    void deleteScene();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event);

@@ -6,7 +6,7 @@
 **Others: 页面切换
 **
 **修改历史:
-**
+**20161004:wey:修复删除工作区奔溃问题
 *************************************************/
 #ifndef MYPAGESWITCH_H
 #define MYPAGESWITCH_H
@@ -23,6 +23,8 @@ class MyPageSwitch : public QWidget
     Q_OBJECT
 public:
     static MyPageSwitch * instance();
+
+    void closePage();
 
     struct PageMapping
     {
@@ -48,6 +50,8 @@ private:
     QHBoxLayout * layout;
 
     QList<PageMapping *> pages;
+
+    PageMapping * selectedPage;
 };
 
 #endif // MYPAGESWITCH_H

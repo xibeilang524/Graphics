@@ -45,11 +45,13 @@ class PageManager
 public:
     static PageManager * instance();
     MyPageItem * addPageItem();
+    int getPageCount(){return ++pageCount;}
+    void resetPageCount(){pageCount = 0;}
 
 private:
     PageManager();
     static PageManager * manager;
-
+    int pageCount;
 };
 
 #endif // MYPAGEITEM_H

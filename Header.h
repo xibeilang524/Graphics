@@ -26,6 +26,7 @@
 #include "typeinfo"
 
 #define TYPE_ID(a) typeid(a).name()
+#define MY_ASSERT(a) {if(!a) return;}
 
 #include <QBrush>
 #include <QPen>

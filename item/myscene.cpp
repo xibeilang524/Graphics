@@ -94,11 +94,6 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-//    if(itemAt(event->scenePos()))
-//    {
-//        qDebug()<<TYPE_ID(*itemAt(event->scenePos()));
-//    }
-
     if((isDragLine||CurrAddGraType == GRA_LINE)&& insertTmpLine)
     {
         QLineF newLine(insertTmpLine->line().p1(), event->scenePos() /*- QPointF(2,2)*/);

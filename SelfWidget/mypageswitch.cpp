@@ -3,6 +3,7 @@
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QList>
+#include <QMessageBox>
 #include <QDebug>
 
 #include "../manager/mypageitem.h"
@@ -16,6 +17,7 @@ MyPageSwitch::MyPageSwitch(QWidget *parent) :
 {
     setFixedHeight(25);
 
+    selectedPage = NULL;
     initWidget();
 }
 
@@ -23,8 +25,7 @@ void MyPageSwitch::initWidget()
 {
     addPageButt = new QPushButton();
     addPageButt->setFixedSize(20,20);
-    addPageButt->setToolTip("添加新页面");
-//    addPageButt->setStyleSheet("border-radius:10px;border:1px solid gray");
+    addPageButt->setToolTip("插入工作页(Ctrl+N)");
     addPageButt->setText("+");
     connect(addPageButt,SIGNAL(clicked()),this,SLOT(addPage()));
 
@@ -49,10 +50,11 @@ void MyPageSwitch::addPage()
     page->id = id;
     page->pageItem = item;
     page->scene = MyGraphicsView::instance()->addScene(id);
+    selectedPage = page;
 
     pages.append(page);
     layout->insertWidget(1,item);
-    item->setText(QString("工作区%1").arg(pages.size()));
+    item->setText(QString("工作区%1").arg(PageManager::instance()->getPageCount()));
 
     switchToPage(id);
 }
@@ -64,6 +66,7 @@ void MyPageSwitch::switchToPage(QString pageId)
     {
         if(mapping->id == pageId)
         {
+            selectedPage = mapping;
             mapping->pageItem->setSelected(true);
             MyGraphicsView::instance()->showScene(mapping->scene);
         }
@@ -77,28 +80,52 @@ void MyPageSwitch::switchToPage(QString pageId)
 //删除当前页面，用后面一个页面
 void MyPageSwitch::deleteThisPage(QString pageId)
 {
-    int index = -1;
-    for( int i = 0; i < pages.size() ; i++)
+    int result = QMessageBox::warning(0,"警告","是否删除此工作区?",QMessageBox::Yes,QMessageBox::No);
+    if(result == QMessageBox::Yes)
     {
-        if(pages.at(i)->id == pageId )
+        int index = -1;
+        for( int i = 0; i < pages.size() ; i++)
         {
-            index = i;
-            break;
+            if(pages.at(i)->id == pageId )
+            {
+                index = i;
+                break;
+            }
+        }
+        if( index >=0  && index < pages.size()-1)
+        {
+            pages.at(index+1)->pageItem->setSelected(true);
+            MyGraphicsView::instance()->showScene(pages.at(index+1)->scene);
+            selectedPage = pages.at(index + 1);
+        }
+        else if(index == pages.size()-1 && index >0)
+        {
+            pages.at(index - 1)->pageItem->setSelected(true);
+            MyGraphicsView::instance()->showScene(pages.at(index - 1)->scene);
+            selectedPage = pages.at(index - 1);
+        }
+        else if(index <0)
+        {
+            return;
+        }
+
+        pages.at(index)->scene->clear();
+
+        delete pages.at(index)->scene;
+        delete pages.at(index)->pageItem;
+        pages.removeAt(index);
+
+        if(pages.size() == 0)
+        {
+            MyGraphicsView::instance()->deleteScene();
         }
     }
-    if( index >=0  && index < pages.size()-1)
-    {
-        pages.at(index+1)->pageItem->setSelected(true);
-        MyGraphicsView::instance()->showScene(pages.at(index+1)->scene);
-    }
-    else if(index == pages.size()-1 && index >0)
-    {
-        pages.at(index - 1)->pageItem->setSelected(true);
-        MyGraphicsView::instance()->showScene(pages.at(index - 1)->scene);
-    }
-    delete pages.at(index)->scene;
-    delete pages.at(index)->pageItem;
-    pages.removeAt(index);
+}
+
+//关闭当前页
+void MyPageSwitch::closePage()
+{
+    deleteThisPage(selectedPage->id);
 }
 
 MyPageSwitch * MyPageSwitch::pageSwitch = NULL;

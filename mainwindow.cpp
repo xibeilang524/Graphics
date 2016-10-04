@@ -286,6 +286,10 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     {
         SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
     }
+    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_W)
+    {
+        MyPageSwitch::instance()->closePage();
+    }
 
     QMainWindow::keyPressEvent(event);
 }
@@ -344,6 +348,8 @@ void MainWindow::fileNew()
 void MainWindow::fileOpen()
 {
     respRestItemAction();
+
+    MY_ASSERT(MyGraphicsView::instance()->scene())
 
     if(MyGraphicsView::instance()->scene()->items().size()>0)
     {
