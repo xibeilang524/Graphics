@@ -86,12 +86,13 @@ void RotateLine::mousePressEvent(QGraphicsSceneMouseEvent *event)
     QGraphicsPolygonItem::mousePressEvent(event);
 }
 
+//【利用鼠标的scene坐标和item的夹角关系，可以实现旋转】
 void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
-    qreal posY = mapToParent(event->pos()).y();
-    qreal posX = mapToParent(event->pos()).x();
+    QPointF tmpPoint = event->scenePos() - parentItem->pos();
 
-    qDebug()<<mapToParent(event->pos())<<"__"<<event->pos();
+    qreal posY = tmpPoint.y();
+    qreal posX = tmpPoint.x();
 
     if(posX == 0)
     {
@@ -119,11 +120,7 @@ void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         rotateDegree = 270 + rotateDegree;
     }
 
-    qDebug()<<rotateDegree;
-
     emit rotateItem(MOUSE_MOVE,rotateDegree);
-
-//    startPoint = event->pos();
 
     QGraphicsPolygonItem::mouseMoveEvent(event);
 }

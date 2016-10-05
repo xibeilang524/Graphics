@@ -8,6 +8,7 @@
 **修改历史:
 **20160922:wey:添加状态锁定，锁定后图标改变
 **20160930:wey:调整父类至QGraphicsPolygonItem
+**20161005:wey:实现控件旋转【!!!重大更新】
 *************************************************/
 #ifndef ROTATELINE_H
 #define ROTATELINE_H

@@ -508,12 +508,13 @@ void MyScene::showItemRotationInfo(MyItem *item)
     {
         createItemInfo();
     }
+
     QRectF minRect = getHorizonalRoundedRect(item);
     myItemInfo->setVisible(true);
     qreal itemWidth = minRect.width();
     qreal itemHeight = minRect.height();
 
-    myItemInfo->setRotationInfo(selectedItems().first()->rotation());
+    myItemInfo->setRotationInfo(item->rotation());
     myItemInfo->setPos(minRect.x() + itemWidth/2,minRect.y() + itemHeight + 30);
 }
 

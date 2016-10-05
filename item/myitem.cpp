@@ -1364,7 +1364,7 @@ void MyItem::procRotate(MouseType mouseType,qreal degree)
         setSelected(true);
     }
 
-//    emit propHasChanged(property);
+    emit propHasChanged(property);
 }
 
 //设置控件的样式属性
