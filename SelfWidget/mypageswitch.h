@@ -31,7 +31,13 @@ public:
         QString id;
         MyPageItem * pageItem;
         MyScene * scene;
+        qreal hScrollValue;
+        qreal vScrollValue;
+        qreal scaleView;
     };
+
+signals:
+    void deletePage();
 
 public slots:
     void addPage();
@@ -44,6 +50,8 @@ private:
     MyPageSwitch(QWidget * parent = 0);
     static MyPageSwitch * pageSwitch;
 
+    void siwtchPage(QString pageId,bool firstView = false);
+
     void initWidget();
 
     QPushButton * addPageButt;
@@ -52,6 +60,7 @@ private:
     QList<PageMapping *> pages;
 
     PageMapping * selectedPage;
+    bool isFirstView;
 };
 
 #endif // MYPAGESWITCH_H

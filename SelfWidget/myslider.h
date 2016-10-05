@@ -27,6 +27,7 @@ private slots:
     void respSliderChanged(int);
     void respZoomIn();
     void respZoomOut();
+    void respSetScaleValue(int value);
 
 private:
     void setLabelText(int value);

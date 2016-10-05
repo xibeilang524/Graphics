@@ -172,6 +172,12 @@ void MySlider::respSliderChanged(int value)
     emit scaleView(value);
 }
 
+//工作区切换，同步改变每个的显示比例
+void MySlider::respSetScaleValue(int value)
+{
+    slider->setValue(value);
+}
+
 void MySlider::setLabelText(int value)
 {
     label->setText(QString::number(value)+"%");

@@ -421,6 +421,18 @@ void MainWindow::recordClickedItem()
     }
 }
 
+//页面删除后，进行相关状态切换【控件栏、右侧控件】
+void MainWindow::respDeletePage()
+{
+    if(MyGraphicsView::instance()->scene() == NULL)
+    {
+        ActionManager::instance()->action(Constants::CLEAR_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(false);
+    }
+
+    rightToolBox->enableButtState(false);
+}
+
 //创建场景和视图
 void MainWindow::createSceneAndView()
 {
@@ -436,6 +448,8 @@ void MainWindow::createSceneAndView()
     vLayout->addWidget(MyPageSwitch::instance());
     vLayout->addWidget(view);
     MyPageSwitch::instance()->addPage();
+
+    connect(MyPageSwitch::instance(),SIGNAL(deletePage()),this,SLOT(respDeletePage()));
 
     leftIconWidget = new LeftIconWidget;
 
@@ -459,6 +473,7 @@ void MainWindow::createSceneAndView()
 //响应item改变
 void MainWindow::respItemSizeChanged(int size)
 {
+    MY_ASSERT(view->scene())
     bool actionEnabled = size;
 
     ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(actionEnabled);
@@ -549,6 +564,7 @@ void MainWindow::createToolBar()
 
     mySlider = new MySlider;
     connect(mySlider,SIGNAL(scaleView(int)),MyGraphicsView::instance(),SLOT(sceneScaled(int)));
+    connect(view,SIGNAL(scaleValue(int)),mySlider,SLOT(respSetScaleValue(int)));
     connect(view,SIGNAL(zoomIn()),mySlider,SLOT(respZoomIn()));
     connect(view,SIGNAL(zoomOut()),mySlider,SLOT(respZoomOut()));
 

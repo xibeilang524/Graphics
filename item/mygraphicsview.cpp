@@ -44,6 +44,7 @@ MyGraphicsView::MyGraphicsView(MainWindow * parent):
     isCtrlPressed = false;
     viewIsDragable = true;
     lockState = ITEM_ALL_UNLOCK;
+    sceneScaleFactor = 100;
 
     setAcceptDrops(true);
     initView();
@@ -675,6 +676,7 @@ void MyGraphicsView::respPropertyUpdate(ItemProperty property)
 void MyGraphicsView::sceneScaled(int currScale)
 {
      double newScale = currScale/100.0;
+     sceneScaleFactor = currScale;
      QMatrix oldMatrix = matrix();
      resetMatrix();
      translate(oldMatrix.dx(), oldMatrix.dy());
@@ -943,6 +945,38 @@ void MyGraphicsView::clearItems()
 void MyGraphicsView::deleteScene()
 {
     myScene = NULL;
+}
+
+//获取水平视图的位置
+qreal MyGraphicsView::getHorizonalValue()
+{
+    return horizontalScrollBar()->value();
+}
+
+//获取水平视图的位置
+qreal MyGraphicsView::getVertiaclValue()
+{
+    return verticalScrollBar()->value();
+}
+
+//获取水平视图的位置
+qreal MyGraphicsView::getScaleValue()
+{
+    return sceneScaleFactor;
+}
+
+//工作区切换，依照不同工作区设置缩放比例
+void MyGraphicsView::setScaleValue(int value)
+{
+    sceneScaled(value);
+    emit scaleValue(value);
+}
+
+//移动视图
+void MyGraphicsView::transformView(qreal hValue, qreal value)
+{
+    horizontalScrollBar()->setValue(hValue);
+    verticalScrollBar()->setValue(value);
 }
 
 MyGraphicsView::~MyGraphicsView()

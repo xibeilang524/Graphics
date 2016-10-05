@@ -8,14 +8,16 @@
 
 #include "../manager/mypageitem.h"
 #include "../util.h"
-#include "Header.h"
 #include "../item/myscene.h"
 #include "../item/mygraphicsview.h"
+#include "../global.h"
+#include "Header.h"
 
 MyPageSwitch::MyPageSwitch(QWidget *parent) :
     QWidget(parent)
 {
     setFixedHeight(25);
+    isFirstView = false;
 
     selectedPage = NULL;
     initWidget();
@@ -50,24 +52,50 @@ void MyPageSwitch::addPage()
     page->id = id;
     page->pageItem = item;
     page->scene = MyGraphicsView::instance()->addScene(id);
+    page->scaleView = 100;
+    page->hScrollValue = SceneWidth /2;
+    page->vScrollValue = SceneHeight /2;
     selectedPage = page;
 
     pages.append(page);
     layout->insertWidget(1,item);
     item->setText(QString("工作区%1").arg(PageManager::instance()->getPageCount()));
 
-    switchToPage(id);
+    if(!isFirstView)
+    {
+        isFirstView = true;
+        siwtchPage(id,isFirstView);
+    }
+    else
+    {
+        switchToPage(id);
+    }
+}
+
+//切换页面.切换前需要先保存当前scene中的尺寸信息
+void MyPageSwitch::switchToPage(QString pageId)
+{
+    siwtchPage(pageId);
 }
 
 //切换页面
-void MyPageSwitch::switchToPage(QString pageId)
+void MyPageSwitch::siwtchPage(QString pageId, bool firstView)
 {
+    if(selectedPage && !firstView)
+    {
+        selectedPage->hScrollValue = MyGraphicsView::instance()->getHorizonalValue();
+        selectedPage->vScrollValue = MyGraphicsView::instance()->getVertiaclValue();
+        selectedPage->scaleView = MyGraphicsView::instance()->getScaleValue();
+    }
+
     foreach (PageMapping * mapping, pages)
     {
         if(mapping->id == pageId)
         {
             selectedPage = mapping;
             mapping->pageItem->setSelected(true);
+            MyGraphicsView::instance()->transformView(mapping->hScrollValue,mapping->vScrollValue);
+            MyGraphicsView::instance()->setScaleValue(mapping->scaleView);
             MyGraphicsView::instance()->showScene(mapping->scene);
         }
         else
@@ -94,15 +122,11 @@ void MyPageSwitch::deleteThisPage(QString pageId)
         }
         if( index >=0  && index < pages.size()-1)
         {
-            pages.at(index+1)->pageItem->setSelected(true);
-            MyGraphicsView::instance()->showScene(pages.at(index+1)->scene);
-            selectedPage = pages.at(index + 1);
+            switchToPage(pages.at(index + 1)->id);
         }
         else if(index == pages.size()-1 && index >0)
         {
-            pages.at(index - 1)->pageItem->setSelected(true);
-            MyGraphicsView::instance()->showScene(pages.at(index - 1)->scene);
-            selectedPage = pages.at(index - 1);
+            switchToPage(pages.at(index - 1)->id);
         }
         else if(index <0)
         {
@@ -119,6 +143,7 @@ void MyPageSwitch::deleteThisPage(QString pageId)
         {
             MyGraphicsView::instance()->deleteScene();
         }
+        emit deletePage();
     }
 }
 

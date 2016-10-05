@@ -21,6 +21,8 @@ public:
     explicit RightToolBox(QWidget *parent = 0);
     ~RightToolBox();
 
+    void enableButtState(bool isEnabled);
+
 signals:
     void updateProperty(ItemProperty property);           //将新的属性设置到选中的item之上
     void deleteCurrItem();
@@ -50,7 +52,6 @@ private:
     void initConnection();
     void setFillColor();
     void setLineColor();
-    void enableButtState(bool isEnabled);
     void prepareBrush();                 //准备笔刷
     void preparePen();                   //准备画笔
     void setNum(QLabel *edit, bool minus, qreal &newValue);

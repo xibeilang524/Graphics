@@ -48,6 +48,12 @@ public:
     void showScene(MyScene *scene);
     void deleteScene();
 
+    qreal getHorizonalValue();
+    qreal getVertiaclValue();
+    qreal getScaleValue();
+    void  transformView(qreal hValue,qreal value);
+    void  setScaleValue(int);
+
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);
@@ -65,6 +71,10 @@ signals:
     void itemPropChanged(ItemProperty);
     void zoomIn();
     void zoomOut();
+    void scaleValue(int);
+
+public slots:
+    void sceneScaled(int currScale);
 
 private slots:
     void undoAndRedoItem();
@@ -80,7 +90,6 @@ private slots:
     void setViewDragEnable(bool enable);
     void respCtrlLockKeyPress();
 
-    void sceneScaled(int currScale);
     void updateActions();
     void editTextItem();
     void editPropertyItem();
@@ -106,6 +115,7 @@ private:
     bool isMoving;
     bool viewIsDragable;              //窗口是否可以平移
     bool isCtrlPressed;               //Crtrl键是否被按下
+    int sceneScaleFactor;             //视图缩放因子
 
     ItemLockState lockState;          //选择控件锁定状态
 };

@@ -69,6 +69,7 @@ private slots:
     void hideSubWidget();
     void getTecSupport();
     void showAbout();
+    void respDeletePage();
 
 private:
     void createActionAndMenus();
