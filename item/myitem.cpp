@@ -63,6 +63,21 @@ QDataStream & operator >>(QDataStream &stream,LineType & type)
     return stream;
 }
 
+QDataStream & operator <<(QDataStream &stream,PointType & type)
+{
+    int tmp = (int)type;
+    stream<<tmp;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream &stream,PointType & type)
+{
+    int tmp;
+    stream>>tmp;
+    type = (PointType)tmp;
+    return stream;
+}
+
 QDataStream & operator <<(QDataStream &stream,AddLineType & type)
 {
     int tmp = (int)type;
@@ -86,7 +101,7 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
             <<prop.isNeedBorder<<prop.itemPen<<prop.itemRect
              <<prop.alphaValue<<prop.rotateDegree
               <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor
-               <<prop.zValue<<prop.lineType<<prop.startLineType<<prop.endLineType
+               <<prop.zValue<<prop.lineType<<prop.startLineType<<prop.endLineType<<prop.startPointType<<prop.endPointType
                 <<prop.isMoveable;
 
     return stream;
@@ -100,7 +115,7 @@ QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
             >>prop.isNeedBorder>>prop.itemPen>>prop.itemRect
              >>prop.alphaValue>>prop.rotateDegree
               >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor
-               >>prop.zValue>>prop.lineType>>prop.startLineType>>prop.endLineType
+               >>prop.zValue>>prop.lineType>>prop.startLineType>>prop.endLineType>>prop.startPointType>>prop.endPointType
                 >>prop.isMoveable;
 
     return stream;
@@ -275,32 +290,6 @@ QRectF MyItem::boundingRect()const
     return boundRect;
 }
 
-//保存添加的箭头
-void MyItem::addArrow(MyArrow *arrow)
-{
-    arrows.push_back(arrow);
-}
-
-//删除此控件时，移除所有的箭头
-void MyItem::removeArrows()
-{
-    foreach (MyArrow *arrow, arrows)
-    {
-        arrow->getStartItem()->removeArrow(arrow);
-        arrow->getEndItem()->removeArrow(arrow);
-        scene()->removeItem(arrow);
-        delete arrow;
-    }
-}
-
-void MyItem::removeArrow(MyArrow *arrow)
-{
-    int index = arrows.indexOf(arrow);
-
-    if (index != -1)
-        arrows.removeAt(index);
-}
-
 void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
 {
     Q_UNUSED(option)
@@ -339,20 +328,20 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     }
 
     //线条绘制状态下，鼠标进入控件，进行样式的改变。
-    if(isPrepareLine)
-    {
-        painter->save();
-        painter->setPen(QPen(Qt::green,2));
-        painter->drawPolygon(itemPolygon);
+//    if(isPrepareLine)
+//    {
+//        painter->save();
+//        painter->setPen(QPen(Qt::green,2));
+//        painter->drawPolygon(itemPolygon);
 
-        painter->setPen(QPen(Qt::gray,5));
-        painter->drawPoint(boundRect.topLeft().x(),0);
-        painter->drawPoint(boundRect.topRight().x(),0);
-        painter->drawPoint(0,boundRect.topLeft().y());
-        painter->drawPoint(0,boundRect.bottomRight().y());
+//        painter->setPen(QPen(Qt::gray,5));
+//        painter->drawPoint(boundRect.topLeft().x(),0);
+//        painter->drawPoint(boundRect.topRight().x(),0);
+//        painter->drawPoint(0,boundRect.topLeft().y());
+//        painter->drawPoint(0,boundRect.bottomRight().y());
 
-        painter->restore();
-    }
+//        painter->restore();
+//    }
 
     //绘制外部接口拖入至本控件时的位置状态
     if(isDragging)
@@ -1554,6 +1543,33 @@ qreal MyItem::getLoopMaxSidLength(qreal width,qreal height)
         realWidth = halfWidth;
     }
     return realWidth;
+}
+
+//返回四边中点的索引
+DragLinePoint * MyItem::getDragLinePoint(PointType pointType)
+{
+    DragLinePoint * tmp = NULL;
+    switch(pointType)
+    {
+        case TOP_MIDDLE: tmp = topLinePoint;
+                               break;
+        case MIDDLE_LEFT: tmp = leftLinePoint;
+                               break;
+        case MIDDLE_RIGHT: tmp = rightLinePoint;
+                               break;
+        case BOTTOM_MIDDLE: tmp = bottomLinePoint;
+                               break;
+    }
+    return tmp;
+}
+
+//删除此控件时，需要将此控件中的DragLinePoint上的箭头清除掉
+void MyItem::removeDragLineArrows()
+{
+    topLinePoint->removeArrows();
+    leftLinePoint->removeArrows();
+    rightLinePoint->removeArrows();
+    bottomLinePoint->removeArrows();
 }
 
 MyItem::~MyItem()

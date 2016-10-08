@@ -11,7 +11,8 @@ HEADERS += \
     item/dragpoint.h \
     item/draglinepoint.h \
     item/mysuperitem.h \
-    item/myiteminfo.h
+    item/myiteminfo.h \
+    item/mynodeline.h
 
 SOURCES += \
     item/rotateline.cpp \
@@ -25,4 +26,5 @@ SOURCES += \
     item/mygraphicsview.cpp \
     item/draglinepoint.cpp \
     item/mysuperitem.cpp \
-    item/myiteminfo.cpp
+    item/myiteminfo.cpp \
+    item/mynodeline.cpp

@@ -22,7 +22,7 @@
 #include <QBrush>
 
 #include "../Header.h"
-#include "mysuperitem.h"
+#include "mynodeline.h"
 
 #include <QDataStream>
 
@@ -30,7 +30,7 @@ class QMenu;
 class MyItem;
 class MyArrow;
 
-class MyNodePort : public MySuperItem
+class MyNodePort : public MyNodeLine
 {
     Q_OBJECT
 public:
@@ -68,10 +68,6 @@ public:
 
     friend QDataStream & operator >>(QDataStream & ,MyNodePort *);
     friend QDataStream & operator <<(QDataStream & ,MyNodePort *);
-
-    void addArrow(MyArrow * arrow);
-    void removeArrows();
-    void removeArrow(MyArrow * arrow);
 
 signals:
     void deletePort(MyNodePort *);

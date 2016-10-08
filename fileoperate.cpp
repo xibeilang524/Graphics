@@ -12,8 +12,6 @@
 #include <QDataStream>
 #include <QDebug>
 
-#include "typeinfo"
-
 FileOperate::FileOperate()
 {
 
@@ -146,6 +144,7 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
             {
                 if(items.at(j)->itemProperty.startItemID == localNodePorts.at(i).parentItemID)
                 {
+
                     NodePortProperty prop = localNodePorts.at(i);
                     items.at(j)->nodeProperties.push_back(prop);
                 }

@@ -23,7 +23,12 @@
 #define ROTATE_MAX_DEGREE 360   //旋转的最大角度
 
 #include <QString>
+
+#if defined(Q_CC_MSVC)
+#include "typeinfo.h"
+#elif defined(Q_CC_GNU)
 #include "typeinfo"
+#endif
 
 #define TYPE_ID(a) typeid(a).name()
 #define MY_ASSERT(a) {if(!a) return;}
@@ -183,6 +188,8 @@ struct ItemProperty
     LineType lineType;              //线条的类型
     AddLineType startLineType;      //起始线条类型
     AddLineType endLineType;        //终止线条类型
+    PointType startPointType;       //线条在【LINE_MYITEM】模式下，起点所在item边的位置
+    PointType endPointType;         //线条在【LINE_MYITEM】模式下，终点点所在item边的位置
 
     bool isMoveable;                //是否被锁定
 };

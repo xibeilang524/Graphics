@@ -67,10 +67,6 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    void addArrow(MyArrow * arrow);
-    void removeArrows();
-    void removeArrow(MyArrow * arrow);
-
     void setProperty(ItemProperty property);
 
     void updateRotation(int rotateValue);
@@ -89,9 +85,12 @@ public:
     void resetPolygon();                   //重新设定多边形
     void setDragPointVisible(bool flag);
     void setDragLineVisible(bool isVisible);
+    void removeDragLineArrows();
 
     void setMoveable(bool lockState);
     bool isMoveable(){return this->property.isMoveable;}
+
+    DragLinePoint * getDragLinePoint(PointType pointType);
 
     void resetItemUUID();                  //重新设定控件的UUID编号，同时更新子节点的父索引值
 
@@ -164,7 +163,6 @@ private:
 
     MouseType currMouseType;
 
-    QList<MyArrow *> arrows;           //保存添加的箭头
     QList<MyNodePort*> ports;          //当前控件端口的集合
 
     bool isNeedBorder;                 //是否需要选中边框

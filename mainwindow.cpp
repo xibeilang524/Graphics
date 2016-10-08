@@ -25,8 +25,6 @@
 #include "global.h"
 #include "util.h"
 
-#include "typeinfo"
-
 using namespace Graphics;
 
 MainWindow::MainWindow(QWidget *parent) :

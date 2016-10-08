@@ -11,12 +11,12 @@
 #ifndef DRAGLINEPOINT_H
 #define DRAGLINEPOINT_H
 
-#include "mysuperitem.h"
+#include "mynodeline.h"
 #include "ItemHeader.h"
 
 class MyItem;
 
-class DragLinePoint : public MySuperItem
+class DragLinePoint : public MyNodeLine
 {
     Q_OBJECT
 public:
@@ -26,6 +26,8 @@ public:
     QRectF boundingRect()const;
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
+
+    const PointType getPointType(){return this->pointType;}
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);

@@ -16,6 +16,7 @@ QDataStream & operator <<(QDataStream & dataStream,NodePortProperty & prop)
 {
     dataStream<<prop.itemBrush<<prop.direct
              <<prop.scaleFactor<<prop.startItemID<<prop.parentItemID;
+
     return dataStream;
 }
 
@@ -52,7 +53,7 @@ QDataStream & operator >>(QDataStream & dataStream,MyNodePort * nodePort)
 }
 
 MyNodePort::MyNodePort(GraphicsType type, MyItem *parentItem, QObject *parent1):
-    MySuperItem(type,parentItem,parent1)
+    MyNodeLine(type,parentItem,parent1)
 {
     setFlag(QGraphicsItem::ItemIsSelectable,parentItem->isMoveable());
 
@@ -183,32 +184,6 @@ void MyNodePort::respDeleteAction()
 void MyNodePort::respEditAction()
 {
     emit editPort(this);
-}
-
-//保存添加的箭头
-void MyNodePort::addArrow(MyArrow *arrow)
-{
-    arrows.push_back(arrow);
-}
-
-//删除此控件时，移除所有的箭头
-void MyNodePort::removeArrows()
-{
-    foreach (MyArrow *arrow, arrows)
-    {
-        arrow->getStartNodePort()->removeArrow(arrow);
-        arrow->getEndNodePort()->removeArrow(arrow);
-//        scene()->removeItem(arrow);
-        delete arrow;
-    }
-}
-
-void MyNodePort::removeArrow(MyArrow *arrow)
-{
-    int index = arrows.indexOf(arrow);
-
-    if (index != -1)
-        arrows.removeAt(index);
 }
 
 //获取端口顶点在当前坐标系中的值(要顺时针保存)

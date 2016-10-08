@@ -42,48 +42,53 @@ MyArrow::MyArrow(QGraphicsItem *parent):
 {
     setFlag(QGraphicsItem::ItemIsSelectable, true);
 
+    type = GRA_LINE;
     property.itemBrush = QBrush(Qt::black);
     property.itemPen = QPen(Qt::black,2);
 
     createTextItem();
 }
 
-MyArrow::MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem *parent):
-    startItem(startItem),
-    endItem(endItem),
-    QGraphicsLineItem(parent)
+//设置线条两端的类型
+void MyArrow::setLineType(LineType lineType)
 {
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
-
-    type = GRA_LINE;
-    property.itemBrush = QBrush(Qt::black);
-    property.itemPen = QPen(Qt::black,2);
-    //直线保存两端控件的引用
-    property.startItemID = startItem->getProperty().startItemID;
-    property.endItemID = endItem->getProperty().startItemID;
-
-    property.lineType = LINE_MYITEM;
-
-    createTextItem();
+    property.lineType = lineType;
 }
 
-MyArrow::MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem *parent):
-    startNodePort(startItem),
-    endNodePort(endItem),
-    QGraphicsLineItem(parent)
+//设置线段的起点
+void MyArrow::setStartItem(MyNodeLine *startItem)
 {
-    setFlag(QGraphicsItem::ItemIsSelectable, true);
+    this->startItem = startItem;
+}
 
-    type = GRA_LINE;
-    property.itemBrush = QBrush(Qt::black);
-    property.itemPen = QPen(Qt::black,2);
-    //直线保存两端控件的引用
-    property.startItemID = startItem->getNodeProperty().startItemID;
-    property.endItemID = endItem->getNodeProperty().startItemID;
+//设置起始点的身份编号
+void MyArrow::setStartItemID(const QString id)
+{
+    property.startItemID = id;
+}
 
-    property.lineType = LINE_NODEPORT;
+//在【LINE_MYITEM】模式下保存起点的类型
+void MyArrow::setStartPointType(PointType type)
+{
+    property.startPointType = type;
+}
 
-    createTextItem();
+//设置线段的终点
+void MyArrow::setEndItem(MyNodeLine *endItem)
+{
+    this->endItem = endItem;
+}
+
+//设置终点的身份编号
+void MyArrow::setEndItemID(const QString id)
+{
+    property.endItemID = id;
+}
+
+//在【LINE_MYITEM】模式下保存终点的类型
+void MyArrow::setEndPointType(PointType type)
+{
+    property.endPointType = type;
 }
 
 //创建文字
@@ -150,22 +155,27 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     if(property.lineType == LINE_MYITEM && startItem && endItem)
     {
         //将两控件的中心点直接相连，分别计算其与两个控件交点
-        QLineF centerLine(startItem->pos(), endItem->pos());
-        QPointF startCrossPoint;
-        countItemCrossPoint(true,startItem->polygon(),centerLine,startCrossPoint);
+//        QLineF centerLine(startItem->pos(), endItem->pos());
 
-        QPointF endCrossPoint;
-        countItemCrossPoint(false,endItem->polygon(),centerLine,endCrossPoint);
+        QPointF startCrossPoint = startItem->getParentItem()->mapToScene(startItem->pos());
+
+//        countItemCrossPoint(true,startItem->polygon(),centerLine,startCrossPoint);
+
+        QPointF endCrossPoint = endItem->getParentItem()->mapToScene(endItem->pos());
+//        countItemCrossPoint(false,endItem->polygon(),centerLine,endCrossPoint);
 
         setLine(QLineF(startCrossPoint,endCrossPoint));
     }
-    else if(property.lineType == LINE_NODEPORT && startNodePort && endNodePort)
+    else if(property.lineType == LINE_NODEPORT && startItem && endItem)
     {
         //获取端口相对整个scene的坐标值
-        QPointF startPoint = startNodePort->getParentItem()->mapToScene(startNodePort->pos());
-        QPointF endPoint = endNodePort->getParentItem()->mapToScene(endNodePort->pos());
+        QPointF startPoint = startItem->getParentItem()->mapToScene(startItem->pos());
+        QPointF endPoint = endItem->getParentItem()->mapToScene(endItem->pos());
 
         QLineF centerLine(startPoint, endPoint);
+
+        MyNodePort * startNodePort = dynamic_cast<MyNodePort *>(startItem);
+        MyNodePort * endNodePort = dynamic_cast<MyNodePort *>(endItem);
 
         QPointF endCrossPoint;
         countNodeCrossPoint(endNodePort->getScenePolygon(),centerLine,endCrossPoint);
@@ -295,59 +305,51 @@ void MyArrow::countNodeCrossPoint(QPolygonF polygon,QLineF centerLine,QPointF &e
     }
 }
 
-//计算交叉点的坐标
+//【废弃】计算交叉点的坐标【因调整线段起始点至控件一边的中点，因此无需计算线与控件边的交点坐标】
 void MyArrow::countItemCrossPoint(bool isStart , QPolygonF polygon,QLineF centerLine,QPointF &intersectPoint)
 {
     //将polygons中item的坐标系转换成scene的坐标系，支持即使控件旋转后依然可以保持箭头指向某一边
-    MyItem * tmpItem;
-    if(isStart)
-    {
-        tmpItem = startItem;
-    }
-    else
-    {
-        tmpItem = endItem;
-    }
+//    MyItem * tmpItem;
+//    if(isStart)
+//    {
+//        tmpItem = startItem;
+//    }
+//    else
+//    {
+//        tmpItem = endItem;
+//    }
 
-    QPointF p1 = tmpItem->mapToScene(polygon.first());
-    QPointF p2;
-    QLineF polyLine;
-    //计算起点多边形的中点和终点多边形的交点
-    for (int i = 1; i <= polygon.count(); ++i)
-    {
-        //最后一个需要和第一个进行连线
-        if(i == polygon.count())
-        {
-            p1 = tmpItem->mapToScene(polygon.first());
-        }
-        else
-        {
-            p2 = tmpItem->mapToScene(polygon.at(i));
-        }
+//    QPointF p1 = tmpItem->mapToScene(polygon.first());
+//    QPointF p2;
+//    QLineF polyLine;
+//    //计算起点多边形的中点和终点多边形的交点
+//    for (int i = 1; i <= polygon.count(); ++i)
+//    {
+//        //最后一个需要和第一个进行连线
+//        if(i == polygon.count())
+//        {
+//            p1 = tmpItem->mapToScene(polygon.first());
+//        }
+//        else
+//        {
+//            p2 = tmpItem->mapToScene(polygon.at(i));
+//        }
 
-        polyLine = QLineF(p1, p2);
-        QLineF::IntersectType intersectType = polyLine.intersect(centerLine, &intersectPoint);
-        if (intersectType == QLineF::BoundedIntersection)
-        {
-            break;
-        }
-        p1 = p2;
-    }
+//        polyLine = QLineF(p1, p2);
+//        QLineF::IntersectType intersectType = polyLine.intersect(centerLine, &intersectPoint);
+//        if (intersectType == QLineF::BoundedIntersection)
+//        {
+//            break;
+//        }
+//        p1 = p2;
+//    }
 }
 
 //更新线段的位置
 void MyArrow::updatePosition()
 {
-    if(property.lineType == LINE_NODEPORT)
-    {
-        QLineF line(mapFromItem(startNodePort, 0, 0), mapFromItem(endNodePort, 0, 0));
-        setLine(line);
-    }
-    else if(property.lineType == LINE_MYITEM)
-    {
-        QLineF line(mapFromItem(startItem, 0, 0), mapFromItem(endItem, 0, 0));
-        setLine(line);
-    }
+    QLineF line(mapFromItem(startItem, 0, 0), mapFromItem(endItem, 0, 0));
+    setLine(line);
 }
 
 //双击编辑文字信息

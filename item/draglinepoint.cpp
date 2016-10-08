@@ -6,11 +6,12 @@
 
 #include "myitem.h"
 
+
 DragLinePoint::DragLinePoint(const PointType pointType, GraphicsType type, MyItem *parent1, QObject *parent):
     pointType(pointType),
-    MySuperItem(type,parent1,parent)
+    MyNodeLine(type,parent1,parent)
 {
-    radius = 3;
+    radius = 4.5;
 
     prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,radius *2,radius *2);
@@ -58,6 +59,7 @@ void DragLinePoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
     Q_UNUSED(event)
     this->setCursor(Qt::ArrowCursor);
 }
+
 
 DragLinePoint::~DragLinePoint()
 {

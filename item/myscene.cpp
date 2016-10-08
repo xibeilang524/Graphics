@@ -5,6 +5,8 @@
 #include <QKeyEvent>
 #include <QDebug>
 
+#include <qglobal.h>
+
 #include "global.h"
 #include "myitem.h"
 #include "myarrow.h"
@@ -14,8 +16,6 @@
 #include "myiteminfo.h"
 #include "draglinepoint.h"
 #include "../util.h"
-
-#include "typeinfo.h"
 
 MyScene::MyScene(QMenu *menu, QObject * parent):
     rightMenu(menu),
@@ -41,6 +41,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
     if(event->button () == Qt::LeftButton)
     {
+        //从控件四边中点拖拽产生直线
         if(itemAt(event->scenePos()) && TYPE_ID(*itemAt(event->scenePos())) == TYPE_ID(DragLinePoint))
         {
             DragLinePoint * tmpDrag = dynamic_cast<DragLinePoint *>(itemAt(event->scenePos()));
@@ -134,7 +135,6 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         {
 
         }
-
         QGraphicsScene::mouseMoveEvent(event);
     }    
 }
@@ -142,7 +142,42 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 //在拖拽产生直线时，可能鼠标按在控件的Text上，那么需要进一步的判断
 void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(CurrAddGraType == GRA_LINE && insertTmpLine)
+    if(isDragLine)
+    {
+        QList<QGraphicsItem *> startItems = items(insertTmpLine->line().p1());
+        if (startItems.count() && startItems.first() == insertTmpLine)
+        {
+            startItems.removeFirst();
+        }
+
+        QList<QGraphicsItem *> endItems = items(insertTmpLine->line().p2());
+        if (endItems.count() && endItems.first() == insertTmpLine)
+        {
+            endItems.removeFirst();
+        }
+
+        removeItem(insertTmpLine);
+        delete insertTmpLine;
+
+        if (startItems.count() > 0 && endItems.count() > 0 &&
+            startItems.first() != endItems.first())
+        {
+            QString firstItemId = TYPE_ID(* startItems.first());
+            QString secondItemId = TYPE_ID(* endItems.first());
+
+            DragLinePoint *startItem = qgraphicsitem_cast<DragLinePoint *>(startItems.first());
+            DragLinePoint *endItem = qgraphicsitem_cast<DragLinePoint *>(endItems.first());
+
+            if(firstItemId == TYPE_ID(DragLinePoint) && secondItemId == TYPE_ID(DragLinePoint) &&
+                    startItem && endItem)
+            {
+                MyArrow * arrow = createArrow(LINE_MYITEM,startItem,endItem);
+                arrow->setStartPointType(startItem->getPointType());
+                arrow->setEndPointType(endItem->getPointType());
+            }
+        }
+    }
+    else if(!isDragLine && CurrAddGraType == GRA_LINE && insertTmpLine)
     {
         QList<QGraphicsItem *> startItems = items(insertTmpLine->line().p1());
         if (startItems.count() && startItems.first() == insertTmpLine)
@@ -163,51 +198,12 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             QString firstItemId = TYPE_ID(* startItems.first());
             QString secondItemId = TYPE_ID(* endItems.first());
 
-            MyItem *startItem = qgraphicsitem_cast<MyItem *>(startItems.first());
-            MyItem *endItem = qgraphicsitem_cast<MyItem *>(endItems.first());
-
-            if(firstItemId == TYPE_ID(MyTextItem) && startItems.size() > 1)
-            {
-                firstItemId = TYPE_ID(* startItems.at(1));
-                startItem = qgraphicsitem_cast<MyItem *>(startItems.at(1));
-            }
-
-            if(secondItemId == TYPE_ID(MyTextItem) && endItems.size() > 1)
-            {
-                secondItemId = TYPE_ID(* endItems.at(1));
-                endItem = qgraphicsitem_cast<MyItem *>(endItems.at(1));
-            }
-
-            if(firstItemId == TYPE_ID(MyItem) && secondItemId == TYPE_ID(MyItem) &&
-                    startItem && endItem)
-            {
-                MyArrow *arrow = new MyArrow(startItem, endItem);
-                connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
-                connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-
-                startItem->addArrow(arrow);
-                endItem->addArrow(arrow);
-                arrow->setZValue(-1000.0);
-                addItem(arrow);
-                arrow->updatePosition();
-            }
-            else if(firstItemId == TYPE_ID(MyNodePort) && secondItemId == TYPE_ID(MyNodePort))
+            if(firstItemId == TYPE_ID(MyNodePort) && secondItemId == TYPE_ID(MyNodePort))
             {
                 MyNodePort *startItem = qgraphicsitem_cast<MyNodePort *>(startItems.first());
                 MyNodePort *endItem = qgraphicsitem_cast<MyNodePort *>(endItems.first());
 
-                if(startItem && endItem)
-                {
-                    MyArrow *arrow = new MyArrow(startItem, endItem);
-                    connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
-                    connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-
-                    startItem->addArrow(arrow);
-                    endItem->addArrow(arrow);
-                    arrow->setZValue(-1000.0);
-                    addItem(arrow);
-                    arrow->updatePosition();
-                }
+                createArrow(LINE_NODEPORT,startItem,endItem);
             }
         }
     }
@@ -301,6 +297,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
 
         item->setText(cutInfo.content);
         item->setProperty(cutInfo.itemProperty);
+
         if(isCopy)
         {
             item->setPos(SceneLastClickPoint);
@@ -337,7 +334,6 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     }
     else if(cutInfo.graphicsType == GRA_LINE)
     {
-
         if(cutInfo.itemProperty.lineType == LINE_MYITEM)
         {
             int startIndex = findItemById(localItems,cutInfo.itemProperty.startItemID);
@@ -346,47 +342,75 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
             if(startIndex>=0&&startIndex<localItems.size() &&
                     endIndex>=0&&endIndex<localItems.size())
             {
-                MyItem * startItem = localItems.at(startIndex);
-                MyItem * endItem = localItems.at(endIndex);
+                DragLinePoint * startItem = localItems.at(startIndex)->getDragLinePoint(cutInfo.itemProperty.startPointType);
+                DragLinePoint * endItem = localItems.at(endIndex)->getDragLinePoint(cutInfo.itemProperty.endPointType);
 
-                MyArrow *arrow = new MyArrow(startItem, endItem);
-                connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
-                connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-
-                startItem->addArrow(arrow);
-                endItem->addArrow(arrow);
-                arrow->setZValue(-1000.0);
+                MyArrow * arrow = createArrow(LINE_MYITEM,startItem,endItem);
                 arrow->setProperty(cutInfo.itemProperty);
-
-                arrow->updatePosition();
-                addItem(arrow);
             }
         }
         else if(cutInfo.itemProperty.lineType == LINE_NODEPORT)
         {
             int startIndex = findItemById(localNodeports,cutInfo.itemProperty.startItemID);
             int endIndex = findItemById(localNodeports,cutInfo.itemProperty.endItemID);
+
             if(startIndex>=0&&startIndex<localNodeports.size() &&
                     endIndex>=0&&endIndex<localNodeports.size())
             {
+                MyNodePort * startItem = localNodeports.at(startIndex);
+                MyNodePort * endItem = localNodeports.at(endIndex);
 
-                MyNodePort * startNode = localNodeports.at(startIndex);
-                MyNodePort * endNode = localNodeports.at(endIndex);
-
-                MyArrow *arrow = new MyArrow(startNode, endNode);
-                connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
-                connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
-
-                startNode->addArrow(arrow);
-                endNode->addArrow(arrow);
-                arrow->setZValue(-1000.0);
+                MyArrow * arrow = createArrow(LINE_NODEPORT,startItem,endItem);
                 arrow->setProperty(cutInfo.itemProperty);
-
-                arrow->updatePosition();
-                addItem(arrow);
             }
         }
     }
+}
+
+///*****************************************************
+///**Function:
+///**Description:统一创建连接线
+///**Input:
+///**Output:
+///**Return:
+///**Others:
+///****************************************************/
+MyArrow * MyScene::createArrow(LineType type, MyNodeLine *startNode, MyNodeLine *endNode)
+{
+    MyArrow *arrow = new MyArrow;
+    connect(arrow,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+    connect(arrow,SIGNAL(updateSceneDraw()),this,SLOT(update()));
+
+    startNode->addArrow(arrow);
+    endNode->addArrow(arrow);
+
+    arrow->setStartItem(startNode);
+    arrow->setEndItem(endNode);
+
+    //对于从拖拽点产生的线条，需要保存其父类的ID和线条在父类的位置
+    if( type == LINE_MYITEM)
+    {
+        MyItem * pStart = dynamic_cast<MyItem *>(startNode->getParentItem());
+        MyItem * pEnd = dynamic_cast<MyItem *>(endNode->getParentItem());
+        arrow->setStartItemID(pStart->getProperty().startItemID);
+        arrow->setEndItemID(pEnd->getProperty().startItemID);
+    }
+    else if( type == LINE_NODEPORT)
+    {
+        MyNodePort * pStart = dynamic_cast<MyNodePort *>(startNode);
+        MyNodePort * pEnd = dynamic_cast<MyNodePort *>(endNode);
+
+        arrow->setStartItemID(pStart->getNodeProperty().startItemID);
+        arrow->setEndItemID(pEnd->getNodeProperty().startItemID);
+    }
+
+    arrow->setZValue(-1000.0);
+    arrow->setLineType(type);
+
+    arrow->updatePosition();
+    addItem(arrow);
+
+    return arrow;
 }
 
 ///*****************************************************
@@ -418,6 +442,11 @@ void MyScene::addItem(QList<CutInfo *> &cutInfos)
     foreach (CutInfo * cutInfo, lines)
     {
         addItem(*cutInfo);
+    }
+
+    foreach (CutInfo * info, cutInfos)
+    {
+        delete info;
     }
 
     isLocalFileOpened = false;

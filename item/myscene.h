@@ -21,7 +21,7 @@
 **             修复文件打开时，存在线条连接不上问题
 **20161002:wey:添加显示item位置和旋转信息MyItemInfo
 **20161003:wey:修复添加MyItemInfo，在清空显示导致程序奔溃问题。
-**
+**20161008:wey:修复本地打开后，临时数据未清空问题
 *************************************************/
 #ifndef MYSCENE_H
 #define MYSCENE_H
@@ -36,6 +36,9 @@ class MyItem;
 class MyPathItem;
 class MyNodePort;
 class MyItemInfo;
+class MyNodeLine;
+class MyArrow;
+class DragLinePoint;
 
 class MyScene : public QGraphicsScene
 {
@@ -80,6 +83,7 @@ private:
     void addMyItemConnect(MyItem * item);
     void addMyTextConnect(MyTextItem  * item);
     void createItemInfo();
+    MyArrow *createArrow(LineType type, MyNodeLine * startNode,MyNodeLine * endNode);
     QRectF getHorizonalRoundedRect(MyItem *item);
     void resetItemSelection();
 

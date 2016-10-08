@@ -15,6 +15,7 @@
 **20150929:wey:修复缩放控件时导致箭头长度不变问题
 **             修复箭头方向不正确问题
 **             添加鼠标进入和离开改变样式，方便状态显示
+**20161008:wey:调整连接线绘制起始点至控件一遍的中点
 *************************************************/
 #ifndef MYARROW_H
 #define MYARROW_H
@@ -27,17 +28,15 @@
 
 #include <QObject>
 
-class MyItem;
 class MyNodePort;
 class MyTextItem;
+class MyNodeLine;
 
 class MyArrow :public QObject, public QGraphicsLineItem
 {
     Q_OBJECT
 public:
     MyArrow(QGraphicsItem * parent = 0);
-    MyArrow(MyItem  * startItem,MyItem  * endItem,QGraphicsItem * parent = 0);
-    MyArrow(MyNodePort  * startItem,MyNodePort  * endItem,QGraphicsItem * parent = 0);
 
     ~MyArrow();
 
@@ -46,17 +45,29 @@ public:
     QPainterPath shape()const;
     void updatePosition();
 
-    MyItem * getStartItem() const{ return startItem; }
-    MyItem * getEndItem() const{ return endItem; }
+    void setLineType(LineType lineType);
 
+    void setStartItem(MyNodeLine * startItem);
+    MyNodeLine * getStartItem() const{ return startItem; }
+
+    void setEndItem(MyNodeLine * endItem);
+    MyNodeLine * getEndItem() const{ return endItem; }
+
+    void setStartPointType(PointType type);
+    PointType getStartPointType(){return this->property.startPointType;}
+
+    void setEndPointType(PointType type);
+    PointType getEndPointType(){return this->property.endPointType;}
+
+    void setStartItemID(const QString id);
+    void setEndItemID(const QString id);
+
+    //获取起始和结束端线条箭头的类型(直线、箭头、实心箭头)
     AddLineType getStartLineType(){return this->property.startLineType;}
     void setStartLineType(int type);
 
     AddLineType getEndLineType(){return this->property.endLineType;}
     void setEndLineType(int type);
-
-    MyNodePort * getStartNodePort() const{return this->startNodePort;}
-    MyNodePort * getEndNodePort() const{return this->endNodePort;}
 
     LineType getLineType()const {return this->property.lineType;}
 
@@ -86,11 +97,8 @@ private:
 
     void createTextItem();
 
-    MyItem  * startItem;
-    MyItem  * endItem;
-
-    MyNodePort * startNodePort;
-    MyNodePort * endNodePort;
+    MyNodeLine * startItem;
+    MyNodeLine * endItem;
 
     QPolygonF arrowHead;
 

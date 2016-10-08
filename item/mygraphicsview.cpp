@@ -392,7 +392,7 @@ void MyGraphicsView::copyItem()
     }
 }
 
-//ð¤Ìù
+//Õ³Ìù
 void MyGraphicsView::pasteItem()
 {
     MY_ASSERT(myScene)
@@ -419,16 +419,8 @@ void MyGraphicsView::deleteItem()
         {
             MyArrow * tmp = dynamic_cast<MyArrow *>(item);
 
-            if(tmp->getLineType() == LINE_MYITEM)
-            {
-                tmp->getStartItem()->removeArrow(tmp);
-                tmp->getEndItem()->removeArrow(tmp);
-            }
-            else if(tmp->getLineType() == LINE_NODEPORT)
-            {
-                tmp->getStartNodePort()->removeArrow(tmp);
-                tmp->getEndNodePort()->removeArrow(tmp);
-            }
+            tmp->getStartItem()->removeArrow(tmp);
+            tmp->getEndItem()->removeArrow(tmp);
             myScene->removeItem(tmp);
 
             delete tmp;
@@ -443,7 +435,7 @@ void MyGraphicsView::deleteItem()
         if(itemName == TYPE_ID(MyItem))
         {
             MyItem * tmp = dynamic_cast<MyItem *>(item);
-            tmp->removeArrows();
+            tmp->removeDragLineArrows();
             myScene->removeItem(tmp);
             delete tmp;
         }
