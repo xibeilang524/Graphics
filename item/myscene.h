@@ -81,6 +81,7 @@ private:
     void addMyTextConnect(MyTextItem  * item);
     void createItemInfo();
     QRectF getHorizonalRoundedRect(MyItem *item);
+    void resetItemSelection();
 
     QMenu * rightMenu;
 
@@ -95,6 +96,8 @@ private:
     bool isDragLine;                   //是否处于添加线条状态
     bool isClear;                      //是否在清空状态，用于控制clear()对MyIemInfo的影响
     QString uuid;
+    QList<MyItem *> mouseItems;        //拖拽连接线时，记录鼠标位置下产生的item
+    QString startMouseItemId;          //拖拽线时按下DragLinePoint的父item的id
 };
 
 #endif // MYSCENE_H

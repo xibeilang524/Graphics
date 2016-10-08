@@ -24,8 +24,11 @@ RotateLine::RotateLine(GraphicsType type, QGraphicsItem *parent, QObject *parent
     setPolygon(itemPolygon);
 
     pixmap.load(":/images/itemLock.png");
+    rotatePixmap.load(":/images/rotate32.png");
+    rotatePixmap = rotatePixmap.scaled(rotatePixmap.width()/3*2,rotatePixmap.height()/3*2);
 
     isMoveable = true;
+    isEnter = false;
 
     setFlags(ItemIsSelectable);
     setAcceptHoverEvents(true);
@@ -61,6 +64,7 @@ void RotateLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     {
         painter->setBrush(Qt::blue);
         painter->drawPolygon(itemPolygon);
+//        painter->drawPixmap(QRectF(-rotatePixmap.width()/2,-rotatePixmap.height()/2,rotatePixmap.width(),rotatePixmap.height()),rotatePixmap,rotatePixmap.rect());
     }
 
     painter->restore();
@@ -68,12 +72,17 @@ void RotateLine::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
 void RotateLine::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    this->setCursor(Qt::PointingHandCursor);
+    isEnter = true;
+    update();
+    this->setCursor(QCursor(rotatePixmap));
+//    this->setCursor(Qt::PointingHandCursor);
     QGraphicsPolygonItem::hoverEnterEvent(event);
 }
 
 void RotateLine::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
+    isEnter = false;
+    update();
     this->setCursor(Qt::ArrowCursor);
     QGraphicsPolygonItem::hoverLeaveEvent(event);
 }
@@ -120,7 +129,10 @@ void RotateLine::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         rotateDegree = 270 + rotateDegree;
     }
 
-    emit rotateItem(MOUSE_MOVE,rotateDegree);
+    if(isMoveable)
+    {
+        emit rotateItem(MOUSE_MOVE,rotateDegree);
+    }
 
     QGraphicsPolygonItem::mouseMoveEvent(event);
 }

@@ -43,6 +43,10 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
     {
         if(itemAt(event->scenePos()) && TYPE_ID(*itemAt(event->scenePos())) == TYPE_ID(DragLinePoint))
         {
+            DragLinePoint * tmpDrag = dynamic_cast<DragLinePoint *>(itemAt(event->scenePos()));
+            QGraphicsItem * pItem = tmpDrag->getParentItem();
+            startMouseItemId = dynamic_cast<MyItem *>(pItem)->getProperty().startItemID;
+
             insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
             insertTmpLine->setPen(QPen(Qt::red, 2));
             insertTmpLine->setZValue(1000);
@@ -94,10 +98,28 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 
 void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
+    //从线段拖拽点中产生的线段，在产生鼠标移动事件时因鼠标一直按下，无法主动的对其它控件产生鼠标进入事件，因此需要对事件进行分发
     if((isDragLine||CurrAddGraType == GRA_LINE)&& insertTmpLine)
     {
-        QLineF newLine(insertTmpLine->line().p1(), event->scenePos() /*- QPointF(2,2)*/);
+        QLineF newLine(insertTmpLine->line().p1(), event->scenePos());
         insertTmpLine->setLine(newLine);
+
+        QList<QGraphicsItem *> currPosItems = items(event->scenePos());
+        foreach (QGraphicsItem * item, currPosItems)
+        {
+            if(TYPE_ID(*item) == TYPE_ID(MyItem))
+            {
+                mouseItems.push_back(dynamic_cast<MyItem *>(item));
+                //主动对鼠标点位置下Item产生进入事件
+                QEvent * eve = new QEvent(QEvent::GraphicsSceneHoverEnter);
+                sendEvent(item,eve);
+            }
+        }
+
+        if(currPosItems.size() == 1)
+        {
+            resetItemSelection();
+        }
     }
     else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
     {
@@ -194,6 +216,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
     }
 
+    isDragLine = false;
     insertTmpLine = NULL;
     insertTmpPath = NULL;
     QGraphicsScene::mouseReleaseEvent(event);
@@ -523,6 +546,7 @@ void MyScene::createItemInfo()
 {
     myItemInfo = new MyItemInfo(GRA_ITEM_INFO);
     myItemInfo->setVisible(false);
+    myItemInfo->setZValue(1000);
 
     addItem(myItemInfo);
 }
@@ -590,6 +614,20 @@ void MyScene::respTextLostFocus(MyTextItem *item)
         removeItem(item);
         item->deleteLater();
     }
+}
+
+//产生控件连接线时，如果当前鼠标位置下没有控件，则清空先前选中的item
+void MyScene::resetItemSelection()
+{
+    foreach(MyItem * item,mouseItems)
+    {
+        if(item->getProperty().startItemID != startMouseItemId)
+        {
+            item->setDragLineVisible(false);
+        }
+    }
+    mouseItems.clear();
+    update();
 }
 
 //清空item，但不清除第一个Item(MyItemInfo)【!!!】

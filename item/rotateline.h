@@ -45,10 +45,11 @@ private:
     QPointF startPoint;
 
     qreal rotateDegree;
-    bool hasSelected;
+    bool isEnter;
     bool isMoveable;
 
     QPixmap pixmap;
+    QPixmap rotatePixmap;
 };
 
 #endif // ROTATELINE_H

@@ -88,6 +88,7 @@ public:
 
     void resetPolygon();                   //重新设定多边形
     void setDragPointVisible(bool flag);
+    void setDragLineVisible(bool isVisible);
 
     void setMoveable(bool lockState);
     bool isMoveable(){return this->property.isMoveable;}
@@ -140,7 +141,6 @@ private:
     qreal getLoopMaxSidLength(qreal width, qreal height);
     void setInitalPolygon(QRectF boundRect, qreal tx, qreal ty, qreal tw, qreal th);
     void initComponentItem();
-    void setDragLineVisible(bool isVisible);
 
     QPen selectedPen;
     int selectedPenWidth;

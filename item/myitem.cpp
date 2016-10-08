@@ -467,7 +467,9 @@ void MyItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 //右键菜单事件
 void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+    isPrepareLine = false;
     setSelected(true);
+    update();
     rightMenu->exec(event->screenPos());
 }
 
@@ -1117,7 +1119,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
         //当前旋转的角度
         qreal rotateDegree = rotation();
 
-        //【201609230控件四角不按比例缩放】
+        //【20160930控件四角不按比例缩放】
 //        qreal  factor = w / h;
 
         QPainterPath path;
