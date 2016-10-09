@@ -2,6 +2,9 @@
 #include <QApplication>
 
 #include <QTextCodec>
+#include <QDesktopWidget>
+
+#include <QDebug>
 
 #include "./manager/actionmanager.h"
 #include "SelfWidget/hidesplit.h"
@@ -15,6 +18,9 @@ int main(int argc, char *argv[])
 
     QTextCodec * codec = QTextCodec::codecForName("GB2312");
     QTextCodec::setCodecForCStrings(codec);
+
+    ScreenWidth = qApp->desktop()->screenGeometry().width();
+    ScreenHeight = qApp->desktop()->screenGeometry().height();
 
     SaveFileSuffix = ".bin";
     SaveFileHeadFlag = "RGVISIO";

@@ -7,7 +7,7 @@ MyTextInput::MyTextInput(QWidget *parent) :
 {
     ui->setupUi(this);
 
-    setWindowTitle("±à¼­ÎÄ±¾");
+    setWindowTitle("±à¼­Ãû³Æ");
 
     connect(ui->confirm,SIGNAL(clicked()),this,SLOT(close()));
 }

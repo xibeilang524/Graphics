@@ -28,6 +28,7 @@ HEADERS  += mainwindow.h \
 include($$PWD\SelfWidget\SelfWidget.pri)
 include($$PWD\item\item.pri)
 include($$PWD\manager\manager.pri)
+include($$PWD\modelview\modelview.pri)
 
 FORMS    += mainwindow.ui
 

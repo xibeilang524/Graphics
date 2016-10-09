@@ -24,9 +24,14 @@ class MyPropertyEdit : public QDialog
 public:
     explicit MyPropertyEdit(QWidget *parent = 0);
     ~MyPropertyEdit();
+
+private slots:
+    void confirmPropety();
+    void cancelProperty();
     
 private:
     Ui::MyPropertyEdit *ui;
+
 };
 
 #endif // MYPROPERTYEDIT_H
