@@ -13,6 +13,9 @@
 
 #include <QDialog>
 
+class ServiceInputTableView;
+class ServiceProperty;
+
 namespace Ui {
 class MyPropertyEdit;
 }
@@ -25,6 +28,8 @@ public:
     explicit MyPropertyEdit(QWidget *parent = 0);
     ~MyPropertyEdit();
 
+    void initProp(ServiceProperty * prop);
+
 private slots:
     void confirmPropety();
     void cancelProperty();
@@ -32,6 +37,10 @@ private slots:
 private:
     Ui::MyPropertyEdit *ui;
 
+    ServiceInputTableView * inputTableView;
+    ServiceInputTableView * outputTableView;
+
+    ServiceProperty * currItemProp;
 };
 
 #endif // MYPROPERTYEDIT_H

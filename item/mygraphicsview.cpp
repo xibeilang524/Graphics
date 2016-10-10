@@ -918,10 +918,10 @@ void MyGraphicsView::editPropertyItem()
         if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+            MyPropertyEdit propertyEdit(this);
+            propertyEdit.initProp(item->getServiceProp());
 
-            MyPropertyEdit propertyEdi(this);
-
-            propertyEdi.exec();
+            propertyEdit.exec();
         }
     }
 }

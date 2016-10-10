@@ -10,6 +10,7 @@
 **20160925:wey:增加隐藏控件位置关系SpiltDirect
 **20160927:wey:添加线条类型AddLineType
 **             添加拖入类型为平行四边形
+**20161009:wey:添加属性编辑结构体ServiceProperty
 *************************************************/
 #ifndef HEADER_H
 #define HEADER_H
@@ -41,6 +42,8 @@
 
 #include "./item/ItemHeader.h"
 
+
+/****************************************建模**************************************************/
 enum ReturnType
 {
     RETURN_OK,
@@ -220,5 +223,28 @@ struct CutInfo
     QString content;
     QList<NodePortProperty> nodeProperties;      //控件包含端口的信息
 };
+
+/****************************************属性编辑**************************************************/
+//输入参数的属性
+struct Parameter
+{
+    QString pName;             //参数名
+    QString pType;             //参数类型
+    QString pValue;            //参数值
+    QString pRemark;           //备注
+};
+
+typedef  QList<Parameter *> ParaList;
+
+//服务的属性
+struct ServiceProperty
+{
+    QString serviceName;              //服务名
+    QString servicePath;              //服务路径
+    ParaList inputParas;              //输入参数集合
+    ParaList outputParas;             //输出参数集合
+};
+
+
 
 #endif // HEADER_H

@@ -196,6 +196,8 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
 
     setBrush(property.itemBrush);
 
+    serviceProp = new ServiceProperty;
+
     currMouseType = MOUSE_NONE;
     isNeedBorder = false;
 

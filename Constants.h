@@ -64,6 +64,7 @@ const char HIDE_TOOL_ID[] = "Constanta.HideToolBox";
 const char TEC_SUPPORT_ID[] = "Constanta.TecSupport";
 const char ABOUT_ID[] = "Constanta.About";
 
+
 } // namespace StyleAssisant
 } // namespace Constants
 #endif // CONSTANTS_H
