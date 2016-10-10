@@ -1,6 +1,7 @@
 #include "serviceinputdelegate.h"
 
 #include <QComboBox>
+#include <QLineEdit>
 
 ServiceInputDelegate::ServiceInputDelegate()
 {
@@ -16,6 +17,11 @@ QWidget * ServiceInputDelegate::createEditor(QWidget *parent, const QStyleOption
         box->addItems(stringList);
         return box;
     }
+    else
+    {
+        QLineEdit * edit = new QLineEdit(parent);
+        return edit;
+    }
     return NULL;
 }
 
@@ -29,6 +35,14 @@ void ServiceInputDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
         if(box)
         {
             box->setCurrentIndex(stringList.indexOf(value));
+        }
+    }
+    else
+    {
+        QLineEdit * edit = dynamic_cast<QLineEdit *>(editor);
+        if(edit)
+        {
+            edit->setText(value);
         }
     }
 }
@@ -49,6 +63,14 @@ void ServiceInputDelegate::setModelData(QWidget *editor, QAbstractItemModel *mod
         if(box)
         {
             value = box->currentText();
+        }
+    }
+    else
+    {
+        QLineEdit * edit = dynamic_cast<QLineEdit *>(editor);
+        if(edit)
+        {
+            value = edit->text();
         }
     }
     model->setData(index,value,Qt::EditRole);
