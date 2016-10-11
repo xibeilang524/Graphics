@@ -54,6 +54,8 @@ public:
     void  transformView(qreal hValue,qreal value);
     void  setScaleValue(int);
 
+    int getItemSize();
+
 protected:
     void dragEnterEvent(QDragEnterEvent *event);
     void dragMoveEvent(QDragMoveEvent *event);

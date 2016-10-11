@@ -650,7 +650,7 @@ void MyScene::resetItemSelection()
 {
     foreach(MyItem * item,mouseItems)
     {
-        if(item->getProperty().startItemID != startMouseItemId)
+        if(item && item->getProperty().startItemID != startMouseItemId)
         {
             item->setDragLineVisible(false);
         }

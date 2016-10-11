@@ -55,5 +55,6 @@
         <file>images/pageFlag.png</file>
         <file>images/pageClose.png</file>
         <file>images/pageClose_hover.png</file>
+        <file>images/editProp.png</file>
     </qresource>
 </RCC>

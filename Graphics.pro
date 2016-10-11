@@ -29,6 +29,8 @@ include($$PWD\SelfWidget\SelfWidget.pri)
 include($$PWD\item\item.pri)
 include($$PWD\manager\manager.pri)
 include($$PWD\modelview\modelview.pri)
+include($$PWD\simulate\simulate.pri)
+
 
 FORMS    += mainwindow.ui
 

@@ -1291,7 +1291,7 @@ void MyItem::procResizeItem()
     {
         topLinePoint->setPos((itemPolygon.at(0).x() + itemPolygon.at(1).x())/2, itemPolygon.at(0).y());
         rightLinePoint->setPos((itemPolygon.at(1).x() + itemPolygon.at(2).x())/2, 0);
-        bottomLinePoint->setPos((itemPolygon.at(2).x() + itemPolygon.at(3).x())/2, itemPolygon.at(2).y());
+        bottomLinePoint->setPos((itemPolygon.at(0).x() + itemPolygon.at(1).x())/2, itemPolygon.at(2).y());
         leftLinePoint->setPos((itemPolygon.at(3).x() + itemPolygon.at(0).x())/2, 0);
     }
     else

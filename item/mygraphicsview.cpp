@@ -926,6 +926,16 @@ void MyGraphicsView::editPropertyItem()
     }
 }
 
+//获取当前模型区域内的item数量
+int MyGraphicsView::getItemSize()
+{
+     if(myScene)
+     {
+         return myScene->items().size();
+     }
+     return 0;
+}
+
 //清空所有的item
 void MyGraphicsView::clearItems()
 {

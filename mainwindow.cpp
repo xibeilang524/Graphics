@@ -144,7 +144,7 @@ void MainWindow::createActionAndMenus()
     editTextAction->setShortcut(QKeySequence("Ctrl+T"));
     ActionManager::instance()->registerAction(editTextAction,MyGraphicsView::instance(),SLOT(editTextItem()));
 
-    MyAction * propertyEditAction = ActionManager::instance()->crateAction(Constants::PROPERTY_EDIT_ID,QIcon(""),"编辑服务");
+    MyAction * propertyEditAction = ActionManager::instance()->crateAction(Constants::PROPERTY_EDIT_ID,QIcon(":/images/editProp.png"),"编辑服务");
     propertyEditAction->setShortcut(QKeySequence("Ctrl+E"));
     ActionManager::instance()->registerAction(propertyEditAction,MyGraphicsView::instance(),SLOT(editPropertyItem()));
 
@@ -349,10 +349,7 @@ void MainWindow::fileOpen()
 
     MY_ASSERT(MyGraphicsView::instance()->scene())
 
-    if(MyGraphicsView::instance()->scene()->items().size()>0)
-    {
-        fileClear();
-    }
+    fileClear();
 
     QString openFileName = QFileDialog::getOpenFileName(this,"选择打开文件","","Files(*"+SaveFileSuffix+")");
     if(!openFileName.isEmpty())
@@ -394,13 +391,16 @@ void MainWindow::fileClear()
 {
     respRestItemAction();
 
-    int result = QMessageBox::warning(this,"警告","是否清空场景的内容?",QMessageBox::Yes,QMessageBox::No);
-    if(result == QMessageBox::Yes)
+    if(view->getItemSize() > 1)
     {
-        view->clearItems();
-        respItemSizeChanged(0);
-        resetEditActionState(false);
-        Util::resetGlobalZValue();
+        int result = QMessageBox::warning(this,"警告","是否清空场景的内容?",QMessageBox::Yes,QMessageBox::No);
+        if(result == QMessageBox::Yes)
+        {
+            view->clearItems();
+            respItemSizeChanged(0);
+            resetEditActionState(false);
+            Util::resetGlobalZValue();
+        }
     }
 }
 

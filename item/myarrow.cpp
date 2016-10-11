@@ -46,6 +46,8 @@ MyArrow::MyArrow(QGraphicsItem *parent):
     property.itemBrush = QBrush(Qt::black);
     property.itemPen = QPen(Qt::black,2);
 
+    property.endLineType = LINE_SOLID_TRIANGLE;
+
     createTextItem();
 }
 

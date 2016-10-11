@@ -64,25 +64,31 @@ QVariant ServiceInputModel::data(const QModelIndex &index, int role) const
     return QVariant();
 }
 
+//设置表头的样式
 QVariant ServiceInputModel::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if(role != Qt::DisplayRole)
+    if( role == Qt::BackgroundColorRole)
     {
-        return QVariant();
-    }
-
-    if( orientation == Qt::Horizontal)
-    {
-        if(horizonalHeadList.size() == column)
+        if( orientation == Qt::Horizontal)
         {
-            return horizonalHeadList.at(section);
+            QBrush brush(QColor(255,0,0));
+            return brush;
         }
     }
-    else if(orientation == Qt::Vertical)
+    else if(role == Qt::DisplayRole)
     {
-        return QString("%1").arg(section +1);
+        if( orientation == Qt::Horizontal)
+        {
+            if(horizonalHeadList.size() == column)
+            {
+                return horizonalHeadList.at(section);
+            }
+        }
+        else if(orientation == Qt::Vertical)
+        {
+            return QString("%1").arg(section +1);
+        }
     }
-
     return QVariant();
 }
 
