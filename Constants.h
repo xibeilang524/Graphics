@@ -51,6 +51,10 @@ const char PARALLEL_ID[] = "Constants.Parallel";
 const char LOOP_DOWN_ID[] = "Constants.LoopDown";
 const char LOOP_UP_ID[] = "Constants.LoopUp";
 
+//模式
+const char BUILD_MODEL_ID[] = "Constants.BuildModel";
+const char SIMLUATE_ID[] = "Constants.Simluate";
+
 //端口右键菜单
 const char NODE_DELETE_ID[] = "Constants.Node.Delete";
 const char NODE_EDIT_ID[] = "Constanta.Node.Edit";
@@ -59,6 +63,7 @@ const char NODE_EDIT_ID[] = "Constanta.Node.Edit";
 const char FULL_SCREEN_ID[] = "Constanta.FullScreen";
 const char HIDE_ICON_ID[] = "Constanta.HideIcon";
 const char HIDE_TOOL_ID[] = "Constanta.HideToolBox";
+const char HIDE_SIMULATE_ID[] = "Constanta.HideSimulate";
 
 //【帮助】
 const char TEC_SUPPORT_ID[] = "Constanta.TecSupport";

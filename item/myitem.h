@@ -91,6 +91,7 @@ public:
     bool isMoveable(){return this->property.isMoveable;}
 
     DragLinePoint * getDragLinePoint(PointType pointType);
+    QList<MyArrow *> getArrows();
 
     void resetItemUUID();                  //重新设定控件的UUID编号，同时更新子节点的父索引值
 

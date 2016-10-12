@@ -11,3 +11,5 @@ QPointF SceneLastClickPoint;              //sceneÖĞ×îºóÒ»´ÎÊó±êµã»÷µÄÎ»ÖÃ£¬×÷ÎªÕ
 
 QString SaveFileSuffix;                   //±£´æÎÄ¼şµÄºó×ºÃû
 QString SaveFileHeadFlag;                 //±¨ÎÄÎÄ¼şµÄÎÄ¼şÍ·£¬ÓÃÓÚÅĞ¶ÏËùÑ¡ÔñµÄÎÄ¼şÊÇ·ñÊÇ³ÌĞòÖ§³ÖµÄ¸ñÊ½
+
+WindowState GlobalWindowState;            //È«¾ÖµÄ¹¤×÷Çø¼äÀàĞÍ

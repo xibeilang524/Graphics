@@ -23,6 +23,7 @@
 **20160925:wey:增加左右工具栏可显示隐藏
 **             增加控件和帮助菜单栏
 **20161003:wey:添加节点属性编辑
+**20161011:wey:添加工作区类型切换，建模/推演类型
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -37,6 +38,7 @@ class MySlider;
 class RightToolBox;
 class LeftIconWidget;
 class HideSplit;
+class SimulateControlPanel;
 
 namespace Ui {
 class MainWindow;
@@ -57,7 +59,6 @@ protected:
     void keyPressEvent(QKeyEvent *event);
 
 private slots:
-    void fileNew();
     void fileOpen();
     void fileSave();
     void fileClear();
@@ -70,6 +71,7 @@ private slots:
     void getTecSupport();
     void showAbout();
     void respDeletePage();
+    void switchWorkModel();
 
 private:
     void createActionAndMenus();
@@ -82,11 +84,24 @@ private:
 
     Ui::MainWindow *ui;
     QActionGroup * itemGroup;
+    QActionGroup * workModelGroup;
 
     MySlider * mySlider;
     MyGraphicsView * view;
     LeftIconWidget * leftIconWidget;
     RightToolBox * rightToolBox;
+    SimulateControlPanel * simulatePanel;
+
+    QToolBar * fileBar;
+    QToolBar * itemBar;
+    QToolBar * editBar;
+    QToolBar * sceneBar;
+
+    QMenu * fileMenu;
+    QMenu * editMenu;
+    QMenu * itemMenu;
+    QMenu * widgetMenu;
+    QMenu * helpMenu;
 
     CutInfo cutTmpInfo;               //保存剪切信息
 };

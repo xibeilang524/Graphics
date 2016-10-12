@@ -8,6 +8,8 @@
 #include <QTextDocument>
 #include <QDebug>
 
+#include "../global.h"
+
 QDataStream & operator <<(QDataStream &stream,MyTextItem * item)
 {
     int type = item->type;
@@ -79,14 +81,17 @@ void MyTextItem::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
 void MyTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if (textInteractionFlags() == Qt::NoTextInteraction)
-        setTextInteractionFlags(Qt::TextEditorInteraction);
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
+    {
+        if (textInteractionFlags() == Qt::NoTextInteraction)
+            setTextInteractionFlags(Qt::TextEditorInteraction);
+    }
     QGraphicsTextItem::mouseDoubleClickEvent(event);
 }
 
 void MyTextItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    if(menu)
+    if(GlobalWindowState == WINDOW_BUILD_MODEL && menu)
     {
         setSelected(true);
         menu->exec(event->screenPos());

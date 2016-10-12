@@ -42,16 +42,39 @@
 
 #include "./item/ItemHeader.h"
 
+//窗口工作区间类型
+enum WindowState
+{
+    WINDOW_BUILD_MODEL,          //模型建立
+    WINDOW_SIMULATE              //模型推演
+};
 
-/****************************************建模**************************************************/
+//返回值类型
 enum ReturnType
 {
-    RETURN_OK,
-    FILE_NOT_EXIST,
-    FILE_CANT_READ,
-    FILE_CANT_WRITE,
-    FILE_ILLEGAL             //文件格式不合法
+    RETURN_ERROR = 0,                //错误
+    RETURN_SUCCESS = 1,              //正确
+    SCENE_NOT_EXIST = 2,             //场景不存在
+    SCENE_EMPTY = 3,                 //场景为空
+    SCENE_WITHOUT_START = 4,         //场景无开始
+    SCENE_MORE_START = 5,            //场景多个开始
+    SCENE_WITHOUT_END = 6,           //场景无结束
+    SCENE_MORE_END = 7,              //场景多个结束
+    SCENE_FLOW_ERROR = 8,            //场景流程错误
+
+    FLOW_NOT_COMPLETE = 10,          //流程不完整
+    FLOW_COMPLETE = 12,              //流程完整
+    FLOW_SUCCESS = 13,               //流程逻辑正确
+    FLOW_ERROR = 14,                 //流程逻辑错误
+
+    FILE_NOT_EXIST = 30,             //文件不存在
+    FILE_CANT_READ = 31,             //文件不可读
+    FILE_CANT_WRITE = 32,            //文件不可写
+    FILE_ILLEGAL = 33                //文件格式不合法
+
 };
+
+/****************************************建模**************************************************/
 
 //当前添加的类型
 enum GraphicsType

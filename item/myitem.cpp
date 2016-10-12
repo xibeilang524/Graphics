@@ -406,8 +406,11 @@ void MyItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 //双击编辑文字信息
 void MyItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    emit editMe();
-    QGraphicsPolygonItem::mouseDoubleClickEvent(event);
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
+    {
+        emit editMe();
+        QGraphicsPolygonItem::mouseDoubleClickEvent(event);
+    }
 
 //    myTextItem->setTextInteractionFlags(Qt::TextEditorInteraction);
 }
@@ -426,42 +429,52 @@ void MyItem::getRealTimePos()
 //鼠标进入控件
 void MyItem::hoverEnterEvent(QGraphicsSceneHoverEvent *event)
 {
-    if(CurrAddGraType == GRA_LINE || CurrAddGraType == GRA_VECTOR_LINE)
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
     {
-        isPrepareLine = true;
-        update();
-    }
-    if(!isSelected())
-    {
-        setDragLineVisible(true);
-    }
+        if(CurrAddGraType == GRA_LINE || CurrAddGraType == GRA_VECTOR_LINE)
+        {
+            isPrepareLine = true;
+            update();
+        }
+        if(!isSelected())
+        {
+            setDragLineVisible(true);
+        }
 
-    setCursor(Qt::SizeAllCursor);
+        setCursor(Qt::SizeAllCursor);
+    }
     QGraphicsPolygonItem::hoverEnterEvent(event);
 }
 
 void MyItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
-    if(CurrAddGraType == GRA_LINE || CurrAddGraType == GRA_VECTOR_LINE)
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
     {
-        isPrepareLine = false;
-        update();
+        if(CurrAddGraType == GRA_LINE || CurrAddGraType == GRA_VECTOR_LINE)
+        {
+            isPrepareLine = false;
+            update();
+        }
+        if(!isSelected())
+        {
+            setDragLineVisible(false);
+        }
+        setCursor(Qt::ArrowCursor);
     }
-    if(!isSelected())
-    {
-        setDragLineVisible(false);
-    }
-    setCursor(Qt::ArrowCursor);
+
     QGraphicsPolygonItem::hoverLeaveEvent(event);
 }
 
 //右键菜单事件
 void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    isPrepareLine = false;
-    setSelected(true);
-    update();
-    rightMenu->exec(event->screenPos());
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
+    {
+        isPrepareLine = false;
+        setSelected(true);
+        update();
+        rightMenu->exec(event->screenPos());
+    }
 }
 
 //拖入事件(注释/并行不允许拖入)
@@ -1572,6 +1585,17 @@ void MyItem::removeDragLineArrows()
     leftLinePoint->removeArrows();
     rightLinePoint->removeArrows();
     bottomLinePoint->removeArrows();
+}
+
+//获取当前控件所有的箭头
+QList<MyArrow *> MyItem::getArrows()
+{
+    QList<MyArrow *> arrows;
+    arrows.append(topLinePoint->getArrows());
+    arrows.append(rightLinePoint->getArrows());
+    arrows.append(bottomLinePoint->getArrows());
+    arrows.append(leftLinePoint->getArrows());
+    return arrows;
 }
 
 MyItem::~MyItem()

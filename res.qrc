@@ -56,5 +56,7 @@
         <file>images/pageClose.png</file>
         <file>images/pageClose_hover.png</file>
         <file>images/editProp.png</file>
+        <file>images/buildmodel.png</file>
+        <file>images/simulate.png</file>
     </qresource>
 </RCC>

@@ -9,6 +9,7 @@
 #include "myitem.h"
 #include "mynodeport.h"
 #include "mytextitem.h"
+#include "../global.h"
 
 #include "math.h"
 
@@ -357,8 +358,11 @@ void MyArrow::updatePosition()
 //双击编辑文字信息
 void MyArrow::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    emit editMe();
-    QGraphicsLineItem::mouseDoubleClickEvent(event);
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
+    {
+        emit editMe();
+        QGraphicsLineItem::mouseDoubleClickEvent(event);
+    }
 }
 
 //鼠标进入

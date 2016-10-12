@@ -21,6 +21,7 @@
 #include "./SelfWidget/righttoolbox.h"
 #include "./SelfWidget/mypageswitch.h"
 #include "./manager/MyLineComboBox.h"
+#include "./simulate/simulatecontrolpanel.h"
 #include "fileoperate.h"
 #include "global.h"
 #include "util.h"
@@ -32,12 +33,17 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    setWindowTitle("多组件模型在线协同调用工具");
 
     mySlider = NULL;
     leftIconWidget = NULL;
     rightToolBox = NULL;
     view = NULL;
+    simulatePanel = NULL;
+
+    fileBar = NULL;
+    itemBar = NULL;
+    sceneBar = NULL;
+    editBar = NULL;
     GlobalItemZValue = 0;
 
     createSceneAndView();
@@ -63,7 +69,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //创建窗口的菜单栏，绑定响应事件
 void MainWindow::createActionAndMenus()
 {
-    QMenu * fileMenu = menuBar()->addMenu("文件(&F)");
+    fileMenu = menuBar()->addMenu("文件(&F)");
 
     MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工作区");
     newAction->setShortcut(QKeySequence("Ctrl+N"));
@@ -91,7 +97,7 @@ void MainWindow::createActionAndMenus()
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
 
-    QMenu * editMenu = menuBar()->addMenu("编辑(&E)");
+    editMenu = menuBar()->addMenu("编辑(&E)");
 
     MyAction * undoAction = ActionManager::instance()->crateAction(Constants::UNDO_ID,QIcon(":/images/undo.png"),"撤销");
     ActionManager::instance()->registerAction(undoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
@@ -149,7 +155,6 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(propertyEditAction,MyGraphicsView::instance(),SLOT(editPropertyItem()));
 
     editMenu->addAction(editTextAction);
-//    editMenu->addAction(propertyEditAction);
     editMenu->addSeparator();
     editMenu->addAction(undoAction);
     editMenu->addAction(redoAction);
@@ -169,36 +174,12 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(dragAbleAction,MyGraphicsView::instance(),SLOT(setViewDragEnable(bool)),true);
     ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setChecked(true);
 
-    QMenu * itemMenu = menuBar()->addMenu("类型(&I)");
+    itemMenu = menuBar()->addMenu("类型(&I)");
 
     MyAction * arrowAction = ActionManager::instance()->crateAction(Constants::ARROW_ID,QIcon(":/images/pointer.png"),"箭头");
     ActionManager::instance()->registerAction(arrowAction,this,SLOT(recordClickedItem()),true);
     arrowAction->setType(GRA_NONE);
     arrowAction->setChecked(true);
-
-//    MyAction * squareAction = ActionManager::instance()->crateAction(Constants::SQUARE_ID,QIcon(":/images/square.png"),"正方形");
-//    ActionManager::instance()->registerAction(squareAction,this,SLOT(recordClickedItem()),true);
-//    squareAction->setType(GRA_SQUARE);
-
-//    MyAction * rectAction = ActionManager::instance()->crateAction(Constants::RECT_ID,QIcon(":/images/rectange.png"),"矩形");
-//    ActionManager::instance()->registerAction(rectAction,this,SLOT(recordClickedItem()),true);
-//    rectAction->setType(GRA_RECT);
-
-//    MyAction * roundRectAction = ActionManager::instance()->crateAction(Constants::ROUNDRECT_ID,QIcon(":/images/roundedrect.png"),"圆角矩形");
-//    ActionManager::instance()->registerAction(roundRectAction,this,SLOT(recordClickedItem()),true);
-//    roundRectAction->setType(GRA_ROUND_RECT);
-
-//    MyAction * circleAction = ActionManager::instance()->crateAction(Constants::CIRCLE_ID,QIcon(":/images/circle.png"),"圆");
-//    ActionManager::instance()->registerAction(circleAction,this,SLOT(recordClickedItem()),true);
-//    circleAction->setType(GRA_CIRCLE);
-
-//    MyAction * ellipseAction = ActionManager::instance()->crateAction(Constants::ELLIPSE_ID,QIcon(":/images/ellipse.png"),"椭圆");
-//    ActionManager::instance()->registerAction(ellipseAction,this,SLOT(recordClickedItem()),true);
-//    ellipseAction->setType(GRA_ELLIPSE);
-
-//    MyAction * polygonAction = ActionManager::instance()->crateAction(Constants::POLYGON_ID,QIcon(":/images/diamonds.png"),"菱形");
-//    ActionManager::instance()->registerAction(polygonAction,this,SLOT(recordClickedItem()),true);
-//    polygonAction->setType(GRA_POLYGON);
 
     MyAction * lineAction = ActionManager::instance()->crateAction(Constants::LINE_ID,QIcon(":/images/linepointer.png"),"线条");
     ActionManager::instance()->registerAction(lineAction,this,SLOT(recordClickedItem()),true);
@@ -216,28 +197,27 @@ void MainWindow::createActionAndMenus()
     itemGroup = new QActionGroup(this);
 
     itemGroup->addAction(arrowAction);
-//    itemGroup->addAction(squareAction);
-//    itemGroup->addAction(rectAction);
-//    itemGroup->addAction(roundRectAction);
-//    itemGroup->addAction(circleAction);
-//    itemGroup->addAction(ellipseAction);
-//    itemGroup->addAction(polygonAction);
     itemGroup->addAction(textAction);
     itemGroup->addAction(lineAction);
     itemGroup->addAction(vectorLineAction);
 
     itemMenu->addAction(arrowAction);
-//    itemMenu->addAction(squareAction);
-//    itemMenu->addAction(rectAction);
-//    itemMenu->addAction(roundRectAction);
-//    itemMenu->addAction(circleAction);
-//    itemMenu->addAction(ellipseAction);
-//    itemMenu->addAction(polygonAction);
     itemMenu->addAction(textAction);
     itemMenu->addAction(lineAction);
     itemMenu->addAction(vectorLineAction);
 
-    QMenu * widgetMenu = menuBar()->addMenu("窗口(&W)");
+    MyAction * buildModelAction = ActionManager::instance()->crateAction(Constants::BUILD_MODEL_ID,QIcon(":/images/buildmodel.png"),"建模");
+    ActionManager::instance()->registerAction(buildModelAction,this,SLOT(switchWorkModel()),true);
+    buildModelAction->setChecked(true);
+
+    MyAction *simulateAction = ActionManager::instance()->crateAction(Constants::SIMLUATE_ID,QIcon(":/images/simulate.png"),"推演");
+    ActionManager::instance()->registerAction(simulateAction,this,SLOT(switchWorkModel()),true);
+
+    workModelGroup = new QActionGroup(this);
+    workModelGroup->addAction(buildModelAction);
+    workModelGroup->addAction(simulateAction);
+
+    widgetMenu = menuBar()->addMenu("窗口(&W)");
     //【窗口菜单栏】
     MyAction * fullScreenAction = ActionManager::instance()->crateAction(Constants::FULL_SCREEN_ID,QIcon(":/images/fullscreen.png"),"全屏");
     fullScreenAction->setShortcut(QKeySequence("Ctrl+Shift+F11"));
@@ -255,7 +235,7 @@ void MainWindow::createActionAndMenus()
     widgetMenu->addAction(hideIconAction);
     widgetMenu->addAction(hideToolAction);
 
-    QMenu * helpMenu = menuBar()->addMenu("帮助(&H)");
+    helpMenu = menuBar()->addMenu("帮助(&H)");
     //【帮助菜单栏】
     MyAction * supportAction = ActionManager::instance()->crateAction(Constants::TEC_SUPPORT_ID,QIcon(":/images/getsupport.png"),"技术支持");
 //    supportAction->setShortcut(QKeySequence("Ctrl+Q"));
@@ -276,17 +256,30 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     {
         switchFullScreen();
     }
+    //隐藏左侧
     else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_L)
     {
         SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
     }
+    //隐藏右侧
     else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_R)
     {
-        SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+        if(GlobalWindowState == WINDOW_BUILD_MODEL)
+        {
+             SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+        }
+        else
+        {
+            SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setContainerVisible();
+        }
     }
+    //关闭工作区
     else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_W)
     {
-        MyPageSwitch::instance()->closePage();
+        if(GlobalWindowState == WINDOW_BUILD_MODEL)
+        {
+            MyPageSwitch::instance()->closePage();
+        }
     }
 
     QMainWindow::keyPressEvent(event);
@@ -336,10 +329,41 @@ void MainWindow::showAbout()
     qApp->aboutQt();
 }
 
-//新建空白空间
-void MainWindow::fileNew()
+//切换工作模式【建模/推演】
+void MainWindow::switchWorkModel()
 {
+    QString objName = QObject::sender()->objectName();
+    bool enable = false;
 
+    if(objName == QString(Constants::BUILD_MODEL_ID))
+    {
+        enable = true;
+        GlobalWindowState = WINDOW_BUILD_MODEL;
+        setWindowTitle("多组件模型在线协同调用工具-建模");
+    }
+    else
+    {
+        GlobalWindowState = WINDOW_SIMULATE;
+        setWindowTitle("多组件模型在线协同调用工具-推演");
+    }
+
+    SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setVisible(enable);
+    SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setVisible(enable);
+    SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setVisible(!enable);
+    MyPageSwitch::instance()->setVisible(enable);
+
+    if(!fileBar)
+    {
+        return;
+    }
+
+    fileMenu->setEnabled(enable);
+    editMenu->setEnabled((enable));
+    itemMenu->setEnabled((enable));
+
+    fileBar->setEnabled(enable);
+    itemBar->setEnabled(enable);
+    editBar->setEnabled(enable);
 }
 
 //打开本地保存的文件，会先提示是否要保存当前添加的控件
@@ -360,7 +384,7 @@ void MainWindow::fileOpen()
         {
             respShowStatusInfo("文件格式不符，请重新选择！");
         }
-        else if(returnType == RETURN_OK)
+        else if(returnType == RETURN_SUCCESS)
         {
             MyGraphicsView::instance()->scene()->addItem(cutInfos);
 
@@ -379,7 +403,7 @@ void MainWindow::fileSave()
     if(!saveFileName.isEmpty())
     {
         ReturnType  result = FileOperate::instance()->saveFile(saveFileName,MyGraphicsView::instance()->scene()->items());
-        if(result == RETURN_OK)
+        if(result == RETURN_SUCCESS)
         {
             respShowStatusInfo("文件保存成功!");
         }
@@ -457,13 +481,17 @@ void MainWindow::createSceneAndView()
     connect(rightToolBox,SIGNAL(deleteCurrItem()),MyGraphicsView::instance(),SLOT(deleteItem()));
     connect(MyGraphicsView::instance(),SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
 
+    simulatePanel = new SimulateControlPanel;
+
     layout->addWidget(SplitManager::instance()->addSplit(QString(Constants::HIDE_ICON_ID),SPLIT_RIGHT,leftIconWidget));
     layout->addLayout(vLayout);
     layout->addWidget(SplitManager::instance()->addSplit(QString(Constants::HIDE_TOOL_ID),SPLIT_LEFT,rightToolBox));
+    layout->addWidget(SplitManager::instance()->addSplit(QString(Constants::HIDE_SIMULATE_ID),SPLIT_LEFT,simulatePanel));
     centralWidget->setLayout(layout);
 
     SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setFixedWidth(162);
     SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setFixedWidth(310);
+    SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setFixedWidth(310);
 
     this->setCentralWidget(centralWidget);
 }
@@ -528,20 +556,20 @@ void MainWindow::createLineComboBox()
 //创建工具栏
 void MainWindow::createToolBar()
 {
-    QToolBar * fileBar = addToolBar("File");
+    fileBar = addToolBar("File");
     fileBar->addAction(ActionManager::instance()->action(Constants::FILE_ID));
     fileBar->addAction(ActionManager::instance()->action(Constants::OPEN_ID));
     fileBar->addAction(ActionManager::instance()->action(Constants::SAVE_ID));
     fileBar->addAction(ActionManager::instance()->action(Constants::CLEAR_ID));
 
-    QToolBar * itemBar = addToolBar("Item");
+    itemBar = addToolBar("Item");
     itemBar->addAction(ActionManager::instance()->action(Constants::ARROW_ID));
     itemBar->addSeparator();
     itemBar->addAction(ActionManager::instance()->action(Constants::TEXT_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::LINE_ID));
     itemBar->addAction(ActionManager::instance()->action(Constants::VECTOR_LINE_ID));
 
-    QToolBar * editBar = addToolBar("Edit");
+    editBar = addToolBar("Edit");
     editBar->addAction(ActionManager::instance()->action(Constants::UNDO_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::REDO_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::CUT_ID));
@@ -558,7 +586,7 @@ void MainWindow::createToolBar()
     editBar->addWidget(ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID));
     editBar->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
 
-    QToolBar * sceneBar = addToolBar("Scene");
+    sceneBar = addToolBar("View");
 
     mySlider = new MySlider;
     connect(mySlider,SIGNAL(scaleView(int)),MyGraphicsView::instance(),SLOT(sceneScaled(int)));
@@ -569,6 +597,10 @@ void MainWindow::createToolBar()
     sceneBar->addAction(ActionManager::instance()->action(Constants::DRAG_ABLE_ID));
     sceneBar->addSeparator();
     sceneBar->addWidget(mySlider);
+
+    QToolBar * modelBar = addToolBar("Model");
+    modelBar->addAction(ActionManager::instance()->action(Constants::BUILD_MODEL_ID));
+    modelBar->addAction(ActionManager::instance()->action(Constants::SIMLUATE_ID));
 }
 
 //创建状态栏

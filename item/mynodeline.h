@@ -1,3 +1,13 @@
+/*************************************************
+**版  权：RenGu Company
+**文件名: mynodeline.h
+**作  者: wey       Version: 1.0       Date: 2016.10.08
+**描  述:可产生连接线控件的父类，用于操作箭头
+**Others:
+**
+**修改历史:
+**
+*************************************************/
 #ifndef MYNODELINE_H
 #define MYNODELINE_H
 
@@ -14,6 +24,7 @@ public:
     void addArrow(MyArrow * arrow);
     void removeArrows();
     void removeArrow(MyArrow * arrow);
+    QList<MyArrow *> & getArrows(){return this->arrows;}
 
 protected:
     QList<MyArrow *> arrows;           //保存添加的箭头

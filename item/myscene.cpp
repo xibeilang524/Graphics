@@ -220,21 +220,24 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void MyScene::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Delete)
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
     {
-        emit deleteKeyPress();
-    }
-    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_L)
-    {
-        emit ctrlLockKeyPress();
-    }
-    else if(event->modifiers() == Qt::ControlModifier && event->modifiers() == Qt::ShiftModifier && event->key() == Qt::Key_L)
-    {
-        emit ctrlUnLockKeyPress();
-    }
-    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_E)
-    {
-        emit ctrlPropEditKeyPress();
+        if(event->key() == Qt::Key_Delete)
+        {
+            emit deleteKeyPress();
+        }
+        else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_L)
+        {
+            emit ctrlLockKeyPress();
+        }
+        else if(event->modifiers() == Qt::ControlModifier && event->modifiers() == Qt::ShiftModifier && event->key() == Qt::Key_L)
+        {
+            emit ctrlUnLockKeyPress();
+        }
+        else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_E)
+        {
+            emit ctrlPropEditKeyPress();
+        }
     }
     QGraphicsScene::keyPressEvent(event);
 }

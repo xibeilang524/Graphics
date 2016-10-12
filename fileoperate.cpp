@@ -73,7 +73,7 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
         }
     }
     file.close();
-    return RETURN_OK;
+    return RETURN_SUCCESS;
 }
 
 /**
@@ -152,5 +152,5 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
         }
     }
 
-    return RETURN_OK;
+    return RETURN_SUCCESS;
 }
