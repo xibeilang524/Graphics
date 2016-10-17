@@ -16,4 +16,7 @@ extern QString SaveFileHeadFlag;                 //±¨ÎÄÎÄ¼şµÄÎÄ¼şÍ·£¬ÓÃÓÚÅĞ¶ÏËùÑ
 
 extern WindowState GlobalWindowState;            //È«¾ÖµÄ¹¤×÷Çø¼äÀàĞÍ
 
+extern int GlobalRotateStep; 		 		 	  //Ğı×ªµ½¶ÔÓ¦½Ç¶È²Å½øĞĞ½Ç¶ÈÇĞ»»
+extern qreal GlobalMinMumSize;            		  //¿Ø¼şËõĞ¡µÄ×îĞ¡·¶Î§
+
 #endif // GLOBAL_H

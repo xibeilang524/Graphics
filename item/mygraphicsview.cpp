@@ -493,7 +493,7 @@ void MyGraphicsView::rotateItem()
         QString objName = QObject::sender()->objectName();
         if(objName == QString(Constants::ROTATE_LEFT_ID))
         {
-            graphicsTmp->updateRotation(-90);
+            graphicsTmp->updateRotation(270);
         }
         else if(objName == QString(Constants::ROTATE_RIGHT_ID))
         {
@@ -637,15 +637,25 @@ void MyGraphicsView::setSelectedItemLockState(bool flag)
 void MyGraphicsView::respPropertyUpdate(ItemProperty property)
 {
     MY_ASSERT(myScene)
-    if(myScene->selectedItems().size() == 1)
+    //当选择旋转点后，会同时选中其下面的item
+    if(myScene->selectedItems().size() == 1 || myScene->selectedItems().size() ==2)
     {
         QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
 
-        if(itemName == TYPE_ID(MyItem))
+        if((itemName == TYPE_ID(MyItem)) || (itemName == TYPE_ID(RotateLine)))
         {
-            MyItem * myItem = dynamic_cast<MyItem *>(myScene->selectedItems().first());
+            MyItem * myItem = NULL;
+            foreach (QGraphicsItem * selectItem, myScene->selectedItems())
+            {
+                if(TYPE_ID(MyItem) == TYPE_ID(*selectItem))
+                {
+                     myItem = dynamic_cast<MyItem *>(selectItem);
+                     break;
+                }
+            }
             if(property.isMoveable)
             {
+                MY_ASSERT(myItem);
                 myItem->setProperty(property);
             }
         }

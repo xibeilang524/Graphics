@@ -22,6 +22,7 @@ RightToolBox::RightToolBox(QWidget *parent) :
 
     isDataInit = false;
 
+    ui->dial->setSingleStep(GlobalRotateStep);
     ui->tabWidget->setCurrentIndex(0);
 }
 
@@ -393,11 +394,11 @@ void RightToolBox::degreeChange()
 
     if(objname==ui->degreeM->objectName())
     {
-        degree = (degree<=ROTATE_MIN_DEGREE)?ROTATE_MIN_DEGREE:--degree;
+        degree = (degree<=ROTATE_MIN_DEGREE)?ROTATE_MIN_DEGREE:degree-GlobalRotateStep;
     }
     else
     {
-        degree = (degree>=ROTATE_MAX_DEGREE)?ROTATE_MAX_DEGREE:++degree;
+        degree = (degree>=ROTATE_MAX_DEGREE)?ROTATE_MAX_DEGREE:degree+GlobalRotateStep;
     }
 
     changeDegree(degree);

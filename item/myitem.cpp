@@ -22,6 +22,7 @@
 #include "rotateline.h"
 #include "draglinepoint.h"
 #include "../global.h"
+#include "../util.h"
 
 #include "qmath.h"
 
@@ -1148,6 +1149,10 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     {
                         tmpW = w - px;
                         tmpH = h - py;
+
+                        tmpW = Util::getMaxNum(tmpW,GlobalMinMumSize);
+                        tmpH = Util::getMaxNum(tmpH,GlobalMinMumSize);
+
 //                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
@@ -1161,7 +1166,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                             centerX = rightBottomX - (tmpW/2)*QCOS(rotateDegree);
                             centerY = rightBottomY - (tmpH/2)*QSIN(rotateDegree);
                         }
-//                        qDebug()<<px<<"_"<<py<<"_"<<tmpW<<"_"<<tmpH<<"__"<<centerX<<"__"<<centerY<<"__"<<rightBottomX<<"__"<<rightBottomY;
+
                         prepareGeometryChange();
                         boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
                     }
@@ -1169,6 +1174,10 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     {
                         tmpW = w + px;
                         tmpH = h - py;
+
+                        tmpW = Util::getMaxNum(tmpW,GlobalMinMumSize);
+                        tmpH = Util::getMaxNum(tmpH,GlobalMinMumSize);
+
 //                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
@@ -1181,6 +1190,10 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     {
                         tmpW = w - px;
                         tmpH = h + py;
+
+                        tmpW = Util::getMaxNum(tmpW,GlobalMinMumSize);
+                        tmpH = Util::getMaxNum(tmpH,GlobalMinMumSize);
+
 //                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
@@ -1193,6 +1206,10 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                     {
                         tmpW = w + px;
                         tmpH = h + py;
+
+                        tmpW = Util::getMaxNum(tmpW,GlobalMinMumSize);
+                        tmpH = Util::getMaxNum(tmpH,GlobalMinMumSize);
+
 //                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
@@ -1364,12 +1381,15 @@ void MyItem::procResizeNodePort()
 void MyItem::procRotate(MouseType mouseType,qreal degree)
 {
     currMouseType = mouseType;
+    int tempDegree = static_cast<int>(degree);
 
     if(currMouseType == MOUSE_MOVE)
     {
-        setRotation(degree);
-
-        property.rotateDegree = degree;
+        if(tempDegree % GlobalRotateStep == 0)
+        {
+            setRotation(tempDegree);
+            property.rotateDegree = tempDegree;
+        }
     }
     else if(currMouseType == MOUSE_RELEASE)
     {

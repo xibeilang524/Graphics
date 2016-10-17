@@ -14,6 +14,7 @@ public:
     static qreal getGlobalZValue();
     static void  resetGlobalZValue();
     static QString getUUID();
+    static qreal getMaxNum(qreal & a,qreal & b);
 };
 
 #endif // UTIL_H

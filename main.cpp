@@ -24,6 +24,8 @@ int main(int argc, char *argv[])
 
     SaveFileSuffix = ".bin";
     SaveFileHeadFlag = "RGVISIO";
+    GlobalRotateStep = 5;
+    GlobalMinMumSize = 15;
 
     ActionManager actionManager;
     SplitManager splitManager;

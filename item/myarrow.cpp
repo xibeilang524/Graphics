@@ -113,9 +113,23 @@ QRectF MyArrow::boundingRect()const
                                            line().p2().y() - line().p1().y()));
 }
 
+//增加选中直线的区间范围
 QPainterPath MyArrow::shape()const
 {
-    QPainterPath path = QGraphicsLineItem::shape();
+    QPainterPath path;
+    qreal shapeWidth = 5;
+
+    QPointF p1 = line().p1();
+    QPointF p2 = line().p2();
+
+    QPolygonF wideSelectArea;
+
+    wideSelectArea<<QPointF(p1.x() + shapeWidth,p1.y()+ shapeWidth)
+                    <<QPointF(p2.x() + shapeWidth,p2.y()+ shapeWidth)
+                      <<QPointF(p2.x() - shapeWidth,p2.y()- shapeWidth)
+                        <<QPointF(p1.x() - shapeWidth,p1.y()- shapeWidth);
+    path.addPolygon(wideSelectArea);
+
     if(property.lineType == LINE_MYITEM)
     {
         path.addPolygon(arrowHead);

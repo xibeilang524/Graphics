@@ -19,6 +19,7 @@ MyPageSwitch::MyPageSwitch(QWidget *parent) :
     setFixedHeight(25);
     isFirstView = false;
 
+    pagePosition = 0;
     selectedPage = NULL;
     initWidget();
 }
@@ -58,7 +59,7 @@ void MyPageSwitch::addPage()
     selectedPage = page;
 
     pages.append(page);
-    layout->insertWidget(1,item);
+    layout->insertWidget(++pagePosition,item);
     item->setText(QString("¹¤×÷Çø%1").arg(PageManager::instance()->getPageCount()));
 
     if(!isFirstView)
@@ -139,6 +140,7 @@ void MyPageSwitch::deleteThisPage(QString pageId)
         delete pages.at(index)->pageItem;
         pages.removeAt(index);
 
+        --pagePosition;
         if(pages.size() == 0)
         {
             MyGraphicsView::instance()->deleteScene();

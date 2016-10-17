@@ -37,3 +37,16 @@ QString Util::getUUID()
 {
     return QUuid::createUuid().toString();
 }
+
+qreal Util::getMaxNum(qreal &a, qreal &b)
+{
+    if(a >= b)
+    {
+        return a;
+    }
+    else
+    {
+        return b;
+    }
+    return 0;
+}

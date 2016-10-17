@@ -7,6 +7,7 @@
 **
 **修改历史:
 **20161004:wey:修复删除工作区奔溃问题
+**20161017: gx:调整新建工作区后默认插入到最后
 *************************************************/
 #ifndef MYPAGESWITCH_H
 #define MYPAGESWITCH_H
@@ -58,7 +59,7 @@ private:
     QHBoxLayout * layout;
 
     QList<PageMapping *> pages;
-
+    int pagePosition;                     //页面位置
     PageMapping * selectedPage;
     bool isFirstView;
 };
