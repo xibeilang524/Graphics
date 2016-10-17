@@ -64,7 +64,10 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
         else if(itemName == TYPE_ID(MyTextItem))
         {
             MyTextItem * myItem = dynamic_cast<MyTextItem *>(item);
-            stream<<myItem;
+            if(myItem->getTextExistType() == TEXT_ALONG)
+            {
+                stream<<myItem;
+            }
         }
         else if(itemName == TYPE_ID(MyNodePort))
         {

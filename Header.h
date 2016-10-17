@@ -145,6 +145,13 @@ enum AddLineType
     LINE_SOLID_TRIANGLE        //实心三角箭头
 };
 
+//文本信息存在的方式
+enum TextExistType
+{
+    TEXT_ALONG,                //单独存在
+    TEXT_CHILD                 //作为某个控件子控件依附存在
+};
+
 //记录当前item在scene中的x、y、w、h值
 struct MyRect
 {

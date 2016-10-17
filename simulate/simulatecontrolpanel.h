@@ -6,7 +6,7 @@
 **Others:推演控制面板
 **
 **修改历史:
-**
+**20161017:wey:调整模拟界面，增加模拟前对控件状态的恢复
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -24,6 +24,9 @@ class SimulateControlPanel : public QWidget
 public:
     explicit SimulateControlPanel(QWidget *parent = 0);
     ~SimulateControlPanel();
+
+signals:
+    void resetSimluate();
 
 private slots:
     void respStartSimulate();

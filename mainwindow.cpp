@@ -207,10 +207,12 @@ void MainWindow::createActionAndMenus()
     itemMenu->addAction(vectorLineAction);
 
     MyAction * buildModelAction = ActionManager::instance()->crateAction(Constants::BUILD_MODEL_ID,QIcon(":/images/buildmodel.png"),"建模");
+    buildModelAction->setShortcut(QKeySequence("Ctrl+M"));
     ActionManager::instance()->registerAction(buildModelAction,this,SLOT(switchWorkModel()),true);
     buildModelAction->setChecked(true);
 
     MyAction *simulateAction = ActionManager::instance()->crateAction(Constants::SIMLUATE_ID,QIcon(":/images/simulate.png"),"推演");
+    simulateAction->setShortcut(QKeySequence("Ctrl+Shift+M"));
     ActionManager::instance()->registerAction(simulateAction,this,SLOT(switchWorkModel()),true);
 
     workModelGroup = new QActionGroup(this);
@@ -234,6 +236,9 @@ void MainWindow::createActionAndMenus()
     widgetMenu->addAction(fullScreenAction);
     widgetMenu->addAction(hideIconAction);
     widgetMenu->addAction(hideToolAction);
+    widgetMenu->addSeparator();
+    widgetMenu->addAction(buildModelAction);
+    widgetMenu->addAction(simulateAction);
 
     helpMenu = menuBar()->addMenu("帮助(&H)");
     //【帮助菜单栏】
@@ -279,6 +284,22 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         if(GlobalWindowState == WINDOW_BUILD_MODEL)
         {
             MyPageSwitch::instance()->closePage();
+        }
+    }
+    //工作模式切换[建模->推演]
+    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_M)
+    {
+        if(!ActionManager::instance()->action(Constants::SIMLUATE_ID)->isChecked())
+        {
+            ActionManager::instance()->action(Constants::SIMLUATE_ID)->setChecked(true);
+        }
+    }
+    //[推演->建模]
+    else if(event->modifiers() == Qt::ControlModifier && event->modifiers() == Qt::ShiftModifier && event->key() == Qt::Key_M)
+    {
+        if(!ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->isChecked())
+        {
+            ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->setChecked(true);
         }
     }
 
@@ -334,6 +355,8 @@ void MainWindow::switchWorkModel()
 {
     QString objName = QObject::sender()->objectName();
     bool enable = false;
+
+    MyGraphicsView::instance()->respResetSimluate();
 
     if(objName == QString(Constants::BUILD_MODEL_ID))
     {
@@ -482,6 +505,7 @@ void MainWindow::createSceneAndView()
     connect(MyGraphicsView::instance(),SIGNAL(itemPropChanged(ItemProperty)),rightToolBox,SLOT(respItemPropChanged(ItemProperty)));
 
     simulatePanel = new SimulateControlPanel;
+    connect(simulatePanel,SIGNAL(resetSimluate()),view,SLOT(respResetSimluate()));
 
     layout->addWidget(SplitManager::instance()->addSplit(QString(Constants::HIDE_ICON_ID),SPLIT_RIGHT,leftIconWidget));
     layout->addLayout(vLayout);

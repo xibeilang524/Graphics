@@ -42,6 +42,8 @@ MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent,
     property.content = "输入文字...";
     setFont(property.itemFont);
 
+    existType = TEXT_ALONG;
+
     setTextInteractionFlags(Qt::TextEditorInteraction);
     setFlag(QGraphicsItem::ItemIsMovable);
     setFlag(QGraphicsItem::ItemIsSelectable);
@@ -96,6 +98,12 @@ void MyTextItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         setSelected(true);
         menu->exec(event->screenPos());
     }
+}
+
+//设置文本存在的方式，如果是单独存在在保存时需要，否则不要保存
+void MyTextItem::setTextExistType(TextExistType type)
+{
+    this->existType = type;
 }
 
 void MyTextItem::setProperty(ItemProperty property)

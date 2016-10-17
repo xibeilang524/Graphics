@@ -33,6 +33,7 @@
 **             添加四边中点用于连接线绘制
 **20161003:wey:调整平行四边形、注释、并行控件中心连接线显示位置
 **20161010:wey:添加控件属性
+**20161017:wey:添加推演状态下显示高亮/正常模式
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -99,6 +100,9 @@ public:
     friend QDataStream & operator >>(QDataStream &,MyItem * item);
 
     ServiceProperty * getServiceProp(){return this->serviceProp;}
+
+    void hightLightItem(bool isHigh = true);
+    bool isHightShow(){return this->isSimulateHigh;}
 
 signals:
     void updateSceneDraw();
@@ -176,6 +180,8 @@ private:
     bool isPrepareLine;                //是否准备绘制线条，如果是，则在鼠标进入时，在四边的中点绘制允许接入点
 
     ServiceProperty * serviceProp;     //属性信息
+
+    bool isSimulateHigh;               //是否为推演状态下的高亮显示
 };
 
 #endif // MYITEM_H

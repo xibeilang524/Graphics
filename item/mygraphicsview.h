@@ -6,7 +6,7 @@
 **Others:
 **
 **修改历史:
-**20160919:wey:添加单利模式
+**20160919:wey:添加单例模式
 **             添加端口编辑页面
 **20160920:wey:修复拖入端口放置在控件上无效问题
 **20160922:wey:增加设置view是否拖拽
@@ -77,6 +77,7 @@ signals:
 
 public slots:
     void sceneScaled(int currScale);
+    void respResetSimluate();
 
 private slots:
     void undoAndRedoItem();

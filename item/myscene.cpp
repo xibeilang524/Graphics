@@ -452,6 +452,7 @@ void MyScene::addItem(QList<CutInfo *> &cutInfos)
         delete info;
     }
 
+    myItemInfo->setVisible(false);
     isLocalFileOpened = false;
     localItems.clear();
     localNodeports.clear();

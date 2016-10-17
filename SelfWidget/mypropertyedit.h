@@ -14,7 +14,7 @@
 #include <QDialog>
 
 class ServiceInputTableView;
-class ServiceProperty;
+struct ServiceProperty;
 
 namespace Ui {
 class MyPropertyEdit;

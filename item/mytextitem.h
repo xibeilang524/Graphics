@@ -37,6 +37,9 @@ public:
 
     GraphicsType getType(){return this->type;}
 
+    void setTextExistType(TextExistType type);
+    TextExistType getTextExistType(){return this->existType;}
+
     void setZValue(qreal z);
 
     void setPos(const QPointF &pos);
@@ -71,6 +74,7 @@ protected:
 private:
     GraphicsType type;
     ItemProperty property;
+    TextExistType existType;
 
     QMenu * menu;
     QPixmap pixmap;

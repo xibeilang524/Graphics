@@ -13,6 +13,7 @@
 #define SCENEITEMPICKUP_H
 
 #include "SimulateHeader.h"
+class QGraphicsItem;
 
 class SceneItemPickup
 {

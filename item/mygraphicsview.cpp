@@ -981,6 +981,25 @@ void MyGraphicsView::transformView(qreal hValue, qreal value)
     verticalScrollBar()->setValue(value);
 }
 
+//模拟开始前，将上次模拟的状态清空
+void MyGraphicsView::respResetSimluate()
+{
+    if(myScene)
+    {
+        foreach(QGraphicsItem * item,myScene->items())
+        {
+            if(TYPE_ID(*item) == TYPE_ID(MyItem))
+            {
+                MyItem * tmp = dynamic_cast<MyItem *>(item);
+                if(tmp && tmp->isHightShow())
+                {
+                    tmp->hightLightItem(false);
+                }
+            }
+        }
+    }
+}
+
 MyGraphicsView::~MyGraphicsView()
 {
     if(nodeEdit)

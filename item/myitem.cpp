@@ -151,6 +151,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     radius = 60;
     isDragging = false;            //默认无拖入
     isPrepareLine = false;
+    isSimulateHigh = false;
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -219,6 +220,7 @@ void MyItem::initComponentItem()
 
     //文字信息
     myTextItem = new MyTextItem(GRA_TEXT,rightMenu,this);
+    myTextItem->setTextExistType(TEXT_CHILD);
     connect(myTextItem,SIGNAL(updateTextGeometry()),this,SLOT(procUpdateTextGeometry()));
 
     myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
@@ -326,6 +328,10 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     }
     else
     {
+        if(isSimulateHigh)
+        {
+            painter->setPen(QPen(Qt::red,3));
+        }
         painter->drawPolygon(itemPolygon);
     }
 
@@ -598,7 +604,7 @@ void MyItem::dragLeaveEvent(QGraphicsSceneDragDropEvent *event)
 /*!
 *拖拽放下
 *在放下时候需要考虑放在哪一侧,
-***/
+*!*/
 void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
 {
     if(event->mimeData()->hasFormat("MyItem"))
@@ -1596,6 +1602,13 @@ QList<MyArrow *> MyItem::getArrows()
     arrows.append(bottomLinePoint->getArrows());
     arrows.append(leftLinePoint->getArrows());
     return arrows;
+}
+
+//设置此控件是否高亮显示
+void MyItem::hightLightItem(bool isHigh)
+{
+    isSimulateHigh = isHigh;
+    update();
 }
 
 MyItem::~MyItem()
