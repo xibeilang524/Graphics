@@ -26,8 +26,8 @@
 
 #include "qmath.h"
 
-#define QCOS(a) qCos(a*PI/180)
-#define QSIN(a) qSin(a*PI/180)
+#define QCOS(a) qCos(a*M_PI/180)
+#define QSIN(a) qSin(a*M_PI/180)
 
 #define CROSS_RADIUS 8        //绘制拖入十字星半径
 #define POINT_FIVE   0.5      //控件竖直和水平的长度比例，用于绘制矩形等非等边图形
@@ -1068,10 +1068,7 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
     }
     else if(change == QGraphicsItem::ItemRotationHasChanged && scene())
     {
-        leftTopPoint->updateDragPointHoverCursor(rotation());
-        rightTopPoint->updateDragPointHoverCursor(rotation());
-        leftBottomPoint->updateDragPointHoverCursor(rotation());
-        rightBottomPoint->updateDragPointHoverCursor(rotation());
+        updateDragPointCursor();
 
         emit itemRotationChanged(this);
     }
@@ -1080,6 +1077,15 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
         emit itemPosChanged(this);
     }
     return QGraphicsPolygonItem::itemChange(change,value);
+}
+
+//更新拖拽点的鼠标样式
+void MyItem::updateDragPointCursor()
+{
+    leftTopPoint->updateDragPointHoverCursor(rotation());
+    rightTopPoint->updateDragPointHoverCursor(rotation());
+    leftBottomPoint->updateDragPointHoverCursor(rotation());
+    rightBottomPoint->updateDragPointHoverCursor(rotation());
 }
 
 //根据旋转的角度动态改变拖拽点鼠标悬停时的样式
@@ -1150,19 +1156,12 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                         tmpW = Util::getMaxNum(tmpW,GlobalMinMumSize);
                         tmpH = Util::getMaxNum(tmpH,GlobalMinMumSize);
 
-//                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
-                        if(rotateDegree == 0)
-                        {
-                            centerX = rightBottomX - tmpW/2;
-                            centerY = rightBottomY - tmpH/2;
-                        }
-                        else
-                        {
-                            centerX = rightBottomX - (tmpW/2)*QCOS(rotateDegree);
-                            centerY = rightBottomY - (tmpH/2)*QSIN(rotateDegree);
-                        }
+
+                        qreal beta = rotateDegree + Util::radinToAngle(qAtan(tmpH/tmpW));
+                        centerX = rightBottomX - sqrt(qPow(tmpH,2) +qPow(tmpW,2)) * QCOS(beta)/2;
+                        centerY = rightBottomY - sqrt(qPow(tmpH,2) +qPow(tmpW,2)) * QSIN(beta)/2;
 
                         prepareGeometryChange();
                         boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
@@ -1178,8 +1177,11 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 //                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
-                        centerX = leftBottomX + tmpW/2;
-                        centerY = leftBottomY - tmpH/2;
+
+                        qreal beta = 90 - rotateDegree + Util::radinToAngle(qAtan(tmpH/tmpW));
+                        centerX = leftBottomX + sqrt(qPow(tmpH,2) +qPow(tmpW,2)) * QSIN(beta)/2;
+                        centerY = leftBottomY + sqrt(qPow(tmpH,2) +qPow(tmpW,2)) * QCOS(beta)/2;
+
                         prepareGeometryChange();
                         boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
                     }
@@ -1194,8 +1196,10 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 //                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
-                        centerX = rightTopX - tmpW/2;
-                        centerY = rightTopY + tmpH/2;
+                        qreal beta = 90 - rotateDegree + Util::radinToAngle(qAtan(tmpH/tmpW));
+                        centerX = rightTopX - sqrt(qPow(tmpH,2) +qPow(tmpW,2)) * QSIN(beta)/2;
+                        centerY = rightTopY - sqrt(qPow(tmpH,2) +qPow(tmpW,2)) * QCOS(beta)/2;
+
                         prepareGeometryChange();
                         boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
                     }
@@ -1210,8 +1214,11 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
 //                        tmpH = tmpW /factor;
                         tmpX = tmpW/2;
                         tmpY = tmpH/2;
-                        centerX = leftTopX + tmpW/2;
-                        centerY = leftTopY + tmpH/2;
+
+                        qreal beta = rotateDegree + Util::radinToAngle(qAtan(tmpH/tmpW));
+                        centerX = leftTopX + sqrt(qPow(tmpH,2) +qPow(tmpW,2)) * QCOS(beta)/2;
+                        centerY = leftTopY + sqrt(qPow(tmpH,2) +qPow(tmpW,2)) * QSIN(beta)/2;
+
                         prepareGeometryChange();
                         boundRect = QRectF(-tmpX,-tmpY,tmpW,tmpH);
                     }
@@ -1403,6 +1410,9 @@ void MyItem::setProperty(ItemProperty property)
     setBrush(property.itemBrush);
 
     setRotation(property.rotateDegree);
+
+    updateDragPointCursor();
+
     setZValue(property.zValue);
     setPos(QPointF (property.itemRect.x,property.itemRect.y));
 

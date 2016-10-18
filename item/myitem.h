@@ -36,6 +36,8 @@
 **20161017:wey:添加推演状态下显示高亮/正常模式
 **          gx:调整控件旋转，由每1度旋转改成每5度旋转(可调整)
 **          gx:添加对控件最小尺寸的限定，并行线较为特殊
+**20161018: gx:修复旋转后尺寸缩放的问题【!!!】
+**             修复本地打开后，拖拽点鼠标样式不随角度改变问题
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -142,6 +144,7 @@ private:
     void updateRotateLinePos();
     void procResizeNodePort();
     void getRealTimePos();
+    void updateDragPointCursor();
     qreal getPointToRectMinDistance(QRectF rect,QPointF point);
     bool getRangeValue(qreal maxValue, qreal minValue, qreal & currValue, DragRange &range);
     MyNodePort * createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);

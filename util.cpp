@@ -6,6 +6,7 @@
 #include <QUuid>
 
 #include "global.h"
+#include "qmath.h"
 
 #define TABLE_ROW_HEIGHT  30      //表格高度
 
@@ -116,3 +117,9 @@ void Util::clearTableData(QTableWidget *table)
         }
     }
 }
+
+//将弧度转换为角度
+qreal Util::radinToAngle(const qreal &radin)
+{
+     return 180/M_PI*radin;
+ }
