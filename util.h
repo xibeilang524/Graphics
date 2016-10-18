@@ -5,6 +5,7 @@
 #include <QFont>
 
 class QWidget;
+class QTableWidget;
 
 class Util
 {
@@ -15,6 +16,11 @@ public:
     static void  resetGlobalZValue();
     static QString getUUID();
     static qreal getMaxNum(qreal & a,qreal & b);
+    static void setTableStylesheet(QTableWidget * table);
+
+    static void createTableItem(const int rowCount,QTableWidget * table);
+    static void removeTableItem(QTableWidget * table);
+    static void clearTableData(QTableWidget * table);
 };
 
 #endif // UTIL_H

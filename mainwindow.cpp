@@ -20,6 +20,7 @@
 #include "./SelfWidget/hidesplit.h"
 #include "./SelfWidget/righttoolbox.h"
 #include "./SelfWidget/mypageswitch.h"
+#include "./SelfWidget/serviceview.h"
 #include "./manager/MyLineComboBox.h"
 #include "./simulate/simulatecontrolpanel.h"
 #include "fileoperate.h"
@@ -34,6 +35,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+    GlobalMainWindow = this;
+
     mySlider = NULL;
     leftIconWidget = NULL;
     rightToolBox = NULL;
@@ -44,6 +47,8 @@ MainWindow::MainWindow(QWidget *parent) :
     itemBar = NULL;
     sceneBar = NULL;
     editBar = NULL;
+    databaseBar = NULL;
+
     GlobalItemZValue = 0;
 
     createSceneAndView();
@@ -54,6 +59,7 @@ MainWindow::MainWindow(QWidget *parent) :
     createStatusBar();
 
     view->addContextMenuItem();
+    view->addViewContextMenu();
 
     showMaximized();
 
@@ -64,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
     ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
     SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+
+    ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->setChecked(true);
 }
 
 //创建窗口的菜单栏，绑定响应事件
@@ -209,7 +217,6 @@ void MainWindow::createActionAndMenus()
     MyAction * buildModelAction = ActionManager::instance()->crateAction(Constants::BUILD_MODEL_ID,QIcon(":/images/buildmodel.png"),"建模");
     buildModelAction->setShortcut(QKeySequence("Ctrl+M"));
     ActionManager::instance()->registerAction(buildModelAction,this,SLOT(switchWorkModel()),true);
-    buildModelAction->setChecked(true);
 
     MyAction *simulateAction = ActionManager::instance()->crateAction(Constants::SIMLUATE_ID,QIcon(":/images/simulate.png"),"推演");
     simulateAction->setShortcut(QKeySequence("Ctrl+Shift+M"));
@@ -252,6 +259,14 @@ void MainWindow::createActionAndMenus()
 
     helpMenu->addAction(supportAction);
     helpMenu->addAction(aboutAction);
+
+    MyAction * databaseViewAction = ActionManager::instance()->crateAction(Constants::DATABASE_VIEW,QIcon(":/images/database_view.png"),"查看数据库");
+//    databaseViewAction->setShortcut(QKeySequence("Ctrl+P"));
+    ActionManager::instance()->registerAction(databaseViewAction,ServiceView::instance(),SLOT(viewDatabaseContent()));
+
+    MyAction * databaseRefreshAction = ActionManager::instance()->crateAction(Constants::DATABASE_REFRESH,QIcon(":/images/database_refresh.png"),"刷新数据库");
+//    databaseViewAction->setShortcut(QKeySequence("Ctrl+P"));
+    ActionManager::instance()->registerAction(databaseRefreshAction,ServiceView::instance(),SLOT(refreshDatabaseContent()));
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -398,6 +413,8 @@ void MainWindow::switchWorkModel()
         setWindowTitle("多组件模型在线协同调用工具-推演");
     }
 
+    MyGraphicsView::instance()->addContextMenuItem();
+
     SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setVisible(enable);
     SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setVisible(enable);
     SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setVisible(!enable);
@@ -415,6 +432,7 @@ void MainWindow::switchWorkModel()
     fileBar->setEnabled(enable);
     itemBar->setEnabled(enable);
     editBar->setEnabled(enable);
+    databaseBar->setEnabled(!enable);
 }
 
 //打开本地保存的文件，会先提示是否要保存当前添加的控件
@@ -438,6 +456,7 @@ void MainWindow::fileOpen()
         else if(returnType == RETURN_SUCCESS)
         {
             MyGraphicsView::instance()->scene()->addItem(cutInfos);
+            MyGraphicsView::instance()->setKeyCtrlStated(false);
 
             respShowStatusInfo("文件解析完成!");
         }
@@ -608,6 +627,10 @@ void MainWindow::createLineComboBox()
 //创建工具栏
 void MainWindow::createToolBar()
 {
+    QToolBar * modelBar = addToolBar("Model");
+    modelBar->addAction(ActionManager::instance()->action(Constants::BUILD_MODEL_ID));
+    modelBar->addAction(ActionManager::instance()->action(Constants::SIMLUATE_ID));
+
     fileBar = addToolBar("File");
     fileBar->addAction(ActionManager::instance()->action(Constants::FILE_ID));
     fileBar->addAction(ActionManager::instance()->action(Constants::OPEN_ID));
@@ -650,9 +673,9 @@ void MainWindow::createToolBar()
     sceneBar->addSeparator();
     sceneBar->addWidget(mySlider);
 
-    QToolBar * modelBar = addToolBar("Model");
-    modelBar->addAction(ActionManager::instance()->action(Constants::BUILD_MODEL_ID));
-    modelBar->addAction(ActionManager::instance()->action(Constants::SIMLUATE_ID));
+    databaseBar = addToolBar("Database");
+    databaseBar->addAction(ActionManager::instance()->action(Constants::DATABASE_VIEW));
+    databaseBar->addAction(ActionManager::instance()->action(Constants::DATABASE_REFRESH));
 }
 
 //创建状态栏

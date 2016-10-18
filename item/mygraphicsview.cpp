@@ -96,23 +96,34 @@ void MyGraphicsView::showScene(MyScene *scene)
 //初始化右键菜单
 void MyGraphicsView::addContextMenuItem()
 {
-    rightMenu->addAction(ActionManager::instance()->action(Constants::EDIT_TEXT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::PROPERTY_EDIT_ID));
-    rightMenu->addSeparator();
-    rightMenu->addAction(ActionManager::instance()->action(Constants::CUT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::COPY_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
-    rightMenu->addSeparator();
-    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
-    rightMenu->addSeparator();
-    rightMenu->addAction(ActionManager::instance()->action(Constants::LOCK_ID));
-    rightMenu->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
-    rightMenu->addSeparator();
-    rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
+    rightMenu->clear();
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
+    {
+        rightMenu->addAction(ActionManager::instance()->action(Constants::EDIT_TEXT_ID));
+        rightMenu->addSeparator();
+        rightMenu->addAction(ActionManager::instance()->action(Constants::CUT_ID));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::COPY_ID));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::PASTE_ID));
+        rightMenu->addSeparator();
+        rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_LEFT_ID));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_FRONT_ID));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::BRING_BACK_ID));
+        rightMenu->addSeparator();
+        rightMenu->addAction(ActionManager::instance()->action(Constants::LOCK_ID));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::UNLOCK_ID));
+        rightMenu->addSeparator();
+        rightMenu->addAction(ActionManager::instance()->action(Constants::DELETE_ID));
+    }
+    else if(GlobalWindowState == WINDOW_SIMULATE)
+    {
+        rightMenu->addAction(ActionManager::instance()->action(Constants::PROPERTY_EDIT_ID));
+    }
+}
 
+//设置视图的右键菜单
+void MyGraphicsView::addViewContextMenu()
+{
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::UNDO_ID));
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::REDO_ID));
     viewRightMenu->addSeparator();
@@ -144,6 +155,7 @@ void MyGraphicsView::keyPressEvent(QKeyEvent *event)
     {
         isCtrlPressed = true;
     }
+
     QGraphicsView::keyPressEvent(event);
 }
 
@@ -153,6 +165,7 @@ void MyGraphicsView::keyReleaseEvent(QKeyEvent *event)
     {
         isCtrlPressed = false;
     }
+
     QGraphicsView::keyReleaseEvent(event);
 }
 

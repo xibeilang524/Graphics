@@ -69,6 +69,9 @@ const char HIDE_SIMULATE_ID[] = "Constanta.HideSimulate";
 const char TEC_SUPPORT_ID[] = "Constanta.TecSupport";
 const char ABOUT_ID[] = "Constanta.About";
 
+//¡¾Êý¾Ý¿â¡¿
+const char DATABASE_VIEW[] = "Constanta.DatabaseView";
+const char DATABASE_REFRESH[] = "Constanta.DatabaseRefresh";
 
 } // namespace StyleAssisant
 } // namespace Constants

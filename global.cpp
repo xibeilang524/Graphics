@@ -1,5 +1,6 @@
 #include "global.h"
 
+QWidget * GlobalMainWindow;               //顶层的主窗口
 
 GraphicsType CurrAddGraType;              //当前添加的类型
 

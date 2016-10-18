@@ -98,6 +98,10 @@ void MyTextItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         setSelected(true);
         menu->exec(event->screenPos());
     }
+    else
+    {
+        QGraphicsTextItem::contextMenuEvent(event);
+    }
 }
 
 //设置文本存在的方式，如果是单独存在在保存时需要，否则不要保存

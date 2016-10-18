@@ -98,6 +98,7 @@ private:
     QToolBar * itemBar;
     QToolBar * editBar;
     QToolBar * sceneBar;
+    QToolBar * databaseBar;
 
     QMenu * fileMenu;
     QMenu * editMenu;

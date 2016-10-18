@@ -58,5 +58,7 @@
         <file>images/editProp.png</file>
         <file>images/buildmodel.png</file>
         <file>images/simulate.png</file>
+        <file>images/database_refresh.png</file>
+        <file>images/database_view.png</file>
     </qresource>
 </RCC>

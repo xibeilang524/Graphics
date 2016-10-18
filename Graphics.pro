@@ -5,6 +5,7 @@
 #-------------------------------------------------
 
 QT       += core gui
+QT       += sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -25,11 +26,14 @@ HEADERS  += mainwindow.h \
     util.h \
     fileoperate.h
 
-include($$PWD\SelfWidget\SelfWidget.pri)
-include($$PWD\item\item.pri)
-include($$PWD\manager\manager.pri)
-include($$PWD\modelview\modelview.pri)
-include($$PWD\simulate\simulate.pri)
+include($$PWD/SelfWidget/SelfWidget.pri)
+include($$PWD/item/item.pri)
+include($$PWD/manager/manager.pri)
+include($$PWD/modelview/modelview.pri)
+include($$PWD/simulate/simulate.pri)
+include($$PWD/sql/sql.pri)
+include($$PWD/assisant/assisant.pri)
+
 
 
 FORMS    += mainwindow.ui

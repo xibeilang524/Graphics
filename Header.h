@@ -34,11 +34,17 @@
 #define TYPE_ID(a) typeid(a).name()
 #define MY_ASSERT(a) {if(!a) return;}
 
+#include <QVariant>
+
+typedef  QList<QVariant> VariantList;
+typedef  QList<VariantList> DataList;
+
 #include <QBrush>
 #include <QPen>
 #include <QFont>
 #include <QDataStream>
 #include <QUuid>
+#include <QDateTime>
 
 #include "./item/ItemHeader.h"
 
@@ -275,6 +281,61 @@ struct ServiceProperty
     ParaList outputParas;             //输出参数集合
 };
 
+//服务的基本信息
+struct ServiceInfo
+{
+    QString id;           //服务索引
+    QString code;
+    QString name;
+    QString descirption;
+    QString status;
+    QString auditOpinion;
+    QString method;
+    QString input;
+    QString result;
+    int num;
+    QDateTime addTime;
+    QString addUser;
+    QString auditUser;     //审批人
+    QString auditUserName; //审批人姓名
+    QString outputName;
+    QString outputType;
+    QString addUserName;
+    QDateTime auditTime;
+};
 
+//服务的参数信息
+struct ServiceParameter
+{
+    QString id;
+    QString relationId;
+    QString parameterName;
+    QString parameterType;
+    QDateTime addTime;
+};
+
+//服务的部署信息
+struct ServiceDeploy
+{
+    QString id;
+    QString relationId;
+    QString hostIP;
+    QString hostId;
+    QDateTime addTime;
+    QString exampleName;
+    QString url;
+    QString status;
+};
+
+typedef QList<ServiceInfo> ServiceInfoList;
+
+//数据显示表的行号和数据在数据库中index对应关系
+struct RowToIndex
+{
+    int rowNum;
+    QString indexNum;
+};
+
+typedef QList< RowToIndex > RowList;
 
 #endif // HEADER_H

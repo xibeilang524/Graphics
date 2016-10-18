@@ -475,13 +475,10 @@ void MyItem::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 //右键菜单事件
 void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    if(GlobalWindowState == WINDOW_BUILD_MODEL)
-    {
-        isPrepareLine = false;
-        setSelected(true);
-        update();
-        rightMenu->exec(event->screenPos());
-    }
+    isPrepareLine = false;
+    setSelected(true);
+    update();
+    rightMenu->exec(event->screenPos());
 }
 
 //拖入事件(注释/并行不允许拖入)

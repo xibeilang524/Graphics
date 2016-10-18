@@ -17,6 +17,7 @@
 **20161003:wey:增加控件属性编辑窗口
 **20161017: gx:修复点击旋转点后，改变右侧样式属性，所选控件不更改样式问题。
 **          gx:修复工具栏左旋导致角度为负问题
+**20161018:wey:修复快捷键Ctrl+O打开本地选择文件后，Ctrl键盘释放无法捕获，导致滚轮缩放事件激活
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -44,6 +45,7 @@ public:
 
     void clearItems();
     void addContextMenuItem();
+    void addViewContextMenu();
 
     MyScene * scene();
     MyScene * addScene(QString id);
@@ -55,6 +57,7 @@ public:
     qreal getScaleValue();
     void  transformView(qreal hValue,qreal value);
     void  setScaleValue(int);
+    void  setKeyCtrlStated(bool isPressed){this->isCtrlPressed = isPressed;}
 
     int getItemSize();
 

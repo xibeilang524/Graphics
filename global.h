@@ -3,6 +3,10 @@
 
 #include "Header.h"
 
+class QWidget;
+
+extern QWidget * GlobalMainWindow;               //顶层的主窗口
+
 extern GraphicsType CurrAddGraType;              //当前添加的类型
 
 extern int SceneWidth,SceneHeight;               //scene的宽度和高度
