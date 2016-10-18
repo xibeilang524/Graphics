@@ -226,11 +226,11 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(fullScreenAction,this,SLOT(switchFullScreen()));
 
     MyAction * hideIconAction = ActionManager::instance()->crateAction(Constants::HIDE_ICON_ID,QIcon(""),"Òþ²Ø×ó²à¿Ø¼þÇø");
-    hideIconAction->setShortcut(QKeySequence("Alt+L"));
+    hideIconAction->setShortcut(QKeySequence("Ctrl+L"));
     ActionManager::instance()->registerAction(hideIconAction,this,SLOT(hideSubWidget()));
 
     MyAction * hideToolAction = ActionManager::instance()->crateAction(Constants::HIDE_TOOL_ID,QIcon(""),"Òþ²ØÊôÐÔ±à¼­Çø");
-    hideToolAction->setShortcut(QKeySequence("Alt+R"));
+    hideToolAction->setShortcut(QKeySequence("Ctrl+R"));
     ActionManager::instance()->registerAction(hideToolAction,this,SLOT(hideSubWidget()));
 
     widgetMenu->addAction(fullScreenAction);
@@ -262,20 +262,38 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         switchFullScreen();
     }
     //Òþ²Ø×ó²à
-    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_L)
+    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_L)
     {
         SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
     }
     //Òþ²ØÓÒ²à
-    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_R)
+    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_R)
     {
         if(GlobalWindowState == WINDOW_BUILD_MODEL)
         {
              SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+
+             if(SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->getContainer()->isVisible())
+             {
+                 ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("Òþ²ØÊôÐÔ±à¼­Çø");
+             }
+             else
+             {
+                 ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("ÏÔÊ¾ÊôÐÔ±à¼­Çø");
+             }
         }
         else
         {
             SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setContainerVisible();
+
+            if(SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->getContainer()->isVisible())
+            {
+                ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("Òþ²ØÍÆÑÝÇø");
+            }
+            else
+            {
+                ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("ÏÔÊ¾ÍÆÑÝÇø");
+            }
         }
     }
     //¹Ø±Õ¹¤×÷Çø
@@ -328,13 +346,23 @@ void MainWindow::hideSubWidget()
 {
     QString objName = QObject::sender()->objectName();
 
-    if(objName == QString(Constants::HIDE_ICON_ID))
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
     {
-        SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
+        if(objName == QString(Constants::HIDE_ICON_ID))
+        {
+            SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
+        }
+        else if(objName == QString(Constants::HIDE_TOOL_ID))
+        {
+            SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+        }
     }
-    else if(objName == QString(Constants::HIDE_TOOL_ID))
+    else
     {
-        SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+        if(objName == QString(Constants::HIDE_TOOL_ID))
+        {
+            SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setContainerVisible();
+        }
     }
 }
 
