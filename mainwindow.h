@@ -84,6 +84,10 @@ private:
     void createLineComboBox();
     void respShowStatusInfo(QString);
     void resetEditActionState(bool state);
+    void setIconWidgetState();
+    void setToolWidgetState(bool flag = true);
+    void setWorkspaceState();
+    void setSimulateWidgetState(bool flag = true);
 
     Ui::MainWindow *ui;
     QActionGroup * itemGroup;

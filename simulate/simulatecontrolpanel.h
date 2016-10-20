@@ -7,11 +7,15 @@
 **
 **修改历史:
 **20161017:wey:调整模拟界面，增加模拟前对控件状态的恢复
+**20161020:wey:增加验证提示，以及流程运行过程
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
 
 #include <QWidget>
+
+class QLabel;
+struct ProcessUnit;
 
 namespace Ui {
 class SimulateControlPanel;
@@ -27,11 +31,17 @@ public:
 
 signals:
     void resetSimluate();
+    void sendSingleSimulate(ProcessUnit * unit);
 
 private slots:
     void respStartSimulate();
+    void showSimulateOperate(ProcessUnit * unit);
     
 private:
+
+    void setFlagState(QLabel * label,bool isSuccess);
+    void resetSimluateFlag();
+
     Ui::SimulateControlPanel *ui;
 };
 

@@ -183,6 +183,8 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
         case GAR_PARALLE:
                              boundRect = QRectF(-radius,-POINT_ONE_EIGHTH*radius,2*radius,POINT_TWO_FIVE*radius);
                              break;
+        default:
+             break;
     }
     //【!!初始化不同类型图形】
     setInitalPolygon(boundRect,boundRect.width()/2,boundRect.height()/2,boundRect.width(),boundRect.height());
@@ -376,6 +378,8 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
                              painter->drawLine(dragMovePoint.x()-CROSS_RADIUS,dragMovePoint.y(),dragMovePoint.x()+CROSS_RADIUS,dragMovePoint.y());
                              painter->drawLine(dragMovePoint.x(),dragMovePoint.y()-CROSS_RADIUS,dragMovePoint.x(),dragMovePoint.y());
                              break;
+            default:
+                 break;
         }
         painter->restore();
     }
@@ -549,6 +553,8 @@ void MyItem::dragMoveEvent(QGraphicsSceneDragDropEvent *event)
                                   dragMovePoint.setX(event->pos().x());
                                   dragMovePoint.setY(boundRect.bottomRight().y());
                               break;
+                default:
+                     break;
             }
             setSelected(true);
             event->acceptProposedAction();
@@ -638,6 +644,8 @@ void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
                               itemPos.setY(boundRect.bottomRight().y());
                               scaleFactor = (dropPoint.x() - boundRect.bottomLeft().x()) / boundRect.width();
                           break;
+            default:
+                 break;
         }
 
         createProp(itemPos,direct,scaleFactor);
@@ -709,6 +717,8 @@ MyNodePort * MyItem::addNodePort(const NodePortProperty &prop)
                         itemPos.setY(boundRect.bottomLeft().y());
                     }
                     break;
+        default:
+             break;
     }
     return createProp(itemPos,prop.direct,prop.scaleFactor);
 }
@@ -930,6 +940,8 @@ void MyItem::procPortChanged(MouseType type, QPointF currPoint)
                                    }
                               }
                                break;
+                default:
+                    break;
             }
 
             newPoint.setX(tmpX);
@@ -962,6 +974,8 @@ void MyItem::procPortChanged(MouseType type, QPointF currPoint)
                                    scaleFactor = (tmpPort->pos().x() - boundRect.topLeft().x()) / boundRect.width();
                               }
                                break;
+                default:
+                     break;
             }
 
             tmpPort->setScaleFactor(scaleFactor);
@@ -1291,9 +1305,13 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                                 hasProcessed = true;
                             }
                             break;
+                        default:
+                             break;
                     }
                     break;
                 }
+            default:
+                 break;
         }
 
         if(hasProcessed)
@@ -1375,6 +1393,8 @@ void MyItem::procResizeNodePort()
                                newPoint.setY(boundRect.bottomLeft().y());
                           }
                            break;
+            default:
+                 break;
         }
 
         nodePort->setPos(newPoint);
@@ -1528,6 +1548,8 @@ void MyItem::setInitalPolygon(QRectF boundRect,qreal tx,qreal ty,qreal tw,qreal 
                                              <<QPointF(-tx+loopWith,ty)<<QPointF(-tx,ty-loopWith);
                             }
                                break;
+            default:
+                 break;
     }
     setPolygon(itemPolygon);
 }
@@ -1607,6 +1629,8 @@ DragLinePoint * MyItem::getDragLinePoint(PointType pointType)
                                break;
         case BOTTOM_MIDDLE: tmp = bottomLinePoint;
                                break;
+        default:
+             break;
     }
     return tmp;
 }

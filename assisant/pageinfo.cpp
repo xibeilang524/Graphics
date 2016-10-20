@@ -1,4 +1,5 @@
 #include "pageinfo.h"
+#include "math.h"
 
 #include <QDebug>
 
@@ -53,7 +54,7 @@ void PageInfo::countTotalPage()
 }
 
 //上一页
-const int PageInfo::getPrePage()
+int PageInfo::getPrePage()
 {
     currPage = (currPage-1<=0)?0:currPage-1;
 
@@ -61,7 +62,7 @@ const int PageInfo::getPrePage()
 }
 
 //下一页
-const int PageInfo::getNextPage()
+int PageInfo::getNextPage()
 {
     currPage = (currPage+1>=totalPages)?totalPages-1:currPage+1;
 
@@ -71,14 +72,14 @@ const int PageInfo::getNextPage()
 }
 
 //第一页
-const int PageInfo::getFirstPage()
+int PageInfo::getFirstPage()
 {
     this->currPage = 0;
     return this->currPage;
 }
 
 //最后一页
-const int PageInfo::getLastPage()
+int PageInfo::getLastPage()
 {
     currPage = totalPages -1;
 

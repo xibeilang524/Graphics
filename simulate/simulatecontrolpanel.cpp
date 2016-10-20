@@ -2,6 +2,7 @@
 #include "ui_simulatecontrolpanel.h"
 
 #include <QDebug>
+#include <QListWidgetItem>
 #include <QMessageBox>
 
 #include "SimulateHeader.h"
@@ -19,6 +20,7 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     setFixedWidth(300);
 
     connect(ui->startSimulate,SIGNAL(clicked()),this,SLOT(respStartSimulate()));
+    connect(this,SIGNAL(sendSingleSimulate(ProcessUnit*)),this,SLOT(showSimulateOperate(ProcessUnit*)));
 }
 
 /*!
@@ -32,6 +34,8 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
 void SimulateControlPanel::respStartSimulate()
 {
     emit resetSimluate();
+    resetSimluateFlag();
+    ui->simProcedure->clear();
 
     QList<QGraphicsItem *> existedItems;
     //【1】【2】
@@ -39,12 +43,12 @@ void SimulateControlPanel::respStartSimulate()
 
     if(returnType != RETURN_SUCCESS)
     {
-        QMessageBox::information(0,"提示",QString("%1").arg(returnType));
+        setFlagState(ui->step1,false);
         return;
     }
     else
     {
-        QMessageBox::information(0,"提示","起始验证正确");
+        setFlagState(ui->step1,true);
     }
 
     //【3】【4】
@@ -54,18 +58,20 @@ void SimulateControlPanel::respStartSimulate()
 
     if(returnType != RETURN_SUCCESS)
     {
-        QMessageBox::information(0,"提示",QString("%1").arg(returnType));
+        setFlagState(ui->step2,false);
         return;
     }
     else
     {
-        QMessageBox::information(0,"提示","流程验证并转换正确");
+        setFlagState(ui->step2,true);
+        setFlagState(ui->step3,true);
     }
 
     //【5】对处理单元进行处理
     ProcessUnit * currUnit = procUnits.first();
     while(currUnit && currUnit->ptype != PRO_END)
     {
+        emit sendSingleSimulate(currUnit);
         currUnit->item->hightLightItem(true);
 
         if(currUnit->ptype == PRO_JUDGE)
@@ -89,7 +95,86 @@ void SimulateControlPanel::respStartSimulate()
         if(currUnit && currUnit->ptype == PRO_END)
         {
             currUnit->item->hightLightItem(true);
+            emit sendSingleSimulate(currUnit);
         }
+    }
+}
+
+//显示每一步的推演的操作信息
+void SimulateControlPanel::showSimulateOperate(ProcessUnit *unit)
+{
+    MY_ASSERT(unit)
+    QPixmap pixmap;
+    switch(unit->gtype)
+    {
+        case GRA_SQUARE:
+                           pixmap.load(":/images/square.png");
+                           break;
+        case GRA_RECT:
+                           pixmap.load(":/images/rectange.png");
+                           break;
+        case GRA_ROUND_RECT:
+                           pixmap.load(":/images/roundedrect.png");
+                           break;
+        case GRA_CIRCLE:
+                           pixmap.load(":/images/circle.png");
+                           break;
+        case GRA_ELLIPSE:
+                           pixmap.load(":/images/ellipse.png");
+                           break;
+        case GRA_POLYGON:
+                           pixmap.load(":/images/diamonds.png");
+                           break;
+        case GRA_TEXT:
+                           pixmap.load(":/images/text.png");
+                           break;
+        case GRA_NODE_PORT:
+                           pixmap.load(":/images/nodePort.png");
+                           break;
+        case GRA_PARALLELOGRAM:
+                           pixmap.load(":/images/parallelogram.png");
+                           break;
+        case GRA_LOOP_UP:
+                           pixmap.load(":/images/loop_up.png");
+                           break;
+        case GRA_LOOP_DOWN:
+                           pixmap.load(":/images/loop_down.png");
+                           break;
+        case GRA_ANNOTATION:
+                           pixmap.load(":/images/annotation.png");
+                           break;
+        case GAR_PARALLE:
+                           pixmap.load(":/images/parallel.png");
+                           break;
+        default:
+                           break;
+    }
+
+    QListWidgetItem * item = new QListWidgetItem;
+    item->setIcon(QIcon(pixmap));
+    item->setText(unit->item->getText());
+
+    ui->simProcedure->addItem(item);
+}
+
+//重置推演流程验证提示
+void SimulateControlPanel::resetSimluateFlag()
+{
+    ui->step1->setStyleSheet("");
+    ui->step2->setStyleSheet("");
+    ui->step3->setStyleSheet("");
+}
+
+//根据检查的结果设置流程中样式
+void SimulateControlPanel::setFlagState(QLabel * label,bool isSuccess)
+{
+    if(isSuccess)
+    {
+        label->setStyleSheet("background-color:green;color:white;border-radius:4px;");
+    }
+    else
+    {
+        label->setStyleSheet("background-color:red;color:white;border-radius:4px;");
     }
 }
 

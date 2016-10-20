@@ -24,14 +24,14 @@ public:
     static SQLProecss * instance();
     bool initDatabase(const QString dbFileName);
 
-    const int  getSqlDataCount(const QString sql);
-    const bool insert(const QString & sql,int & lastInserId);
-    const bool execute(const QString sql);
-    const bool obtainData(const QString sql, DataList & result);
+    int  getSqlDataCount(const QString sql);
+    bool insert(const QString & sql,int & lastInserId);
+    bool execute(const QString sql);
+    bool obtainData(const QString sql, DataList & result);
 
-    const bool transaction();
-    const bool commit();
-    const bool rollback();
+    bool transaction();
+    bool commit();
+    bool rollback();
 
 private:
     SQLProecss();

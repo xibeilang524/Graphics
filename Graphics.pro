@@ -35,6 +35,8 @@ include($$PWD/sql/sql.pri)
 include($$PWD/assisant/assisant.pri)
 
 
+RC_FILE = images/log.rc
+
 
 FORMS    += mainwindow.ui
 

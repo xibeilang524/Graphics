@@ -45,7 +45,7 @@ void MyListWidget::mouseMoveEvent(QMouseEvent *event)
         QPixmap pixmap;
         switch(graphicsType)
         {
-           case GRA_SQUARE:
+            case GRA_SQUARE:
                                pixmap.load(":/images/square.png");
                                break;
             case GRA_RECT:
@@ -83,6 +83,8 @@ void MyListWidget::mouseMoveEvent(QMouseEvent *event)
                                break;
             case GAR_PARALLE:
                                pixmap.load(":/images/parallel.png");
+                               break;
+            default:
                                break;
         }
 
@@ -145,6 +147,8 @@ void MyListWidget::startDrag(Qt::DropActions supportedActions)
                                 break;
              case GRA_NODE_PORT:
                                 pixmap.load(":/images/nodePort.png");
+                                break;
+             default:
                                 break;
          }
 

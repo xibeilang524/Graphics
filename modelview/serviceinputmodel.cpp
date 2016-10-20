@@ -60,6 +60,8 @@ QVariant ServiceInputModel::data(const QModelIndex &index, int role) const
                       color.setRgb(255,0,0);
                       return color;
                   }
+        default:
+             break;
     }
     return QVariant();
 }
@@ -127,6 +129,8 @@ bool ServiceInputModel::setData(const QModelIndex &index, const QVariant &value,
             case 3:
                    paraList.at(index.row())->pRemark = value.toString();
                    break;
+            default:
+                 break;
         }
         return true;
     }

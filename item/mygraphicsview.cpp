@@ -23,6 +23,7 @@
 #include "myarrow.h"
 #include "myitem.h"
 #include "mynodeport.h"
+#include "rotateline.h"
 
 using namespace Graphics;
 

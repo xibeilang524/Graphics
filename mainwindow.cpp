@@ -233,7 +233,7 @@ void MainWindow::createActionAndMenus()
     fullScreenAction->setShortcut(QKeySequence("Ctrl+Shift+F11"));
     ActionManager::instance()->registerAction(fullScreenAction,this,SLOT(switchFullScreen()));
 
-    MyAction * hideIconAction = ActionManager::instance()->crateAction(Constants::HIDE_ICON_ID,QIcon(""),"隐藏左侧控件区");
+    MyAction * hideIconAction = ActionManager::instance()->crateAction(Constants::HIDE_ICON_ID,QIcon(""),"隐藏控件区");
     hideIconAction->setShortcut(QKeySequence("Ctrl+L"));
     ActionManager::instance()->registerAction(hideIconAction,this,SLOT(hideSubWidget()));
 
@@ -241,9 +241,14 @@ void MainWindow::createActionAndMenus()
     hideToolAction->setShortcut(QKeySequence("Ctrl+R"));
     ActionManager::instance()->registerAction(hideToolAction,this,SLOT(hideSubWidget()));
 
+    MyAction * hideSpaceAction = ActionManager::instance()->crateAction(Constants::HIDE_WORKSPACE_ID,QIcon(""),"隐藏工作区");
+    hideSpaceAction->setShortcut(QKeySequence("Ctrl+U"));
+    ActionManager::instance()->registerAction(hideSpaceAction,this,SLOT(hideSubWidget()));
+
     widgetMenu->addAction(fullScreenAction);
     widgetMenu->addAction(hideIconAction);
     widgetMenu->addAction(hideToolAction);
+    widgetMenu->addAction(hideSpaceAction);
     widgetMenu->addSeparator();
     widgetMenu->addAction(buildModelAction);
     widgetMenu->addAction(simulateAction);
@@ -280,36 +285,29 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     //隐藏左侧
     else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_L)
     {
-        SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
+        if(GlobalWindowState == WINDOW_BUILD_MODEL)
+        {
+            setIconWidgetState();
+        }
     }
     //隐藏右侧
     else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_R)
     {
         if(GlobalWindowState == WINDOW_BUILD_MODEL)
         {
-             SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
-
-             if(SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->getContainer()->isVisible())
-             {
-                 ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("隐藏属性编辑区");
-             }
-             else
-             {
-                 ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("显示属性编辑区");
-             }
+            setToolWidgetState();
         }
         else
         {
-            SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setContainerVisible();
-
-            if(SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->getContainer()->isVisible())
-            {
-                ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("隐藏推演区");
-            }
-            else
-            {
-                ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("显示推演区");
-            }
+            setSimulateWidgetState();
+        }
+    }
+    //隐藏工作区
+    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_U)
+    {
+        if(GlobalWindowState == WINDOW_BUILD_MODEL)
+        {
+            setWorkspaceState();
         }
     }
     //关闭工作区
@@ -379,19 +377,84 @@ void MainWindow::hideSubWidget()
     {
         if(objName == QString(Constants::HIDE_ICON_ID))
         {
-            SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
+            setIconWidgetState();
         }
         else if(objName == QString(Constants::HIDE_TOOL_ID))
         {
-            SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+            setToolWidgetState();
+        }
+        else if(objName == QString(Constants::HIDE_WORKSPACE_ID))
+        {
+            setWorkspaceState();
         }
     }
     else
     {
         if(objName == QString(Constants::HIDE_TOOL_ID))
         {
-            SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setContainerVisible();
+            setSimulateWidgetState();
         }
+    }
+}
+
+void MainWindow::setIconWidgetState()
+{
+    SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->setContainerVisible();
+    if(SplitManager::instance()->split(QString(Constants::HIDE_ICON_ID))->getContainer()->isVisible())
+    {
+        ActionManager::instance()->action(Constants::HIDE_ICON_ID)->setText("隐藏控件区");
+    }
+    else
+    {
+        ActionManager::instance()->action(Constants::HIDE_ICON_ID)->setText("显示控件区");
+    }
+}
+
+void MainWindow::setToolWidgetState(bool flag)
+{
+    if(flag)
+    {
+        SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->setContainerVisible();
+    }
+
+    if(SplitManager::instance()->split(QString(Constants::HIDE_TOOL_ID))->getContainer()->isVisible())
+    {
+        ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("隐藏属性编辑区");
+    }
+    else
+    {
+        ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("显示属性编辑区");
+    }
+}
+
+void MainWindow::setWorkspaceState()
+{
+    bool isVisible = MyPageSwitch::instance()->isVisible();
+    MyPageSwitch::instance()->setVisible(!isVisible);
+    if(MyPageSwitch::instance()->isVisible())
+    {
+        ActionManager::instance()->action(Constants::HIDE_WORKSPACE_ID)->setText("隐藏工作区");
+    }
+    else
+    {
+        ActionManager::instance()->action(Constants::HIDE_WORKSPACE_ID)->setText("显示工作区");
+    }
+}
+
+void MainWindow::setSimulateWidgetState(bool flag)
+{
+    if(flag)
+    {
+        SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setContainerVisible();
+    }
+
+    if(SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->getContainer()->isVisible())
+    {
+        ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("隐藏推演区");
+    }
+    else
+    {
+        ActionManager::instance()->action(Constants::HIDE_TOOL_ID)->setText("显示推演区");
     }
 }
 
@@ -420,11 +483,13 @@ void MainWindow::switchWorkModel()
         enable = true;
         GlobalWindowState = WINDOW_BUILD_MODEL;
         setWindowTitle("多组件模型在线协同调用工具-建模");
+        setToolWidgetState(false);
     }
     else
     {
         GlobalWindowState = WINDOW_SIMULATE;
         setWindowTitle("多组件模型在线协同调用工具-推演");
+        setSimulateWidgetState(false);
     }
 
     MyGraphicsView::instance()->addContextMenuItem();

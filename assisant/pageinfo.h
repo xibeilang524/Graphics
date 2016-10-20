@@ -37,14 +37,14 @@ public:
     void setTotalNum(const int num);
     void setCurrPage(const int num);
     const QString setFormat(const QString & format ="/");
-    const int getTotalPages(){return this->totalPages;}
-    const int getTotalNums(){return this->totalNums;}
-    const int getCurrPage(){return this->currPage;}
-    const int getPerPageShow(){return this->perPageShow;}
-    const int getPrePage();
-    const int getNextPage();
-    const int getFirstPage();
-    const int getLastPage();
+    int getTotalPages(){return this->totalPages;}
+    int getTotalNums(){return this->totalNums;}
+    int getCurrPage(){return this->currPage;}
+    int getPerPageShow(){return this->perPageShow;}
+    int getPrePage();
+    int getNextPage();
+    int getFirstPage();
+    int getLastPage();
 
 private:
     void countTotalPage();

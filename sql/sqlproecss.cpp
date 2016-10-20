@@ -58,7 +58,7 @@ bool SQLProecss::initDatabase(const QString dbFileName)
 ///**Return:
 ///**Others:由【数据装配层】调用
 ///****************************************************/
-const bool SQLProecss::obtainData(const QString sql, DataList & result)
+bool SQLProecss::obtainData(const QString sql, DataList & result)
 {
     QSqlQuery query(sqlDatabase);
 
@@ -91,7 +91,7 @@ const bool SQLProecss::obtainData(const QString sql, DataList & result)
 ///**Return: const int:数据的条数
 ///**Others:
 ///****************************************************/
-const int SQLProecss::getSqlDataCount(const QString sql)
+int SQLProecss::getSqlDataCount(const QString sql)
 {
     QSqlQuery query(sqlDatabase);
 //    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
@@ -114,7 +114,7 @@ const int SQLProecss::getSqlDataCount(const QString sql)
 ///**Return: const bool : 插入成功与否的标志
 ///**Others:
 ///****************************************************/
-const bool SQLProecss::insert(const QString &sql, int &lastInserId)
+bool SQLProecss::insert(const QString &sql, int &lastInserId)
 {
     QSqlQuery query(sqlDatabase);
 //    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
@@ -135,7 +135,7 @@ const bool SQLProecss::insert(const QString &sql, int &lastInserId)
 ///**Return:const bool：执行成功与否
 ///**Others:
 ///****************************************************/
-const bool SQLProecss::execute(const QString sql)
+bool SQLProecss::execute(const QString sql)
 {
     QSqlQuery query(sqlDatabase);
 //    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
@@ -155,17 +155,17 @@ const bool SQLProecss::execute(const QString sql)
 ///**Return:const bool : 当前操作是否成功
 ///**Others:
 ///****************************************************/
-const bool SQLProecss::transaction()
+bool SQLProecss::transaction()
 {
     return sqlDatabase.transaction();
 }
 
-const bool SQLProecss::commit()
+bool SQLProecss::commit()
 {
     return sqlDatabase.commit();
 }
 
-const bool SQLProecss::rollback()
+bool SQLProecss::rollback()
 {
     return sqlDatabase.rollback();
 }

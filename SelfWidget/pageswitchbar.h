@@ -30,10 +30,10 @@ public:
     void setPerPageShow(const int num);
     void setTotalNum(const int num);
     void setCurrPage(const int num);
-    const int getTotalNums();
-    const int getCurrPage();
-    const int getPerPageShow();
-    const int getTotalPage();
+    int getTotalNums();
+    int getCurrPage();
+    int getPerPageShow();
+    int getTotalPage();
     QString getFormatOutput(const QString & format ="/" );
     ~PageSwitchBar();
 

@@ -18,7 +18,7 @@ AbstractDataProcess::AbstractDataProcess()
 ///**Return:bool:插入数据成功与否
 ///**Others:
 ///****************************************************/
-const bool AbstractDataProcess::insertData(const QString tableName, const QStringList insertKey,
+bool AbstractDataProcess::insertData(const QString tableName, const QStringList insertKey,
                                            const QStringList insertValue, int & insertId)
 {
     if(insertKey.size() != insertValue.size())
@@ -62,7 +62,7 @@ const bool AbstractDataProcess::insertData(const QString tableName, const QStrin
 ///**Return:bool:插入数据成功与否
 ///**Others:
 ///****************************************************/
-const bool AbstractDataProcess::insertData(const QString tableName, const QMap<QString, QString> insertKeyAndValue,
+bool AbstractDataProcess::insertData(const QString tableName, const QMap<QString, QString> insertKeyAndValue,
                                            int &insertId)
 {
     return insertData(tableName,QStringList(insertKeyAndValue.keys()),
@@ -79,7 +79,7 @@ const bool AbstractDataProcess::insertData(const QString tableName, const QMap<Q
 ///**Return:bool：返回删除的成功与否
 ///**Others:
 ///****************************************************/
-const bool AbstractDataProcess::deleteData(const QString tableName,  const QStringList deleteKey,
+bool AbstractDataProcess::deleteData(const QString tableName,  const QStringList deleteKey,
                                            const QStringList deleteValue)
 {
     if(deleteKey.size() != deleteValue.size())
@@ -101,7 +101,7 @@ const bool AbstractDataProcess::deleteData(const QString tableName,  const QStri
     return SQLProecss::instance()->execute(sql);
 }
 
-const bool AbstractDataProcess::deleteData(const QString tableName, const QMap<QString, QString> deleteKeyAndValue)
+bool AbstractDataProcess::deleteData(const QString tableName, const QMap<QString, QString> deleteKeyAndValue)
 {
     return deleteData(tableName,QStringList(deleteKeyAndValue.keys()),QStringList(deleteKeyAndValue.values()));
 }
@@ -118,7 +118,7 @@ const bool AbstractDataProcess::deleteData(const QString tableName, const QMap<Q
 ///**Return:bool:更新数据成功与否
 ///**Others:
 ///****************************************************/
-const bool AbstractDataProcess::updateData(const QString tableName, const QStringList updateKey,
+bool AbstractDataProcess::updateData(const QString tableName, const QStringList updateKey,
                                            const QStringList updateValue,  const QStringList conditionKey,
                                            const QStringList conditionValue)
 {
@@ -154,7 +154,7 @@ const bool AbstractDataProcess::updateData(const QString tableName, const QStrin
     return SQLProecss::instance()->execute(sql);
 }
 
-const bool AbstractDataProcess::updateData(const QString tableName, const QMap<QString, QString> updateKeyAndValue,
+bool AbstractDataProcess::updateData(const QString tableName, const QMap<QString, QString> updateKeyAndValue,
                                            const QMap<QString, QString> conditionKeyAndValue)
 {
     return updateData(tableName,QStringList(updateKeyAndValue.keys()),QStringList(updateKeyAndValue.values())
@@ -169,7 +169,7 @@ const bool AbstractDataProcess::updateData(const QString tableName, const QMap<Q
 ///**Return:const int：返回对应数据表的条数
 ///**Others:
 ///****************************************************/
-const int AbstractDataProcess::getDataCount(const QString tableName)
+int AbstractDataProcess::getDataCount(const QString tableName)
 {
     QString condition = "select count(*) from "+tableName;
 
@@ -187,7 +187,7 @@ const int AbstractDataProcess::getDataCount(const QString tableName)
 ///**Return:const bool：执行成功或者失败
 ///**Others:
 ///****************************************************/
-const bool AbstractDataProcess::getUnWrappedData(const QString tableName, const QStringList selectKey,
+bool AbstractDataProcess::getUnWrappedData(const QString tableName, const QStringList selectKey,
                                                  const QStringList conditionKey, const QStringList conditionValue,
                                                  DataList & result)
 {

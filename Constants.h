@@ -57,21 +57,22 @@ const char SIMLUATE_ID[] = "Constants.Simluate";
 
 //端口右键菜单
 const char NODE_DELETE_ID[] = "Constants.Node.Delete";
-const char NODE_EDIT_ID[] = "Constanta.Node.Edit";
+const char NODE_EDIT_ID[] = "Constants.Node.Edit";
 
 //【控件】
-const char FULL_SCREEN_ID[] = "Constanta.FullScreen";
-const char HIDE_ICON_ID[] = "Constanta.HideIcon";
-const char HIDE_TOOL_ID[] = "Constanta.HideToolBox";
-const char HIDE_SIMULATE_ID[] = "Constanta.HideSimulate";
+const char FULL_SCREEN_ID[] = "Constants.FullScreen";
+const char HIDE_ICON_ID[] = "Constants.HideIcon";
+const char HIDE_TOOL_ID[] = "Constants.HideToolBox";
+const char HIDE_SIMULATE_ID[] = "Constants.HideSimulate";
+const char HIDE_WORKSPACE_ID[] = "Constants.HideWorkspace";
 
 //【帮助】
-const char TEC_SUPPORT_ID[] = "Constanta.TecSupport";
-const char ABOUT_ID[] = "Constanta.About";
+const char TEC_SUPPORT_ID[] = "Constants.TecSupport";
+const char ABOUT_ID[] = "Constants.About";
 
 //【数据库】
-const char DATABASE_VIEW[] = "Constanta.DatabaseView";
-const char DATABASE_REFRESH[] = "Constanta.DatabaseRefresh";
+const char DATABASE_VIEW[] = "Constants.DatabaseView";
+const char DATABASE_REFRESH[] = "Constants.DatabaseRefresh";
 
 } // namespace StyleAssisant
 } // namespace Constants

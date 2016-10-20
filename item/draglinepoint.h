@@ -27,7 +27,7 @@ public:
 
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
-    const PointType getPointType(){return this->pointType;}
+    PointType getPointType(){return this->pointType;}
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);

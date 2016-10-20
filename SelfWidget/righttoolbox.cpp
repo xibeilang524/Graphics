@@ -23,7 +23,8 @@ RightToolBox::RightToolBox(QWidget *parent) :
     isDataInit = false;
 
     ui->dial->setSingleStep(GlobalRotateStep);
-    ui->tabWidget->setCurrentIndex(0);
+    ui->widget_8->hide();
+    ui->line_4->hide();
 }
 
 //初始化信号槽连接
@@ -234,6 +235,8 @@ void RightToolBox::preparePen()
           case 4:
                  newPen.setStyle(Qt::DashDotDotLine);
                  break;
+          default:
+                 break;
         }
     }
     newPen.setColor(selectedLineColor);
@@ -289,6 +292,8 @@ void RightToolBox::prepareBrush()
            case 4:newBrush.setStyle(Qt::BDiagPattern);break;
            case 5:newBrush.setStyle(Qt::FDiagPattern);break;
            case 6:newBrush.setStyle(Qt::DiagCrossPattern);break;
+           default:
+                   break;
         }
 
         currItemProperty.itemBrush = newBrush;
@@ -505,6 +510,8 @@ void RightToolBox::respInitToolBox(int seletedItemNum,ItemProperty property)
           case Qt::DiagCrossPattern:
                  ui->fillKind->setCurrentIndex(6);
                  break;
+          default:
+                 break;
         }
 
         switch(currItemProperty.itemPen.style())
@@ -523,6 +530,8 @@ void RightToolBox::respInitToolBox(int seletedItemNum,ItemProperty property)
                      break;
               case Qt::DashDotDotLine:
                      ui->lineKind->setCurrentIndex(4);
+                     break;
+              default:
                      break;
         }
 

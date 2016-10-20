@@ -68,6 +68,8 @@ void DragPoint::updateDragPointHoverCursor(qreal parentRotateDegree)
             case MIDDLE_LEFT:
             case MIDDLE_RIGHT: cursorShape = Qt::SizeHorCursor;
                 break;
+           default:
+                break;
         }
     }
     else if(parentRotateDegree >=30 && parentRotateDegree < 60)
@@ -86,6 +88,8 @@ void DragPoint::updateDragPointHoverCursor(qreal parentRotateDegree)
             case MIDDLE_LEFT:
             case MIDDLE_RIGHT: cursorShape = Qt::SizeFDiagCursor;
                 break;
+            default:
+                 break;
         }
     }
     else if(parentRotateDegree >=60 && parentRotateDegree < 120)
@@ -104,6 +108,8 @@ void DragPoint::updateDragPointHoverCursor(qreal parentRotateDegree)
             case MIDDLE_LEFT:
             case MIDDLE_RIGHT: cursorShape = Qt::SizeVerCursor;
                 break;
+            default:
+                 break;
         }
     }
     else if(parentRotateDegree >=120 && parentRotateDegree < 150)
@@ -122,6 +128,8 @@ void DragPoint::updateDragPointHoverCursor(qreal parentRotateDegree)
             case MIDDLE_LEFT:
             case MIDDLE_RIGHT: cursorShape = Qt::SizeBDiagCursor;
                 break;
+            default:
+                 break;
         }
     }
     else if(parentRotateDegree >=150 && parentRotateDegree <= 180)
@@ -140,6 +148,8 @@ void DragPoint::updateDragPointHoverCursor(qreal parentRotateDegree)
             case MIDDLE_LEFT:
             case MIDDLE_RIGHT: cursorShape = Qt::SizeHorCursor;
                 break;
+            default:
+                 break;
         }
     }
 }

@@ -3,6 +3,7 @@
 #include "../item/mygraphicsview.h"
 #include "../item/myscene.h"
 #include "../item/myitem.h"
+#include "../item/myarrow.h"
 
 SceneItemPickup * SceneItemPickup::pickup = NULL;
 

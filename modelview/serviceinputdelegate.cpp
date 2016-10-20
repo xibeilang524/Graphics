@@ -11,6 +11,7 @@ ServiceInputDelegate::ServiceInputDelegate()
 //创建代理的控件
 QWidget * ServiceInputDelegate::createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    Q_UNUSED(option)
     if(index.column() == 1)
     {
         QComboBox * box = new QComboBox(parent);
@@ -50,6 +51,8 @@ void ServiceInputDelegate::setEditorData(QWidget *editor, const QModelIndex &ind
 //更新代理控件的位置尺寸
 void ServiceInputDelegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+    Q_UNUSED(option)
+    Q_UNUSED(index)
     editor->setGeometry(option.rect);
 }
 

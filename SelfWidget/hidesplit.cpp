@@ -66,6 +66,8 @@ void HideSplit::init()
                         break;
         case SPLIT_BOTTOM:
         break;
+        default:
+                       break;
     }
 }
 

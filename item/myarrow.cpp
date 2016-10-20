@@ -273,7 +273,7 @@ QPolygonF MyArrow::countArrowPolygon(QPointF startPoint,bool isStart)
     return polygon;
 }
 
-void MyArrow::countArrowPoint(bool isStart,QPointF & startPoint,QPointF & point1, QPointF & point2)
+void MyArrow::countArrowPoint(bool isStart,QPointF  startPoint,QPointF & point1, QPointF & point2)
 {
     double angle = ::acos(line().dx() / line().length());
 
@@ -326,6 +326,10 @@ void MyArrow::countNodeCrossPoint(QPolygonF polygon,QLineF centerLine,QPointF &e
 //【废弃】计算交叉点的坐标【因调整线段起始点至控件一边的中点，因此无需计算线与控件边的交点坐标】
 void MyArrow::countItemCrossPoint(bool isStart , QPolygonF polygon,QLineF centerLine,QPointF &intersectPoint)
 {
+    Q_UNUSED(isStart)
+    Q_UNUSED(polygon)
+    Q_UNUSED(centerLine)
+    Q_UNUSED(intersectPoint)
     //将polygons中item的坐标系转换成scene的坐标系，支持即使控件旋转后依然可以保持箭头指向某一边
 //    MyItem * tmpItem;
 //    if(isStart)

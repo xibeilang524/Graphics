@@ -60,5 +60,26 @@
         <file>images/simulate.png</file>
         <file>images/database_refresh.png</file>
         <file>images/database_view.png</file>
+        <file>images/simulate/step1.png</file>
+        <file>images/simulate/step1_over.png</file>
+        <file>images/simulate/step2.png</file>
+        <file>images/simulate/step2_over.png</file>
+        <file>images/simulate/step3.png</file>
+        <file>images/simulate/step3_over.png</file>
+        <file>images/simulate/step4.png</file>
+        <file>images/simulate/step4_over.png</file>
+        <file>images/simulate/step5.png</file>
+        <file>images/simulate/step5_over.png</file>
+        <file>images/simulate/step6.png</file>
+        <file>images/simulate/step6_over.png</file>
+        <file>images/simulate/step7.png</file>
+        <file>images/simulate/step7_over.png</file>
+        <file>images/simulate/step8.png</file>
+        <file>images/simulate/step8_over.png</file>
+        <file>images/simulate/step9.png</file>
+        <file>images/simulate/step9_over.png</file>
+        <file>images/softicon.png</file>
+        <file>images/softicon.ico</file>
+        <file>images/log.rc</file>
     </qresource>
 </RCC>

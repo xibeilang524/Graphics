@@ -20,22 +20,22 @@ class AbstractDataProcess
 public:
     AbstractDataProcess();
 
-    virtual const bool insertData(const QString tableName, const QStringList insertKey, const QStringList insertValue, int &insertId);
-    virtual const bool insertData(const QString tableName, const QMap<QString, QString> insertKeyAndValue, int &insertId);
+    virtual bool insertData(const QString tableName, const QStringList insertKey, const QStringList insertValue, int &insertId);
+    virtual bool insertData(const QString tableName, const QMap<QString, QString> insertKeyAndValue, int &insertId);
 
-    virtual const bool updateData(const QString tableName,const QStringList updateKey, const QStringList updateValue,
+    virtual bool updateData(const QString tableName,const QStringList updateKey, const QStringList updateValue,
                                   const QStringList conditionKey,const QStringList conditionValue);
-    virtual const bool updateData(const QString tableName,const QMap<QString, QString> updateKeyAndValue,
+    virtual bool updateData(const QString tableName,const QMap<QString, QString> updateKeyAndValue,
                                   const QMap<QString, QString> conditionKeyAndValue);
 
-    virtual const bool deleteData(const QString tableName, const QStringList deleteKey,const QStringList deleteValue);
-    virtual const bool deleteData(const QString tableName, const QMap<QString, QString> deleteKeyAndValue);
+    virtual bool deleteData(const QString tableName, const QStringList deleteKey,const QStringList deleteValue);
+    virtual bool deleteData(const QString tableName, const QMap<QString, QString> deleteKeyAndValue);
 
 
-    virtual const bool getUnWrappedData(const QString tableName, const QStringList selectKey,
+    virtual bool getUnWrappedData(const QString tableName, const QStringList selectKey,
                                   const QStringList conditionKey, const QStringList conditionValue, DataList &result);
 
-    virtual const int getDataCount(const QString tableName);
+    virtual int getDataCount(const QString tableName);
 
 };
 

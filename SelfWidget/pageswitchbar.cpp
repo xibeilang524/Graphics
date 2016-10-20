@@ -108,25 +108,25 @@ QString PageSwitchBar::getFormatOutput(const QString &format)
 }
 
 //获取总的条数
-const int PageSwitchBar::getTotalNums()
+int PageSwitchBar::getTotalNums()
 {
     return pageInfo->getTotalNums();
 }
 
 //获取当前的页面数
-const int PageSwitchBar::getCurrPage()
+int PageSwitchBar::getCurrPage()
 {
     return pageInfo->getCurrPage();
 }
 
 //获取每页显示的条数
-const int PageSwitchBar::getPerPageShow()
+int PageSwitchBar::getPerPageShow()
 {
     return pageInfo->getPerPageShow();
 }
 
 //获取总的页数
-const int PageSwitchBar::getTotalPage()
+int PageSwitchBar::getTotalPage()
 {
     return pageInfo->getTotalPages();
 }
