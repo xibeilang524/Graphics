@@ -28,3 +28,13 @@ void ServiceInfoProcess::getServiceInfo(ServiceInfoList &list, const int startIn
 
     SQLDataAdapter::instance()->getServiceData(sql,list);
 }
+
+//获取所有的属性信息
+void ServiceInfoProcess::getServiceProperty(QList<ServiceProperty> &properties)
+{
+    QString sql = "select s.name,s.status,s.descirption,sd.url,s.method from\
+            business_softwareonline s left join business_softwareonline_deploy sd\
+                on s.id = sd.relationId";
+
+   SQLDataAdapter::instance()->getSericeProperties(sql,properties);
+}

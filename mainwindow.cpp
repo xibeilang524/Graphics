@@ -11,6 +11,7 @@
 #include <QStatusBar>
 #include <QKeyEvent>
 #include <QDebug>
+#include <QMessageBox>
 
 #include "./manager/actionmanager.h"
 #include "item/myscene.h"
@@ -96,7 +97,7 @@ void MainWindow::createActionAndMenus()
 
     MyAction * exitAction = ActionManager::instance()->crateAction(Constants::EXIT_ID,"退出");
     exitAction->setShortcut(QKeySequence("Ctrl+Q"));
-    ActionManager::instance()->registerAction(exitAction,this,SLOT(exitApp()));
+    ActionManager::instance()->registerAction(exitAction,this,SLOT(close()));
 
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
@@ -339,6 +340,19 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
     QMainWindow::keyPressEvent(event);
 }
 
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    int result = QMessageBox::warning(this,"警告","是否退出程序?",QMessageBox::Yes,QMessageBox::No);
+    if(result == QMessageBox::Yes)
+    {
+        event->accept();
+    }
+    else
+    {
+        event->ignore();
+    }
+}
+
 //切换全屏
 void MainWindow::switchFullScreen()
 {
@@ -496,11 +510,6 @@ void MainWindow::fileClear()
             Util::resetGlobalZValue();
         }
     }
-}
-
-void MainWindow::exitApp()
-{
-    qApp->exit();
 }
 
 //获取点击控件的类型

@@ -49,6 +49,23 @@ void SQLDataAdapter::getServiceData(QString sql, ServiceInfoList &list)
     }
 }
 
+//获取所有的属性信息，将结果保存至全局的列表中
+void SQLDataAdapter::getSericeProperties(QString sql, QList<ServiceProperty> &list)
+{
+    DataList dataList;
+    SQLProecss::instance()->obtainData(sql,dataList);
+    foreach (VariantList variant, dataList)
+    {
+        ServiceProperty property;
+        property.serviceName = variant.at(0).toString();
+        property.status = variant.at(1).toString();
+        property.descirption = variant.at(2).toString();
+        property.servicePath = variant.at(3).toString();
+        property.method = variant.at(4).toString();
+
+        list.append(property);
+    }
+}
 
 SQLDataAdapter::~SQLDataAdapter()
 {

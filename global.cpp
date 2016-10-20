@@ -18,3 +18,5 @@ WindowState GlobalWindowState;            //全局的工作区间类型
 int GlobalRotateStep; 		 		 	  //旋转到对应角度才进行角度切换
 qreal GlobalMinMumSize;            		  //控件缩小的最小范围
 qreal GlobalParalMinMumSize;              //平行控件缩小的最小范围
+
+QList<ServiceProperty> GlobalServiceProperties;     //全局的服务信息

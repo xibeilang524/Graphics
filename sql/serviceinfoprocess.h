@@ -20,6 +20,8 @@ public:
     static ServiceInfoProcess * instance();
     void getServiceInfo(ServiceInfoList & list,const int startIndex = 0,const int perPage = 0);
 
+    void getServiceProperty(QList<ServiceProperty> & properties);
+
 private:
     ServiceInfoProcess();
     static ServiceInfoProcess * serviceProcess;

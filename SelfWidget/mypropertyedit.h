@@ -6,7 +6,7 @@
 **Others: 控件属性编辑窗口
 **
 **修改历史:
-**
+**20160120:wey:修改服务的属性信息，增加从数据库读取信息
 *************************************************/
 #ifndef MYPROPERTYEDIT_H
 #define MYPROPERTYEDIT_H
@@ -33,14 +33,19 @@ public:
 private slots:
     void confirmPropety();
     void cancelProperty();
+    void switchServiceInfo(int index);
     
 private:
+    void initServiceData();
+
     Ui::MyPropertyEdit *ui;
 
     ServiceInputTableView * inputTableView;
     ServiceInputTableView * outputTableView;
 
     ServiceProperty * currItemProp;
+
+    bool isComboxAutoChanged;               //下拉框如果自动改变，则无需响应槽函数
 };
 
 #endif // MYPROPERTYEDIT_H

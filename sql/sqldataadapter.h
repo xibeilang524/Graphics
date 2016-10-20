@@ -26,6 +26,8 @@ public:
 
     void getServiceData(QString sql,ServiceInfoList &list);
 
+    void getSericeProperties(QString sql,QList<ServiceProperty> &list);
+
 private:
     SQLDataAdapter();
     ~SQLDataAdapter();

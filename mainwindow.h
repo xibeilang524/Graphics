@@ -26,6 +26,7 @@
 **20161011:wey:添加工作区类型切换，建模/推演类型
 **20161017:wey:添加快捷键Ctrl+M/Ctrl+Shift+M快速切换工作类型
 **20161018:wey:修复切换工作模式后，显示/隐藏右侧推演栏无效问题
+**20161020:wey:添加关闭提示窗口
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -59,12 +60,12 @@ signals:
 
 protected:
     void keyPressEvent(QKeyEvent *event);
+    void closeEvent(QCloseEvent *event);
 
 private slots:
     void fileOpen();
     void fileSave();
     void fileClear();
-    void exitApp();
     void recordClickedItem();
     void respRestItemAction();
     void respItemSizeChanged(int size);

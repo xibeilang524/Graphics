@@ -275,10 +275,19 @@ typedef  QList<Parameter *> ParaList;
 //服务的属性
 struct ServiceProperty
 {
+    ServiceProperty()
+    {
+        hasSettInfo = false;
+    }
+    bool hasSettInfo;                 //是否已经设置了信息，用于在显示属性编辑时作为标识是否要从数据库读取
     QString serviceName;              //服务名
+    QString status;                   //服务状态
+    QString descirption;              //服务描述
     QString servicePath;              //服务路径
+    QString method;                   //调用接口
     ParaList inputParas;              //输入参数集合
     ParaList outputParas;             //输出参数集合
+    bool isAsNextInput;               //输出是否作为下个服务的输入
 };
 
 //服务的基本信息
