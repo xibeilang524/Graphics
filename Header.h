@@ -15,8 +15,10 @@
 #ifndef HEADER_H
 #define HEADER_H
 
+#define M_VERTION 0x0004     //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
+
 #define PI 3.141592653
-#define ICON_WIDTH  60          //图标的宽高
+#define ICON_WIDTH  60          //拖拽图标的宽高
 #define ICON_HEIGHT 60
 #define LAYOUT_SPACING  1       //布局管理器中两控件间的距离
 #define FONT_DEAFULT_PIX  9     //字体初始化大小
@@ -76,7 +78,8 @@ enum ReturnType
     FILE_NOT_EXIST = 30,             //文件不存在
     FILE_CANT_READ = 31,             //文件不可读
     FILE_CANT_WRITE = 32,            //文件不可写
-    FILE_ILLEGAL = 33                //文件格式不合法
+    FILE_ILLEGAL = 33,               //文件格式不合法
+    FILE_VERSION = 34                //文件的版本不一致(文件与程序版本不一致)
 
 };
 

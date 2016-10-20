@@ -45,6 +45,7 @@ ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &
     QDataStream stream(&file);
 
     //写入文件标识头
+    stream<<M_VERTION;
     stream<<SaveFileHeadFlag;
 
     foreach(QGraphicsItem * item,items)
@@ -93,6 +94,13 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
     }
 
     QDataStream stream(&file);
+
+    int softVersion;
+    stream >>softVersion;
+    if(softVersion != M_VERTION)
+    {
+        return FILE_VERSION;
+    }
 
     QString fileFlag;
     stream>>fileFlag;

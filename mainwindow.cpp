@@ -234,15 +234,15 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(fullScreenAction,this,SLOT(switchFullScreen()));
 
     MyAction * hideIconAction = ActionManager::instance()->crateAction(Constants::HIDE_ICON_ID,QIcon(""),"隐藏控件区");
-    hideIconAction->setShortcut(QKeySequence("Ctrl+L"));
+    hideIconAction->setShortcut(QKeySequence("Alt+L"));
     ActionManager::instance()->registerAction(hideIconAction,this,SLOT(hideSubWidget()));
 
     MyAction * hideToolAction = ActionManager::instance()->crateAction(Constants::HIDE_TOOL_ID,QIcon(""),"隐藏属性编辑区");
-    hideToolAction->setShortcut(QKeySequence("Ctrl+R"));
+    hideToolAction->setShortcut(QKeySequence("Alt+R"));
     ActionManager::instance()->registerAction(hideToolAction,this,SLOT(hideSubWidget()));
 
     MyAction * hideSpaceAction = ActionManager::instance()->crateAction(Constants::HIDE_WORKSPACE_ID,QIcon(""),"隐藏工作区");
-    hideSpaceAction->setShortcut(QKeySequence("Ctrl+U"));
+    hideSpaceAction->setShortcut(QKeySequence("Alt+U"));
     ActionManager::instance()->registerAction(hideSpaceAction,this,SLOT(hideSubWidget()));
 
     widgetMenu->addAction(fullScreenAction);
@@ -271,7 +271,6 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(databaseViewAction,ServiceView::instance(),SLOT(viewDatabaseContent()));
 
     MyAction * databaseRefreshAction = ActionManager::instance()->crateAction(Constants::DATABASE_REFRESH,QIcon(":/images/database_refresh.png"),"刷新数据库");
-//    databaseViewAction->setShortcut(QKeySequence("Ctrl+P"));
     ActionManager::instance()->registerAction(databaseRefreshAction,ServiceView::instance(),SLOT(refreshDatabaseContent()));
 }
 
@@ -283,7 +282,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         switchFullScreen();
     }
     //隐藏左侧
-    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_L)
+    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_L)
     {
         if(GlobalWindowState == WINDOW_BUILD_MODEL)
         {
@@ -291,7 +290,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
     }
     //隐藏右侧
-    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_R)
+    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_R)
     {
         if(GlobalWindowState == WINDOW_BUILD_MODEL)
         {
@@ -303,7 +302,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         }
     }
     //隐藏工作区
-    else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_U)
+    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_U)
     {
         if(GlobalWindowState == WINDOW_BUILD_MODEL)
         {
@@ -531,6 +530,10 @@ void MainWindow::fileOpen()
         if(returnType == FILE_ILLEGAL)
         {
             respShowStatusInfo("文件格式不符，请重新选择！");
+        }
+        else if(returnType == FILE_VERSION)
+        {
+            respShowStatusInfo("所选文件与当前软件版本不一致!");
         }
         else if(returnType == RETURN_SUCCESS)
         {
