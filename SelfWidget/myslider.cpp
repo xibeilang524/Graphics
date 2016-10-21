@@ -7,7 +7,6 @@
 #include <QEvent>
 #include <QMouseEvent>
 
-#include <QDebug>
 
 MySlider::MySlider(QWidget * parent):
     QWidget(parent)

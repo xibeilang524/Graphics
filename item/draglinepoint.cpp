@@ -2,6 +2,7 @@
 
 #include <QPainter>
 #include <QCursor>
+#include <QGraphicsSceneMouseEvent>
 #include <QDebug>
 
 #include "myitem.h"
@@ -27,6 +28,7 @@ DragLinePoint::DragLinePoint(const PointType pointType, GraphicsType type, MyIte
 
     setAcceptHoverEvents(true);
 
+    connect(this,SIGNAL(currMouseState(MouseType)),parent1,SLOT(procDragLineMouseState(MouseType)));
 }
 
 QRectF DragLinePoint::boundingRect()const
@@ -58,6 +60,33 @@ void DragLinePoint::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     Q_UNUSED(event)
     this->setCursor(Qt::ArrowCursor);
+}
+
+void DragLinePoint::mousePressEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event)
+
+    emit currMouseState(MOUSE_PRESS);
+
+    MySuperItem::mousePressEvent(event);
+}
+
+void DragLinePoint::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event)
+
+    emit currMouseState(MOUSE_MOVE);
+
+    MySuperItem::mouseMoveEvent(event);
+}
+
+void DragLinePoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    Q_UNUSED(event)
+
+    emit currMouseState(MOUSE_RELEASE);
+
+    MySuperItem::mouseReleaseEvent(event);
 }
 
 

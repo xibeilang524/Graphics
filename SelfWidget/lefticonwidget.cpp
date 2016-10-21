@@ -2,7 +2,6 @@
 
 #include <QToolBox>
 #include <QHBoxLayout>
-#include <QDebug>
 
 #include "../manager/listitemmanager.h"
 #include "mylistwidget.h"

@@ -79,7 +79,7 @@ MyScene * MyGraphicsView::addScene(QString id)
     connect(tmpScene,SIGNAL(deleteKeyPress()),this,SLOT(deleteItem()));
     connect(tmpScene,SIGNAL(ctrlLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
     connect(tmpScene,SIGNAL(ctrlUnLockKeyPress()),this,SLOT(respCtrlLockKeyPress()));
-    connect(tmpScene,SIGNAL(itemSizeChanged(int)),parentWindow,SLOT(respItemSizeChanged(int)));
+    connect(tmpScene,SIGNAL(itemSizeChanged(int)),this,SLOT(respItemSizeChanged(int)));
     connect(tmpScene,SIGNAL(itemPropChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
     connect(tmpScene,SIGNAL(editCurrItem()),this,SLOT(editTextItem()));
     connect(tmpScene,SIGNAL(ctrlPropEditKeyPress()),this,SLOT(editPropertyItem()));
@@ -336,6 +336,7 @@ void MyGraphicsView::cutItem()
         {
             MyItem * item = dynamic_cast<MyItem *>(myScene->selectedItems().first());
 
+            cutTmpInfo.hasContent = true;
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->getText();
@@ -354,6 +355,7 @@ void MyGraphicsView::cutItem()
         {
             MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
 
+            cutTmpInfo.hasContent = true;
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             delete item;
@@ -377,6 +379,7 @@ void MyGraphicsView::copyItem()
         {
             MyItem * item = dynamic_cast<MyItem *>(myScene->selectedItems().first());
 
+            cutTmpInfo.hasContent = true;
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->getText();
@@ -396,6 +399,7 @@ void MyGraphicsView::copyItem()
         {
             MyTextItem * item = dynamic_cast<MyTextItem*>(selectedItems.first());
 
+            cutTmpInfo.hasContent = true;
             cutTmpInfo.graphicsType = item->getType();
             cutTmpInfo.itemProperty = item->getProperty();
             cutTmpInfo.content = item->toPlainText();
@@ -416,6 +420,7 @@ void MyGraphicsView::pasteItem()
 //清空剪切板
 void MyGraphicsView::clearPasteItem()
 {
+    cutTmpInfo.hasContent = false;
     ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(false);
     ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(false);
 }
@@ -713,6 +718,12 @@ void MyGraphicsView::updateActions()
         ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
 
+        if(!cutTmpInfo.hasContent)
+        {
+            ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(false);
+        }
+
         ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(false);
@@ -720,9 +731,8 @@ void MyGraphicsView::updateActions()
         ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(false);
-//        ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID)->setEnabled(false);
-//        ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID)->setEnabled(false);
-
+        ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID)->setEnabled(false);
+        ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID)->setEnabled(false);
     }
     else if(selectedSize == 1)
     {
@@ -780,7 +790,7 @@ void MyGraphicsView::updateActions()
             ComboBoxManager::instance()->item(Constants::LEFT_LINE_ID)->setEnabled(true);
             ComboBoxManager::instance()->item(Constants::RIGHT_LINE_ID)->setEnabled(true);
         }
-        else if(itemName == TYPE_ID(MyNodePort))
+        else if(itemName == TYPE_ID(MyNodePort) || itemName == TYPE_ID(DragLinePoint))
         {
             ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
             ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
@@ -1021,6 +1031,56 @@ void MyGraphicsView::respResetSimluate()
                 }
             }
         }
+    }
+}
+
+//获取被选中最上层被选中item的名称
+QString MyGraphicsView::getFirstSelectedItem()
+{
+    if(myScene->selectedItems().size() == 1)
+    {
+       return TYPE_ID(*(myScene->selectedItems().first()));
+    }
+    return "";
+}
+
+//响应scene中item数量的改变
+void MyGraphicsView::respItemSizeChanged(int size)
+{
+    MY_ASSERT(myScene)
+    bool actionEnabled = true;
+
+    //默认每个scene的第一个item为【MyItemInfo】
+    if(size <= 1)
+    {
+        actionEnabled = false;
+    }
+
+    ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(actionEnabled);
+    ActionManager::instance()->action(Constants::CLEAR_ID)->setEnabled(actionEnabled);
+
+    ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(actionEnabled);
+
+
+    if(myScene->selectedItems().size() > 0)
+    {
+        if(myScene->selectedItems().size() == 1)
+        {
+            QString itemName = getFirstSelectedItem();
+            if(itemName == TYPE_ID(MyNodePort) || itemName == TYPE_ID(DragLinePoint))
+            {
+                actionEnabled = false;
+            }
+        }
+        ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(actionEnabled);
+        ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(actionEnabled);
+        ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(actionEnabled);
+
+        ActionManager::instance()->action(Constants::ROTATE_LEFT_ID)->setEnabled(actionEnabled);
+        ActionManager::instance()->action(Constants::ROTATE_RIGHT_ID)->setEnabled(actionEnabled);
+        ActionManager::instance()->action(Constants::BRING_FRONT_ID)->setEnabled(actionEnabled);
+        ActionManager::instance()->action(Constants::BRING_BACK_ID)->setEnabled(actionEnabled);
+        ActionManager::instance()->action(Constants::DELETE_ID)->setEnabled(actionEnabled);
     }
 }
 

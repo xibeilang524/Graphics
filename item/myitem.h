@@ -119,6 +119,7 @@ private slots:
     void procResizeItem();
     void procRotate(MouseType mouseType, qreal degree);
     void procMouseState(MouseType, PointType pointType, QPointF currPos);
+    void procDragLineMouseState(MouseType);
     void procPortChanged(MouseType type, QPointF currPoint);
 
     void procDeleteNodePort(MyNodePort * nodePort);

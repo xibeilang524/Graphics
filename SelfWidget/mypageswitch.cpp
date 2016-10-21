@@ -4,7 +4,6 @@
 #include <QPushButton>
 #include <QList>
 #include <QMessageBox>
-#include <QDebug>
 
 #include "../manager/mypageitem.h"
 #include "../util.h"

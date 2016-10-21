@@ -10,7 +10,6 @@
 
 #include <QFile>
 #include <QDataStream>
-#include <QDebug>
 
 FileOperate::FileOperate()
 {

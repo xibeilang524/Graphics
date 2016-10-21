@@ -18,6 +18,8 @@
 **20161017: gx:修复点击旋转点后，改变右侧样式属性，所选控件不更改样式问题。
 **          gx:修复工具栏左旋导致角度为负问题
 **20161018:wey:修复快捷键Ctrl+O打开本地选择文件后，Ctrl键盘释放无法捕获，导致滚轮缩放事件激活
+**20161021:wey:修复删除item后，清空和本地保存按钮仍然可用问题
+**             修复产生连接线时，粘贴按钮被置为可用问题
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -42,6 +44,8 @@ public:
     ~MyGraphicsView();
 
     void showNodePortEdit(MyNodePort * nodePort);
+
+    QString getFirstSelectedItem();
 
     void clearItems();
     void addContextMenuItem();
@@ -83,6 +87,7 @@ signals:
 public slots:
     void sceneScaled(int currScale);
     void respResetSimluate();
+    void respItemSizeChanged(int size);
 
 private slots:
     void undoAndRedoItem();

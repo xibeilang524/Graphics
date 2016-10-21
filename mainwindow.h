@@ -69,7 +69,6 @@ private slots:
     void fileClear();
     void recordClickedItem();
     void respRestItemAction();
-    void respItemSizeChanged(int size);
     void switchFullScreen();
     void hideSubWidget();
     void getTecSupport();

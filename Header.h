@@ -257,6 +257,11 @@ struct NodePortProperty
 //暂存一个剪切时的控件信息
 struct CutInfo
 {
+    CutInfo()
+    {
+        hasContent = false;
+    }
+    bool  hasContent;                            //是否包拷贝内容,在剪切和复制后置为true，清空后置为false
     GraphicsType graphicsType;
     ItemProperty itemProperty;
     QString content;

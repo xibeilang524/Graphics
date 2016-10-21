@@ -3,7 +3,6 @@
 #include <QMimeData>
 #include <QDrag>
 #include <QMouseEvent>
-#include <QDebug>
 
 #include "../manager/listitemmanager.h"
 #include "../Header.h"

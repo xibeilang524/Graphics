@@ -4,8 +4,6 @@
 #include <QTextCodec>
 #include <QDesktopWidget>
 
-#include <QDebug>
-
 #include "./manager/actionmanager.h"
 #include "SelfWidget/hidesplit.h"
 #include "global.h"

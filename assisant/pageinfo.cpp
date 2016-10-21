@@ -1,7 +1,6 @@
 #include "pageinfo.h"
 #include "math.h"
 
-#include <QDebug>
 
 PageInfo::PageInfo()
 {

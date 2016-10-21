@@ -14,7 +14,7 @@
 #include <QMessageBox>
 
 #include "./manager/actionmanager.h"
-#include "item/myscene.h"
+#include "./item/myscene.h"
 #include "./item/mygraphicsview.h"
 #include "./SelfWidget/myslider.h"
 #include "./SelfWidget/lefticonwidget.h"
@@ -61,10 +61,9 @@ MainWindow::MainWindow(QWidget *parent) :
 
     view->addContextMenuItem();
     view->addViewContextMenu();
+    view->respItemSizeChanged(0);
 
     showMaximized();
-
-    respItemSizeChanged(0);
 
     resetEditActionState(false);
 
@@ -573,7 +572,7 @@ void MainWindow::fileClear()
         if(result == QMessageBox::Yes)
         {
             view->clearItems();
-            respItemSizeChanged(0);
+            view->respItemSizeChanged(0);
             resetEditActionState(false);
             Util::resetGlobalZValue();
         }
@@ -642,23 +641,6 @@ void MainWindow::createSceneAndView()
     SplitManager::instance()->split(QString(Constants::HIDE_SIMULATE_ID))->setFixedWidth(310);
 
     this->setCentralWidget(centralWidget);
-}
-
-//响应item改变
-void MainWindow::respItemSizeChanged(int size)
-{
-    MY_ASSERT(view->scene())
-    bool actionEnabled = size;
-
-    ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(actionEnabled);
-    ActionManager::instance()->action(Constants::CLEAR_ID)->setEnabled(actionEnabled);
-
-    ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(actionEnabled);
-
-    if(view->scene()->selectedItems().size() > 0)
-    {
-        resetEditActionState(actionEnabled);
-    }
 }
 
 //重置编辑action的状态

@@ -1102,7 +1102,15 @@ void MyItem::updateDragPointCursor()
     rightBottomPoint->updateDragPointHoverCursor(rotation());
 }
 
-//根据旋转的角度动态改变拖拽点鼠标悬停时的样式
+//处理操作线段拖拽点鼠标状态
+void MyItem::procDragLineMouseState(MouseType type)
+{
+    currMouseType = type;
+    if(currMouseType == MOUSE_NONE || currMouseType == MOUSE_RELEASE)
+    {
+        setDragPointVisible(false);
+    }
+}
 
 //左上、右上、左下、右下在缩放时要按照比例进行
 //上、左、右、下在缩放时只按改变一边长度

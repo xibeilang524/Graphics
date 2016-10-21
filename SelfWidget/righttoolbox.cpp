@@ -3,7 +3,6 @@
 
 #include <QFontDialog>
 #include <QColorDialog>
-#include <QDebug>
 
 #include "../util.h"
 #include "../global.h"
