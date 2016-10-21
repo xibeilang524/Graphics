@@ -126,6 +126,9 @@ void ServiceView::viewDatabaseContent()
 //刷新数据库信息
 void ServiceView::refreshDatabaseContent()
 {
+    GlobalServiceProperties.clear();
+    ServiceInfoProcess::instance()->getServiceProperty(GlobalServiceProperties);
+
     QMessageBox::information(this,"提示","数据库更新完毕");
 }
 

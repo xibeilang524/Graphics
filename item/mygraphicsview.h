@@ -20,6 +20,7 @@
 **20161018:wey:修复快捷键Ctrl+O打开本地选择文件后，Ctrl键盘释放无法捕获，导致滚轮缩放事件激活
 **20161021:wey:修复删除item后，清空和本地保存按钮仍然可用问题
 **             修复产生连接线时，粘贴按钮被置为可用问题
+**             添加工作区切换后，工具栏依照相应的控件来自动的更改状态
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -108,6 +109,7 @@ private slots:
     void editPropertyItem();
     void respPropertyUpdate(ItemProperty property);
     void setSelectedLineType(int type);
+    void setToolBarState();
 
 private:
     void initView();

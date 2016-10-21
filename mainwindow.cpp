@@ -77,8 +77,6 @@ MainWindow::MainWindow(QWidget *parent) :
 //创建窗口的菜单栏，绑定响应事件
 void MainWindow::createActionAndMenus()
 {
-    fileMenu = menuBar()->addMenu("文件(&F)");
-
     MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工作区");
     newAction->setShortcut(QKeySequence("Ctrl+N"));
     ActionManager::instance()->registerAction(newAction,MyPageSwitch::instance(),SLOT(addPage()));
@@ -98,14 +96,13 @@ void MainWindow::createActionAndMenus()
     exitAction->setShortcut(QKeySequence("Ctrl+Q"));
     ActionManager::instance()->registerAction(exitAction,this,SLOT(close()));
 
+    fileMenu = menuBar()->addMenu("文件(&F)");
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(clearAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
-
-    editMenu = menuBar()->addMenu("编辑(&E)");
 
     MyAction * undoAction = ActionManager::instance()->crateAction(Constants::UNDO_ID,QIcon(":/images/undo.png"),"撤销");
     ActionManager::instance()->registerAction(undoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
@@ -131,10 +128,10 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(clearPasteAction,MyGraphicsView::instance(),SLOT(clearPasteItem()));
     ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(false);
 
-    MyAction * rotateLeftAction = ActionManager::instance()->crateAction(Constants::ROTATE_LEFT_ID,QIcon(":/images/rotateLeft.png"),"左转90°");
+    MyAction * rotateLeftAction = ActionManager::instance()->crateAction(Constants::ROTATE_LEFT_ID,QIcon(":/images/rotateLeft.png"),"旋转90°(逆时针)");
     ActionManager::instance()->registerAction(rotateLeftAction,MyGraphicsView::instance(),SLOT(rotateItem()));
 
-    MyAction * rotateRightAction = ActionManager::instance()->crateAction(Constants::ROTATE_RIGHT_ID,QIcon(":/images/rotateRight.png"),"右转90°");
+    MyAction * rotateRightAction = ActionManager::instance()->crateAction(Constants::ROTATE_RIGHT_ID,QIcon(":/images/rotateRight.png"),"旋转90°(顺时针)");
     ActionManager::instance()->registerAction(rotateRightAction,MyGraphicsView::instance(),SLOT(rotateItem()));
 
     MyAction * bringFrontAction = ActionManager::instance()->crateAction(Constants::BRING_FRONT_ID,QIcon(":/images/sendtoback.png"),"置于顶层");
@@ -162,6 +159,7 @@ void MainWindow::createActionAndMenus()
     propertyEditAction->setShortcut(QKeySequence("Ctrl+E"));
     ActionManager::instance()->registerAction(propertyEditAction,MyGraphicsView::instance(),SLOT(editPropertyItem()));
 
+    editMenu = menuBar()->addMenu("编辑(&E)");
     editMenu->addAction(editTextAction);
     editMenu->addSeparator();
     editMenu->addAction(undoAction);
@@ -181,8 +179,6 @@ void MainWindow::createActionAndMenus()
     MyAction * dragAbleAction = ActionManager::instance()->crateAction(Constants::DRAG_ABLE_ID,QIcon(":/images/dragable.png"),"窗口允许拖拽");
     ActionManager::instance()->registerAction(dragAbleAction,MyGraphicsView::instance(),SLOT(setViewDragEnable(bool)),true);
     ActionManager::instance()->action(Constants::DRAG_ABLE_ID)->setChecked(true);
-
-    itemMenu = menuBar()->addMenu("类型(&I)");
 
     MyAction * arrowAction = ActionManager::instance()->crateAction(Constants::ARROW_ID,QIcon(":/images/pointer.png"),"箭头");
     ActionManager::instance()->registerAction(arrowAction,this,SLOT(recordClickedItem()),true);
@@ -209,6 +205,7 @@ void MainWindow::createActionAndMenus()
     itemGroup->addAction(lineAction);
     itemGroup->addAction(vectorLineAction);
 
+    itemMenu = menuBar()->addMenu("类型(&I)");
     itemMenu->addAction(arrowAction);
     itemMenu->addAction(textAction);
     itemMenu->addAction(lineAction);
@@ -617,6 +614,7 @@ void MainWindow::createSceneAndView()
     vLayout->addWidget(view);
     MyPageSwitch::instance()->addPage();
 
+    connect(MyPageSwitch::instance(),SIGNAL(switchPage()),MyGraphicsView::instance(),SLOT(setToolBarState()));
     connect(MyPageSwitch::instance(),SIGNAL(deletePage()),this,SLOT(respDeletePage()));
 
     leftIconWidget = new LeftIconWidget;

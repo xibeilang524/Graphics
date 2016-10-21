@@ -1084,6 +1084,25 @@ void MyGraphicsView::respItemSizeChanged(int size)
     }
 }
 
+//切换工作区后，将工具栏上的按钮恢复到初始状态，有的要根据是否有子item来设定状态
+void MyGraphicsView::setToolBarState()
+{
+    MY_ASSERT(myScene)
+
+    if(myScene->items().size() <=1 )
+    {
+        ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(false);
+        ActionManager::instance()->action(Constants::CLEAR_ID)->setEnabled(false);
+    }
+    else
+    {
+        ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(true);
+        ActionManager::instance()->action(Constants::CLEAR_ID)->setEnabled(true);
+    }
+
+    updateActions();
+}
+
 MyGraphicsView::~MyGraphicsView()
 {
     if(nodeEdit)

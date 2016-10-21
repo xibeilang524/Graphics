@@ -97,6 +97,7 @@ void MyPageSwitch::siwtchPage(QString pageId, bool firstView)
             MyGraphicsView::instance()->transformView(mapping->hScrollValue,mapping->vScrollValue);
             MyGraphicsView::instance()->setScaleValue(mapping->scaleView);
             MyGraphicsView::instance()->showScene(mapping->scene);
+            emit switchPage();
         }
         else
         {

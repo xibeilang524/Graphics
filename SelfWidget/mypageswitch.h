@@ -39,6 +39,7 @@ public:
 
 signals:
     void deletePage();
+    void switchPage();
 
 public slots:
     void addPage();
