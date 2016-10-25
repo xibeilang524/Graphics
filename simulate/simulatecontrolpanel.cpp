@@ -169,7 +169,7 @@ void SimulateControlPanel::respItemDoubleClicked(QListWidgetItem *current)
     if(citem)
     {
         MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item);
-//        QEvent * event = new QEvent(QEvent::GraphicsSceneContextMenu);
+//        QEvent * event(QEvent::GraphicsSceneContextMenu);
 //        MyGraphicsView::instance()->scene()->sendEvent(citem->getUnit()->item,event);
     }
 }

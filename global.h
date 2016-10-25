@@ -3,9 +3,9 @@
 
 #include "Header.h"
 
-class QWidget;
+class MainWindow;
 
-extern QWidget * GlobalMainWindow;               //顶层的主窗口
+extern MainWindow * GlobalMainWindow;            //顶层的主窗口
 
 extern GraphicsType CurrAddGraType;              //当前添加的类型
 

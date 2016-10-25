@@ -270,6 +270,11 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(databaseRefreshAction,ServiceView::instance(),SLOT(refreshDatabaseContent()));
 }
 
+void MainWindow::keyPress(QKeyEvent *event)
+{
+    keyPressEvent(event);
+}
+
 void MainWindow::keyPressEvent(QKeyEvent *event)
 {
     //È«ÆÁ/·ÇÈ«ÆÁ

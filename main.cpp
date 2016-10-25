@@ -1,5 +1,5 @@
 #include "mainwindow.h"
-#include <QApplication>
+#include "myapplication.h"
 
 #include <QTextCodec>
 #include <QDesktopWidget>
@@ -11,9 +11,9 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication a(argc, argv);
+    MyApplication a(argc, argv);
 
-    QApplication::addLibraryPath("./plugins");
+    MyApplication::addLibraryPath("./plugins");
 
     QTextCodec * codec = QTextCodec::codecForName("GB2312");
     QTextCodec::setCodecForCStrings(codec);

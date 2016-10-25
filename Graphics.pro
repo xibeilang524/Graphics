@@ -17,14 +17,16 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     global.cpp \
     util.cpp \
-    fileoperate.cpp
+    fileoperate.cpp \
+    myapplication.cpp
 
 HEADERS  += mainwindow.h \
     Constants.h \
     Header.h \
     global.h \
     util.h \
-    fileoperate.h
+    fileoperate.h \
+    myapplication.h
 
 include($$PWD/SelfWidget/SelfWidget.pri)
 include($$PWD/item/item.pri)

@@ -122,8 +122,8 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                 {
                     mouseItems.push_back(tmpItem);
                     //主动对鼠标点位置下Item产生进入事件
-                    QEvent * eve = new QEvent(QEvent::GraphicsSceneHoverEnter);
-                    sendEvent(tmpItem,eve);
+                    QEvent eve(QEvent::GraphicsSceneHoverEnter);
+                    sendEvent(tmpItem,&eve);
                 }
             }
         }

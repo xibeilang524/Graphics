@@ -10,6 +10,7 @@
 #include "../global.h"
 #include "../util.h"
 #include "../sql/serviceinfoprocess.h"
+#include "../mainwindow.h"
 #include "pageswitchbar.h"
 
 #define MAX_ROW_COUNT 10
