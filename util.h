@@ -13,6 +13,9 @@
 
 #include <QColor>
 #include <QFont>
+#include <QPixmap>
+
+#include "Header.h"
 
 class QWidget;
 class QTableWidget;
@@ -32,6 +35,7 @@ public:
     static void removeTableItem(QTableWidget * table);
     static void clearTableData(QTableWidget * table);
     static qreal radinToAngle(const qreal &radin);
+    static void loadPixmapByGType(GraphicsType type,QPixmap & pixmap);
 };
 
 #endif // UTIL_H

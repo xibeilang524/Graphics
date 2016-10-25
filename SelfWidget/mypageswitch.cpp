@@ -149,6 +149,31 @@ void MyPageSwitch::deleteThisPage(QString pageId)
     }
 }
 
+//切换前一个页面
+void MyPageSwitch::switchFrontBack(bool isFront)
+{
+    MY_ASSERT_GT_ZERO(pages.size())
+
+    int index = -1;
+    for(int i = 0;i<pages.size(); i++)
+    {
+        if(selectedPage->id == pages.at(i)->id)
+        {
+            index = i;
+            break;
+        }
+    }
+
+    if(isFront && index >0)
+    {
+        switchToPage(pages.at(index -1 )->id);
+    }
+    else if(!isFront && index < pages.size() - 1)
+    {
+        switchToPage(pages.at(index +1 )->id);
+    }
+}
+
 //关闭当前页
 void MyPageSwitch::closePage()
 {

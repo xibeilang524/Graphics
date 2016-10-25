@@ -9,7 +9,6 @@ class MyListWidget : public QListWidget
 public:
     MyListWidget(QWidget * parent = 0);
 
-
 protected:
     void startDrag(Qt::DropActions supportedActions);
     void mousePressEvent(QMouseEvent *event);

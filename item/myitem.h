@@ -105,7 +105,7 @@ public:
 
     ServiceProperty * getServiceProp(){return this->serviceProp;}
 
-    void hightLightItem(bool isHigh = true);
+    void hightLightItem(HightLightLevel level = LEVEL_NORMAL,bool isHigh = true);
     bool isHightShow(){return this->isSimulateHigh;}
 
 signals:
@@ -188,6 +188,7 @@ private:
     ServiceProperty * serviceProp;     //属性信息
 
     bool isSimulateHigh;               //是否为推演状态下的高亮显示
+    HightLightLevel  lightLevel;       //当前属于哪种显示
 };
 
 #endif // MYITEM_H

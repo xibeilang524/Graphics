@@ -8,6 +8,7 @@
 #include <QScrollBar>
 #include <QDebug>
 #include <QKeyEvent>
+#include <QApplication>
 
 #include "myscene.h"
 #include "../SelfWidget/nodeeditdialog.h"
@@ -155,6 +156,11 @@ void MyGraphicsView::keyPressEvent(QKeyEvent *event)
     if(event->key() == Qt::Key_Control)
     {
         isCtrlPressed = true;
+    }
+    else if(event->modifiers() == Qt::AltModifier && (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right))
+    {
+        event->ignore();
+        return;
     }
 
     QGraphicsView::keyPressEvent(event);
@@ -414,6 +420,7 @@ void MyGraphicsView::copyItem()
 void MyGraphicsView::pasteItem()
 {
     MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
     myScene->addItem(cutTmpInfo,true);
 }
 
@@ -429,6 +436,7 @@ void MyGraphicsView::clearPasteItem()
 void MyGraphicsView::deleteItem()
 {
     MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
     foreach(QGraphicsItem * item, selectedItems)
@@ -496,6 +504,7 @@ void MyGraphicsView::deleteItem()
 void MyGraphicsView::rotateItem()
 {
     MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
     if(selectedItems.size() !=  1)
@@ -530,6 +539,7 @@ void MyGraphicsView::rotateItem()
 void MyGraphicsView::bringZItem()
 {
     MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
     if (myScene->selectedItems().isEmpty())
     {
          return;
@@ -580,6 +590,7 @@ void MyGraphicsView::bringZItem()
 //键盘快捷键Ctrl+L/U(快速锁定/解锁)
 void MyGraphicsView::respCtrlLockKeyPress()
 {
+    MY_BUILD_MODEL_ONLY
     QString objName = QObject::sender()->objectName();
 
     getSelectedLockState();
@@ -607,6 +618,7 @@ void MyGraphicsView::respCtrlLockKeyPress()
 //锁定与解锁
 void MyGraphicsView::lockAndunlockItem()
 {
+    MY_BUILD_MODEL_ONLY
     QString objName = QObject::sender()->objectName();
 
     bool moveable = false;
@@ -883,6 +895,7 @@ void MyGraphicsView::getSelectedLockState()
 void MyGraphicsView::setSelectedLineType(int type)
 {
     MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
     if(myScene->selectedItems().size() == 1)
     {
         QString itemName = TYPE_ID(*(myScene->selectedItems().first()));
@@ -907,6 +920,7 @@ void MyGraphicsView::setSelectedLineType(int type)
 void MyGraphicsView::editTextItem()
 {
     MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
     if(selectedItems.size() == 1)
     {
@@ -952,12 +966,18 @@ void MyGraphicsView::editPropertyItem()
         if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
-            MyPropertyEdit propertyEdit(this);
-            propertyEdit.initProp(item->getServiceProp());
-
-            propertyEdit.exec();
+            showSelectedItemPropEdit(item);
         }
     }
+}
+
+//右键显示选择控件的属性编辑窗口
+void MyGraphicsView::showSelectedItemPropEdit(MyItem * item)
+{
+    MyPropertyEdit propertyEdit(this);
+    propertyEdit.initProp(item->getServiceProp());
+
+    propertyEdit.exec();
 }
 
 //获取当前模型区域内的item数量
@@ -1027,7 +1047,7 @@ void MyGraphicsView::respResetSimluate()
                 MyItem * tmp = dynamic_cast<MyItem *>(item);
                 if(tmp && tmp->isHightShow())
                 {
-                    tmp->hightLightItem(false);
+                    tmp->hightLightItem(LEVEL_NORMAL,false);
                 }
             }
         }

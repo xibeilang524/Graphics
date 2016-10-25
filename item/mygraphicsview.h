@@ -33,6 +33,7 @@ class MyNodePort;
 class NodeEditDialog;
 class MyScene;
 class MainWindow;
+class MyItem;
 class QMenu;
 
 class MyGraphicsView : public QGraphicsView
@@ -89,6 +90,7 @@ public slots:
     void sceneScaled(int currScale);
     void respResetSimluate();
     void respItemSizeChanged(int size);
+    void showSelectedItemPropEdit(MyItem * item);
 
 private slots:
     void undoAndRedoItem();

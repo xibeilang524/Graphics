@@ -35,6 +35,10 @@
 
 #define TYPE_ID(a) typeid(a).name()
 #define MY_ASSERT(a) {if(!a) return;}
+#define MY_ASSERT_GT_ZERO(a) {if(a <=0 ) return;}
+
+#define MY_BUILD_MODEL_ONLY {if(GlobalWindowState != WINDOW_BUILD_MODEL) return;}
+#define MY_SIMULATE_MODEL_ONLY {if(GlobalWindowState != WINDOW_SIMULATE) return;}
 
 #include <QVariant>
 
@@ -266,6 +270,14 @@ struct CutInfo
     ItemProperty itemProperty;
     QString content;
     QList<NodePortProperty> nodeProperties;      //控件包含端口的信息
+};
+
+//高亮等级
+enum HightLightLevel
+{
+    LEVEL_NORMAL,        //普通(黑)
+    LEVEL_MIDDLE,        //中级(红)推演流程
+    LEVEL_HIGH           //高级(蓝)推演流程选中
 };
 
 /****************************************属性编辑**************************************************/

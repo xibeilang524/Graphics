@@ -377,11 +377,10 @@ void MyArrow::updatePosition()
 //双击编辑文字信息
 void MyArrow::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(GlobalWindowState == WINDOW_BUILD_MODEL)
-    {
-        emit editMe();
-        QGraphicsLineItem::mouseDoubleClickEvent(event);
-    }
+    MY_BUILD_MODEL_ONLY
+
+    emit editMe();
+    QGraphicsLineItem::mouseDoubleClickEvent(event);
 }
 
 //鼠标进入

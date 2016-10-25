@@ -38,6 +38,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
     //[1]判断流程是否完整，同时将流程重排列
     MyItem * startItem;
     MyItem * endItem;
+
     foreach(QGraphicsItem * item,existedItems)
     {
         if(TYPE_ID(*item) == TYPE_ID(MyItem))
@@ -57,6 +58,8 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
             }
         }
     }
+
+
     bool isAtEnd = false;
 
     MyItem * currItem = startItem;        //当前操作指针指向控件
@@ -69,6 +72,10 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
 
     while(!isAtEnd)
     {
+        if(!currItem)
+        {
+            return RETURN_ERROR;
+        }
         resortedItems.append(currItem);
 
         QList<MyArrow *> arrows = currItem->getArrows();
@@ -196,7 +203,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
             //输入输出框/处理框[关注箭头指向点]
             if(gtype == GRA_PARALLELOGRAM || gtype == GRA_RECT)
             {
-                if(inNum !=1 && outNum != 1)
+                if(inNum !=1 || outNum != 1)
                 {
                     return FLOW_ERROR;
                 }
@@ -264,7 +271,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
             //判断[1个输入，2个输出]
             else if(gtype == GRA_POLYGON)
             {
-                if(inNum !=2 && outNum != 1)
+                if(inNum !=2 || outNum != 1)
                 {
                     return FLOW_ERROR;
                 }

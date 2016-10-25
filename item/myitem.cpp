@@ -153,6 +153,7 @@ MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, 
     isDragging = false;            //默认无拖入
     isPrepareLine = false;
     isSimulateHigh = false;
+    lightLevel = LEVEL_NORMAL;
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -333,8 +334,16 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
     {
         if(isSimulateHigh)
         {
-            painter->setPen(QPen(Qt::red,3));
+            if(lightLevel == LEVEL_MIDDLE)
+            {
+                painter->setPen(QPen(Qt::red,3));
+            }
+            else if(lightLevel == LEVEL_HIGH)
+            {
+                painter->setPen(QPen(Qt::blue,3));
+            }
         }
+
         painter->drawPolygon(itemPolygon);
     }
 
@@ -417,11 +426,9 @@ void MyItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 //双击编辑文字信息
 void MyItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    if(GlobalWindowState == WINDOW_BUILD_MODEL)
-    {
-        emit editMe();
-        QGraphicsPolygonItem::mouseDoubleClickEvent(event);
-    }
+    MY_BUILD_MODEL_ONLY
+    emit editMe();
+    QGraphicsPolygonItem::mouseDoubleClickEvent(event);
 
 //    myTextItem->setTextInteractionFlags(Qt::TextEditorInteraction);
 }
@@ -482,6 +489,7 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     isPrepareLine = false;
     setSelected(true);
     update();
+
     rightMenu->exec(event->screenPos());
 }
 
@@ -1355,9 +1363,9 @@ void MyItem::procResizeItem()
 
     if(currItemType == GRA_PARALLELOGRAM)
     {
-        topLinePoint->setPos((itemPolygon.at(0).x() + itemPolygon.at(1).x())/2, itemPolygon.at(0).y());
+        topLinePoint->setPos(0/*(itemPolygon.at(0).x() + itemPolygon.at(1).x())/2*/, itemPolygon.at(0).y());
         rightLinePoint->setPos((itemPolygon.at(1).x() + itemPolygon.at(2).x())/2, 0);
-        bottomLinePoint->setPos((itemPolygon.at(0).x() + itemPolygon.at(1).x())/2, itemPolygon.at(2).y());
+        bottomLinePoint->setPos(0/*(itemPolygon.at(0).x() + itemPolygon.at(1).x())/2*/, itemPolygon.at(2).y());
         leftLinePoint->setPos((itemPolygon.at(3).x() + itemPolygon.at(0).x())/2, 0);
     }
     else
@@ -1664,8 +1672,9 @@ QList<MyArrow *> MyItem::getArrows()
 }
 
 //设置此控件是否高亮显示
-void MyItem::hightLightItem(bool isHigh)
+void MyItem::hightLightItem(HightLightLevel level,bool isHigh)
 {
+    lightLevel = level;
     isSimulateHigh = isHigh;
     update();
 }

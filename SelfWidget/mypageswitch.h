@@ -8,6 +8,7 @@
 **修改历史:
 **20161004:wey:修复删除工作区奔溃问题
 **20161017: gx:调整新建工作区后默认插入到最后
+**20161015:wey:增加Alt+左右键快速切换工作区间
 *************************************************/
 #ifndef MYPAGESWITCH_H
 #define MYPAGESWITCH_H
@@ -26,6 +27,7 @@ public:
     static MyPageSwitch * instance();
 
     void closePage();
+    void switchFrontBack(bool isFront = true);
 
     struct PageMapping
     {

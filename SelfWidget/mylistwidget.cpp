@@ -6,6 +6,7 @@
 
 #include "../manager/listitemmanager.h"
 #include "../Header.h"
+#include "../util.h"
 
 MyListWidget::MyListWidget(QWidget *parent):
     QListWidget(parent)
@@ -42,50 +43,8 @@ void MyListWidget::mouseMoveEvent(QMouseEvent *event)
         drag->setMimeData(mimeData);
 
         QPixmap pixmap;
-        switch(graphicsType)
-        {
-            case GRA_SQUARE:
-                               pixmap.load(":/images/square.png");
-                               break;
-            case GRA_RECT:
-                               pixmap.load(":/images/rectange.png");
-                               break;
-            case GRA_ROUND_RECT:
-                               pixmap.load(":/images/roundedrect.png");
-                               break;
-            case GRA_CIRCLE:
-                               pixmap.load(":/images/circle.png");
-                               break;
-            case GRA_ELLIPSE:
-                               pixmap.load(":/images/ellipse.png");
-                               break;
-            case GRA_POLYGON:
-                               pixmap.load(":/images/diamonds.png");
-                               break;
-            case GRA_TEXT:
-                               pixmap.load(":/images/text.png");
-                               break;
-            case GRA_NODE_PORT:
-                               pixmap.load(":/images/nodePort.png");
-                               break;
-            case GRA_PARALLELOGRAM:
-                               pixmap.load(":/images/parallelogram.png");
-                               break;
-            case GRA_LOOP_UP:
-                               pixmap.load(":/images/loop_up.png");
-                               break;
-            case GRA_LOOP_DOWN:
-                               pixmap.load(":/images/loop_down.png");
-                               break;
-            case GRA_ANNOTATION:
-                               pixmap.load(":/images/annotation.png");
-                               break;
-            case GAR_PARALLE:
-                               pixmap.load(":/images/parallel.png");
-                               break;
-            default:
-                               break;
-        }
+
+        Util::loadPixmapByGType((GraphicsType)graphicsType,pixmap);
 
         pixmap = pixmap.scaled(ICON_WIDTH,ICON_HEIGHT);
 
@@ -121,35 +80,7 @@ void MyListWidget::startDrag(Qt::DropActions supportedActions)
          drag->setMimeData(mimeData);
 
          QPixmap pixmap;
-         switch(graphicsType)
-         {
-            case GRA_SQUARE:
-                                pixmap.load(":/images/square.png");
-                                break;
-             case GRA_RECT:
-                                pixmap.load(":/images/rectange.png");
-                                break;
-             case GRA_ROUND_RECT:
-                                pixmap.load(":/images/roundedrect.png");
-                                break;
-             case GRA_CIRCLE:
-                                pixmap.load(":/images/circle.png");
-                                break;
-             case GRA_ELLIPSE:
-                                pixmap.load(":/images/ellipse.png");
-                                break;
-             case GRA_POLYGON:
-                                pixmap.load(":/images/diamonds.png");
-                                break;
-             case GRA_TEXT:
-                                pixmap.load(":/images/text.png");
-                                break;
-             case GRA_NODE_PORT:
-                                pixmap.load(":/images/nodePort.png");
-                                break;
-             default:
-                                break;
-         }
+         Util::loadPixmapByGType((GraphicsType)graphicsType,pixmap);
 
          pixmap = pixmap.scaled(ICON_WIDTH,ICON_HEIGHT);
 

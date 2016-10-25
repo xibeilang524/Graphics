@@ -5,8 +5,8 @@
 #include <QTableWidget>
 #include <QUuid>
 
-#include "global.h"
 #include "qmath.h"
+#include "global.h"
 
 #define TABLE_ROW_HEIGHT  30      //表格高度
 
@@ -122,4 +122,53 @@ void Util::clearTableData(QTableWidget *table)
 qreal Util::radinToAngle(const qreal &radin)
 {
      return 180/M_PI*radin;
- }
+}
+
+//根据不同类型加载对应的图片
+void Util::loadPixmapByGType(GraphicsType type, QPixmap &pixmap)
+{
+    switch(type)
+    {
+        case GRA_SQUARE:
+                           pixmap.load(":/images/square.png");
+                           break;
+        case GRA_RECT:
+                           pixmap.load(":/images/rectange.png");
+                           break;
+        case GRA_ROUND_RECT:
+                           pixmap.load(":/images/roundedrect.png");
+                           break;
+        case GRA_CIRCLE:
+                           pixmap.load(":/images/circle.png");
+                           break;
+        case GRA_ELLIPSE:
+                           pixmap.load(":/images/ellipse.png");
+                           break;
+        case GRA_POLYGON:
+                           pixmap.load(":/images/diamonds.png");
+                           break;
+        case GRA_TEXT:
+                           pixmap.load(":/images/text.png");
+                           break;
+        case GRA_NODE_PORT:
+                           pixmap.load(":/images/nodePort.png");
+                           break;
+        case GRA_PARALLELOGRAM:
+                           pixmap.load(":/images/parallelogram.png");
+                           break;
+        case GRA_LOOP_UP:
+                           pixmap.load(":/images/loop_up.png");
+                           break;
+        case GRA_LOOP_DOWN:
+                           pixmap.load(":/images/loop_down.png");
+                           break;
+        case GRA_ANNOTATION:
+                           pixmap.load(":/images/annotation.png");
+                           break;
+        case GAR_PARALLE:
+                           pixmap.load(":/images/parallel.png");
+                           break;
+        default:
+                           break;
+    }
+}

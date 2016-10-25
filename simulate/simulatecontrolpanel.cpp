@@ -2,7 +2,7 @@
 #include "ui_simulatecontrolpanel.h"
 
 #include <QDebug>
-#include <QListWidgetItem>
+#include <QApplication>
 #include <QMessageBox>
 
 #include "SimulateHeader.h"
@@ -10,6 +10,27 @@
 #include "processcheck.h"
 
 #include "../item/myitem.h"
+#include "../item/mygraphicsview.h"
+#include "../item/myscene.h"
+#include "../util.h"
+
+MyListWidgetItem::MyListWidgetItem(QListWidget *parent, int type)
+    :QListWidgetItem(parent,type)
+{
+    punit = NULL;
+}
+
+MyListWidgetItem::MyListWidgetItem(const QString &text, QListWidget *parent, int type)
+    :QListWidgetItem(text,parent,type)
+{
+    punit = NULL;
+}
+
+//绑定处理单元，用于反向的控制
+void MyListWidgetItem::bindProscessUnit(ProcessUnit *unit)
+{
+    this->punit = unit;
+}
 
 SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     QWidget(parent),
@@ -20,6 +41,8 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     setFixedWidth(300);
 
     connect(ui->startSimulate,SIGNAL(clicked()),this,SLOT(respStartSimulate()));
+    connect(ui->simProcedure,SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem *)),this,SLOT(respItemChanged(QListWidgetItem * , QListWidgetItem *)));
+    connect(ui->simProcedure,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(respItemDoubleClicked(QListWidgetItem *)));
     connect(this,SIGNAL(sendSingleSimulate(ProcessUnit*)),this,SLOT(showSimulateOperate(ProcessUnit*)));
 }
 
@@ -72,7 +95,7 @@ void SimulateControlPanel::respStartSimulate()
     while(currUnit && currUnit->ptype != PRO_END)
     {
         emit sendSingleSimulate(currUnit);
-        currUnit->item->hightLightItem(true);
+        currUnit->item->hightLightItem(LEVEL_MIDDLE,true);
 
         if(currUnit->ptype == PRO_JUDGE)
         {
@@ -94,7 +117,7 @@ void SimulateControlPanel::respStartSimulate()
 
         if(currUnit && currUnit->ptype == PRO_END)
         {
-            currUnit->item->hightLightItem(true);
+            currUnit->item->hightLightItem(LEVEL_MIDDLE,true);
             emit sendSingleSimulate(currUnit);
         }
     }
@@ -105,56 +128,50 @@ void SimulateControlPanel::showSimulateOperate(ProcessUnit *unit)
 {
     MY_ASSERT(unit)
     QPixmap pixmap;
-    switch(unit->gtype)
-    {
-        case GRA_SQUARE:
-                           pixmap.load(":/images/square.png");
-                           break;
-        case GRA_RECT:
-                           pixmap.load(":/images/rectange.png");
-                           break;
-        case GRA_ROUND_RECT:
-                           pixmap.load(":/images/roundedrect.png");
-                           break;
-        case GRA_CIRCLE:
-                           pixmap.load(":/images/circle.png");
-                           break;
-        case GRA_ELLIPSE:
-                           pixmap.load(":/images/ellipse.png");
-                           break;
-        case GRA_POLYGON:
-                           pixmap.load(":/images/diamonds.png");
-                           break;
-        case GRA_TEXT:
-                           pixmap.load(":/images/text.png");
-                           break;
-        case GRA_NODE_PORT:
-                           pixmap.load(":/images/nodePort.png");
-                           break;
-        case GRA_PARALLELOGRAM:
-                           pixmap.load(":/images/parallelogram.png");
-                           break;
-        case GRA_LOOP_UP:
-                           pixmap.load(":/images/loop_up.png");
-                           break;
-        case GRA_LOOP_DOWN:
-                           pixmap.load(":/images/loop_down.png");
-                           break;
-        case GRA_ANNOTATION:
-                           pixmap.load(":/images/annotation.png");
-                           break;
-        case GAR_PARALLE:
-                           pixmap.load(":/images/parallel.png");
-                           break;
-        default:
-                           break;
-    }
 
-    QListWidgetItem * item = new QListWidgetItem;
+    Util::loadPixmapByGType(unit->gtype,pixmap);
+
+    MyListWidgetItem * item = new MyListWidgetItem;
     item->setIcon(QIcon(pixmap));
     item->setText(unit->item->getText());
+    item->bindProscessUnit(unit);
 
     ui->simProcedure->addItem(item);
+}
+
+//根据选择的item，反向控制控件
+void SimulateControlPanel::respItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    MY_ASSERT(current)
+    MY_ASSERT(previous)
+    MyListWidgetItem * citem = dynamic_cast<MyListWidgetItem *>(current);
+    MyListWidgetItem * pitem = dynamic_cast<MyListWidgetItem *>(previous);
+
+    if(citem)
+    {
+        citem->getUnit()->item->hightLightItem(LEVEL_HIGH,true);
+    }
+
+    if(pitem)
+    {
+        pitem->getUnit()->item->hightLightItem(LEVEL_MIDDLE,true);
+    }
+
+    MyGraphicsView::instance()->update();
+}
+
+//双击右侧的列表，可以查看当前的属性
+void SimulateControlPanel::respItemDoubleClicked(QListWidgetItem *current)
+{
+    MY_ASSERT(current)
+    MyListWidgetItem * citem = dynamic_cast<MyListWidgetItem *>(current);
+
+    if(citem)
+    {
+        MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item);
+//        QEvent * event = new QEvent(QEvent::GraphicsSceneContextMenu);
+//        MyGraphicsView::instance()->scene()->sendEvent(citem->getUnit()->item,event);
+    }
 }
 
 //重置推演流程验证提示

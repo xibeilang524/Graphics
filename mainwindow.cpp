@@ -329,6 +329,21 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->setChecked(true);
         }
     }
+    //左右切换工作区间
+    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_Left)
+    {
+        if(GlobalWindowState == WINDOW_BUILD_MODEL)
+        {
+            MyPageSwitch::instance()->switchFrontBack(true);
+        }
+    }
+    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_Right)
+    {
+        if(GlobalWindowState == WINDOW_BUILD_MODEL)
+        {
+            MyPageSwitch::instance()->switchFrontBack(false);
+        }
+    }
 
     QMainWindow::keyPressEvent(event);
 }
@@ -512,6 +527,8 @@ void MainWindow::switchWorkModel()
 //打开本地保存的文件，会先提示是否要保存当前添加的控件
 void MainWindow::fileOpen()
 {
+    MY_BUILD_MODEL_ONLY
+
     respRestItemAction();
 
     MY_ASSERT(MyGraphicsView::instance()->scene())
@@ -545,6 +562,8 @@ void MainWindow::fileOpen()
 //保存当前所添加的控件
 void MainWindow::fileSave()
 {
+    MY_BUILD_MODEL_ONLY
+
     respRestItemAction();
 
     QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
@@ -561,6 +580,8 @@ void MainWindow::fileSave()
 //清空当前的控件
 void MainWindow::fileClear()
 {
+    MY_BUILD_MODEL_ONLY
+
     respRestItemAction();
 
     if(view->getItemSize() > 1)
