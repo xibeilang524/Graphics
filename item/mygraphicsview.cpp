@@ -2,6 +2,7 @@
 
 #include <QDropEvent>
 #include <QMimeData>
+#include <QFileDialog>
 #include <QDataStream>
 #include <QMenu>
 #include <QMouseEvent>
@@ -20,6 +21,7 @@
 #include "../manager/actionmanager.h"
 #include "../manager/mylinecombobox.h"
 #include "../Constants.h"
+#include "../fileoperate.h"
 #include "mytextitem.h"
 #include "myarrow.h"
 #include "myitem.h"
@@ -1121,6 +1123,30 @@ void MyGraphicsView::setToolBarState()
     }
 
     updateActions();
+}
+
+//
+//保存当前所添加的控件
+void MyGraphicsView::fileSave()
+{
+    MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
+    if(myScene->items().size() <= 1)
+    {
+        return;
+    }
+
+    ActionManager::instance()->action(Constants::ARROW_ID)->setChecked(true);
+
+    QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
+    if(!saveFileName.isEmpty())
+    {
+        ReturnType  result = FileOperate::instance()->saveFile(saveFileName,MyGraphicsView::instance()->scene()->items());
+        if(result == RETURN_SUCCESS)
+        {
+//            respShowStatusInfo("文件保存成功!");
+        }
+    }
 }
 
 MyGraphicsView::~MyGraphicsView()

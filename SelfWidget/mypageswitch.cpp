@@ -4,13 +4,20 @@
 #include <QPushButton>
 #include <QList>
 #include <QMessageBox>
+#include <QDebug>
+#include <QMenu>
 
 #include "../manager/mypageitem.h"
+#include "../manager/actionmanager.h"
 #include "../util.h"
 #include "../item/myscene.h"
 #include "../item/mygraphicsview.h"
 #include "../global.h"
+#include "../Constants.h"
+#include "../mainwindow.h"
 #include "Header.h"
+
+using namespace Graphics;
 
 MyPageSwitch::MyPageSwitch(QWidget *parent) :
     QWidget(parent)
@@ -20,6 +27,7 @@ MyPageSwitch::MyPageSwitch(QWidget *parent) :
 
     pagePosition = 0;
     selectedPage = NULL;
+    rightMenu = NULL;
     initWidget();
 }
 
@@ -38,12 +46,25 @@ void MyPageSwitch::initWidget()
     setLayout(layout);
 }
 
+void MyPageSwitch::addSwitchContextMenu()
+{
+    if(!rightMenu)
+    {
+        rightMenu = new QMenu;
+
+        rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_WORKSPACE));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::SAVE_WORKSPACE));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_LEFT_WORKSPACE));
+        rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_RIGHT_WORKSPACE));
+    }
+}
+
 //添加页面
 void MyPageSwitch::addPage()
 {
     QString id = Util::getUUID();
 
-    MyPageItem  * item = PageManager::instance()->addPageItem();
+    MyPageItem  * item = PageManager::instance()->addPageItem(rightMenu);
     connect(item,SIGNAL(switchPage(QString)),this,SLOT(switchToPage(QString)));
     connect(item,SIGNAL(deletePage(QString)),this,SLOT(deleteThisPage(QString)));
     item->setId(id);
@@ -55,11 +76,12 @@ void MyPageSwitch::addPage()
     page->scaleView = 100;
     page->hScrollValue = SceneWidth /2;
     page->vScrollValue = SceneHeight /2;
+    page->pageName = QString("工作区%1").arg(PageManager::instance()->getPageCount());
     selectedPage = page;
 
     pages.append(page);
     layout->insertWidget(++pagePosition,item);
-    item->setText(QString("工作区%1").arg(PageManager::instance()->getPageCount()));
+    item->setText(page->pageName);
 
     if(!isFirstView)
     {
@@ -109,7 +131,20 @@ void MyPageSwitch::siwtchPage(QString pageId, bool firstView)
 //删除当前页面，用后面一个页面
 void MyPageSwitch::deleteThisPage(QString pageId)
 {
-    int result = QMessageBox::warning(0,"警告","是否删除此工作区?",QMessageBox::Yes,QMessageBox::No);
+    int pageIndex = getPageIndex(pageId);
+
+    QString tipInfo;
+
+    if(pageIndex >= 0)
+    {
+        tipInfo = QString("是否删除 [%1]?").arg(pages.at(pageIndex)->pageName);
+    }
+    else
+    {
+        tipInfo = "是否删除此工作区?";
+    }
+
+    int result = QMessageBox::warning(GlobalMainWindow,"警告",tipInfo,QMessageBox::Yes|QMessageBox::No|QMessageBox::Ok,QMessageBox::No);
     if(result == QMessageBox::Yes)
     {
         int index = -1;
@@ -178,6 +213,46 @@ void MyPageSwitch::switchFrontBack(bool isFront)
 void MyPageSwitch::closePage()
 {
     deleteThisPage(selectedPage->id);
+}
+
+//关闭左侧所有工作区
+void MyPageSwitch::closeLeftPage()
+{
+    int index = getPageIndex(selectedPage->id);
+    if(index > 0)
+    {
+        for(int i = index - 1;i>=0;i--)
+        {
+            deleteThisPage(pages.at(i)->id);
+        }
+    }
+}
+
+//关闭右侧所有工作区
+void MyPageSwitch::closeRightPage()
+{
+    int index = getPageIndex(selectedPage->id);
+
+    if(index >= 0)
+    {
+        for(int i = pages.size() -1; i > index ;i--)
+        {
+            deleteThisPage(pages.at(i)->id);
+        }
+    }
+}
+
+//获取索引在集合中的位置
+int MyPageSwitch::getPageIndex(QString id)
+{
+    for(int i = 0;i<pages.size();i++)
+    {
+        if(pages.at(i)->id == id)
+        {
+            return i;
+        }
+    }
+    return -1;
 }
 
 MyPageSwitch * MyPageSwitch::pageSwitch = NULL;

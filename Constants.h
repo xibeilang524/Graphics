@@ -74,6 +74,13 @@ const char ABOUT_ID[] = "Constants.About";
 const char DATABASE_VIEW[] = "Constants.DatabaseView";
 const char DATABASE_REFRESH[] = "Constants.DatabaseRefresh";
 
+
+//【工作区间】
+const char CLOSE_WORKSPACE[] = "Workspace.Close";
+const char SAVE_WORKSPACE[] = "Workspace.Save";
+const char CLOSE_LEFT_WORKSPACE[] = "Workspace.CloseLeft";
+const char CLOSE_RIGHT_WORKSPACE[] = "Workspace.CloseRight";
+
 } // namespace StyleAssisant
 } // namespace Constants
 #endif // CONSTANTS_H

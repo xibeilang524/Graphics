@@ -59,6 +59,9 @@ MainWindow::MainWindow(QWidget *parent) :
     createToolBar();
     createStatusBar();
 
+    MyPageSwitch::instance()->addSwitchContextMenu();
+    MyPageSwitch::instance()->addPage();
+
     view->addContextMenuItem();
     view->addViewContextMenu();
     view->respItemSizeChanged(0);
@@ -83,7 +86,7 @@ void MainWindow::createActionAndMenus()
 
     MyAction * saveAction = ActionManager::instance()->crateAction(Constants::SAVE_ID,QIcon(":/images/save.png"),"保存");
     saveAction->setShortcut(QKeySequence("Ctrl+S"));
-    ActionManager::instance()->registerAction(saveAction,this,SLOT(fileSave()));
+    ActionManager::instance()->registerAction(saveAction,MyGraphicsView::instance(),SLOT(fileSave()));
 
     MyAction * openAction = ActionManager::instance()->crateAction(Constants::OPEN_ID,QIcon(":/images/open.png"),"打开");
     openAction->setShortcut(QKeySequence("Ctrl+O"));
@@ -106,11 +109,13 @@ void MainWindow::createActionAndMenus()
 
     MyAction * undoAction = ActionManager::instance()->crateAction(Constants::UNDO_ID,QIcon(":/images/undo.png"),"撤销");
     ActionManager::instance()->registerAction(undoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
-    ActionManager::instance()->action(Constants::UNDO_ID)->setEnabled(false);
+    undoAction->setShortcut(QKeySequence("Ctrl+Z"));
+    undoAction->setEnabled(false);
 
     MyAction * redoAction = ActionManager::instance()->crateAction(Constants::REDO_ID,QIcon(":/images/redo.png"),"重做");
     ActionManager::instance()->registerAction(redoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
-    ActionManager::instance()->action(Constants::REDO_ID)->setEnabled(false);
+    redoAction->setShortcut(QKeySequence("Ctrl+Y"));
+    redoAction->setEnabled(false);
 
     MyAction * cutAction = ActionManager::instance()->crateAction(Constants::CUT_ID,QIcon(":/images/cut.png"),"剪切");
     cutAction->setShortcut(QKeySequence("Ctrl+X"));
@@ -150,6 +155,7 @@ void MainWindow::createActionAndMenus()
 
     MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::DELETE_ID,QIcon(":/images/delete.png"),"删除");
     ActionManager::instance()->registerAction(deleteAction,MyGraphicsView::instance(),SLOT(deleteItem()));
+    deleteAction->setShortcut(QKeySequence("Delete"));
 
     MyAction * editTextAction = ActionManager::instance()->crateAction(Constants::EDIT_TEXT_ID,QIcon(":/images/editText.png"),"编辑名称");
     editTextAction->setShortcut(QKeySequence("Ctrl+T"));
@@ -268,6 +274,20 @@ void MainWindow::createActionAndMenus()
 
     MyAction * databaseRefreshAction = ActionManager::instance()->crateAction(Constants::DATABASE_REFRESH,QIcon(":/images/database_refresh.png"),"刷新数据库");
     ActionManager::instance()->registerAction(databaseRefreshAction,ServiceView::instance(),SLOT(refreshDatabaseContent()));
+
+
+    //【工作区间右键菜单】
+    MyAction * closeWorkAction = ActionManager::instance()->crateAction(Constants::CLOSE_WORKSPACE,QIcon(""),"关闭工作区");
+    ActionManager::instance()->registerAction(closeWorkAction,MyPageSwitch::instance(),SLOT(closePage()));
+
+    MyAction * saveWorkAction = ActionManager::instance()->crateAction(Constants::SAVE_WORKSPACE,QIcon(":/images/save.png"),"保存");
+    ActionManager::instance()->registerAction(saveWorkAction,MyGraphicsView::instance(),SLOT(fileSave()));
+
+    MyAction * closeLeftWorkAction = ActionManager::instance()->crateAction(Constants::CLOSE_LEFT_WORKSPACE,QIcon(""),"关闭左侧所有");
+    ActionManager::instance()->registerAction(closeLeftWorkAction,MyPageSwitch::instance(),SLOT(closeLeftPage()));
+
+    MyAction * closeRightWorkAction = ActionManager::instance()->crateAction(Constants::CLOSE_RIGHT_WORKSPACE,QIcon(""),"关闭右侧所有");
+    ActionManager::instance()->registerAction(closeRightWorkAction,MyPageSwitch::instance(),SLOT(closeRightPage()));
 }
 
 void MainWindow::keyPress(QKeyEvent *event)
@@ -356,6 +376,7 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     int result = QMessageBox::warning(this,"警告","是否退出程序?",QMessageBox::Yes,QMessageBox::No);
+
     if(result == QMessageBox::Yes)
     {
         event->accept();
@@ -564,24 +585,6 @@ void MainWindow::fileOpen()
     MyGraphicsView::instance()->scene()->update();
 }
 
-//保存当前所添加的控件
-void MainWindow::fileSave()
-{
-    MY_BUILD_MODEL_ONLY
-
-    respRestItemAction();
-
-    QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
-    if(!saveFileName.isEmpty())
-    {
-        ReturnType  result = FileOperate::instance()->saveFile(saveFileName,MyGraphicsView::instance()->scene()->items());
-        if(result == RETURN_SUCCESS)
-        {
-            respShowStatusInfo("文件保存成功!");
-        }
-    }
-}
-
 //清空当前的控件
 void MainWindow::fileClear()
 {
@@ -638,7 +641,6 @@ void MainWindow::createSceneAndView()
 
     vLayout->addWidget(MyPageSwitch::instance());
     vLayout->addWidget(view);
-    MyPageSwitch::instance()->addPage();
 
     connect(MyPageSwitch::instance(),SIGNAL(switchPage()),MyGraphicsView::instance(),SLOT(setToolBarState()));
     connect(MyPageSwitch::instance(),SIGNAL(deletePage()),this,SLOT(respDeletePage()));

@@ -5,12 +5,13 @@
 
 class QLabel;
 class QPushButton;
+class QMenu;
 
 class MyPageItem : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MyPageItem(QWidget *parent = 0);
+    explicit MyPageItem(QMenu * menu ,QWidget *parent = 0);
     void setText(QString text);
     void setSelected(bool);
     bool getSelected(){return this->isSelected;}
@@ -27,6 +28,7 @@ private slots:
 
 protected:
     void mousePressEvent(QMouseEvent *);
+    void contextMenuEvent(QContextMenuEvent *);
     
 private:
     void initWidget();
@@ -38,13 +40,14 @@ private:
     bool isSelected;           //是否被选中
     QString id;
     
+    QMenu * rightMenu;
 };
 
 class PageManager
 {
 public:
     static PageManager * instance();
-    MyPageItem * addPageItem();
+    MyPageItem * addPageItem(QMenu *menu);
     int getPageCount(){return ++pageCount;}
     void resetPageCount(){pageCount = 0;}
 

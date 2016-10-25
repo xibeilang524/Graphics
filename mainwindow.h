@@ -55,6 +55,7 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = 0);
     void keyPress(QKeyEvent * event);
+    void respShowStatusInfo(QString);
     ~MainWindow();
 
 signals:
@@ -66,7 +67,6 @@ protected:
 
 private slots:
     void fileOpen();
-    void fileSave();
     void fileClear();
     void recordClickedItem();
     void respRestItemAction();
@@ -83,7 +83,6 @@ private:
     void createToolBar();
     void createStatusBar();
     void createLineComboBox();
-    void respShowStatusInfo(QString);
     void resetEditActionState(bool state);
     void setIconWidgetState();
     void setToolWidgetState(bool flag = true);

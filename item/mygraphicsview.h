@@ -93,6 +93,8 @@ public slots:
     void showSelectedItemPropEdit(MyItem * item);
 
 private slots:
+    void fileSave();
+
     void undoAndRedoItem();
     void cutItem();
     void copyItem();
