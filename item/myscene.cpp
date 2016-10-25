@@ -45,14 +45,20 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         if(itemAt(event->scenePos()) && TYPE_ID(*itemAt(event->scenePos())) == TYPE_ID(DragLinePoint))
         {
             DragLinePoint * tmpDrag = dynamic_cast<DragLinePoint *>(itemAt(event->scenePos()));
-            QGraphicsItem * pItem = tmpDrag->getParentItem();
-            startMouseItemId = dynamic_cast<MyItem *>(pItem)->getProperty().startItemID;
-
-            insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
-            insertTmpLine->setPen(QPen(Qt::red, 2));
-            insertTmpLine->setZValue(1000);
-            addItem(insertTmpLine);
-            isDragLine = true;
+            if(tmpDrag)
+            {
+                QGraphicsItem * pItem = tmpDrag->getParentItem();
+                MyItem * tmpItem = dynamic_cast<MyItem *>(pItem);
+                if(tmpItem)
+                {
+                    startMouseItemId = tmpItem->getProperty().startItemID;
+                    insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
+                    insertTmpLine->setPen(QPen(Qt::red, 2));
+                    insertTmpLine->setZValue(1000);
+                    addItem(insertTmpLine);
+                    isDragLine = true;
+                }
+            }
         }
 
         if(!isDragLine && CurrAddGraType == GRA_LINE)
@@ -106,14 +112,19 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
         insertTmpLine->setLine(newLine);
 
         QList<QGraphicsItem *> currPosItems = items(event->scenePos());
+
         foreach (QGraphicsItem * item, currPosItems)
         {
-            if(TYPE_ID(*item) == TYPE_ID(MyItem))
+            if(item && TYPE_ID(*item) == TYPE_ID(MyItem))
             {
-                mouseItems.push_back(dynamic_cast<MyItem *>(item));
-                //主动对鼠标点位置下Item产生进入事件
-                QEvent * eve = new QEvent(QEvent::GraphicsSceneHoverEnter);
-                sendEvent(item,eve);
+                MyItem  * tmpItem = dynamic_cast<MyItem *>(item);
+                if(tmpItem)
+                {
+                    mouseItems.push_back(tmpItem);
+                    //主动对鼠标点位置下Item产生进入事件
+                    QEvent * eve = new QEvent(QEvent::GraphicsSceneHoverEnter);
+                    sendEvent(tmpItem,eve);
+                }
             }
         }
 
@@ -215,6 +226,8 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     isDragLine = false;
     insertTmpLine = NULL;
     insertTmpPath = NULL;
+    //【20161025】修复从同一控件多次删除连线后，导致奔溃问题
+    mouseItems.clear();
     QGraphicsScene::mouseReleaseEvent(event);
 }
 
