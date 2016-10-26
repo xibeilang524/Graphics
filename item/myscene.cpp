@@ -506,6 +506,7 @@ void MyScene::addMyItemConnect(MyItem * item)
     connect(item,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
     connect(item,SIGNAL(itemPosChanged(MyItem *)),this,SLOT(showItemPosInfo(MyItem *)));
     connect(item,SIGNAL(itemRotationChanged(MyItem *)),this,SLOT(showItemRotationInfo(MyItem *)));
+    connect(item,SIGNAL(clearOtherSelectedItems(MyItem*)),this,SLOT(respClearOtherSelectedItems(MyItem*)));
 }
 
 //建立MyText的信号槽关系
@@ -674,6 +675,32 @@ void MyScene::resetItemSelection()
     }
     mouseItems.clear();
     update();
+}
+
+//右键菜单时，清除不是当前控件的其它已经选择的控件.确保右键菜单只选中一个控件
+void MyScene::respClearOtherSelectedItems(MyItem * currItem)
+{
+    if(selectedItems().size() > 0)
+    {
+        for(int i = selectedItems().size() -1 ;i>=0;i--)
+        {
+            QGraphicsItem * item = selectedItems().at(i);
+            if(item && TYPE_ID(*item) == TYPE_ID(MyItem))
+            {
+                MyItem * sitem = dynamic_cast<MyItem *>(item);
+                if(sitem && sitem != currItem)
+                {
+                    sitem->setDragLineVisible(false);
+                    sitem->setDragPointVisible(false);
+                    sitem->setSelected(false);
+                }
+            }
+            else
+            {
+                item->setSelected(false);
+            }
+        }
+    }
 }
 
 //清空item，但不清除第一个Item(MyItemInfo)【!!!】

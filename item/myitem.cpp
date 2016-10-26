@@ -488,6 +488,9 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     isPrepareLine = false;
     setSelected(true);
+
+    emit clearOtherSelectedItems(this);
+
     update();
 
     rightMenu->exec(event->screenPos());

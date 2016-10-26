@@ -9,6 +9,8 @@
 #include <QDebug>
 
 #include "../global.h"
+#include "mygraphicsview.h"
+#include "myscene.h"
 
 QDataStream & operator <<(QDataStream &stream,MyTextItem * item)
 {
@@ -95,8 +97,16 @@ void MyTextItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
     if(GlobalWindowState == WINDOW_BUILD_MODEL && menu)
     {
-        setSelected(true);
-        menu->exec(event->screenPos());
+        if(existType == TEXT_CHILD)
+        {
+            MY_ASSERT(this->parentItem())
+            MyGraphicsView::instance()->scene()->sendEvent(this->parentItem(),event);
+        }
+        else if(existType == TEXT_ALONG)
+        {
+            setSelected(true);
+            menu->exec(event->screenPos());
+        }
     }
     else
     {

@@ -52,6 +52,7 @@ signals:
 private slots:
     void respStartSimulate();
     void showSimulateOperate(ProcessUnit * unit);
+    void respItemActivated(QListWidgetItem * current);
     void respItemChanged(QListWidgetItem * current, QListWidgetItem * previous);
     void respItemDoubleClicked(QListWidgetItem * current);
     

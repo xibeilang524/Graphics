@@ -23,6 +23,7 @@
 **20161003:wey:修复添加MyItemInfo，在清空显示导致程序奔溃问题。
 **20161008:wey:修复本地打开后，临时数据未清空问题
 **20161025:wey:修复从同一控件多次删除连线后，导致奔溃问题
+**20161026:wey:添加确保右键菜单只选中一个控件
 *************************************************/
 #ifndef MYSCENE_H
 #define MYSCENE_H
@@ -71,6 +72,7 @@ private slots:
     void itemSelectedChanged();
     void showItemRotationInfo(MyItem *);
     void showItemPosInfo(MyItem *);
+    void respClearOtherSelectedItems(MyItem*);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

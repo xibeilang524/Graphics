@@ -114,6 +114,7 @@ signals:
     void propHasChanged(ItemProperty);
     void itemPosChanged(MyItem  * );
     void itemRotationChanged(MyItem  *);
+    void clearOtherSelectedItems(MyItem  *);
 
 private slots:
     void procResizeItem();

@@ -536,6 +536,7 @@ void MyGraphicsView::rotateItem()
     {
 
     }
+    myScene->update();
 }
 
 //ÖÃ¶¥»òÖÃÓÚµ×²ã

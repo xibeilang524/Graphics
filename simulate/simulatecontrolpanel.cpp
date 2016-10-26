@@ -42,6 +42,7 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
 
     connect(ui->startSimulate,SIGNAL(clicked()),this,SLOT(respStartSimulate()));
     connect(ui->simProcedure,SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem *)),this,SLOT(respItemChanged(QListWidgetItem * , QListWidgetItem *)));
+    connect(ui->simProcedure,SIGNAL(itemClicked (QListWidgetItem*)),this,SLOT(respItemActivated(QListWidgetItem*)));
     connect(ui->simProcedure,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(respItemDoubleClicked(QListWidgetItem *)));
     connect(this,SIGNAL(sendSingleSimulate(ProcessUnit*)),this,SLOT(showSimulateOperate(ProcessUnit*)));
 }
@@ -139,18 +140,25 @@ void SimulateControlPanel::showSimulateOperate(ProcessUnit *unit)
     ui->simProcedure->addItem(item);
 }
 
-//根据选择的item，反向控制控件
-void SimulateControlPanel::respItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+//点击控件时，高亮显示
+void SimulateControlPanel::respItemActivated(QListWidgetItem * current)
 {
     MY_ASSERT(current)
-    MY_ASSERT(previous)
-    MyListWidgetItem * citem = dynamic_cast<MyListWidgetItem *>(current);
-    MyListWidgetItem * pitem = dynamic_cast<MyListWidgetItem *>(previous);
 
+    MyListWidgetItem * citem = dynamic_cast<MyListWidgetItem *>(current);
     if(citem)
     {
         citem->getUnit()->item->hightLightItem(LEVEL_HIGH,true);
     }
+}
+
+//根据选择的item，反向控制控件
+void SimulateControlPanel::respItemChanged(QListWidgetItem *current, QListWidgetItem *previous)
+{
+    Q_UNUSED(current)
+    MY_ASSERT(previous)
+
+    MyListWidgetItem * pitem = dynamic_cast<MyListWidgetItem *>(previous);
 
     if(pitem)
     {
