@@ -2,13 +2,17 @@
 
 #include <QSqlQuery>
 #include <QSqlRecord>
+#include <QSqlError>
 
 #include "../assisant/properties.h"
 #include "../global.h"
+#include "../util.h"
 
 #include <QDebug>
 
 QSqlDatabase sqlDatabase;
+
+#define MY_CHECK_DATABASE {if(!sqlDatabase.isOpen()){GlobalLastSQLError = "数据库连接未打开!" ; return false;}}
 
 SQLProecss* SQLProecss::process = NULL;
 
@@ -47,7 +51,14 @@ bool SQLProecss::initDatabase(const QString dbFileName)
     sqlDatabase.setUserName(prop->getValue("userName"));
     sqlDatabase.setPassword(prop->getValue("password"));
 
-    return sqlDatabase.open();
+    bool isOpen = sqlDatabase.open();
+
+    if(!isOpen)
+    {
+        GlobalLastSQLError = sqlDatabase.lastError().text();
+    }
+
+    return isOpen;
 }
 
 ///*****************************************************
@@ -60,6 +71,8 @@ bool SQLProecss::initDatabase(const QString dbFileName)
 ///****************************************************/
 bool SQLProecss::obtainData(const QString sql, DataList & result)
 {
+    MY_CHECK_DATABASE
+
     QSqlQuery query(sqlDatabase);
 
 //    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
@@ -80,6 +93,10 @@ bool SQLProecss::obtainData(const QString sql, DataList & result)
         }
         return true;
     }
+    else
+    {
+       GlobalLastSQLError = query.lastError().text();
+    }
     return false;
 }
 
@@ -93,6 +110,8 @@ bool SQLProecss::obtainData(const QString sql, DataList & result)
 ///****************************************************/
 int SQLProecss::getSqlDataCount(const QString sql)
 {
+    MY_CHECK_DATABASE
+
     QSqlQuery query(sqlDatabase);
 //    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
 //             <<sql;
@@ -102,6 +121,10 @@ int SQLProecss::getSqlDataCount(const QString sql)
         {
             return query.value(0).toInt();
         }
+    }
+    else
+    {
+        GlobalLastSQLError = query.lastError().text();
     }
     return 0;
 }
@@ -116,6 +139,8 @@ int SQLProecss::getSqlDataCount(const QString sql)
 ///****************************************************/
 bool SQLProecss::insert(const QString &sql, int &lastInserId)
 {
+    MY_CHECK_DATABASE
+
     QSqlQuery query(sqlDatabase);
 //    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
 //             <<sql;
@@ -123,6 +148,10 @@ bool SQLProecss::insert(const QString &sql, int &lastInserId)
     {
         lastInserId = query.lastInsertId().toInt();
         return true;
+    }
+    else
+    {
+        GlobalLastSQLError = query.lastError().text();
     }
     return false;
 }
@@ -137,12 +166,18 @@ bool SQLProecss::insert(const QString &sql, int &lastInserId)
 ///****************************************************/
 bool SQLProecss::execute(const QString sql)
 {
+    MY_CHECK_DATABASE
+
     QSqlQuery query(sqlDatabase);
 //    qDebug() << __FILE__ << __FUNCTION__<<__LINE__<<__DATE__<<__TIME__<<"\n"
 //             <<sql;
     if(query.exec(sql))
     {
         return true;
+    }
+    else
+    {
+        GlobalLastSQLError = query.lastError().text();
     }
     return false;
 }
@@ -168,6 +203,12 @@ bool SQLProecss::commit()
 bool SQLProecss::rollback()
 {
     return sqlDatabase.rollback();
+}
+
+//获取最新的错误信息
+QString SQLProecss::getLastError()
+{
+    return GlobalLastSQLError;
 }
 
 SQLProecss::~SQLProecss()

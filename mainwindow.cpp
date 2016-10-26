@@ -290,9 +290,25 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(closeRightWorkAction,MyPageSwitch::instance(),SLOT(closeRightPage()));
 }
 
+//直接处理，无需再出发KeyPressEvent，否则一个事件会处理两遍
 void MainWindow::keyPress(QKeyEvent *event)
 {
-    keyPressEvent(event);
+//    keyPressEvent(event);
+    //左右切换工作区间
+    if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_Left)
+    {
+        if(GlobalWindowState == WINDOW_BUILD_MODEL)
+        {
+            MyPageSwitch::instance()->switchFrontBack(true);
+        }
+    }
+    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_Right)
+    {
+        if(GlobalWindowState == WINDOW_BUILD_MODEL)
+        {
+            MyPageSwitch::instance()->switchFrontBack(false);
+        }
+    }
 }
 
 void MainWindow::keyPressEvent(QKeyEvent *event)
@@ -354,28 +370,13 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->setChecked(true);
         }
     }
-    //左右切换工作区间
-    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_Left)
-    {
-        if(GlobalWindowState == WINDOW_BUILD_MODEL)
-        {
-            MyPageSwitch::instance()->switchFrontBack(true);
-        }
-    }
-    else if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_Right)
-    {
-        if(GlobalWindowState == WINDOW_BUILD_MODEL)
-        {
-            MyPageSwitch::instance()->switchFrontBack(false);
-        }
-    }
 
     QMainWindow::keyPressEvent(event);
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    int result = QMessageBox::warning(this,"警告","是否退出程序?",QMessageBox::Yes,QMessageBox::No);
+    int result = Util::getWarnChoice("是否退出程序");
 
     if(result == QMessageBox::Yes)
     {
@@ -594,7 +595,7 @@ void MainWindow::fileClear()
 
     if(view->getItemSize() > 1)
     {
-        int result = QMessageBox::warning(this,"警告","是否清空场景的内容?",QMessageBox::Yes,QMessageBox::No);
+        int result = Util::getWarnChoice("是否清空场景的内容?");
         if(result == QMessageBox::Yes)
         {
             view->clearItems();

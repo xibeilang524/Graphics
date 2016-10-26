@@ -10,6 +10,7 @@
 **修改历史:
 **20160709:wey:将访问改成单例模式
 **             提供程序通用的数据库访问操作，其直接与数据装配层进行交互
+**20161026:wey:增加对错误信息的保存和获取
 *************************************************/
 #ifndef SQLPROECSS_H
 #define SQLPROECSS_H
@@ -28,6 +29,8 @@ public:
     bool insert(const QString & sql,int & lastInserId);
     bool execute(const QString sql);
     bool obtainData(const QString sql, DataList & result);
+
+    QString getLastError();
 
     bool transaction();
     bool commit();

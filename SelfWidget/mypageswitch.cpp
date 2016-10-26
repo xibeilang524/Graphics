@@ -144,7 +144,7 @@ void MyPageSwitch::deleteThisPage(QString pageId)
         tipInfo = "是否删除此工作区?";
     }
 
-    int result = QMessageBox::warning(GlobalMainWindow,"警告",tipInfo,QMessageBox::Yes|QMessageBox::No|QMessageBox::Ok,QMessageBox::No);
+    int result = Util::getWarnChoice(tipInfo);
     if(result == QMessageBox::Yes)
     {
         int index = -1;
@@ -212,7 +212,10 @@ void MyPageSwitch::switchFrontBack(bool isFront)
 //关闭当前页
 void MyPageSwitch::closePage()
 {
-    deleteThisPage(selectedPage->id);
+    if(pages.size() > 0)
+    {
+        deleteThisPage(selectedPage->id);
+    }
 }
 
 //关闭左侧所有工作区

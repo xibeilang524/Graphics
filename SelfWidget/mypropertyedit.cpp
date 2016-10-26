@@ -5,6 +5,7 @@
 #include "../modelview/serviceinputtableview.h"
 #include "../modelview/serviceinputmodel.h"
 #include "../sql/serviceinfoprocess.h"
+#include "../util.h"
 
 #include <QHBoxLayout>
 #include <QListView>
@@ -89,7 +90,11 @@ void MyPropertyEdit::initServiceData()
 {
     if(GlobalServiceProperties.size() == 0)
     {
-        ServiceInfoProcess::instance()->getServiceProperty(GlobalServiceProperties);
+       bool flag = ServiceInfoProcess::instance()->getServiceProperty(GlobalServiceProperties);
+       if(!flag)
+       {
+           Util::showWarn(ServiceInfoProcess::instance()->getLastError());
+       }
     }
 
     foreach(ServiceProperty prop,GlobalServiceProperties)

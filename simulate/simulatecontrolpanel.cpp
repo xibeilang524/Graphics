@@ -99,7 +99,7 @@ void SimulateControlPanel::respStartSimulate()
 
         if(currUnit->ptype == PRO_JUDGE)
         {
-            int result = QMessageBox::warning(0,"¾¯¸æ",currUnit->item->getText(),QMessageBox::Yes,QMessageBox::No);
+            int result = Util::getWarnChoice(currUnit->item->getText());
 
             if(result == QMessageBox::Yes)
             {

@@ -18,9 +18,11 @@ class ServiceInfoProcess : public AbstractDataProcess
 {
 public:
     static ServiceInfoProcess * instance();
-    void getServiceInfo(ServiceInfoList & list,const int startIndex = 0,const int perPage = 0);
+    bool getServiceInfo(ServiceInfoList & list,const int startIndex = 0,const int perPage = 0);
 
-    void getServiceProperty(QList<ServiceProperty> & properties);
+    bool getServiceProperty(QList<ServiceProperty> & properties);
+
+    QString getLastError();
 
 private:
     ServiceInfoProcess();

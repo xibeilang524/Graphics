@@ -71,7 +71,10 @@ void ServiceView::beginSearch()
 
     ServiceInfoList list;
     int startIndex = pageBar->getCurrPage()*pageBar->getPerPageShow();
-    ServiceInfoProcess::instance()->getServiceInfo(list,startIndex,pageBar->getPerPageShow());
+    if(!ServiceInfoProcess::instance()->getServiceInfo(list,startIndex,pageBar->getPerPageShow()))
+    {
+        Util::showWarn(ServiceInfoProcess::instance()->getLastError());
+    }
 
     rowIndexs.clear();
 
@@ -128,9 +131,16 @@ void ServiceView::viewDatabaseContent()
 void ServiceView::refreshDatabaseContent()
 {
     GlobalServiceProperties.clear();
-    ServiceInfoProcess::instance()->getServiceProperty(GlobalServiceProperties);
 
-    QMessageBox::information(this,"提示","数据库更新完毕");
+    bool flag = ServiceInfoProcess::instance()->getServiceProperty(GlobalServiceProperties);
+    if(!flag)
+    {
+        Util::showWarn(ServiceInfoProcess::instance()->getLastError());
+    }
+    else
+    {
+        Util::showInfo("数据库更新完毕");
+    }
 }
 
 ServiceView::~ServiceView()

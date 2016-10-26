@@ -4,6 +4,8 @@
 #include <QTextStream>
 #include <QMessageBox>
 
+#include "util.h"
+
 Properties::Properties(QString fileName):
     fileName(fileName)
 {
@@ -15,12 +17,12 @@ void Properties::parseFile()
     QFile file(fileName);
     if(!file.exists())
     {
-        QMessageBox::warning(0,"警告",fileName+" 文件不存在,请重新确认!");
+        Util::showWarn(fileName+" 文件不存在,请重新确认!");
         return;
     }
     if(!file.open(QIODevice::ReadOnly))
     {
-        QMessageBox::warning(0,"警告",fileName+" 文件不能读!");
+        Util::showWarn(fileName+" 文件不能读!");
         return;
     }
     QTextStream stream(&file);

@@ -24,9 +24,9 @@ class SQLDataAdapter
 public:
     static SQLDataAdapter * instance();
 
-    void getServiceData(QString sql,ServiceInfoList &list);
+    bool getServiceData(QString sql,ServiceInfoList &list);
 
-    void getSericeProperties(QString sql,QList<ServiceProperty> &list);
+    bool getSericeProperties(QString sql,QList<ServiceProperty> &list);
 
 private:
     SQLDataAdapter();

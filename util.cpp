@@ -5,8 +5,10 @@
 #include <QTableWidget>
 #include <QUuid>
 
+
 #include "qmath.h"
 #include "global.h"
+#include "mainwindow.h"
 
 #define TABLE_ROW_HEIGHT  30      //表格高度
 
@@ -171,4 +173,30 @@ void Util::loadPixmapByGType(GraphicsType type, QPixmap &pixmap)
         default:
                            break;
     }
+}
+
+//只显示提示信息，无需获取返回值
+void Util::showWarn(QString tipText)
+{
+    QMessageBox::warning(GlobalMainWindow,"警告",tipText,QMessageBox::Yes,QMessageBox::Yes);
+}
+
+//全局显示警告信息
+int Util::getWarnChoice(QString tipText,QMessageBox::StandardButton butt)
+{
+    int result = QMessageBox::warning(GlobalMainWindow,"警告",tipText,QMessageBox::Yes|butt,butt);
+
+    return result;
+}
+
+//只显示提示信息，无需获取返回值
+void Util::showInfo(QString tipText)
+{
+    QMessageBox::information(GlobalMainWindow,"提示",tipText,QMessageBox::Yes,QMessageBox::Yes);
+}
+
+//全局显示信息提示信息
+QMessageBox::StandardButton Util::getInfoChoice(QString tipText,QMessageBox::StandardButton butt)
+{
+    return QMessageBox::information(GlobalMainWindow,"提示",tipText,QMessageBox::Yes|butt,butt);
 }

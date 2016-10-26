@@ -13,6 +13,8 @@ QPointF SceneLastClickPoint;              //sceneÖĞ×îºóÒ»´ÎÊó±êµã»÷µÄÎ»ÖÃ£¬×÷ÎªÕ
 QString SaveFileSuffix;                   //±£´æÎÄ¼şµÄºó×ºÃû
 QString SaveFileHeadFlag;                 //±¨ÎÄÎÄ¼şµÄÎÄ¼şÍ·£¬ÓÃÓÚÅĞ¶ÏËùÑ¡ÔñµÄÎÄ¼şÊÇ·ñÊÇ³ÌĞòÖ§³ÖµÄ¸ñÊ½
 
+QString GlobalLastSQLError;               //Êı¾İ¿â·ÃÎÊ´íÎó£¬±£Áô×îĞÂµÄ´íÎó
+
 WindowState GlobalWindowState;            //È«¾ÖµÄ¹¤×÷Çø¼äÀàĞÍ
 
 int GlobalRotateStep; 		 		 	  //Ğı×ªµ½¶ÔÓ¦½Ç¶È²Å½øĞĞ½Ç¶ÈÇĞ»»

@@ -27,6 +27,7 @@
 #include "myitem.h"
 #include "mynodeport.h"
 #include "rotateline.h"
+#include "draglinepoint.h"
 
 using namespace Graphics;
 

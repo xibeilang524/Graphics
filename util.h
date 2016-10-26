@@ -7,6 +7,7 @@
 **
 **修改历史:
 **20161018:gx:弧度角度互换radinToAngle
+**20161026:wey:调整全局的弹出框
 *************************************************/
 #ifndef UTIL_H
 #define UTIL_H
@@ -14,6 +15,7 @@
 #include <QColor>
 #include <QFont>
 #include <QPixmap>
+#include <QMessageBox>
 
 #include "Header.h"
 
@@ -36,6 +38,11 @@ public:
     static void clearTableData(QTableWidget * table);
     static qreal radinToAngle(const qreal &radin);
     static void loadPixmapByGType(GraphicsType type,QPixmap & pixmap);
+
+    static void showWarn(QString tipText);
+    static int getWarnChoice(QString tipText, QMessageBox::StandardButton butt = QMessageBox::No);
+    static void showInfo(QString tipText);
+    static QMessageBox::StandardButton getInfoChoice(QString tipText,QMessageBox::StandardButton butt = QMessageBox::Yes);
 };
 
 #endif // UTIL_H

@@ -20,10 +20,10 @@ SQLDataAdapter* SQLDataAdapter::instance()
 }
 
 //获取服务的基本信息，并进行装配
-void SQLDataAdapter::getServiceData(QString sql, ServiceInfoList &list)
+bool SQLDataAdapter::getServiceData(QString sql, ServiceInfoList &list)
 {
     DataList dataList;
-    SQLProecss::instance()->obtainData(sql,dataList);
+    bool flag = SQLProecss::instance()->obtainData(sql,dataList);
     foreach (VariantList variant, dataList)
     {
         ServiceInfo  info;
@@ -47,13 +47,14 @@ void SQLDataAdapter::getServiceData(QString sql, ServiceInfoList &list)
         info.auditTime = variant.at(17).toDateTime();
         list.push_back(info);
     }
+    return flag;
 }
 
 //获取所有的属性信息，将结果保存至全局的列表中
-void SQLDataAdapter::getSericeProperties(QString sql, QList<ServiceProperty> &list)
+bool SQLDataAdapter::getSericeProperties(QString sql, QList<ServiceProperty> &list)
 {
     DataList dataList;
-    SQLProecss::instance()->obtainData(sql,dataList);
+    bool flag = SQLProecss::instance()->obtainData(sql,dataList);
     foreach (VariantList variant, dataList)
     {
         ServiceProperty property;
@@ -65,6 +66,7 @@ void SQLDataAdapter::getSericeProperties(QString sql, QList<ServiceProperty> &li
 
         list.append(property);
     }
+    return flag;
 }
 
 SQLDataAdapter::~SQLDataAdapter()
