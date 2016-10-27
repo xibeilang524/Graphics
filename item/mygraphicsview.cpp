@@ -291,6 +291,12 @@ void MyGraphicsView::dragMoveEvent(QDragMoveEvent *event)
     }
 }
 
+/*!
+*【拖入事件】：
+*【1】View用于接收大控件
+*【2】端口控件，view不处理，将事件抛出交由每个控件处理drop
+*
+*/
 void MyGraphicsView::dropEvent(QDropEvent *event)
 {
     MY_ASSERT(myScene)
@@ -302,7 +308,8 @@ void MyGraphicsView::dropEvent(QDropEvent *event)
         int graphicsType;
         stream>>graphicsType;
 
-        if(graphicsType == GRA_LINE || graphicsType == GRA_VECTOR_LINE || graphicsType == GRA_NODE_PORT)
+        if(graphicsType == GRA_LINE || graphicsType == GRA_VECTOR_LINE || graphicsType == GRA_NODE_PORT ||
+                graphicsType == GRA_NODE_HALF_CIRCLE || graphicsType == GRA_NODE_TRIANGLE_IN ||graphicsType == GRA_NODE_TRIANGLE_OUT)
         {
             QGraphicsView::dropEvent(event);
         }
@@ -397,6 +404,7 @@ void MyGraphicsView::copyItem()
             foreach (MyNodePort * node, item->getNodePorts())
             {
                 NodePortProperty  props;
+                props.portType = node->getType();
                 props.direct = node->getDragDirect();
                 props.scaleFactor = node->getScaleFactor();
                 cutTmpInfo.nodeProperties.push_back(props);

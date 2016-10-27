@@ -149,7 +149,7 @@ private:
     void updateDragPointCursor();
     qreal getPointToRectMinDistance(QRectF rect,QPointF point);
     bool getRangeValue(qreal maxValue, qreal minValue, qreal & currValue, DragRange &range);
-    MyNodePort * createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor);
+    MyNodePort * createProp(GraphicsType type, const QPointF pos, const DragDirect direct, const qreal scaleFactor);
     DragDirect getDropDirect(const QPointF &currPoint);
     qreal getLoopMaxSidLength(qreal width, qreal height);
     void setInitalPolygon(QRectF boundRect, qreal tx, qreal ty, qreal tw, qreal th);
@@ -190,6 +190,8 @@ private:
 
     bool isSimulateHigh;               //是否为推演状态下的高亮显示
     HightLightLevel  lightLevel;       //当前属于哪种显示
+
+    GraphicsType dragGraphicsType;     //当前拖入的端口类型，拖拽结束后置为GRA_NONE
 };
 
 #endif // MYITEM_H

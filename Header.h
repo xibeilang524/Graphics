@@ -15,7 +15,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#define M_VERTION 0x0004     //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
+#define M_VERTION 0x0005        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
 
 #define PI 3.141592653
 #define ICON_WIDTH  60          //拖拽图标的宽高
@@ -111,7 +111,10 @@ enum GraphicsType
     GRA_DRAG_POINT,      //控件拖拽点
     GRA_DRAG_LING,       //控件线段拖拽点
     GRA_ROTATE_POINT,    //控件旋转点
-    GRA_ITEM_INFO        //控件显示信息
+    GRA_ITEM_INFO,       //控件显示信息
+    GRA_NODE_HALF_CIRCLE,  //D端口
+    GRA_NODE_TRIANGLE_IN ,    //三角输入端口
+    GRA_NODE_TRIANGLE_OUT     //三角输出端口
 };
 
 //拖入端口的方向
@@ -251,6 +254,7 @@ struct NodePortProperty
     friend QDataStream & operator <<(QDataStream &,NodePortProperty & item);
     friend QDataStream & operator >>(QDataStream &,NodePortProperty & item);
 
+    GraphicsType portType;      //节点类型
     QBrush itemBrush;           //填充颜色
     DragDirect direct;          //保存的方向
     qreal scaleFactor;          //拖入的位置相当于当前一边所在的比例

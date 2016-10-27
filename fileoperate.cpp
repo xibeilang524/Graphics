@@ -121,9 +121,11 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
 
         GraphicsType gtype = (GraphicsType)type;
 
-        if(gtype == GRA_NODE_PORT)
+        if(gtype == GRA_NODE_PORT ||gtype == GRA_NODE_HALF_CIRCLE
+                ||gtype == GRA_NODE_TRIANGLE_OUT ||gtype == GRA_NODE_TRIANGLE_IN)
         {
             NodePortProperty nodeProperty;
+            nodeProperty.portType = (GraphicsType)type;
             stream>>nodeProperty;
             localNodePorts.push_back(nodeProperty);
         }
@@ -154,7 +156,6 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
             {
                 if(items.at(j)->itemProperty.startItemID == localNodePorts.at(i).parentItemID)
                 {
-
                     NodePortProperty prop = localNodePorts.at(i);
                     items.at(j)->nodeProperties.push_back(prop);
                 }

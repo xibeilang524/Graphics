@@ -13,6 +13,7 @@
 **             增加连线功能
 **20160920:wey:增加本地保存
 **20160930:wey:调整父类QGraphicsPolygonItem
+**20161027:wey:增加三角和D端口
 *************************************************/
 #ifndef MYNODEPORT_H
 #define MYNODEPORT_H
@@ -96,7 +97,6 @@ private:
     QMenu * nodePortRightMenu;         //端口右键菜单，支持删除
 
     QList<MyArrow *> arrows;           //保存添加的箭头
-
 };
 
 #endif // MYNODEPORT_H

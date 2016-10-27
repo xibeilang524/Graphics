@@ -511,14 +511,18 @@ void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
 
         int graphicsType;
         stream>>graphicsType;
-        if(graphicsType == GRA_NODE_PORT)
+
+        if(graphicsType == GRA_NODE_PORT || graphicsType == GRA_NODE_TRIANGLE_OUT || graphicsType == GRA_NODE_HALF_CIRCLE
+                || graphicsType == GRA_NODE_TRIANGLE_OUT || graphicsType == GRA_NODE_TRIANGLE_IN)
         {
+            dragGraphicsType = (GraphicsType)graphicsType;
             setSelected(true);
             event->acceptProposedAction();
             isDragging = false;
         }
         else
         {
+            dragGraphicsType = GRA_NONE;
             isDragging = false;
             event->ignore();
         }
@@ -659,7 +663,7 @@ void MyItem::dropEvent(QGraphicsSceneDragDropEvent *event)
                  break;
         }
 
-        createProp(itemPos,direct,scaleFactor);
+        createProp(dragGraphicsType,itemPos,direct,scaleFactor);
 
         setSelected(false);
 
@@ -731,12 +735,12 @@ MyNodePort * MyItem::addNodePort(const NodePortProperty &prop)
         default:
              break;
     }
-    return createProp(itemPos,prop.direct,prop.scaleFactor);
+    return createProp(prop.portType,itemPos,prop.direct,prop.scaleFactor);
 }
 
-MyNodePort * MyItem::createProp(const QPointF pos,const DragDirect direct,const qreal scaleFactor)
+MyNodePort * MyItem::createProp(GraphicsType  type, const QPointF pos,const DragDirect direct,const qreal scaleFactor)
 {
-    MyNodePort * port = new MyNodePort(GRA_NODE_PORT,this);
+    MyNodePort * port = new MyNodePort(type,this);
     port->setPos(pos);
     port->setDragDirect(direct);
     port->setScaleFactor(scaleFactor);

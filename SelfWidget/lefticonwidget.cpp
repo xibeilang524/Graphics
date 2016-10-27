@@ -34,7 +34,7 @@ void LeftIconWidget::initWidget()
     initListItems();
 
     toolBox->addItem(polygonWidget,"流程图");
-    toolBox->addItem(nodeWidget,"Nodes");
+    toolBox->addItem(nodeWidget,"端口");
 
     mainLayout->addWidget(toolBox);
 
@@ -94,9 +94,21 @@ void LeftIconWidget::initListItems()
     polygonWidget->addItem(text);
 
     //插入节点
-    MyListItem * nodePort = ListItemManager::instance()->createListItem(Constants::NODE_PORT_ID,QIcon(":/images/nodePort.png"),"端口",nodeWidget);
+    MyListItem * nodePort = ListItemManager::instance()->createListItem(Constants::NODE_PORT_ID,QIcon(":/images/nodePort.png"),"方形端口",nodeWidget);
     nodePort->setData(Qt::UserRole,(int)GRA_NODE_PORT);
     nodeWidget->addItem(nodePort);
+
+    MyListItem * nodeTriangleInPort = ListItemManager::instance()->createListItem(Constants::NODE_TRIANGLE_IN_ID,QIcon(":/images/nodeTriangle.png"),"三角输出端口",nodeWidget);
+    nodeTriangleInPort->setData(Qt::UserRole,(int)GRA_NODE_TRIANGLE_OUT);
+    nodeWidget->addItem(nodeTriangleInPort);
+
+    MyListItem * nodeTriangleOutPort = ListItemManager::instance()->createListItem(Constants::NODE_TRIANGLE_OUT_ID,QIcon(":/images/nodeTriangle.png"),"三角输入端口",nodeWidget);
+    nodeTriangleOutPort->setData(Qt::UserRole,(int)GRA_NODE_TRIANGLE_IN);
+    nodeWidget->addItem(nodeTriangleOutPort);
+
+    MyListItem * nodeHalfCircle = ListItemManager::instance()->createListItem(Constants::NODE_HALF_CIRCLE_ID,QIcon(":/images/nodeHalfCircle.png"),"D端口",nodeWidget);
+    nodeHalfCircle->setData(Qt::UserRole,(int)GRA_NODE_HALF_CIRCLE);
+    nodeWidget->addItem(nodeHalfCircle);
 }
 
 LeftIconWidget::~LeftIconWidget()

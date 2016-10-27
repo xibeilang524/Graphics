@@ -14,7 +14,7 @@ using namespace Graphics;
 
 QDataStream & operator <<(QDataStream & dataStream,NodePortProperty & prop)
 {
-    dataStream<<prop.itemBrush<<prop.direct
+    dataStream<<prop.portType<<prop.itemBrush<<prop.direct
              <<prop.scaleFactor<<prop.startItemID<<prop.parentItemID;
 
     return dataStream;
@@ -23,10 +23,12 @@ QDataStream & operator <<(QDataStream & dataStream,NodePortProperty & prop)
 QDataStream & operator >>(QDataStream & dataStream,NodePortProperty & prop)
 {
     int direct;
+    int type;
 
-    dataStream>>prop.itemBrush>>direct
+    dataStream>>type>>prop.itemBrush>>direct
              >>prop.scaleFactor>>prop.startItemID>>prop.parentItemID;
 
+    prop.portType = (GraphicsType)type;
     prop.direct = (DragDirect)direct;
 
     return dataStream;
@@ -58,7 +60,8 @@ MyNodePort::MyNodePort(GraphicsType type, MyItem *parentItem, QObject *parent1):
     setFlag(QGraphicsItem::ItemIsSelectable,parentItem->isMoveable());
 
     radius = 8;
-    currItemType = GRA_NODE_PORT;
+    currItemType = type;
+    nodeProperty.portType = type;
     nextDirect = DRAG_NONE;
     arrivalLimitRang = false;
 
@@ -66,11 +69,6 @@ MyNodePort::MyNodePort(GraphicsType type, MyItem *parentItem, QObject *parent1):
 
     prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);
-
-    itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
-             <<QPointF(radius,radius)<<QPointF(-radius,radius);
-
-    setPolygon(itemPolygon);
 
     initNodePortRightMenu();
     connect(this,SIGNAL(deletePort(MyNodePort*)),parentItem,SLOT(procDeleteNodePort(MyNodePort*)));
@@ -83,6 +81,109 @@ MyNodePort::MyNodePort(GraphicsType type, MyItem *parentItem, QObject *parent1):
 void MyNodePort::setDragDirect(DragDirect direct)
 {
     nodeProperty.direct = direct;
+    prepareGeometryChange();
+
+    itemPolygon.clear();
+    if(currItemType == GRA_NODE_PORT)
+    {
+        itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
+                 <<QPointF(radius,radius)<<QPointF(-radius,radius);
+    }
+    else
+    {
+        switch(direct)
+        {
+            case DRAG_LEFT:
+                            {
+                                if(currItemType == GRA_NODE_HALF_CIRCLE)
+                                {
+                                    QPainterPath path;
+                                    path.moveTo(radius,-radius);
+                                    path.lineTo(radius,radius);
+                                    path.arcTo(QRectF(-radius,-radius,2*radius,2*radius),-90,-180);
+                                    itemPolygon = path.toFillPolygon();
+                                }
+                                else if(currItemType == GRA_NODE_TRIANGLE_OUT)
+                                {
+                                    itemPolygon<<QPointF(radius,-radius)<<QPointF(-radius,0)
+                                                <<QPointF(radius,radius);
+                                }
+                                else if(currItemType == GRA_NODE_TRIANGLE_IN)
+                                {
+                                    itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,0)
+                                                <<QPointF(-radius,radius);
+                                }
+                                break;
+                            }
+            case DRAG_TOP:
+                            {
+                                if(currItemType == GRA_NODE_HALF_CIRCLE)
+                                {
+                                    QPainterPath path;
+                                    path.moveTo(radius,radius);
+                                    path.lineTo(-radius,radius);
+                                    path.arcTo(QRectF(-radius,-radius,2*radius,2*radius),180,-180);
+                                    itemPolygon = path.toFillPolygon();
+                                }
+                                else if(currItemType == GRA_NODE_TRIANGLE_OUT)
+                                {
+                                    itemPolygon<<QPointF(radius,radius)<<QPointF(0,-radius)
+                                                <<QPointF(-radius,radius);
+                                }
+                                else if(currItemType == GRA_NODE_TRIANGLE_IN)
+                                {
+                                    itemPolygon<<QPointF(-radius,-radius)<<QPointF(0,radius)
+                                                <<QPointF(radius,-radius);
+                                }
+                                break;
+                            }
+            case DRAG_RIGHT:
+                            {
+                                if(currItemType == GRA_NODE_HALF_CIRCLE)
+                                {
+                                    QPainterPath path;
+                                    path.moveTo(-radius,-radius);
+                                    path.lineTo(-radius,radius);
+                                    path.arcTo(QRectF(-radius,-radius,2*radius,2*radius),-90,180);
+                                    itemPolygon = path.toFillPolygon();
+                                }
+                                else if(currItemType == GRA_NODE_TRIANGLE_OUT)
+                                {
+                                    itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,0)
+                                                <<QPointF(-radius,radius);
+                                }
+                                else if(currItemType == GRA_NODE_TRIANGLE_IN)
+                                {
+                                    itemPolygon<<QPointF(radius,-radius)<<QPointF(-radius,0)
+                                                <<QPointF(radius,radius);
+                                }
+                                break;
+                            }
+            case DRAG_BOTTOM:
+                            {
+                                if(currItemType == GRA_NODE_HALF_CIRCLE)
+                                {
+                                    QPainterPath path;
+                                    path.moveTo(-radius,-radius);
+                                    path.lineTo(radius,-radius);
+                                    path.arcTo(QRectF(-radius,-radius,2*radius,2*radius),0,-180);
+                                    itemPolygon = path.toFillPolygon();
+                                }
+                                else if(currItemType == GRA_NODE_TRIANGLE_OUT)
+                                {
+                                    itemPolygon<<QPointF(-radius,-radius)<<QPointF(0,radius)
+                                                <<QPointF(radius,-radius);
+                                }
+                                else if(currItemType == GRA_NODE_TRIANGLE_IN)
+                                {
+                                    itemPolygon<<QPointF(-radius,radius)<<QPointF(0,-radius)
+                                                <<QPointF(radius,radius);
+                                }
+                                break;
+                            }
+        }
+    }
+    setPolygon(itemPolygon);
 }
 
 //µ½´ï¹Õµã

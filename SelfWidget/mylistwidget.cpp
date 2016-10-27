@@ -3,6 +3,7 @@
 #include <QMimeData>
 #include <QDrag>
 #include <QMouseEvent>
+#include <QDebug>
 
 #include "../manager/listitemmanager.h"
 #include "../Header.h"
@@ -51,7 +52,7 @@ void MyListWidget::mouseMoveEvent(QMouseEvent *event)
         drag->setHotSpot(QPoint(pixmap.width()/2, pixmap.height()/2));
 
         drag->setPixmap(pixmap);
-        if (drag->exec(Qt::MoveAction) == Qt::MoveAction)
+        if(drag->exec(Qt::MoveAction) == Qt::MoveAction)
         {
 
         }

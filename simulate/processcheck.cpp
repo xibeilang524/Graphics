@@ -78,6 +78,8 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
         }
         resortedItems.append(currItem);
 
+        qDebug()<<currItem->getText();
+
         QList<MyArrow *> arrows = currItem->getArrows();
 
         //¿ªÊ¼µã

@@ -155,6 +155,15 @@ void Util::loadPixmapByGType(GraphicsType type, QPixmap &pixmap)
         case GRA_NODE_PORT:
                            pixmap.load(":/images/nodePort.png");
                            break;
+        case GRA_NODE_TRIANGLE_OUT:
+                           pixmap.load(":/images/nodeTriangle.png");
+                           break;
+        case GRA_NODE_TRIANGLE_IN:
+                           pixmap.load(":/images/nodeTriangle.png");
+                           break;
+        case GRA_NODE_HALF_CIRCLE:
+                           pixmap.load(":/images/nodeHalfCircle.png");
+                           break;
         case GRA_PARALLELOGRAM:
                            pixmap.load(":/images/parallelogram.png");
                            break;
