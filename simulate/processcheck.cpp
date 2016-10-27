@@ -78,8 +78,6 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
         }
         resortedItems.append(currItem);
 
-        qDebug()<<currItem->getText();
-
         QList<MyArrow *> arrows = currItem->getArrows();
 
         //开始点
@@ -139,28 +137,38 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
 
             if(polygons.size() > 0)
             {
-                PolygonDesc * topDesc = polygons.at(polygons.size() -1);
                 //左侧未处理完成，标记左侧处理完成，然后将处理权交给右控件
-                if(topDesc->isProcLeft && !topDesc->isLeftOver)
+                while(polygons.size() > 0 )
                 {
-                    topDesc->isLeftOver = true;
-                    topDesc->isProcLeft = false;
-                    topDesc->isProcRight = true;
+                    PolygonDesc * topDesc = polygons.at(polygons.size() -1);
+                    PolygonDesc * parent = NULL;
+                    //设置自身的状态
+                    if(topDesc->isProcLeft && !topDesc->isLeftOver)
+                    {
+                        topDesc->isLeftOver = true;
+                        topDesc->isProcLeft = false;
+                        topDesc->isProcRight = true;
 
-                    currItem = topDesc->rightItem;
-                    frontUnit = topDesc->processUnit;
-                }
-                //右侧未处理完，标记右控件处理完成
-                else if(topDesc->isProcRight && !topDesc->isRightOver)
-                {
-                    topDesc->isRightOver = true;
-                    topDesc->isProcRight = false;
-                }
+                        currItem = topDesc->rightItem;
+                        frontUnit = topDesc->processUnit;
 
-                //左右均处理完,如果有父类，则将处理权交给父类，并且将自己从栈中移除
-                if(topDesc->isLeftOver && topDesc->isRightOver)
-                {
-                    PolygonDesc * parent = topDesc->parent;
+                        break;
+                    }
+                    //右侧未处理完，标记右控件处理完成
+                    else if(topDesc->isProcRight && !topDesc->isRightOver)
+                    {
+                        topDesc->isRightOver = true;
+                        topDesc->isProcRight = false;
+                    }
+
+                    if(topDesc->isLeftOver && topDesc->isLeftOver)
+                    {
+                        parent = topDesc->parent;
+                        delete topDesc;
+                        polygons.pop();             //弹出自身
+                    }
+
+                    //设置父控件的状态
                     if(parent && !parent->isLeftOver)
                     {
                         parent->isProcLeft = false;
@@ -170,23 +178,19 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                         currItem = parent->rightItem;
 
                         frontUnit = parent->processUnit;
+                        break;
                     }
                     else if(parent && !parent->isRightOver)
                     {
                         parent->isProcRight = false;
                         parent->isRightOver = true;
                     }
-                    delete topDesc;
-                    polygons.pop();
+                }
 
-                    //如果父类左右均处理完后，整个流程结束
-                    if(parent && parent->isLeftOver && parent->isRightOver)
-                    {
-                        delete parent;
-                        isAtEnd = true;
-                        procUnits.push_back(endUnit);
-                        polygons.pop();
-                    }
+                if(polygons.size() == 0)
+                {
+                    isAtEnd = true;
+                    procUnits.push_back(endUnit);
                 }
             }
             else
