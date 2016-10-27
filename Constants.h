@@ -49,6 +49,7 @@ const char NODE_PORT_ID[] = "Constants.NodePort";
 const char NODE_TRIANGLE_IN_ID[] = "Constants.NodeTriangleIn";
 const char NODE_TRIANGLE_OUT_ID[] = "Constants.NodeTriangleOut";
 const char NODE_HALF_CIRCLE_ID[] = "Constants.NodeHalfCricle";
+const char NODE_CIRCLE_ID[] = "Constants.NodeCircle";
 const char ANNOTATION_ID[] = "Constants.Annotation";
 const char PARALLEL_ID[] = "Constants.Parallel";
 const char LOOP_DOWN_ID[] = "Constants.LoopDown";

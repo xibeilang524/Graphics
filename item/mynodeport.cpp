@@ -89,6 +89,12 @@ void MyNodePort::setDragDirect(DragDirect direct)
         itemPolygon<<QPointF(-radius,-radius)<<QPointF(radius,-radius)
                  <<QPointF(radius,radius)<<QPointF(-radius,radius);
     }
+    else if(currItemType == GRA_NODE_CIRCLE)
+    {
+        QPainterPath path;
+        path.addEllipse(QRectF(-radius,-radius,2*radius,2*radius));
+        itemPolygon = path.toFillPolygon();
+    }
     else
     {
         switch(direct)

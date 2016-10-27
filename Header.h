@@ -114,7 +114,8 @@ enum GraphicsType
     GRA_ITEM_INFO,       //控件显示信息
     GRA_NODE_HALF_CIRCLE,  //D端口
     GRA_NODE_TRIANGLE_IN ,    //三角输入端口
-    GRA_NODE_TRIANGLE_OUT     //三角输出端口
+    GRA_NODE_TRIANGLE_OUT,    //三角输出端口
+    GRA_NODE_CIRCLE           //圆输出端口
 };
 
 //拖入端口的方向

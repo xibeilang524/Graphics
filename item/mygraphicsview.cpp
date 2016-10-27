@@ -309,7 +309,8 @@ void MyGraphicsView::dropEvent(QDropEvent *event)
         stream>>graphicsType;
 
         if(graphicsType == GRA_LINE || graphicsType == GRA_VECTOR_LINE || graphicsType == GRA_NODE_PORT ||
-                graphicsType == GRA_NODE_HALF_CIRCLE || graphicsType == GRA_NODE_TRIANGLE_IN ||graphicsType == GRA_NODE_TRIANGLE_OUT)
+                graphicsType == GRA_NODE_HALF_CIRCLE || graphicsType == GRA_NODE_TRIANGLE_IN ||graphicsType == GRA_NODE_TRIANGLE_OUT
+                ||graphicsType == GRA_NODE_CIRCLE)
         {
             QGraphicsView::dropEvent(event);
         }

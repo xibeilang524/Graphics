@@ -569,11 +569,11 @@ void MainWindow::fileOpen()
         ReturnType returnType = FileOperate::instance()->openFile(openFileName,cutInfos);
         if(returnType == FILE_ILLEGAL)
         {
-            respShowStatusInfo("文件格式不符，请重新选择！");
+            Util::showWarn("文件格式不符，请重新选择！");
         }
         else if(returnType == FILE_VERSION)
         {
-            respShowStatusInfo("所选文件与当前软件版本不一致!");
+            Util::showWarn("所选文件与当前软件版本不一致!");
         }
         else if(returnType == RETURN_SUCCESS)
         {
