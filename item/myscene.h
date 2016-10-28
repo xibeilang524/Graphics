@@ -32,7 +32,6 @@
 
 #include "../Header.h"
 
-class QMenu;
 class MyTextItem;
 class MyItem;
 class MyPathItem;
@@ -46,7 +45,7 @@ class MyScene : public QGraphicsScene
 {
     Q_OBJECT
 public:
-    MyScene(QMenu * menu,QObject * parent = 0 );
+    MyScene(QObject * parent = 0 );
     void addItem(QGraphicsItem *item);
     void addItem(CutInfo cutInfo,bool isCopy = false);
     void addItem(QList<CutInfo *> & cutInfos);
@@ -89,8 +88,6 @@ private:
     MyArrow *createArrow(LineType type, MyNodeLine * startNode,MyNodeLine * endNode);
     QRectF getHorizonalRoundedRect(MyItem *item);
     void resetItemSelection();
-
-    QMenu * rightMenu;
 
     QGraphicsLineItem * insertTmpLine;
     MyPathItem * insertTmpPath;

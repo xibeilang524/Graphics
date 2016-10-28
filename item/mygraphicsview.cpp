@@ -20,6 +20,7 @@
 #include "../mainwindow.h"
 #include "../manager/actionmanager.h"
 #include "../manager/mylinecombobox.h"
+#include "../manager/menumanager.h"
 #include "../Constants.h"
 #include "../fileoperate.h"
 #include "mytextitem.h"
@@ -64,15 +65,14 @@ MyScene * MyGraphicsView::scene()
 void MyGraphicsView::initView()
 {
     SceneWidth = SceneHeight = 5000;
-
-    rightMenu = new QMenu;
-    viewRightMenu = new QMenu;
+    MenuManager::instance()->createMenu(Constants::MENU_ITEM_RIGHT_MENU);
+    MenuManager::instance()->createMenu(Constants::MENU_GRAPHICS_VIEW);
 }
 
 //创建新的scene
 MyScene * MyGraphicsView::addScene(QString id)
 {
-    MyScene  * tmpScene = new MyScene(rightMenu);
+    MyScene  * tmpScene = new MyScene();
     tmpScene->setSceneRect(0,0,SceneWidth,SceneHeight);
     tmpScene->setId(id);
 
@@ -101,6 +101,8 @@ void MyGraphicsView::showScene(MyScene *scene)
 //初始化右键菜单
 void MyGraphicsView::addContextMenuItem()
 {
+    QMenu * rightMenu = MenuManager::instance()->menu(Constants::MENU_ITEM_RIGHT_MENU);
+
     rightMenu->clear();
     if(GlobalWindowState == WINDOW_BUILD_MODEL)
     {
@@ -129,6 +131,8 @@ void MyGraphicsView::addContextMenuItem()
 //设置视图的右键菜单
 void MyGraphicsView::addViewContextMenu()
 {
+    QMenu * viewRightMenu = MenuManager::instance()->menu(Constants::MENU_GRAPHICS_VIEW);
+
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::UNDO_ID));
     viewRightMenu->addAction(ActionManager::instance()->action(Constants::REDO_ID));
     viewRightMenu->addSeparator();
@@ -251,7 +255,7 @@ void MyGraphicsView::contextMenuEvent(QContextMenuEvent *event)
 
     if(curItemSize == 0)
     {
-        viewRightMenu->exec(mapToGlobal(event->pos()));
+        MenuManager::instance()->menu(Constants::MENU_GRAPHICS_VIEW)->exec(mapToGlobal(event->pos()));
     }
 }
 
@@ -405,6 +409,7 @@ void MyGraphicsView::copyItem()
             foreach (MyNodePort * node, item->getNodePorts())
             {
                 NodePortProperty  props;
+                props.content = node->getText();
                 props.portType = node->getType();
                 props.direct = node->getDragDirect();
                 props.scaleFactor = node->getScaleFactor();
@@ -956,6 +961,17 @@ void MyGraphicsView::editTextItem()
         else if(itemName == TYPE_ID(MyArrow))
         {
             MyArrow * item = dynamic_cast<MyArrow*>(selectedItems.first());
+
+            MyTextInput textInput(this);
+
+            textInput.setTex(item->getText());
+            textInput.exec();
+
+            item->setText(textInput.getText());
+        }
+        else if(itemName == TYPE_ID(MyNodePort))
+        {
+            MyNodePort * item = dynamic_cast<MyNodePort*>(selectedItems.first());
 
             MyTextInput textInput(this);
 

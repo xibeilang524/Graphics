@@ -106,12 +106,6 @@ private:
     QToolBar * sceneBar;
     QToolBar * databaseBar;
 
-    QMenu * fileMenu;
-    QMenu * editMenu;
-    QMenu * itemMenu;
-    QMenu * widgetMenu;
-    QMenu * helpMenu;
-
     CutInfo cutTmpInfo;               //±£¥ÊºÙ«––≈œ¢
 };
 

@@ -9,6 +9,7 @@
 
 #include "../manager/mypageitem.h"
 #include "../manager/actionmanager.h"
+#include "../manager/menumanager.h"
 #include "../util.h"
 #include "../item/myscene.h"
 #include "../item/mygraphicsview.h"
@@ -27,7 +28,6 @@ MyPageSwitch::MyPageSwitch(QWidget *parent) :
 
     pagePosition = 0;
     selectedPage = NULL;
-    rightMenu = NULL;
     initWidget();
 }
 
@@ -48,15 +48,11 @@ void MyPageSwitch::initWidget()
 
 void MyPageSwitch::addSwitchContextMenu()
 {
-    if(!rightMenu)
-    {
-        rightMenu = new QMenu;
-
-        rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_WORKSPACE));
-        rightMenu->addAction(ActionManager::instance()->action(Constants::SAVE_WORKSPACE));
-        rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_LEFT_WORKSPACE));
-        rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_RIGHT_WORKSPACE));
-    }
+    MyMenu * rightMenu = MenuManager::instance()->createMenu(Constants::MENU_MYPAGE_SWITCH);
+    rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_WORKSPACE));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::SAVE_WORKSPACE));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_LEFT_WORKSPACE));
+    rightMenu->addAction(ActionManager::instance()->action(Constants::CLOSE_RIGHT_WORKSPACE));
 }
 
 //Ìí¼ÓÒ³Ãæ
@@ -64,7 +60,7 @@ void MyPageSwitch::addPage()
 {
     QString id = Util::getUUID();
 
-    MyPageItem  * item = PageManager::instance()->addPageItem(rightMenu);
+    MyPageItem  * item = PageManager::instance()->addPageItem();
     connect(item,SIGNAL(switchPage(QString)),this,SLOT(switchToPage(QString)));
     connect(item,SIGNAL(deletePage(QString)),this,SLOT(deleteThisPage(QString)));
     item->setId(id);

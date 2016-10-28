@@ -10,9 +10,10 @@
 #include <QDebug>
 
 #include "../SelfWidget/mypageswitch.h"
+#include "../manager/menumanager.h"
 
-MyPageItem::MyPageItem(QMenu *menu, QWidget *parent) :
-    rightMenu(menu),
+
+MyPageItem::MyPageItem(QWidget *parent) :
     QWidget(parent)
 {
     initWidget();
@@ -85,7 +86,7 @@ void MyPageItem::mousePressEvent(QMouseEvent *)
 
 void MyPageItem::contextMenuEvent(QContextMenuEvent *)
 {
-    rightMenu->exec(QCursor::pos());
+    MenuManager::instance()->menu(Constants::MENU_MYPAGE_SWITCH)->exec(QCursor::pos());
 }
 
 PageManager * PageManager::manager = NULL;
@@ -104,8 +105,8 @@ PageManager * PageManager::instance()
     return manager;
 }
 
-MyPageItem * PageManager::addPageItem(QMenu * menu)
+MyPageItem * PageManager::addPageItem()
 {
-    MyPageItem * item = new MyPageItem(menu,MyPageSwitch::instance());
+    MyPageItem * item = new MyPageItem(MyPageSwitch::instance());
     return item;
 }

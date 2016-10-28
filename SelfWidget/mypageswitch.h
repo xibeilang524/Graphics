@@ -21,7 +21,6 @@ class QPushButton;
 class QHBoxLayout;
 class MyScene;
 class MyPageItem;
-class QMenu;
 class QAction;
 
 class MyPageSwitch : public QWidget
@@ -74,9 +73,6 @@ private:
     int pagePosition;                     //“≥√ÊŒª÷√
     PageMapping * selectedPage;
     bool isFirstView;
-
-    QMenu * rightMenu;
-
 };
 
 #endif // MYPAGESWITCH_H

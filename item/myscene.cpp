@@ -17,8 +17,7 @@
 #include "draglinepoint.h"
 #include "../util.h"
 
-MyScene::MyScene(QMenu *menu, QObject * parent):
-    rightMenu(menu),
+MyScene::MyScene(QObject * parent):
     QGraphicsScene(parent)
 {
     CurrAddGraType =  GRA_NONE;
@@ -69,7 +68,7 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
         }
         else if(CurrAddGraType == GRA_TEXT)
         {
-            MyTextItem  * item = new MyTextItem(CurrAddGraType,rightMenu);
+            MyTextItem  * item = new MyTextItem(CurrAddGraType);
             connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
 //            connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
@@ -275,7 +274,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
 {
     if(cutInfo.graphicsType == GRA_TEXT)
     {
-        MyTextItem  * item = new MyTextItem(cutInfo.graphicsType,rightMenu);
+        MyTextItem  * item = new MyTextItem(cutInfo.graphicsType);
         addMyTextConnect(item);
 //        connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
@@ -303,7 +302,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
     }
     else if(cutInfo.graphicsType != GRA_NONE && cutInfo.graphicsType != GRA_LINE)
     {
-        MyItem * item = new MyItem(cutInfo.graphicsType,rightMenu,this);
+        MyItem * item = new MyItem(cutInfo.graphicsType,this);
         addMyItemConnect(item);
 
         if(!isLocalFileOpened)
@@ -475,7 +474,7 @@ void MyScene::addItem(GraphicsType type, QPointF pos)
 {
     if(type == GRA_TEXT)
     {
-        MyTextItem  * item = new MyTextItem(type,rightMenu);
+        MyTextItem  * item = new MyTextItem(type);
         if(!isLocalFileOpened)
         {
             item->setZValue(Util::getGlobalZValue());
@@ -487,7 +486,7 @@ void MyScene::addItem(GraphicsType type, QPointF pos)
     }
     else
     {
-        MyItem * myItem = new MyItem(type,rightMenu,this);
+        MyItem * myItem = new MyItem(type,this);
         if(!isLocalFileOpened)
         {
             myItem->setZValue(Util::getGlobalZValue());

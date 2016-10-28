@@ -14,6 +14,7 @@
 #include <QMessageBox>
 
 #include "./manager/actionmanager.h"
+#include "./manager/menumanager.h"
 #include "./item/myscene.h"
 #include "./item/mygraphicsview.h"
 #include "./SelfWidget/myslider.h"
@@ -99,7 +100,9 @@ void MainWindow::createActionAndMenus()
     exitAction->setShortcut(QKeySequence("Ctrl+Q"));
     ActionManager::instance()->registerAction(exitAction,this,SLOT(close()));
 
-    fileMenu = menuBar()->addMenu("文件(&F)");
+    MyMenu * fileMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_FILE_MENU,QString("文件(&F)"));
+    menuBar()->addMenu(fileMenu);
+
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
@@ -165,7 +168,9 @@ void MainWindow::createActionAndMenus()
     propertyEditAction->setShortcut(QKeySequence("Ctrl+E"));
     ActionManager::instance()->registerAction(propertyEditAction,MyGraphicsView::instance(),SLOT(editPropertyItem()));
 
-    editMenu = menuBar()->addMenu("编辑(&E)");
+    MyMenu * editMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_EDIT_MENU,QString("编辑(&E)"));
+    menuBar()->addMenu(editMenu);
+
     editMenu->addAction(editTextAction);
     editMenu->addSeparator();
     editMenu->addAction(undoAction);
@@ -211,7 +216,9 @@ void MainWindow::createActionAndMenus()
     itemGroup->addAction(lineAction);
     itemGroup->addAction(vectorLineAction);
 
-    itemMenu = menuBar()->addMenu("类型(&I)");
+    MyMenu * itemMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_ITEM_MENU,QString("类型(&I)"));
+    menuBar()->addMenu(itemMenu);
+
     itemMenu->addAction(arrowAction);
     itemMenu->addAction(textAction);
     itemMenu->addAction(lineAction);
@@ -229,7 +236,6 @@ void MainWindow::createActionAndMenus()
     workModelGroup->addAction(buildModelAction);
     workModelGroup->addAction(simulateAction);
 
-    widgetMenu = menuBar()->addMenu("窗口(&W)");
     //【窗口菜单栏】
     MyAction * fullScreenAction = ActionManager::instance()->crateAction(Constants::FULL_SCREEN_ID,QIcon(":/images/fullscreen.png"),"全屏");
     fullScreenAction->setShortcut(QKeySequence("Ctrl+Shift+F11"));
@@ -247,6 +253,8 @@ void MainWindow::createActionAndMenus()
     hideSpaceAction->setShortcut(QKeySequence("Alt+U"));
     ActionManager::instance()->registerAction(hideSpaceAction,this,SLOT(hideSubWidget()));
 
+    MyMenu * widgetMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_WIDGET_MENU,QString("窗口(&W)"));
+    menuBar()->addMenu(widgetMenu);
     widgetMenu->addAction(fullScreenAction);
     widgetMenu->addAction(hideIconAction);
     widgetMenu->addAction(hideToolAction);
@@ -255,7 +263,6 @@ void MainWindow::createActionAndMenus()
     widgetMenu->addAction(buildModelAction);
     widgetMenu->addAction(simulateAction);
 
-    helpMenu = menuBar()->addMenu("帮助(&H)");
     //【帮助菜单栏】
     MyAction * supportAction = ActionManager::instance()->crateAction(Constants::TEC_SUPPORT_ID,QIcon(":/images/getsupport.png"),"技术支持");
 //    supportAction->setShortcut(QKeySequence("Ctrl+Q"));
@@ -265,6 +272,8 @@ void MainWindow::createActionAndMenus()
     aboutAction->setShortcut(QKeySequence("Ctrl+P"));
     ActionManager::instance()->registerAction(aboutAction,this,SLOT(showAbout()));
 
+    MyMenu * helpMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_HELP_MENU,QString("帮助(&H)"));
+    menuBar()->addMenu(helpMenu);
     helpMenu->addAction(supportAction);
     helpMenu->addAction(aboutAction);
 
@@ -274,7 +283,6 @@ void MainWindow::createActionAndMenus()
 
     MyAction * databaseRefreshAction = ActionManager::instance()->crateAction(Constants::DATABASE_REFRESH,QIcon(":/images/database_refresh.png"),"刷新数据库");
     ActionManager::instance()->registerAction(databaseRefreshAction,ServiceView::instance(),SLOT(refreshDatabaseContent()));
-
 
     //【工作区间右键菜单】
     MyAction * closeWorkAction = ActionManager::instance()->crateAction(Constants::CLOSE_WORKSPACE,QIcon(""),"关闭工作区");
@@ -541,9 +549,9 @@ void MainWindow::switchWorkModel()
         return;
     }
 
-    fileMenu->setEnabled(enable);
-    editMenu->setEnabled((enable));
-    itemMenu->setEnabled((enable));
+    MenuManager::instance()->menu(Constants::MENUBAR_FILE_MENU)->setEnabled(enable);
+    MenuManager::instance()->menu(Constants::MENUBAR_EDIT_MENU)->setEnabled(enable);
+    MenuManager::instance()->menu(Constants::MENUBAR_ITEM_MENU)->setEnabled(enable);
 
     fileBar->setEnabled(enable);
     itemBar->setEnabled(enable);

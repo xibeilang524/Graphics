@@ -97,7 +97,7 @@ void MyArrow::setEndPointType(PointType type)
 //´´½¨ÎÄ×Ö
 void MyArrow::createTextItem()
 {
-    myTextItem = new MyTextItem(GRA_TEXT,NULL,this);
+    myTextItem = new MyTextItem(GRA_TEXT,this);
     myTextItem->setTextExistType(TEXT_CHILD);
     myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
     myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);

@@ -9,6 +9,7 @@
 #include <QDebug>
 
 #include "../global.h"
+#include "../manager/menumanager.h"
 #include "mygraphicsview.h"
 #include "myscene.h"
 
@@ -34,8 +35,7 @@ QDataStream & operator >>(QDataStream &stream,MyTextItem * item)
     return stream;
 }
 
-MyTextItem::MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent, QGraphicsScene *scene):
-    menu(menu),
+MyTextItem::MyTextItem(GraphicsType itemType, QGraphicsItem *parent, QGraphicsScene *scene):
     type(itemType),
     QGraphicsTextItem(parent,scene)
 {
@@ -95,7 +95,7 @@ void MyTextItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void MyTextItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
-    if(GlobalWindowState == WINDOW_BUILD_MODEL && menu)
+    if(GlobalWindowState == WINDOW_BUILD_MODEL)
     {
         if(existType == TEXT_CHILD)
         {
@@ -105,7 +105,7 @@ void MyTextItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
         else if(existType == TEXT_ALONG)
         {
             setSelected(true);
-            menu->exec(event->screenPos());
+            MenuManager::instance()->menu(Constants::MENU_ITEM_RIGHT_MENU)->exec(event->screenPos());
         }
     }
     else
@@ -218,6 +218,17 @@ void MyTextItem::cleartText()
 {
     property.content = "";
     setPlainText(property.content);
+}
+
+void MyTextItem::setText(QString text)
+{
+    property.content = text;
+    QGraphicsTextItem::setPlainText(text);
+}
+
+QString MyTextItem::getText()
+{
+    return property.content;
 }
 
 QVariant MyTextItem::itemChange(GraphicsItemChange change, const QVariant &value)

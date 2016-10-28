@@ -4,7 +4,8 @@ HEADERS += \
     manager/actionmanager.h \
     manager/mylinecombobox.h \
     manager/supermanager.h \
-    manager/mypageitem.h
+    manager/mypageitem.h \
+    manager/menumanager.h
 
 SOURCES += \
     manager/listitemmanager.cpp \
@@ -12,4 +13,5 @@ SOURCES += \
     manager/actionmanager.cpp \
     manager/mylinecombobox.cpp \
     manager/supermanager.cpp \
-    manager/mypageitem.cpp
+    manager/mypageitem.cpp \
+    manager/menumanager.cpp

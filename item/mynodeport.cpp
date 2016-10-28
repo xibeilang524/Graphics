@@ -8,13 +8,14 @@
 
 #include "myitem.h"
 #include "myarrow.h"
+#include "mytextitem.h"
 #include "../manager/actionmanager.h"
 
 using namespace Graphics;
 
 QDataStream & operator <<(QDataStream & dataStream,NodePortProperty & prop)
 {
-    dataStream<<prop.portType<<prop.itemBrush<<prop.direct
+    dataStream<<prop.portType<<prop.content<<prop.itemBrush<<prop.direct
              <<prop.scaleFactor<<prop.startItemID<<prop.parentItemID;
 
     return dataStream;
@@ -25,7 +26,7 @@ QDataStream & operator >>(QDataStream & dataStream,NodePortProperty & prop)
     int direct;
     int type;
 
-    dataStream>>type>>prop.itemBrush>>direct
+    dataStream>>type>>prop.content>>prop.itemBrush>>direct
              >>prop.scaleFactor>>prop.startItemID>>prop.parentItemID;
 
     prop.portType = (GraphicsType)type;
@@ -64,17 +65,34 @@ MyNodePort::MyNodePort(GraphicsType type, MyItem *parentItem, QObject *parent1):
     nodeProperty.portType = type;
     nextDirect = DRAG_NONE;
     arrivalLimitRang = false;
+    isMoveable = true;
 
     nodeProperty.parentItemID = parentItem->getProperty().startItemID;     //保存父节点的ID号
 
     prepareGeometryChange();
     boundRect = QRectF(-radius,-radius,2*radius,2*radius);
 
+    initWidget(parentItem);
+}
+
+//初始化控件
+void MyNodePort::initWidget(MyItem *parentItem)
+{
+    //文字信息
+    myTextItem = new MyTextItem(GRA_TEXT,this);
+    myTextItem->setTextExistType(TEXT_CHILD);
+    connect(myTextItem,SIGNAL(updateTextGeometry()),this,SLOT(updateTextPosByDirect()));
+
+    myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
+    myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);
+    myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
+    myTextItem->setFlag(ItemIsFocusable,false);
+    myTextItem->cleartText();
+
     initNodePortRightMenu();
     connect(this,SIGNAL(deletePort(MyNodePort*)),parentItem,SLOT(procDeleteNodePort(MyNodePort*)));
     connect(this,SIGNAL(editPort(MyNodePort*)),parentItem,SLOT(procEditNodePort(MyNodePort*)));
-
-    isMoveable = true;
+    connect(this,SIGNAL(portPosChanged(MouseType,QPointF)),parentItem,SLOT(procPortChanged(MouseType,QPointF)));
 }
 
 //设置端口拖入的方向
@@ -190,6 +208,8 @@ void MyNodePort::setDragDirect(DragDirect direct)
         }
     }
     setPolygon(itemPolygon);
+
+    updateTextPosByDirect();
 }
 
 //到达拐点
@@ -332,6 +352,43 @@ void MyNodePort::setMoveable(bool isMoveable)
 {
     isMoveable = isMoveable;
     setFlag(QGraphicsItem::ItemIsSelectable,isMoveable);
+}
+
+QString MyNodePort::getText()
+{
+    return myTextItem->toPlainText();
+}
+
+//更新文字信息，同时更新textItem在Nodeport中的位置
+void MyNodePort::setText(QString text)
+{
+    nodeProperty.content = text;
+    myTextItem->setPlainText(text);
+    updateTextPosByDirect();
+}
+
+//根据当前控件所在的Direct来动态的改变文字的位置
+void MyNodePort::updateTextPosByDirect()
+{
+    QRectF rectF = myTextItem->getBoundRect();
+
+    switch(nodeProperty.direct)
+    {
+          case DRAG_LEFT:
+                            myTextItem->setPos(-(radius*2 + rectF.width()),-rectF.height());
+                          break;
+          case DRAG_TOP:
+                            myTextItem->setPos(-rectF.width()/2,-(radius*2+rectF.height()));
+                          break;
+          case DRAG_RIGHT:
+                            myTextItem->setPos(radius,-rectF.height());
+                          break;
+          case DRAG_BOTTOM:
+                            myTextItem->setPos(-rectF.width()/2,radius);
+                          break;
+          default:
+                    break;
+    }
 }
 
 MyNodePort::~MyNodePort()

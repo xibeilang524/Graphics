@@ -5,13 +5,12 @@
 
 class QLabel;
 class QPushButton;
-class QMenu;
 
 class MyPageItem : public QWidget
 {
     Q_OBJECT
 public:
-    explicit MyPageItem(QMenu * menu ,QWidget *parent = 0);
+    explicit MyPageItem(QWidget *parent = 0);
     void setText(QString text);
     void setSelected(bool);
     bool getSelected(){return this->isSelected;}
@@ -39,15 +38,13 @@ private:
 
     bool isSelected;           //是否被选中
     QString id;
-    
-    QMenu * rightMenu;
 };
 
 class PageManager
 {
 public:
     static PageManager * instance();
-    MyPageItem * addPageItem(QMenu *menu);
+    MyPageItem * addPageItem();
     int getPageCount(){return ++pageCount;}
     void resetPageCount(){pageCount = 0;}
 

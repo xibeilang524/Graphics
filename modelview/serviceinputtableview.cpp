@@ -63,6 +63,6 @@ void ServiceInputTableView::deleteRow()
 }
 
 void ServiceInputTableView::contextMenuEvent(QContextMenuEvent *event)
-{    
+{
     rightMenu->exec(event->globalPos());
 }

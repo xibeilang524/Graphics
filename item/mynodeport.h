@@ -14,6 +14,8 @@
 **20160920:wey:增加本地保存
 **20160930:wey:调整父类QGraphicsPolygonItem
 **20161027:wey:增加三角和D端口
+**20161028:wey:增加文字信息显示
+**             调整右键菜单由全局同一创建
 *************************************************/
 #ifndef MYNODEPORT_H
 #define MYNODEPORT_H
@@ -30,6 +32,7 @@
 class QMenu;
 class MyItem;
 class MyArrow;
+class MyTextItem;
 
 class MyNodePort : public MyNodeLine
 {
@@ -70,6 +73,9 @@ public:
     friend QDataStream & operator >>(QDataStream & ,MyNodePort *);
     friend QDataStream & operator <<(QDataStream & ,MyNodePort *);
 
+    QString getText();
+    void setText(QString text);
+
 signals:
     void deletePort(MyNodePort *);
     void editPort(MyNodePort *);
@@ -85,8 +91,10 @@ protected:
 private slots:
     void respDeleteAction();
     void respEditAction();
+    void updateTextPosByDirect();
 
 private:
+    void initWidget(MyItem *parentItem);
     void initNodePortRightMenu();
     bool isMoveable;                   //是否支持移动，用于父窗口锁定
 
@@ -95,6 +103,7 @@ private:
     bool arrivalLimitRang;             //端口是否到达线段的端点
 
     QMenu * nodePortRightMenu;         //端口右键菜单，支持删除
+    MyTextItem * myTextItem;           //文字信息
 
     QList<MyArrow *> arrows;           //保存添加的箭头
 };

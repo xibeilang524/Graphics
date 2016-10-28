@@ -59,10 +59,6 @@ const char LOOP_UP_ID[] = "Constants.LoopUp";
 const char BUILD_MODEL_ID[] = "Constants.BuildModel";
 const char SIMLUATE_ID[] = "Constants.Simluate";
 
-//端口右键菜单
-const char NODE_DELETE_ID[] = "Constants.Node.Delete";
-const char NODE_EDIT_ID[] = "Constants.Node.Edit";
-
 //【控件】
 const char FULL_SCREEN_ID[] = "Constants.FullScreen";
 const char HIDE_ICON_ID[] = "Constants.HideIcon";
@@ -78,13 +74,30 @@ const char ABOUT_ID[] = "Constants.About";
 const char DATABASE_VIEW[] = "Constants.DatabaseView";
 const char DATABASE_REFRESH[] = "Constants.DatabaseRefresh";
 
-
 //【工作区间】
 const char CLOSE_WORKSPACE[] = "Workspace.Close";
 const char SAVE_WORKSPACE[] = "Workspace.Save";
 const char CLOSE_LEFT_WORKSPACE[] = "Workspace.CloseLeft";
 const char CLOSE_RIGHT_WORKSPACE[] = "Workspace.CloseRight";
 
-} // namespace StyleAssisant
+//【节点】
+const char NODE_EDIT_ID[] = "Constants.Node.Edit";
+const char NODE_DELETE_ID[] = "Constants.Node.Delete";
+
+//【Menu/右键菜单】
+const char MENUBAR_FILE_MENU[] = "Constants.Menu.FileMenu";
+const char MENUBAR_EDIT_MENU[] = "Constants.Menu.EditMenu";
+const char MENUBAR_ITEM_MENU[] = "Constants.Menu.ItemMenu";
+const char MENUBAR_WIDGET_MENU[] = "Constants.Menu.WidgetMenu";
+const char MENUBAR_HELP_MENU[] = "Constants.Menu.HelpMenu";
+
+const char MENU_MYPAGE_SWITCH[] = "Constants.Menu.PageSwitchMenu";
+const char MENU_GRAPHICS_VIEW[] = "Constants.Menu.GraphicsViewMenu";
+const char MENU_ITEM_RIGHT_MENU[] = "Constants.Menu.ItemRightMenu";
+
+const char MENU_SERVICE_INPUT[] = "Constants.Menu.ServiceInputMenu";
+const char MENU_NODE_PORT[] = "Constants.Menu.NodePort";
+
 } // namespace Constants
+} // namespace Graphics
 #endif // CONSTANTS_H

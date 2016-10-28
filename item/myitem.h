@@ -51,7 +51,6 @@
 class QGraphicsItem;
 class DragPoint;
 class RotateLine;
-class QMenu;
 class MyArrow;
 class MyTextItem;
 class MyNodePort;
@@ -65,7 +64,7 @@ class MyItem : public MySuperItem
 {
     Q_OBJECT
 public:
-    MyItem(GraphicsType itemType,QMenu * menu,QGraphicsScene * parentScene,QObject * parent1 = 0,QGraphicsItem * parent2 = 0);
+    MyItem(GraphicsType itemType,QGraphicsScene * parentScene,QObject * parent1 = 0,QGraphicsItem * parent2 = 0);
     ~MyItem();
 
     QRectF boundingRect() const;
@@ -124,7 +123,7 @@ private slots:
     void procPortChanged(MouseType type, QPointF currPoint);
 
     void procDeleteNodePort(MyNodePort * nodePort);
-    void procEditNodePort(MyNodePort * nodePort);
+    void procEditNodePort(MyNodePort *nodePort);
     void procUpdateTextGeometry();
 
 protected:
@@ -172,8 +171,6 @@ private:
 
     RotateLine * rotateLine;
     QGraphicsScene * parentScene;      //´°¿ÚµÄË÷Òý
-
-    QMenu * rightMenu;
 
     MouseType currMouseType;
 

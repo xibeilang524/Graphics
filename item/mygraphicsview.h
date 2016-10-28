@@ -35,7 +35,6 @@ class NodeEditDialog;
 class MyScene;
 class MainWindow;
 class MyItem;
-class QMenu;
 
 class MyGraphicsView : public QGraphicsView
 {
@@ -126,9 +125,6 @@ private:
     NodeEditDialog * nodeEdit;
     MyScene * myScene;
     MainWindow * parentWindow;
-    QMenu * rightMenu;
-    QMenu * viewRightMenu;            //窗口的右键菜单
-
     CutInfo cutTmpInfo;               //保存剪切信息
 
     QPoint pressPoint,movePoint;

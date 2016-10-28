@@ -23,6 +23,7 @@
 #include "draglinepoint.h"
 #include "../global.h"
 #include "../util.h"
+#include "../manager/menumanager.h"
 
 #include "qmath.h"
 
@@ -144,8 +145,7 @@ QDataStream & operator >>(QDataStream &stream,MyItem * item)
     return stream;
 }
 
-MyItem::MyItem(GraphicsType itemType, QMenu *menu, QGraphicsScene *parentScene, QObject *parent1, QGraphicsItem *parent2):
-    rightMenu(menu),
+MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *parent1, QGraphicsItem *parent2):
     parentScene(parentScene),
     MySuperItem(itemType,parent2,parent1)
 {
@@ -223,7 +223,7 @@ void MyItem::initComponentItem()
     updateRotateLinePos();
 
     //文字信息
-    myTextItem = new MyTextItem(GRA_TEXT,rightMenu,this);
+    myTextItem = new MyTextItem(GRA_TEXT,this);
     myTextItem->setTextExistType(TEXT_CHILD);
     connect(myTextItem,SIGNAL(updateTextGeometry()),this,SLOT(procUpdateTextGeometry()));
 
@@ -273,9 +273,7 @@ void MyItem::setText(QString text)
     property.content = text;
     myTextItem->setPlainText(text);
 
-    QRectF rectF = myTextItem->getBoundRect();
-
-    myTextItem->setPos(-rectF.width()/2,-rectF.height()/2);
+    procUpdateTextGeometry();
 }
 
 //动态调整输入字符框的位置尺寸
@@ -493,7 +491,7 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
     update();
 
-    rightMenu->exec(event->screenPos());
+    MenuManager::instance()->menu(Constants::MENU_ITEM_RIGHT_MENU)->exec(event->screenPos());
 }
 
 //拖入事件(注释/并行不允许拖入)
@@ -735,7 +733,12 @@ MyNodePort * MyItem::addNodePort(const NodePortProperty &prop)
         default:
              break;
     }
-    return createProp(prop.portType,itemPos,prop.direct,prop.scaleFactor);
+
+    MyNodePort * nodePort = createProp(prop.portType,itemPos,prop.direct,prop.scaleFactor);
+
+    nodePort->setText(prop.content);
+
+    return nodePort;
 }
 
 MyNodePort * MyItem::createProp(GraphicsType  type, const QPointF pos,const DragDirect direct,const qreal scaleFactor)
@@ -745,8 +748,6 @@ MyNodePort * MyItem::createProp(GraphicsType  type, const QPointF pos,const Drag
     port->setDragDirect(direct);
     port->setScaleFactor(scaleFactor);
     port->setProperty(property);
-
-    connect(port,SIGNAL(portPosChanged(MouseType,QPointF)),this,SLOT(procPortChanged(MouseType,QPointF)));
 
     ports.push_back(port);
 
@@ -1025,7 +1026,8 @@ void MyItem::procDeleteNodePort(MyNodePort *nodePort)
 //编辑某个端口
 void MyItem::procEditNodePort(MyNodePort *nodePort)
 {
-    MyGraphicsView::instance()->showNodePortEdit(nodePort);
+    emit editMe();
+//    MyGraphicsView::instance()->showNodePortEdit(nodePort);
 }
 
 //将当前值和最大及最小值相比较，只能在此范围内,到达最大或最小值的边界时，返回用于设置改变方向

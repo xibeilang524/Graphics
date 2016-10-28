@@ -18,15 +18,13 @@
 #include <QObject>
 #include <QDataStream>
 
-class QMenu;
-
 #include "../Header.h"
 
 class MyTextItem : public QGraphicsTextItem
 {
     Q_OBJECT
 public:
-    MyTextItem(GraphicsType itemType,QMenu * menu,QGraphicsItem *parent2 = 0, QGraphicsScene *scene = 0);
+    MyTextItem(GraphicsType itemType,QGraphicsItem *parent2 = 0, QGraphicsScene *scene = 0);
     ~MyTextItem();
 
     void setProperty(ItemProperty property);
@@ -75,8 +73,6 @@ private:
     GraphicsType type;
     ItemProperty property;
     TextExistType existType;
-
-    QMenu * menu;
     QPixmap pixmap;
 };
 

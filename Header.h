@@ -15,7 +15,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#define M_VERTION 0x0005        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
+#define M_VERTION 0x0006        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
 
 #define PI 3.141592653
 #define ICON_WIDTH  60          //拖拽图标的宽高
@@ -256,6 +256,7 @@ struct NodePortProperty
     friend QDataStream & operator >>(QDataStream &,NodePortProperty & item);
 
     GraphicsType portType;      //节点类型
+    QString content;            //节点文字信息
     QBrush itemBrush;           //填充颜色
     DragDirect direct;          //保存的方向
     qreal scaleFactor;          //拖入的位置相当于当前一边所在的比例
