@@ -9,7 +9,8 @@ HEADERS += \
     SelfWidget/mypropertyedit.h \
     SelfWidget/mypageswitch.h \
     SelfWidget/serviceview.h \
-    SelfWidget/pageswitchbar.h
+    SelfWidget/pageswitchbar.h \
+    SelfWidget/myconditionsetting.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -22,7 +23,8 @@ SOURCES += \
     SelfWidget/mypropertyedit.cpp \
     SelfWidget/mypageswitch.cpp \
     SelfWidget/serviceview.cpp \
-    SelfWidget/pageswitchbar.cpp
+    SelfWidget/pageswitchbar.cpp \
+    SelfWidget/myconditionsetting.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
@@ -31,4 +33,5 @@ FORMS += \
     SelfWidget/hidesplit.ui \
     SelfWidget/mypropertyedit.ui \
     SelfWidget/serviceview.ui \
-    SelfWidget/pageswitchbar.ui
+    SelfWidget/pageswitchbar.ui \
+    SelfWidget/myconditionsetting.ui

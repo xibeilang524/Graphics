@@ -15,6 +15,7 @@
 #include "../SelfWidget/nodeeditdialog.h"
 #include "../SelfWidget/mytextinput.h"
 #include "../SelfWidget/mypropertyedit.h"
+#include "../SelfWidget/myconditionsetting.h"
 #include "../Header.h"
 #include "../global.h"
 #include "../mainwindow.h"
@@ -1003,10 +1004,25 @@ void MyGraphicsView::editPropertyItem()
 //右键显示选择控件的属性编辑窗口
 void MyGraphicsView::showSelectedItemPropEdit(MyItem * item)
 {
-    MyPropertyEdit propertyEdit(this);
-    propertyEdit.initProp(item->getServiceProp());
+    GraphicsType type = item->getType();
+    if(type == GRA_ROUND_RECT )
+    {
 
-    propertyEdit.exec();
+    }
+    //判断框
+    else if(type == GRA_POLYGON)
+    {
+        MyConditionSetting dialog(this);
+
+        dialog.exec();
+    }
+    else
+    {
+        MyPropertyEdit propertyEdit(this);
+        propertyEdit.initProp(item->getServiceProp());
+
+        propertyEdit.exec();
+    }
 }
 
 //获取当前模型区域内的item数量

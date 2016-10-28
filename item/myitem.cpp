@@ -491,6 +491,14 @@ void MyItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 
     update();
 
+    if(GlobalWindowState == WINDOW_SIMULATE)
+    {
+        if(currItemType == GRA_ROUND_RECT)
+        {
+            return;
+        }
+    }
+
     MenuManager::instance()->menu(Constants::MENU_ITEM_RIGHT_MENU)->exec(event->screenPos());
 }
 
@@ -1024,7 +1032,7 @@ void MyItem::procDeleteNodePort(MyNodePort *nodePort)
 }
 
 //±à¼­Ä³¸ö¶Ë¿Ú
-void MyItem::procEditNodePort(MyNodePort *nodePort)
+void MyItem::procEditNodePort(MyNodePort *)
 {
     emit editMe();
 //    MyGraphicsView::instance()->showNodePortEdit(nodePort);
