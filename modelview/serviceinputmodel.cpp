@@ -153,6 +153,22 @@ bool ServiceInputModel::addRow()
     return true;
 }
 
+//增加一行带参数
+bool ServiceInputModel::addRow(Parameter * intputPara)
+{
+    beginInsertRows(QModelIndex(),paraList.size()+1,paraList.size()+1);
+
+    Parameter * para = new Parameter;
+    para->pName = intputPara->pName;
+    para->pType = intputPara->pType;
+    para->pValue = "";
+    para->pRemark = intputPara->pRemark;
+    paraList.append(para);
+
+    endInsertRows();
+    return true;
+}
+
 //删除行
 bool ServiceInputModel::deleteRow(int rowNum)
 {
@@ -179,3 +195,22 @@ void ServiceInputModel::setPara(ParaList list)
         endInsertRows();
     }
 }
+
+//清空表格内容
+void ServiceInputModel::clearTable()
+{
+    foreach(Parameter * para,paraList)
+    {
+        delete para;
+    }
+
+    if(paraList.size() > 0)
+    {
+        beginRemoveRows(QModelIndex(),0,paraList.size() - 1);
+
+        endRemoveRows();
+    }
+
+    paraList.clear();
+}
+

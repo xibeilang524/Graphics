@@ -52,6 +52,12 @@ void ServiceInputTableView::insertRow()
     serviceModel->addRow();
 }
 
+//单行插入输入参数
+void ServiceInputTableView::insertRow(Parameter * intputPara)
+{
+    serviceModel->addRow(intputPara);
+}
+
 //单行删除
 void ServiceInputTableView::deleteRow()
 {
@@ -62,7 +68,13 @@ void ServiceInputTableView::deleteRow()
     }
 }
 
+//清空表格
+void ServiceInputTableView::clearTable()
+{
+    serviceModel->clearTable();
+}
+
 void ServiceInputTableView::contextMenuEvent(QContextMenuEvent *event)
 {
-    rightMenu->exec(event->globalPos());
+//    rightMenu->exec(event->globalPos());
 }

@@ -20,7 +20,7 @@ public:
     static ServiceInfoProcess * instance();
     bool getServiceInfo(ServiceInfoList & list,const int startIndex = 0,const int perPage = 0);
 
-    bool getServiceProperty(QList<ServiceProperty> & properties);
+    bool getServiceProperty(QList<ServiceProperty *> &properties);
 
     QString getLastError();
 

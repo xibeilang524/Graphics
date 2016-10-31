@@ -290,6 +290,7 @@ enum HightLightLevel
 //输入参数的属性
 struct Parameter
 {
+    QString pId;               //主键值
     QString pName;             //参数名
     QString pType;             //参数类型
     QString pValue;            //参数值
@@ -306,6 +307,7 @@ struct ServiceProperty
         hasSettInfo = false;
     }
     bool hasSettInfo;                 //是否已经设置了信息，用于在显示属性编辑时作为标识是否要从数据库读取
+    QString id;                       //数据库主键值
     QString serviceName;              //服务名
     QString status;                   //服务状态
     QString descirption;              //服务描述

@@ -130,6 +130,10 @@ void ServiceView::viewDatabaseContent()
 //刷新数据库信息
 void ServiceView::refreshDatabaseContent()
 {
+    foreach(ServiceProperty * prop,GlobalServiceProperties)
+    {
+        delete prop;
+    }
     GlobalServiceProperties.clear();
 
     bool flag = ServiceInfoProcess::instance()->getServiceProperty(GlobalServiceProperties);

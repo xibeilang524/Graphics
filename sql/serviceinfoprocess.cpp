@@ -3,6 +3,8 @@
 #include "sqldataadapter.h"
 #include "../global.h"
 
+#include <QDebug>
+
 ServiceInfoProcess * ServiceInfoProcess::serviceProcess = NULL;
 
 ServiceInfoProcess::ServiceInfoProcess()
@@ -31,14 +33,46 @@ bool ServiceInfoProcess::getServiceInfo(ServiceInfoList &list, const int startIn
 }
 
 //获取所有的属性信息
-bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty> &properties)
+bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty *> &properties)
 {
-    QString sql = "select s.name,s.status,s.descirption,sd.url,s.method from\
+    QString sql = "select s.id,s.name,s.status,s.descirption,sd.url,s.method,s.outputName,s.outputType from\
             business_softwareonline s left join business_softwareonline_deploy sd\
-                on s.id = sd.relationId";
+                on s.id = sd.relationId where s.status = '可用'";
+    bool flag = SQLDataAdapter::instance()->getSericeProperties(sql,properties);
 
-   return SQLDataAdapter::instance()->getSericeProperties(sql,properties);
+    if(flag)
+    {
+        QString psql = "select p.id,p.parameterName,p.parameterType,p.addTime from\
+                business_softwareonline s left join business_softwareonline_parameter p\
+                on s.id = p.relationId where s.id = ";
+
+        foreach(ServiceProperty *prop,properties)
+        {
+            QList<Parameter> paras;
+
+            QString fsql = psql + " '"+prop->id+"' ";
+
+            bool tFlag = SQLDataAdapter::instance()->getParameterById(fsql,paras);
+            if(tFlag)
+            {
+
+                  foreach(Parameter para,paras)
+                  {
+                       Parameter * p = new Parameter;
+                       p->pId = para.pId;
+                       p->pName = para.pName;
+                       p->pType = para.pType;
+                       p->pRemark = para.pRemark;
+                       prop->inputParas.append(p);
+                  }
+            }
+        }
+    }
+
+   return flag;
 }
+
+
 
 //获取最新的错误信息
 QString ServiceInfoProcess::getLastError()

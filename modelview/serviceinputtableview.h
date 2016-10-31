@@ -13,6 +13,8 @@
 
 #include <QTableView>
 
+#include "../Header.h"
+
 class ServiceInputModel;
 class ServiceInputDelegate;
 class QMenu;
@@ -26,8 +28,13 @@ public:
 
     ServiceInputModel * model() const;
 
+    void clearTable();
+
 protected:
     void contextMenuEvent(QContextMenuEvent *event);
+
+public slots:
+    void insertRow(Parameter *intputPara);
 
 private slots:
     void insertRow();

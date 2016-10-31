@@ -23,10 +23,12 @@ public:
     ServiceInputModel(int row,int column);
 
     bool addRow();
+    bool addRow(Parameter *intputPara);
     bool deleteRow(int rowNum);
 
     void setPara(ParaList list);
     ParaList getPara(){return this->paraList;}
+    void clearTable();
 
 protected:
     int rowCount(const QModelIndex &parent) const;

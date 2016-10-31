@@ -62,8 +62,8 @@ void MyPropertyEdit::initProp(ServiceProperty *prop)
         int index = -1;
         for(int i = 0;i<GlobalServiceProperties.size();i++)
         {
-            ui->serviceName->addItem(GlobalServiceProperties.at(i).serviceName);
-            if(GlobalServiceProperties.at(i).serviceName == prop->serviceName)
+            ui->serviceName->addItem(GlobalServiceProperties.at(i)->serviceName);
+            if(GlobalServiceProperties.at(i)->serviceName == prop->serviceName)
             {
                 index = i;
             }
@@ -97,9 +97,9 @@ void MyPropertyEdit::initServiceData()
        }
     }
 
-    foreach(ServiceProperty prop,GlobalServiceProperties)
+    foreach(ServiceProperty * prop,GlobalServiceProperties)
     {
-        ui->serviceName->addItem(prop.serviceName);
+        ui->serviceName->addItem(prop->serviceName);
     }
 }
 
@@ -108,11 +108,26 @@ void MyPropertyEdit::switchServiceInfo(int index)
 {
     if(!isComboxAutoChanged && index >= 0 && index < GlobalServiceProperties.size())
     {
-        ServiceProperty  prop = GlobalServiceProperties.at(index);
-        ui->serviceState->setText(prop.status);
-        ui->serviceDesc->setText(prop.descirption);
-        ui->servicePath->setText(prop.servicePath);
-        ui->servicePort->setText(prop.method);
+        ServiceProperty * prop = GlobalServiceProperties.at(index);
+        ui->serviceState->setText(prop->status);
+        ui->serviceDesc->setText(prop->descirption);
+        ui->servicePath->setText(prop->servicePath);
+        ui->servicePort->setText(prop->method);
+
+        inputTableView->clearTable();
+        if(prop->inputParas.size() > 0)
+        {
+            for(int i = 0;i<prop->inputParas.size(); i++)
+            {
+                inputTableView->insertRow(prop->inputParas.at(0));
+            }
+        }
+
+        outputTableView->clearTable();
+        if(prop->outputParas.size() > 0)
+        {
+            outputTableView->insertRow(prop->outputParas.at(0));
+        }
     }
 }
 

@@ -16,9 +16,10 @@ QWidget * ServiceInputDelegate::createEditor(QWidget *parent, const QStyleOption
     {
         QComboBox * box = new QComboBox(parent);
         box->addItems(stringList);
-        return box;
+//        return box;
+        return NULL;
     }
-    else
+    else if(index.column() == 2)
     {
         QLineEdit * edit = new QLineEdit(parent);
         return edit;

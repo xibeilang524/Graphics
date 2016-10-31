@@ -11,6 +11,7 @@
 **
 **修改历史:
 **20160709:wey:建立文件，将SQL访问部分进行合并。
+**20161031:wey:增加对参数的读取
 *************************************************/
 #ifndef SQLDATAADAPTER_H
 #define SQLDATAADAPTER_H
@@ -26,7 +27,8 @@ public:
 
     bool getServiceData(QString sql,ServiceInfoList &list);
 
-    bool getSericeProperties(QString sql,QList<ServiceProperty> &list);
+    bool getSericeProperties(QString sql, QList<ServiceProperty *> &list);
+    bool getParameterById(QString sql,QList<Parameter> & list);
 
 private:
     SQLDataAdapter();
