@@ -5,6 +5,8 @@
 #include "../item/myitem.h"
 #include "../item/myarrow.h"
 
+#include "simulateutil.h"
+
 SceneItemPickup * SceneItemPickup::pickup = NULL;
 
 SceneItemPickup::SceneItemPickup()
@@ -66,12 +68,11 @@ ReturnType SceneItemPickup::validateStartEnd(QList<QGraphicsItem *> &existedItem
             MyItem * tmpItem = dynamic_cast<MyItem *>(item);
             if(tmpItem && tmpItem->getType() == GRA_ROUND_RECT)
             {
-                QString text = tmpItem->getText();
-                if(text == "¿ªÊ¼" || text.toLower().contains("start"))
+                if(SimulateUtil::instance()->getIsItemStart(tmpItem))
                 {
                     startItemCount++;
                 }
-                else if(text == "½áÊø" || text.toLower().contains("end"))
+                else if(SimulateUtil::instance()->getIsItemEnd(tmpItem))
                 {
                     endItemCount++;
                 }

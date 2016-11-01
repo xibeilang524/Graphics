@@ -5,6 +5,7 @@
 #include "../item/myitem.h"
 #include "../item/myarrow.h"
 #include "../item/draglinepoint.h"
+#include "simulateutil.h"
 
 #include <QDebug>
 #include <QStack>
@@ -88,7 +89,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                 return FLOW_ERROR;
             }
 
-            currItem = getMyItem(arrows.at(0));
+            currItem = SimulateUtil::instance()->getMyItem(arrows.at(0));
 
             ProcessUnit  * unit = new ProcessUnit;
             unit->gtype = startItem->getType();
@@ -204,7 +205,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
             GraphicsType gtype = currItem->getType();
 
             int inNum = 0,outNum = 0;               //当前控件分别作为起点和终点引出直线的个数
-            getItemInOutNum(currItem,arrows,inNum,outNum);
+            SimulateUtil::instance()->getItemInOutNum(currItem,arrows,inNum,outNum);
 
             //输入输出框/处理框[关注箭头指向点]
             if(gtype == GRA_PARALLELOGRAM || gtype == GRA_RECT)
@@ -215,7 +216,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                 }
 
                 //当前控件的下一个节点
-                QList<MyItem *> outItems = getInOutItems(currItem,arrows,true);
+                QList<MyItem *> outItems = SimulateUtil::instance()->getInOutItems(currItem,arrows,true);
 
                 if(outItems.size() == 1)
                 {
@@ -327,8 +328,8 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
 //                QList<MyItem *> outItems = getInOutItems(currItem,arrows,true);
 
                 //分别获取条件成立和不成立的item，将条件成立item赋值left，不成立item赋值right
-                MyItem * yesItem = getConditionItem(currItem,arrows,true);
-                MyItem * noItem = getConditionItem(currItem,arrows,false);
+                MyItem * yesItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,true);
+                MyItem * noItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,false);
 
                 desc->isProcLeft = true;
                 desc->leftItem = yesItem;
@@ -340,85 +341,3 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
     //[2]验证逻辑是否正确
     return RETURN_SUCCESS;
 }
-
-//分别获取条件成立和不成立的item
-MyItem * ProcessCheck::getConditionItem(MyItem * currItem,QList<MyArrow *> &arrows, bool isYes)
-{
-    foreach(MyArrow * arrow,arrows)
-    {
-        MyItem * item = getMyItem(arrow,true);
-        if(item != currItem && isYes && (arrow->getText().toLower()== "yes" || arrow->getText() == "是"))
-        {
-            return item;
-        }
-        else if(item != currItem && !isYes && (arrow->getText().toLower()== "no" || arrow->getText() == "否"))
-        {
-            return item;
-        }
-    }
-    return NULL;
-}
-
-//获取某个控件作为箭头起点和终点个数
-void ProcessCheck::getItemInOutNum(MyItem *currItem, QList<MyArrow *> &arrows, int &inputNum, int &outputNum)
-{
-    QString currItemId = currItem->getProperty().startItemID;
-
-    foreach(MyArrow * arrow,arrows)
-    {
-        MyItem * startItem = getMyItem(arrow,false);
-        MyItem * endItem = getMyItem(arrow,true);
-        QString startItemId = startItem->getProperty().startItemID;
-        QString endItemId = endItem->getProperty().startItemID;
-
-        if(startItemId == currItemId)
-        {
-            inputNum++;
-        }
-        else if(endItemId == currItemId)
-        {
-            outputNum++;
-        }
-    }
-}
-
-//获取控件上作为箭头起点或终点控件集合
-QList<MyItem *> ProcessCheck::getInOutItems(MyItem *currItem,QList<MyArrow *> &arrows, bool isEnd)
-{
-    QList<MyItem *> resultList;
-
-    foreach (MyArrow * arrow, arrows)
-    {
-       MyItem * item = getMyItem(arrow,isEnd);
-       if(item != currItem)
-       {
-           resultList.append(item);
-       }
-    }
-    return resultList;
-}
-
-//获取箭头起始点/终点Item
-MyItem * ProcessCheck::getMyItem(MyArrow * arrow, bool isEnd)
-{
-    if(arrow->getLineType() == LINE_MYITEM)
-    {
-        DragLinePoint * dragLine = NULL;
-        if(isEnd)
-        {
-            dragLine = dynamic_cast<DragLinePoint *>(arrow->getEndItem());
-        }
-        else
-        {
-            dragLine = dynamic_cast<DragLinePoint *>(arrow->getStartItem());
-        }
-
-        if(dragLine)
-        {
-            MyItem * item = dynamic_cast<MyItem *>(dragLine->getParentItem());
-            return item;
-        }
-    }
-    return NULL;
-}
-

@@ -14,6 +14,7 @@
 #include <QDialog>
 
 class ServiceInputTableView;
+class MyItem;
 struct ServiceProperty;
 
 namespace Ui {
@@ -29,6 +30,7 @@ public:
     ~MyPropertyEdit();
 
     void initProp(ServiceProperty * prop);
+    void updateDelegateList(QList<MyItem *> pItems);
 
 private slots:
     void confirmPropety();

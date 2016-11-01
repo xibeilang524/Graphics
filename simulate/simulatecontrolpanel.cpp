@@ -8,6 +8,7 @@
 #include "SimulateHeader.h"
 #include "sceneitempickup.h"
 #include "processcheck.h"
+#include "simulateutil.h"
 
 #include "../item/myitem.h"
 #include "../item/mygraphicsview.h"
@@ -149,6 +150,8 @@ void SimulateControlPanel::respItemActivated(QListWidgetItem * current)
     if(citem)
     {
         citem->getUnit()->item->hightLightItem(LEVEL_HIGH,true);
+
+        SimulateUtil::instance()->getCurrParentItem(citem->getUnit()->item);
     }
 }
 

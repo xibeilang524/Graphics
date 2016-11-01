@@ -59,11 +59,6 @@ public:
     ReturnType checkProcess(QList<QGraphicsItem *> &existedItems, QList<MyItem *> &resortedItems, QList<ProcessUnit *> &procUnits);
 
 private:
-    MyItem * getMyItem(MyArrow * arrow,bool isEnd = true);
-    QList<MyItem *> getInOutItems(MyItem *currItem, QList<MyArrow *>& arrows, bool isEnd = true);
-    void getItemInOutNum(MyItem * currItem,QList<MyArrow *>& arrows,int &inputNum,int &outputNum);
-    MyItem * getConditionItem(MyItem *currItem, QList<MyArrow *>& arrows, bool isYes = true);
-
     ProcessCheck();
     static ProcessCheck * pcheck;
 

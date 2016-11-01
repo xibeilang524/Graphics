@@ -27,6 +27,7 @@ public:
     ServiceInputTableView(int row,int column,QWidget * parent = 0);
 
     ServiceInputModel * model() const;
+    ServiceInputDelegate * delegate();
 
     void clearTable();
 

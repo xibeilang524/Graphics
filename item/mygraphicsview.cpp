@@ -16,6 +16,7 @@
 #include "../SelfWidget/mytextinput.h"
 #include "../SelfWidget/mypropertyedit.h"
 #include "../SelfWidget/myconditionsetting.h"
+#include "../simulate/simulateutil.h"
 #include "../Header.h"
 #include "../global.h"
 #include "../mainwindow.h"
@@ -996,6 +997,7 @@ void MyGraphicsView::editPropertyItem()
         if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+
             showSelectedItemPropEdit(item);
         }
     }
@@ -1019,6 +1021,7 @@ void MyGraphicsView::showSelectedItemPropEdit(MyItem * item)
     else
     {
         MyPropertyEdit propertyEdit(this);
+        propertyEdit.updateDelegateList(SimulateUtil::instance()->getCurrParentItem(item));
         propertyEdit.initProp(item->getServiceProp());
 
         propertyEdit.exec();

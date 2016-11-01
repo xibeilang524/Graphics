@@ -7,6 +7,7 @@
 **
 **修改历史:
 **20161010:wey:添加QComboBox控件作为类型编辑代理
+**20161031:wey:添加控件输入的引参【！！！】
 *************************************************/
 #ifndef SERVICEINPUTDELEGATE_H
 #define SERVICEINPUTDELEGATE_H
@@ -20,6 +21,9 @@ class ServiceInputDelegate : public QItemDelegate
 public:
     ServiceInputDelegate();
 
+    void setColumnState(bool isComboBox = true);
+    void updateStringList(const QStringList & list);
+
 protected:
     QWidget * createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const;
     void setEditorData(QWidget *editor, const QModelIndex &index) const;
@@ -28,6 +32,8 @@ protected:
 
 private:
     QStringList  stringList;            //代理下拉控件子item
+
+    bool column2IsCombox;                //用于区分列表2代理类型
 
 };
 

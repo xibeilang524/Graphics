@@ -74,7 +74,12 @@ void ServiceInputTableView::clearTable()
     serviceModel->clearTable();
 }
 
-void ServiceInputTableView::contextMenuEvent(QContextMenuEvent *event)
+void ServiceInputTableView::contextMenuEvent(QContextMenuEvent *)
 {
 //    rightMenu->exec(event->globalPos());
+}
+
+ServiceInputDelegate * ServiceInputTableView::delegate()
+{
+    return this->serviceDelegate;
 }

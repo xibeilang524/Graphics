@@ -4,7 +4,9 @@
 #include "../global.h"
 #include "../modelview/serviceinputtableview.h"
 #include "../modelview/serviceinputmodel.h"
+#include "../modelview/serviceinputdelegate.h"
 #include "../sql/serviceinfoprocess.h"
+#include "../item/myitem.h"
 #include "../util.h"
 
 #include <QHBoxLayout>
@@ -28,6 +30,7 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
     inputTableView = new ServiceInputTableView(0,4);
 
     outputTableView = new ServiceInputTableView(0,4);
+    outputTableView->delegate()->setColumnState(false);
 
     ui->serviceName->setView(new QListView());
 
@@ -146,6 +149,26 @@ void MyPropertyEdit::confirmPropety()
     currItemProp->outputParas = outputTableView->model()->getPara();
 
     cancelProperty();
+}
+
+//更新代理下拉列表显示引单的列表
+void MyPropertyEdit::updateDelegateList(QList<MyItem *> pItems)
+{
+    QStringList list;
+    foreach(MyItem * item,pItems)
+    {
+        ServiceProperty * prop = item->getServiceProp();
+        if(prop->outputParas.size() == 1)
+        {
+            QString newItem = prop->serviceName+":"+prop->outputParas.at(0)->pName;
+            if(!list.contains(newItem))
+            {
+                list<<newItem;
+            }
+        }
+    }
+
+    inputTableView->delegate()->updateStringList(list);
 }
 
 //取消
