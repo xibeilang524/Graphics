@@ -24,8 +24,7 @@ enum ProcessType
     PRO_PROCESS,            //处理:矩形
     PRO_JUDGE,              //判断:菱形
     PRO_PARALLEL,           //并行:平行线
-    PRO_LOOP_UP,            //上循环
-    PRO_LOOP_DOWN,          //下循环
+    PRO_LOOP,               //循环
     PRO_END                 //结束:圆角矩形
 };
 

@@ -11,7 +11,7 @@
 #include "util.h"
 
 int main(int argc, char *argv[])
-{
+{    
     MyApplication a(argc, argv);
 
     MyApplication::addLibraryPath("./plugins");

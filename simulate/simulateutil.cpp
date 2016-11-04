@@ -25,7 +25,7 @@ SimulateUtil * SimulateUtil::instance()
 
 /*!
  *获取当前控件的父控件，只考虑判断框(GRA_RECT).
- *【1】目前只考虑到GRA_RECT只有一个输入箭头，未考虑循环条件。
+ *【1】20161101增加对循环条件的引单功能
  *!*/
 QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
 {
@@ -48,7 +48,7 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
             if(pItems.size() > 1)
             {
 
-                for(int i=0;i<descs.size();i++)
+                for(int i = 0;i < descs.size() ; i++)
                 {
                     if(descs.at(i)->currItem == pItem)
                     {
@@ -123,8 +123,6 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                     MultiPathDesc * lastDesc = descs.at(descs.size()-1);
                     SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
 
-
-
                     for(int i=0;i<spathDesc->hasAddItem;i++)
                     {
                         list.removeLast();
@@ -134,7 +132,6 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                     spathDesc->hasSearched = true;
 
                     lastDesc->currPathNum += 1;
-                    qDebug()<<pItem->getText()<<"__"<<spathDesc->hasAddItem<<"__"<<lastDesc->currPathNum<<"__"<<lastDesc->totalPathNum;
                     //当前已经搜索结束
                     if(lastDesc->currPathNum >= lastDesc->totalPathNum)
                     {
@@ -166,15 +163,6 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                     list.append(pItem);
                 }
             }
-
-//            foreach(MyItem * tmp,pItems)
-//            {
-//                if(tmp!=item && tmp->getType() == GRA_RECT)
-//                {
-//                    list.append(tmp);
-//                }
-//                pItem = tmp;
-//            }
         }
     }
     return list;

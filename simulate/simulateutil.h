@@ -67,9 +67,6 @@ private:
         QList<SignalPathDesc*> pathes;      //总共存在的路径
 
     };
-
-
-
 };
 
 #endif // SIMULATEUTIL_H

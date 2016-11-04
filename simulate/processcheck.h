@@ -11,6 +11,7 @@
 **20161017:wey:添加对验证的队列控件的提取并转换成处理单元
 **20161024:wey:修复因流程不完整导致推演检查时程序奔溃问题
 **20161027:wey:修复因多个判断未完全处理结束而导致流程自动退出
+**20161104:wey:添加对for和while循环的支持【！！！】
 *************************************************/
 #ifndef PROCESSCHECK_H
 #define PROCESSCHECK_H
@@ -53,7 +54,6 @@ public:
         PolygonDesc * parent;                //父框
         ProcessUnit * processUnit;           //处理单元
     };
-
     static ProcessCheck * instance();
 
     ReturnType checkProcess(QList<QGraphicsItem *> &existedItems, QList<MyItem *> &resortedItems, QList<ProcessUnit *> &procUnits);

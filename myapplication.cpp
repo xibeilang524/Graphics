@@ -13,6 +13,7 @@ MyApplication::MyApplication(int &argc, char **argv):
 
 }
 
+//对全局的事件进行过滤
 bool MyApplication::notify(QObject * obj, QEvent * event)
 {
     if(event->type() == QEvent::KeyPress)
