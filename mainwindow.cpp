@@ -38,6 +38,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     GlobalMainWindow = this;
+    GlobalIsSimulateState = false;
 
     mySlider = NULL;
     leftIconWidget = NULL;
@@ -362,20 +363,30 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
             MyPageSwitch::instance()->closePage();
         }
     }
-    //工作模式切换[建模->推演]
+    //工作模式切换[推演->建模]
     else if(event->modifiers() == Qt::ControlModifier && event->key() == Qt::Key_M)
     {
-        if(!ActionManager::instance()->action(Constants::SIMLUATE_ID)->isChecked())
+        if(!GlobalIsSimulateState)
         {
-            ActionManager::instance()->action(Constants::SIMLUATE_ID)->setChecked(true);
+            if(!ActionManager::instance()->action(Constants::SIMLUATE_ID)->isChecked())
+            {
+                ActionManager::instance()->action(Constants::SIMLUATE_ID)->setChecked(true);
+            }
+        }
+        else
+        {
+            Util::showWarn("当前在推演状态，无法功能切换!");
         }
     }
-    //[推演->建模]
+    //[建模->推演]
     else if(event->modifiers() == Qt::ControlModifier && event->modifiers() == Qt::ShiftModifier && event->key() == Qt::Key_M)
     {
-        if(!ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->isChecked())
+        if(!GlobalIsSimulateState)
         {
-            ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->setChecked(true);
+            if(!ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->isChecked())
+            {
+                ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->setChecked(true);
+            }
         }
     }
 
@@ -518,6 +529,11 @@ void MainWindow::showAbout()
 //切换工作模式【建模/推演】
 void MainWindow::switchWorkModel()
 {
+    if(GlobalIsSimulateState)
+    {
+        Util::showWarn("推演尚未结束，无法切换至建模状态!");
+        return;
+    }
     QString objName = QObject::sender()->objectName();
     bool enable = false;
 
@@ -535,6 +551,7 @@ void MainWindow::switchWorkModel()
         GlobalWindowState = WINDOW_SIMULATE;
         setWindowTitle("多组件模型在线协同调用工具-推演");
         setSimulateWidgetState(false);
+        simulatePanel->resetSimluateFlag();
     }
 
     MyGraphicsView::instance()->addContextMenuItem();

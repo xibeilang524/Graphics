@@ -27,4 +27,6 @@ extern qreal GlobalMinMumSize;            		  //控件缩小的最小范围
 
 extern QList<ServiceProperty *> GlobalServiceProperties;     //全局的服务信息
 
+extern bool GlobalIsSimulateState;               //是否为推演状态，如果是则不允许进行状态变更
+
 #endif // GLOBAL_H

@@ -14,6 +14,7 @@
 #include "../item/mygraphicsview.h"
 #include "../item/myscene.h"
 #include "../util.h"
+#include "../global.h"
 
 MyListWidgetItem::MyListWidgetItem(QListWidget *parent, int type)
     :QListWidgetItem(parent,type)
@@ -58,9 +59,10 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
  *!*/
 void SimulateControlPanel::respStartSimulate()
 {
+    setSimulateState(true);
+
     emit resetSimluate();
     resetSimluateFlag();
-    ui->simProcedure->clear();
 
     QList<QGraphicsItem *> existedItems;
     //【1】【2】
@@ -69,6 +71,7 @@ void SimulateControlPanel::respStartSimulate()
     if(returnType != RETURN_SUCCESS)
     {
         setFlagState(ui->step1,false);
+        setSimulateState(false);
         return;
     }
     else
@@ -78,12 +81,13 @@ void SimulateControlPanel::respStartSimulate()
 
     //【3】【4】
     QList<MyItem *> resortedItems;
-    QList<ProcessUnit *> procUnits;
+
     returnType = ProcessCheck::instance()->checkProcess(existedItems,resortedItems,procUnits);
 
     if(returnType != RETURN_SUCCESS)
     {
         setFlagState(ui->step2,false);
+        setSimulateState(false);
         return;
     }
     else
@@ -123,6 +127,14 @@ void SimulateControlPanel::respStartSimulate()
             emit sendSingleSimulate(currUnit);
         }
     }
+    setSimulateState(false);
+}
+
+//根据是否为推演状态设置控件的状态
+void SimulateControlPanel::setSimulateState(bool isSim)
+{
+    GlobalIsSimulateState = isSim;
+    ui->startSimulate->setEnabled(!isSim);
 }
 
 //显示每一步的推演的操作信息
@@ -191,6 +203,8 @@ void SimulateControlPanel::resetSimluateFlag()
     ui->step1->setStyleSheet("");
     ui->step2->setStyleSheet("");
     ui->step3->setStyleSheet("");
+
+    ui->simProcedure->clear();
 }
 
 //根据检查的结果设置流程中样式

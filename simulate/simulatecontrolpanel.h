@@ -10,6 +10,7 @@
 **20161020:wey:增加验证提示，以及流程运行过程
 **20161021:wey:增加从推演队列选择对应的处理单元
 **20161025:wey:增加从过程列表直接双击显示处理单元属性编辑信息
+**20161104:wey:增加禁止从正在模拟的状态退出至建模状态
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -45,6 +46,8 @@ public:
     explicit SimulateControlPanel(QWidget *parent = 0);
     ~SimulateControlPanel();
 
+    void resetSimluateFlag();
+
 signals:
     void resetSimluate();
     void sendSingleSimulate(ProcessUnit * unit);
@@ -57,11 +60,12 @@ private slots:
     void respItemDoubleClicked(QListWidgetItem * current);
     
 private:
-
     void setFlagState(QLabel * label,bool isSuccess);
-    void resetSimluateFlag();
+    void setSimulateState(bool isSim);
 
     Ui::SimulateControlPanel *ui;
+
+    QList<ProcessUnit *> procUnits;
 };
 
 #endif // SIMULATECONTROLPANEL_H
