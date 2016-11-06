@@ -61,12 +61,12 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
         }
     }
 
-
     bool isAtEnd = false;
 
     MyItem * currItem = startItem;        //当前操作指针指向控件
     QStack<PolygonDesc *> polygons;       //推演过程中记录所有遇到的判断框
     QStack<PolygonDesc *> loopPolygons;   //推演过程中遇到的循环判断框
+    QStack<ProcessUnit *> doWhileRects;   //推演过程中遇到RECT为多个的进，一个出认定为dowhile循环
 
     ProcessUnit * frontUnit = NULL;       //前一个控制单元
 
@@ -282,7 +282,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
             //输入输出框/处理框[关注箭头指向点]
             if(gtype == GRA_PARALLELOGRAM || gtype == GRA_RECT)
             {
-                if(inNum !=1 || outNum != 1)
+                if(inNum !=1 || outNum < 1)
                 {
                     return FLOW_ERROR;
                 }
@@ -292,17 +292,13 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
 
                 if(outItems.size() == 1)
                 {
-                    ProcessUnit  * unit = new ProcessUnit;
-                    unit->gtype = gtype;
-                    unit->item = currItem;
-
                     ProcessType  ptype;
 
                     switch (gtype)
                     {
                         case GRA_RECT:
-                                       ptype = PRO_PROCESS;
-                                       break;
+                                        ptype = PRO_PROCESS;
+                                        break;
                         case GRA_PARALLELOGRAM:
                                        ptype = PRO_INPUT;
                                        break;
@@ -314,46 +310,91 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                             break;
                     }
 
+                    ProcessUnit  * unit = new ProcessUnit;
+                    unit->gtype = gtype;
+                    unit->item = currItem;
                     unit->ptype = ptype;
 
-                    //紧跟着判断框，需要将将此控件设置到判断框的左右分支上
-                    if(frontUnit->gtype == GRA_POLYGON)
+                    bool isDoWhile = false;
+
+                    //遇到处理框，并且有多个输入，则暂时认定为循环处理的起点
+                    if(ptype == PRO_PROCESS && outNum > 1)
                     {
-                        PolygonDesc * currDesc = NULL;
-                        if(frontUnit->ptype == PRO_JUDGE && polygons.size() > 0)
+                        bool isExisted = false;
+                        foreach (ProcessUnit * punit, doWhileRects)
                         {
-                            currDesc = polygons.at(polygons.size() - 1);
-                        }
-                        else if(frontUnit->ptype == PRO_LOOP && loopPolygons.size() >0)
-                        {
-                            currDesc = loopPolygons.at(loopPolygons.size() - 1);
+                            if(punit->item == currItem)
+                            {
+                                isExisted = true;
+                                unit = punit;
+                                break;
+                            }
                         }
 
-                        if(currDesc)
+                        if(!isExisted)
                         {
-                            if(currDesc->isProcLeft)
+                            doWhileRects.append(unit);
+                        }
+
+                        //判断框在yes分支
+                        if(frontUnit->ptype == PRO_LOOP && isExisted &&loopPolygons.size()>0)
+                        {
+                            PolygonDesc * topLoop = loopPolygons.at(loopPolygons.size()-1);
+                            if(topLoop->isProcLeft)
                             {
-                                frontUnit->yesChild = unit;
-                            }
-                            else if(currDesc->isProcRight)
-                            {
-                                frontUnit->noChild = unit;
+                                topLoop->isProcLeft = false;
+                                topLoop->isLeftOver = true;
+                                topLoop->isProcRight = true;
+
+                                topLoop->processUnit->yesChild = unit;
+                                currItem = topLoop->rightItem;
+                                isDoWhile = true;
                             }
                         }
                     }
-                    else
+
+                    if(!isDoWhile)
                     {
-                        frontUnit->nextChild = unit;
+                        //紧跟着判断框，需要将将此控件设置到判断框的左右分支上
+                        if(frontUnit->gtype == GRA_POLYGON)
+                        {
+                            PolygonDesc * currDesc = NULL;
+                            if(frontUnit->ptype == PRO_JUDGE && polygons.size() > 0)
+                            {
+                                currDesc = polygons.at(polygons.size() - 1);
+                            }
+                            else if(frontUnit->ptype == PRO_LOOP && loopPolygons.size() >0)
+                            {
+                                currDesc = loopPolygons.at(loopPolygons.size() - 1);
+                            }
+
+                            if(currDesc)
+                            {
+                                if(currDesc->isProcLeft)
+                                {
+                                    frontUnit->yesChild = unit;
+                                }
+                                else if(currDesc->isProcRight)
+                                {
+                                    frontUnit->noChild = unit;
+                                }
+                            }
+                        }
+                        else
+                        {
+                            frontUnit->nextChild = unit;
+                        }
+
+                        frontUnit = unit;
+
+                        procUnits.push_back(unit);
+
+                        currItem = outItems.at(0);
                     }
-
-                    frontUnit = unit;
-
-                    procUnits.push_back(unit);
-
-                    currItem = outItems.at(0);
                 }
             }
             //[1个输入(判断)/2个输入(循环)，2个输出]
+            //在作为dowhile循环时，可能会出现与if条件功能重合现象，因此要先一步判断【是】的分支是否指向前面产生的doWhileRects
             else if(gtype == GRA_POLYGON)
             {
                 if(inNum !=2 || outNum < 1)
@@ -361,8 +402,31 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     return FLOW_ERROR;
                 }
 
+                //分别获取条件成立和不成立的item，将条件成立item赋值left，不成立item赋值right
+                MyItem * yesItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,true);
+                MyItem * noItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,false);
+
+                if(yesItem == NULL || noItem == NULL)
+                {
+                    return FLOW_ERROR;
+                }
+
+                bool isYesItemProcced = false;
+                ProcessUnit * yesProcessUnit = NULL;
+
+                //如果yes分支指向的rect在之前的doWhileRects存在，避免无限循环
+                foreach(ProcessUnit * unit,doWhileRects)
+                {
+                    if(unit->item == yesItem)
+                    {
+                        isYesItemProcced = true;
+                        yesProcessUnit = unit;
+                        break;
+                    }
+                }
+
                 //判断处理
-                if(outNum == 1)
+                if(!isYesItemProcced && outNum == 1)
                 {
                     PolygonDesc * desc = new PolygonDesc;
                     desc->currItem = currItem;
@@ -419,17 +483,14 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     //当前控件的下一个节点
     //                QList<MyItem *> outItems = getInOutItems(currItem,arrows,true);
 
-                    //分别获取条件成立和不成立的item，将条件成立item赋值left，不成立item赋值right
-                    MyItem * yesItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,true);
-                    MyItem * noItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,false);
-
                     desc->isProcLeft = true;
                     desc->leftItem = yesItem;
                     desc->rightItem = noItem;
+
                     currItem = yesItem;
                 }
                 //循环处理
-                else if(outNum > 1)
+                else if(isYesItemProcced || outNum > 1)
                 {
                     //判断循环栈是否包含了当前循环控件
                     bool hasExisted = false;
@@ -667,17 +728,24 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
 
                         loopPolygons.push(desc);
 
-                        //当前控件的下一个节点
-        //                QList<MyItem *> outItems = getInOutItems(currItem,arrows,true);
-
-                        //分别获取条件成立和不成立的item，将条件成立item赋值left，不成立item赋值right
-                        MyItem * yesItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,true);
-                        MyItem * noItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,false);
-
                         desc->isProcLeft = true;
                         desc->leftItem = yesItem;
                         desc->rightItem = noItem;
-                        currItem = yesItem;
+
+                        //如果循环状态下，yes分支指向了doWhileRects集合中的一员，那么自动认定分支处理结束
+                        if(isYesItemProcced && yesProcessUnit)
+                        {
+                            desc->isProcLeft = false;
+                            desc->isLeftOver = true;
+                            desc->isProcRight = true;
+
+                            currItem = desc->rightItem;
+                            desc->processUnit->yesChild = yesProcessUnit;
+                        }
+                        else
+                        {
+                            currItem = yesItem;
+                        }
                     }
                 }
             }
