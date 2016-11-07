@@ -73,11 +73,8 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
     ProcessUnit * startUnit = NULL;
     ProcessUnit * endUnit = NULL;
 
-    int num = 0;
-
-    while(!isAtEnd && num<30)
+    while(!isAtEnd)
     {
-        num++;
         if(!currItem)
         {
             return RETURN_ERROR;
@@ -139,6 +136,10 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     {
                         frontUnit->noChild = endUnit;
                     }
+                }
+                else
+                {
+                    frontUnit->nextChild = endUnit;
                 }
 
                 //左侧未处理完成，标记左侧处理完成，然后将处理权交给右控件
@@ -209,6 +210,10 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                         frontUnit->noChild = endUnit;
                         currDesc->isRightOver = true;
                     }
+                }
+                else
+                {
+                    frontUnit->nextChild = endUnit;
                 }
 
                 //左侧未处理完成，标记左侧处理完成，然后将处理权交给右控件
@@ -492,7 +497,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                 //循环处理
                 else if(isYesItemProcced || outNum > 1)
                 {
-                    //判断循环栈是否包含了当前循环控件
+                    //判断循环栈是否包含了当前循环控件，
                     bool hasExisted = false;
                     PolygonDesc * existedDesc = NULL;
                     foreach(PolygonDesc * tmpDesc,loopPolygons)
@@ -502,23 +507,35 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                             hasExisted = true;
                             existedDesc = tmpDesc;
 
-                            //前一个单元是循环
+                            //前一个单元是循环[双层循环时，里层循环会先结束，外层循环未结束，此时要将结束的弹出，以免影响后面]
                             if(frontUnit->ptype == PRO_LOOP)
                             {
-                                if(tmpDesc->isProcLeft)
+                                PolygonDesc * frontDesc = NULL;
+                                for(int i = 0; i<loopPolygons.size();i++)
+                                {
+                                    if(loopPolygons.at(i)->currItem == frontUnit->item)
+                                    {
+                                        frontDesc = loopPolygons.at(i);
+                                        break;
+                                    }
+                                }
+
+                                if(frontDesc && frontDesc->isProcLeft)
                                 {
                                     frontUnit->yesChild = tmpDesc->processUnit;
-                                    tmpDesc->isLeftOver = true;
+                                    frontDesc->isLeftOver = true;
+                                    frontDesc->isProcLeft = false;
 
-                                    tmpDesc->isProcRight = true;
+                                    frontDesc->isProcRight = true;
 
-                                    currItem = tmpDesc->rightItem;
+                                    currItem = frontDesc->rightItem;
                                 }
-                                else if(tmpDesc->isProcRight)
+                                else if(frontDesc && frontDesc->isProcRight)
                                 {
                                     frontUnit->noChild = tmpDesc->processUnit;
 
-                                    tmpDesc->isRightOver = true;
+                                    frontDesc->isRightOver = true;
+                                    frontDesc->isProcRight = false;
                                 }
                             }
                             else if(frontUnit->ptype == PRO_JUDGE )
@@ -542,6 +559,16 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                                 frontUnit->nextChild = tmpDesc->processUnit;
                             }
                             break;
+                        }
+                    }
+
+                    //嵌套循环时，内层循环先结束，外层未结束，需要弹出内层循环对已经完成的弹出
+                    for(int i = loopPolygons.size() - 1; i>=0;i--)
+                    {
+                        if(loopPolygons.at(i)->isLeftOver && loopPolygons.at(i)->isRightOver)
+                        {
+                            delete loopPolygons.at(i);
+                            loopPolygons.remove(i);
                         }
                     }
 

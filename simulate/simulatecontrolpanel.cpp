@@ -96,6 +96,29 @@ void SimulateControlPanel::respStartSimulate()
         setFlagState(ui->step3,true);
     }
 
+    qDebug()<<"============================";
+
+    foreach(ProcessUnit * tmpUnit,procUnits)
+    {
+        if(tmpUnit->gtype == GRA_POLYGON)
+        {
+            qDebug()<<tmpUnit->item->getText()<<"__"<<tmpUnit->yesChild->item->getText()<<"_"<<tmpUnit->noChild->item->getText();
+        }
+        else
+        {
+            if(tmpUnit->nextChild)
+            {
+                qDebug()<<tmpUnit->item->getText()<<"__"<<tmpUnit->nextChild->item->getText();
+            }
+            else
+            {
+                qDebug()<<tmpUnit->item->getText();
+            }
+
+        }
+    }
+
+
     //【5】对处理单元进行处理
     ProcessUnit * currUnit = procUnits.first();
     while(currUnit && currUnit->ptype != PRO_END)
@@ -105,7 +128,7 @@ void SimulateControlPanel::respStartSimulate()
 
         if(currUnit->ptype == PRO_JUDGE)
         {
-            int result = Util::getWarnChoice(currUnit->item->getText());
+            int result = QMessageBox::Yes/*Util::getWarnChoice(currUnit->item->getText())*/;
 
             if(result == QMessageBox::Yes)
             {
@@ -205,6 +228,12 @@ void SimulateControlPanel::resetSimluateFlag()
     ui->step3->setStyleSheet("");
 
     ui->simProcedure->clear();
+
+    foreach(ProcessUnit * unit,procUnits)
+    {
+        delete unit;
+    }
+    procUnits.clear();
 }
 
 //根据检查的结果设置流程中样式
