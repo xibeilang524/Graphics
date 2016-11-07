@@ -26,14 +26,17 @@ SimulateUtil * SimulateUtil::instance()
 /*!
  *获取当前控件的父控件，只考虑判断框(GRA_RECT).
  *【1】20161101增加对循环条件的引单功能
+ *【2】20161107修复因dowhile产生的rect无限循环问题(尚未对判断框功能的区分(判断/循环))
  *!*/
 QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
 {
     QList<MyItem *> list;
 
     MyItem * pItem = item;
+    bool isFirst = true;
 
-    QStack<MultiPathDesc * > descs;
+    QStack<MultiPathDesc * > descs;       //记录推演过程中某个控件因多个输入产生的多路径
+    QStack<MyItem * > polygons;           //记录推到过程中遇到的多边形(可能是判断，也可能是循环)
     MultiPathDesc * currMPath = NULL;
 
     bool isSearchOver = false;
@@ -44,104 +47,206 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
         {
             QList<MyItem *> pItems = getInOutItems(pItem,pItem->getArrows(),false);
 
-            bool hasAdded = false;
-            if(pItems.size() > 1)
-            {
+            qDebug()<<pItem->getText();
 
-                for(int i = 0;i < descs.size() ; i++)
+            bool hasAdded = false;
+            bool skipCurrLoop = false;
+
+            if(pItem->getType() == GRA_POLYGON)
+            {
+                bool hasAddPolygon = false;
+
+                if(pItem == item)
                 {
-                    if(descs.at(i)->currItem == pItem)
+                    hasAddPolygon = true;
+                }
+
+                foreach(MyItem * tmpItem,polygons)
+                {
+                    if(tmpItem == pItem)
                     {
-                        hasAdded = true;
+                        hasAddPolygon = true;
+                        break;
                     }
                 }
 
+                if(!hasAddPolygon)
+                {
+                    polygons.append(pItem);
+                }
+                //已经加入，则说明产生了循环
+                else
+                {
+                    hasAdded = true;
+                }
+            }
+            //为了防止支线中第一个item为rect，导致漏掉处理
+            else if (pItem->getType() == GRA_RECT)
+            {
+                if(!isFirst)
+                {
+                    bool hasAddRect = false;
+
+                    if(pItem == item)
+                    {
+                        hasAddRect = true;
+                    }
+
+                    foreach(MyItem * tmpItem ,list)
+                    {
+                        if(tmpItem == item)
+                        {
+                            hasAddRect = true;
+                            break;
+                        }
+                    }
+
+                    if(!hasAddRect)
+                    {
+                        if(descs.size() > 0)
+                        {
+                            MultiPathDesc * lastDesc = descs.at(descs.size()-1);
+                            SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
+                            spathDesc->hasAddItem++;
+                        }
+
+                        qDebug()<<"===add:"<<pItem->getText();
+                        list.append(pItem);
+                    }
+                    else
+                    {
+                        while(descs.size() > 0 )
+                        {
+                            MultiPathDesc * lastDesc = descs.at(descs.size()-1);
+                            SignalPathDesc * spathDesc = NULL;
+
+                            if(lastDesc->currPathNum < lastDesc->totalPathNum)
+                            {
+                                spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
+                            }
+
+                            if(spathDesc)
+                            {
+                                for(int i=0;i<spathDesc->hasAddItem;i++)
+                                {
+                                    qDebug()<<"===remve:"<<list.last()->getText();
+                                    list.removeLast();
+                                }
+
+                                spathDesc->isSearching = false;
+                                spathDesc->hasSearched = true;
+
+                                lastDesc->currPathNum += 1;
+                                //当前已经搜索结束,
+                                if(lastDesc->currPathNum >= lastDesc->totalPathNum)
+                                {
+                                    delete lastDesc;
+                                    descs.pop();
+                                }
+                                else
+                                {
+                                    SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
+                                    pItem = spathDesc->startItem;
+                                    skipCurrLoop = true;
+                                    qDebug()<<"+++"<<pItem->getText();
+                                    break;
+                                }
+                            }
+
+                            if(descs.size() > 0)
+                            {
+                                MultiPathDesc  *  parentLastDesc = descs.at(descs.size()-1);
+                                parentLastDesc->currPathNum++;
+                                if(parentLastDesc->currPathNum >= parentLastDesc->totalPathNum)
+                                {
+                                    delete parentLastDesc;
+                                    descs.pop();
+                                }
+                                else
+                                {
+                                    SignalPathDesc * spathDesc = parentLastDesc->pathes.at(parentLastDesc->currPathNum);
+                                    pItem = spathDesc->startItem;
+                                    break;
+                                }
+                            }
+
+                            if(descs.size() == 0)
+                            {
+                                isSearchOver = true;
+                                break;
+                            }
+                       }
+                    }
+                }
+            }
+
+            isFirst = false;
+
+            if(!skipCurrLoop)
+            {
                 if(!hasAdded)
                 {
-                    MultiPathDesc * mpath = new MultiPathDesc;
-                    mpath->totalPathNum = pItems.size();
-                    mpath->currItem = pItem;
-                    foreach(MyItem * tmp,pItems)
+                    if(pItems.size() > 1)
                     {
-                        SignalPathDesc * path = new SignalPathDesc;
-                        path->startItem = tmp;
-                        mpath->pathes.append(path);
+                        for(int i = 0;i < descs.size() ; i++)
+                        {
+                            if(descs.at(i)->currItem == pItem)
+                            {
+                                hasAdded = true;
+                            }
+                            break;
+                        }
+
+                        if(!hasAdded)
+                        {
+                            MultiPathDesc * mpath = new MultiPathDesc;
+                            mpath->totalPathNum = pItems.size();
+                            mpath->currItem = pItem;
+                            foreach(MyItem * tmp,pItems)
+                            {
+                                SignalPathDesc * path = new SignalPathDesc;
+                                path->startItem = tmp;
+                                mpath->pathes.append(path);
+                            }
+
+                            descs.append(mpath);
+                            currMPath = mpath;
+
+                            pItem = pItems.at(0);
+                        }
                     }
-
-                    descs.append(mpath);
-                    currMPath = mpath;
-
-                    pItem = pItems.at(0);
-                }
-            }
-            else if(pItems.size() == 1)
-            {
-                pItem = pItems.at(0);
-            }
-            else
-            {
-                isSearchOver = true;
-            }
-
-            //判断当前是否为开始
-            if(getIsItemStart(pItem))
-            {
-                if(descs.size() > 0)
-                {
-                    MultiPathDesc * lastDesc = descs.at(descs.size()-1);
-                    SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
-                    spathDesc->isSearching = false;
-                    spathDesc->hasSearched = true;
-
-                    lastDesc->currPathNum += 1;
-
-                    //当前已经搜索结束
-                    if(lastDesc->currPathNum >= lastDesc->totalPathNum)
+                    else if(pItems.size() == 1)
                     {
-                        delete lastDesc;
-                        descs.pop();
+                        pItem = pItems.at(0);
                     }
                     else
                     {
-                        SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
-                        pItem = spathDesc->startItem;
+                        isSearchOver = true;
                     }
                 }
-
-                if(descs.size() == 0)
+                //判断当前是否为开始
+                if(getIsItemStart(pItem))
                 {
-                    isSearchOver = true;
-                }
-            }
-
-            //当存在循环时，循环后指向了自己
-            if(hasAdded)
-            {
-                //将已经加入的反向弹出
-                if(descs.size() > 0 )
-                {
-                    MultiPathDesc * lastDesc = descs.at(descs.size()-1);
-                    SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
-
-                    for(int i=0;i<spathDesc->hasAddItem;i++)
+                    if(descs.size() > 0)
                     {
-                        list.removeLast();
-                    }
-
-                    spathDesc->isSearching = false;
-                    spathDesc->hasSearched = true;
-
-                    lastDesc->currPathNum += 1;
-                    //当前已经搜索结束
-                    if(lastDesc->currPathNum >= lastDesc->totalPathNum)
-                    {
-                        delete lastDesc;
-                        descs.pop();
-                    }
-                    else
-                    {
+                        MultiPathDesc * lastDesc = descs.at(descs.size()-1);
                         SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
-                        pItem = spathDesc->startItem;
+                        spathDesc->isSearching = false;
+                        spathDesc->hasSearched = true;
+
+                        lastDesc->currPathNum += 1;
+
+                        //当前已经搜索结束
+                        if(lastDesc->currPathNum >= lastDesc->totalPathNum)
+                        {
+                            delete lastDesc;
+                            descs.pop();
+                        }
+                        else
+                        {
+                            SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
+                            pItem = spathDesc->startItem;
+                        }
                     }
 
                     if(descs.size() == 0)
@@ -149,22 +254,80 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                         isSearchOver = true;
                     }
                 }
-            }
-            else
-            {
-                if(pItem->getType() == GRA_RECT)
+
+                //当存在循环时，循环后指向了自己
+                if(hasAdded)
                 {
-                    if(descs.size() > 0)
+                    //如果有多路径存在，则要对当前路径进行更新；并将已经加入的反向弹出
+                    while(descs.size() > 0 )
                     {
                         MultiPathDesc * lastDesc = descs.at(descs.size()-1);
-                        SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
-                        spathDesc->hasAddItem++;
+                        SignalPathDesc * spathDesc = NULL;
+
+                        if(lastDesc->currPathNum < lastDesc->totalPathNum)
+                        {
+                            spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
+                        }
+
+                        if(spathDesc)
+                        {
+                            for(int i=0;i<spathDesc->hasAddItem;i++)
+                            {
+                                qDebug()<<"===remve:"<<list.last()->getText();
+                                list.removeLast();
+                            }
+
+                            spathDesc->isSearching = false;
+                            spathDesc->hasSearched = true;
+
+                            lastDesc->currPathNum += 1;
+                            //当前已经搜索结束,
+                            if(lastDesc->currPathNum >= lastDesc->totalPathNum)
+                            {
+                                delete lastDesc;
+                                descs.pop();
+                            }
+                            else
+                            {
+                                SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
+                                pItem = spathDesc->startItem;
+                                break;
+                            }
+                        }
+
+                        if(descs.size() > 0)
+                        {
+                            MultiPathDesc  *  parentLastDesc = descs.at(descs.size()-1);
+                            parentLastDesc->currPathNum++;
+                            if(parentLastDesc->currPathNum >= parentLastDesc->totalPathNum)
+                            {
+                                delete parentLastDesc;
+                                descs.pop();
+                            }
+                            else
+                            {
+                                SignalPathDesc * spathDesc = parentLastDesc->pathes.at(parentLastDesc->currPathNum);
+                                pItem = spathDesc->startItem;
+                                break;
+                            }
+                        }
+
+                        if(descs.size() == 0)
+                        {
+                            isSearchOver = true;
+                            break;
+                        }
                     }
-                    list.append(pItem);
-                }
+                 }
             }
         }
     }
+
+    foreach(MyItem * tmpItem,list)
+    {
+        qDebug()<<"result:"<<tmpItem->getText();
+    }
+
     return list;
 }
 
