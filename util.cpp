@@ -5,7 +5,6 @@
 #include <QTableWidget>
 #include <QUuid>
 
-
 #include "qmath.h"
 #include "global.h"
 #include "mainwindow.h"
@@ -182,6 +181,29 @@ void Util::loadPixmapByGType(GraphicsType type, QPixmap &pixmap)
         case GAR_PARALLE:
                            pixmap.load(":/images/parallel.png");
                            break;
+#ifdef ADD_STATE_MODEL
+        //в╢л╛╩З
+        case GRA_STATE_START:
+                           pixmap.load(":/images/State_Start.png");
+                           break;
+        case GRA_STATE_END:
+                           pixmap.load(":/images/State_End.png");
+                           break;
+        case GRA_STATE_PROCESS:
+                           pixmap.load(":/images/roundedrect.png");
+                           break;
+        //узуж
+        case GRA_MASK_RECT:
+                           pixmap.load(":/images/rectange.png");
+                           break;
+
+        case GRA_MASK_BOUND_RECT:
+                           pixmap.load(":/images/roundedrect.png");
+                           break;
+        case GRA_MASK_CIRCLE:
+                           pixmap.load(":/images/circle.png");
+                           break;
+#endif
         default:
                            break;
     }

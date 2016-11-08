@@ -36,6 +36,7 @@
 #define POINT_ONE_EIGHTH 0.125
 #define ANNOTATION_SHORT_LINE  7     //注解短边的长度
 #define MAX_LOOP_RADIUS    25        //注解短边最大长度
+#define STATE_END_RADIUS   3         //状态机结束圆与Circle半径差
 
 //对MyRect的输出进行重载
 QDataStream & operator <<(QDataStream &stream,MyRect & rect)
@@ -176,14 +177,31 @@ MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *pare
         case GRA_PARALLELOGRAM:
         case GRA_LOOP_UP:
         case GRA_LOOP_DOWN:
+#ifdef ADD_STATE_MODEL
+        case GRA_STATE_PROCESS:
+#endif
                              boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
                              break;
         case GRA_CIRCLE:
+#ifdef ADD_STATE_MODEL
+        case GRA_STATE_START:
+        case GRA_STATE_END:
+#endif
                              boundRect = QRectF(-POINT_FIVE*radius,-POINT_FIVE*radius,radius,radius);
                              break;
         case GAR_PARALLE:
                              boundRect = QRectF(-radius,-POINT_ONE_EIGHTH*radius,2*radius,POINT_TWO_FIVE*radius);
                              break;
+#ifdef ADD_STATE_MODEL
+        case GRA_MASK_RECT:
+        case GRA_MASK_BOUND_RECT:
+                             radius*=2;
+                             boundRect = QRectF(-POINT_FIVE*radius,-radius,radius,2*radius);
+                             break;
+        case GRA_MASK_CIRCLE:
+                             boundRect = QRectF(-radius,-radius,2*radius,2*radius);
+                             break;
+#endif
         default:
              break;
     }
@@ -191,7 +209,19 @@ MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *pare
     setInitalPolygon(boundRect,boundRect.width()/2,boundRect.height()/2,boundRect.width(),boundRect.height());
 
     property.isMoveable = true;         //默认可以移动
-    property.itemBrush = QBrush(GLOBAL_ITEM_BRUSH);
+#ifdef ADD_STATE_MODEL
+    if(currItemType == GRA_STATE_START||currItemType == GRA_STATE_END)
+    {
+        property.itemBrush = QBrush(Qt::black);
+    }
+    else
+    {
+#endif
+        property.itemBrush = QBrush(GLOBAL_ITEM_BRUSH);
+#ifdef ADD_STATE_MODEL
+    }
+#endif
+
     property.itemPen = QPen(Qt::black,2,Qt::SolidLine);
 
     property.itemRect.width = boundRect.width();
@@ -341,7 +371,16 @@ void MyItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QW
                 painter->setPen(QPen(Qt::blue,3));
             }
         }
-
+#ifdef ADD_STATE_MODEL
+        if(currItemType == GRA_STATE_END)
+        {
+            painter->save();
+            painter->setBrush(Qt::NoBrush);
+            painter->setPen(QPen(Qt::black,2));
+            painter->drawEllipse(boundRect);
+            painter->restore();
+        }
+#endif
         painter->drawPolygon(itemPolygon);
     }
 
@@ -427,7 +466,6 @@ void MyItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     MY_BUILD_MODEL_ONLY
     emit editMe();
     QGraphicsPolygonItem::mouseDoubleClickEvent(event);
-
 //    myTextItem->setTextInteractionFlags(Qt::TextEditorInteraction);
 }
 
@@ -1276,6 +1314,9 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                         case GRA_RECT:
                         case GRA_ANNOTATION:
                         case GAR_PARALLE:
+#ifdef ADD_STATE_MODEL
+                        case GRA_MASK_RECT:
+#endif
                             itemPolygon.clear();
                             itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
                                     QPointF(tmpX,tmpY)<<QPointF(-tmpX,tmpY);
@@ -1283,6 +1324,10 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                             break;
 
                         case GRA_ROUND_RECT:
+#ifdef ADD_STATE_MODEL
+                        case GRA_STATE_PROCESS:
+                        case GRA_MASK_BOUND_RECT:
+#endif
                             itemPolygon.clear();
 
                             path.addRoundedRect(boundRect,10,10);
@@ -1291,11 +1336,24 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                             break;
 
                         case GRA_CIRCLE:
+#ifdef ADD_STATE_MODEL
+                        case GRA_STATE_START:
+                        case GRA_MASK_CIRCLE:
+#endif
                             itemPolygon.clear();
                             path.addEllipse(boundRect);
                             itemPolygon = path.toFillPolygon();
                             hasProcessed = true;
                             break;
+#ifdef ADD_STATE_MODEL
+                        case GRA_STATE_END:
+                            itemPolygon.clear();
+                            path.addEllipse(QRectF(boundRect.x() + STATE_END_RADIUS,
+                                                   boundRect.y()+STATE_END_RADIUS,boundRect.width()-STATE_END_RADIUS*2,boundRect.height()-STATE_END_RADIUS*2));
+                            itemPolygon = path.toFillPolygon();
+                            hasProcessed = true;
+                            break;
+#endif
                         case GRA_ELLIPSE:
                             itemPolygon.clear();
                             path.addEllipse(boundRect);
@@ -1522,25 +1580,47 @@ void MyItem::setInitalPolygon(QRectF boundRect,qreal tx,qreal ty,qreal tw,qreal 
             case GRA_RECT:
             case GRA_ANNOTATION:
             case GAR_PARALLE:
+#ifdef ADD_STATE_MODEL
+            case GRA_MASK_RECT:
+#endif
                                itemPolygon<<QPointF(-tx,-ty)<<QPointF(tx,-ty)<<
                                        QPointF(tx,ty)<<QPointF(-tx,ty);
                                break;
-           //圆角矩形
+           //圆角矩形/状态处理
            case GRA_ROUND_RECT:
+#ifdef ADD_STATE_MODEL
+           case GRA_STATE_PROCESS:
+           case GRA_MASK_BOUND_RECT:
+#endif
                             {
                                 QPainterPath path;
                                 path.addRoundedRect(boundRect,10,10);
                                 itemPolygon = path.toFillPolygon();
                             }
                               break;
-            //圆形
+            //圆形/状态开始/圆形遮罩
             case GRA_CIRCLE:
+#ifdef ADD_STATE_MODEL
+            case GRA_STATE_START:
+            case GRA_MASK_CIRCLE:
+#endif
                             {
                                 QPainterPath path;
                                 path.addEllipse(boundRect);
                                 itemPolygon = path.toFillPolygon();
                             }
                                break;
+#ifdef ADD_STATE_MODEL
+             //状态结束
+             case GRA_STATE_END:
+                            {
+                                QPainterPath path;
+                                path.addEllipse(QRectF(boundRect.x() + STATE_END_RADIUS,
+                                                       boundRect.y()+STATE_END_RADIUS,boundRect.width()-STATE_END_RADIUS*2,boundRect.height()-STATE_END_RADIUS*2));
+                                itemPolygon = path.toFillPolygon();
+                            }
+                                break;
+#endif
             //椭圆
             case GRA_ELLIPSE:
                             {

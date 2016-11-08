@@ -15,6 +15,7 @@
 #define LEFTICONWIDGET_H
 
 #include <QWidget>
+#include "../Header.h"
 
 class QToolBox;
 class MyListWidget;
@@ -32,6 +33,10 @@ private:
 
     QToolBox * toolBox;
     MyListWidget * polygonWidget;         //矩形、圆形
+#ifdef ADD_STATE_MODEL
+    MyListWidget * stateWidget;           //状态机
+    MyListWidget * maskWidget;            //遮罩
+#endif
     MyListWidget * nodeWidget;            //端口等小部件，主要拖入到polygonWidget之上
 
 };

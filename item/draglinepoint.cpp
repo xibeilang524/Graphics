@@ -7,7 +7,6 @@
 
 #include "myitem.h"
 
-
 DragLinePoint::DragLinePoint(const PointType pointType, GraphicsType type, MyItem *parent1, QObject *parent):
     pointType(pointType),
     MyNodeLine(type,parent1,parent)

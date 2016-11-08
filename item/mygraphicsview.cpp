@@ -16,6 +16,12 @@
 #include "../SelfWidget/mytextinput.h"
 #include "../SelfWidget/mypropertyedit.h"
 #include "../SelfWidget/myconditionsetting.h"
+#include "../SelfWidget/myportinitialdialog.h"
+#include "../SelfWidget/myportoutputdialog.h"
+#include "../SelfWidget/mystateinternaleventdialog.h"
+#include "../SelfWidget/mystatemodeldialog.h"
+#include "../SelfWidget/mystatesetdialog.h"
+#include "../SelfWidget/mystatestartdialog.h"
 #include "../simulate/simulateutil.h"
 #include "../Header.h"
 #include "../global.h"
@@ -949,38 +955,84 @@ void MyGraphicsView::editTextItem()
         if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+#ifdef ADD_STATE_MODEL
+            GraphicsType gType = item->getType();
 
-            MyTextInput textInput(this);
+            if(gType == GRA_STATE_START)
+            {
+                MyStateStartDialog dialog(this);
+                dialog.exec();
+            }
+            else if(gType == GRA_STATE_PROCESS)
+            {
+                MyStateModelDialog dialog(this);
+                dialog.exec();
+            }
+            else if(gType == GRA_MASK_RECT || gType == GRA_MASK_BOUND_RECT)
+            {
 
-            textInput.setTex(item->getText());
-            textInput.exec();
+            }
+            else
+            {
+#endif
+                MyTextInput textInput(this);
 
-            item->setText(textInput.getText());
+                textInput.setTex(item->getText());
+                textInput.exec();
 
-            //当修改文字后，需要重新将信息发送至右侧的工具栏。
-            emit initToolBox(selectedItems.size(),item->getProperty());
+                item->setText(textInput.getText());
+
+                //当修改文字后，需要重新将信息发送至右侧的工具栏。
+                emit initToolBox(selectedItems.size(),item->getProperty());
+#ifdef ADD_STATE_MODEL
+            }
+#endif
         }
         else if(itemName == TYPE_ID(MyArrow))
         {
             MyArrow * item = dynamic_cast<MyArrow*>(selectedItems.first());
 
-            MyTextInput textInput(this);
+            MyStateSetDialog dialog(this);
+            dialog.exec();
 
-            textInput.setTex(item->getText());
-            textInput.exec();
+//            MyTextInput textInput(this);
 
-            item->setText(textInput.getText());
+//            textInput.setTex(item->getText());
+//            textInput.exec();
+
+//            item->setText(textInput.getText());
         }
         else if(itemName == TYPE_ID(MyNodePort))
         {
             MyNodePort * item = dynamic_cast<MyNodePort*>(selectedItems.first());
 
-            MyTextInput textInput(this);
+            GraphicsType gType = item->getType();
 
-            textInput.setTex(item->getText());
-            textInput.exec();
+            if(gType == GRA_NODE_TRIANGLE_OUT)
+            {
+                MyPortOutputDialog dialog(this);
+                dialog.exec();
+            }
+            else if(gType == GRA_NODE_HALF_CIRCLE)
+            {
+                MyPortOutputDialog dialog(this);
+                dialog.exec();
+            }
+            //圆形端口
+            else if(gType == GRA_NODE_CIRCLE)
+            {
+                MyPortInitialDialog dialog(this);
+                dialog.exec();
+            }
+            else
+            {
+                MyTextInput textInput(this);
 
-            item->setText(textInput.getText());
+                textInput.setTex(item->getText());
+                textInput.exec();
+
+                item->setText(textInput.getText());
+            }
         }
     }
 }

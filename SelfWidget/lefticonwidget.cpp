@@ -7,7 +7,6 @@
 #include "../manager/listitemmanager.h"
 #include "mylistwidget.h"
 #include "../Constants.h"
-#include "../Header.h"
 
 using namespace Graphics;
 
@@ -28,13 +27,21 @@ void LeftIconWidget::initWidget()
     toolBox = new QToolBox(this);
 
     polygonWidget = new MyListWidget;
-
     nodeWidget = new MyListWidget;
-
+#ifdef ADD_STATE_MODEL
+    stateWidget = new MyListWidget;
+    maskWidget = new MyListWidget;
+#endif
     initListItems();
 
     toolBox->addItem(polygonWidget,"Á÷³ÌÍ¼");
+#ifdef ADD_STATE_MODEL
+    toolBox->addItem(stateWidget,"×´Ì¬Í¼");
+#endif
     toolBox->addItem(nodeWidget,"¶Ë¿Ú");
+#ifdef ADD_STATE_MODEL
+    toolBox->addItem(maskWidget,"ÕÚÕÖ");
+#endif
 
     mainLayout->addWidget(toolBox);
 
@@ -92,7 +99,33 @@ void LeftIconWidget::initListItems()
     MyListItem * text = ListItemManager::instance()->createListItem(Constants::TEXT_ID,QIcon(":/images/text.png"),"ÎÄ×Ö",polygonWidget);
     text->setData(Qt::UserRole,(int)GRA_TEXT);
     polygonWidget->addItem(text);
+#ifdef ADD_STATE_MODEL
+    //×´Ì¬»ú
+    MyListItem * startState = ListItemManager::instance()->createListItem(Constants::STATE_START_ID,QIcon(":/images/State_Start.png"),"¿ªÊ¼",stateWidget);
+    startState->setData(Qt::UserRole,(int)GRA_STATE_START);
+    stateWidget->addItem(startState);
 
+    MyListItem * endState = ListItemManager::instance()->createListItem(Constants::STATE_END_ID,QIcon(":/images/State_End.png"),"½áÊø",stateWidget);
+    endState->setData(Qt::UserRole,(int)GRA_STATE_END);
+    stateWidget->addItem(endState);
+
+    MyListItem * processState = ListItemManager::instance()->createListItem(Constants::STATE_PROCESS_ID,QIcon(":/images/roundedrect.png"),"´¦Àí",stateWidget);
+    processState->setData(Qt::UserRole,(int)GRA_STATE_PROCESS);
+    stateWidget->addItem(processState);
+
+    //ÕÚÕÖmaskWidget
+    MyListItem * rectMask = ListItemManager::instance()->createListItem(Constants::MASK_RECT_ID,QIcon(":/images/rectange.png"),"¾ØÐÎÕÚÕÖ",maskWidget);
+    rectMask->setData(Qt::UserRole,(int)GRA_MASK_RECT);
+    maskWidget->addItem(rectMask);
+
+    MyListItem * boundRectMask = ListItemManager::instance()->createListItem(Constants::MASK_BOUND_RECT_ID,QIcon(":/images/roundedrect.png"),"Ô²½ÇÕÚÕÖ",maskWidget);
+    boundRectMask->setData(Qt::UserRole,(int)GRA_MASK_BOUND_RECT);
+    maskWidget->addItem(boundRectMask);
+
+    MyListItem * circleMask = ListItemManager::instance()->createListItem(Constants::MASK_CIRCLE_ID,QIcon(":/images/circle.png"),"Ô²ÕÚÕÖ",maskWidget);
+    circleMask->setData(Qt::UserRole,(int)GRA_MASK_CIRCLE);
+    maskWidget->addItem(circleMask);
+#endif
     //²åÈë½Úµã
     MyListItem * nodePort = ListItemManager::instance()->createListItem(Constants::NODE_PORT_ID,QIcon(":/images/nodePort.png"),"¾ØÐÎ¶Ë¿Ú",nodeWidget);
     nodePort->setData(Qt::UserRole,(int)GRA_NODE_PORT);
@@ -128,7 +161,19 @@ LeftIconWidget::~LeftIconWidget()
         delete nodeWidget;
         nodeWidget = NULL;
     }
+#ifdef ADD_STATE_MODEL
+    if(stateWidget)
+    {
+        delete stateWidget;
+        stateWidget = NULL;
+    }
 
+    if(maskWidget)
+    {
+        delete maskWidget;
+        maskWidget = NULL;
+    }
+#endif
     if(toolBox)
     {
         delete toolBox;

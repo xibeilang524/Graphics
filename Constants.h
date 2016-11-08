@@ -55,6 +55,16 @@ const char PARALLEL_ID[] = "Constants.Parallel";
 const char LOOP_DOWN_ID[] = "Constants.LoopDown";
 const char LOOP_UP_ID[] = "Constants.LoopUp";
 
+//в╢л╛м╪
+const char STATE_START_ID[] = "Constants.State.Start";
+const char STATE_END_ID[] = "Constants.State.End";
+const char STATE_PROCESS_ID[] = "Constants.State.Process";
+
+//узуж
+const char MASK_RECT_ID[] = "Constants.Mask.Rect";
+const char MASK_BOUND_RECT_ID[] = "Constants.Mask.BoundRect";
+const char MASK_CIRCLE_ID[] = "Constants.Mask.Circle";
+
 //дёй╫
 const char BUILD_MODEL_ID[] = "Constants.BuildModel";
 const char SIMLUATE_ID[] = "Constants.Simluate";

@@ -83,5 +83,7 @@
         <file>images/log.rc</file>
         <file>images/nodeHalfCircle.png</file>
         <file>images/nodeTriangle.png</file>
+        <file>images/State_End.png</file>
+        <file>images/State_Start.png</file>
     </qresource>
 </RCC>

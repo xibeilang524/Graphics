@@ -10,7 +10,14 @@ HEADERS += \
     SelfWidget/mypageswitch.h \
     SelfWidget/serviceview.h \
     SelfWidget/pageswitchbar.h \
-    SelfWidget/myconditionsetting.h
+    SelfWidget/myconditionsetting.h \
+    SelfWidget/myportinitialdialog.h \
+    SelfWidget/myportoutputdialog.h \
+    SelfWidget/mystatestartdialog.h \
+    SelfWidget/mystatemodeldialog.h \
+    SelfWidget/mystateinternaleventdialog.h \
+    SelfWidget/mystatesetdialog.h \
+    SelfWidget/mychoosebar.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -24,7 +31,14 @@ SOURCES += \
     SelfWidget/mypageswitch.cpp \
     SelfWidget/serviceview.cpp \
     SelfWidget/pageswitchbar.cpp \
-    SelfWidget/myconditionsetting.cpp
+    SelfWidget/myconditionsetting.cpp \
+    SelfWidget/myportinitialdialog.cpp \
+    SelfWidget/myportoutputdialog.cpp \
+    SelfWidget/mystatestartdialog.cpp \
+    SelfWidget/mystatemodeldialog.cpp \
+    SelfWidget/mystateinternaleventdialog.cpp \
+    SelfWidget/mystatesetdialog.cpp \
+    SelfWidget/mychoosebar.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
@@ -34,4 +48,11 @@ FORMS += \
     SelfWidget/mypropertyedit.ui \
     SelfWidget/serviceview.ui \
     SelfWidget/pageswitchbar.ui \
-    SelfWidget/myconditionsetting.ui
+    SelfWidget/myconditionsetting.ui \
+    SelfWidget/myportinitialdialog.ui \
+    SelfWidget/myportoutputdialog.ui \
+    SelfWidget/mystatestartdialog.ui \
+    SelfWidget/mystatemodeldialog.ui \
+    SelfWidget/mystateinternaleventdialog.ui \
+    SelfWidget/mystatesetdialog.ui \
+    SelfWidget/mychoosebar.ui

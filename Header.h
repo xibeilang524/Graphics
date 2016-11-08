@@ -17,6 +17,11 @@
 
 #define M_VERTION 0x0006        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
 
+//用于控制是否需要加入状态机模块，如果不需要，将此宏取消定义
+#ifndef ADD_STATE_MODEL
+#define ADD_STATE_MODEL
+#endif
+
 #define PI 3.141592653
 #define ICON_WIDTH  60          //拖拽图标的宽高
 #define ICON_HEIGHT 60
@@ -24,6 +29,8 @@
 #define FONT_DEAFULT_PIX  9     //字体初始化大小
 #define ROTATE_MIN_DEGREE 0     //旋转的最小角度
 #define ROTATE_MAX_DEGREE 360   //旋转的最大角度
+#define POP_SUB_DIALOG_WIDTH  650    //弹出子窗口固定宽度
+#define POP_SUB_DIALOG_HEIGHT 450    //弹出子窗口固定高度
 
 #include <QString>
 
@@ -112,10 +119,22 @@ enum GraphicsType
     GRA_DRAG_LING,       //控件线段拖拽点
     GRA_ROTATE_POINT,    //控件旋转点
     GRA_ITEM_INFO,       //控件显示信息
-    GRA_NODE_HALF_CIRCLE,  //D端口
+    //端口
+    GRA_NODE_HALF_CIRCLE,     //D端口
     GRA_NODE_TRIANGLE_IN ,    //三角输入端口
     GRA_NODE_TRIANGLE_OUT,    //三角输出端口
-    GRA_NODE_CIRCLE           //圆输出端口
+    GRA_NODE_CIRCLE,          //圆输出端口
+#ifdef ADD_STATE_MODEL
+    //状态机
+    GRA_STATE_START,          //状态机开始
+    GRA_STATE_END,            //状态机结束
+    GRA_STATE_PROCESS,        //状态机处理
+    //遮罩
+    GRA_MASK_RECT,            //矩形遮罩
+    GRA_MASK_BOUND_RECT,      //圆角矩形遮罩
+    GRA_MASK_CIRCLE,          //圆形遮罩
+#endif
+    GRA_NO_MEAN               //无意义值
 };
 
 //拖入端口的方向
