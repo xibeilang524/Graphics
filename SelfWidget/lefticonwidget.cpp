@@ -38,7 +38,7 @@ void LeftIconWidget::initWidget()
 #ifdef ADD_STATE_MODEL
     toolBox->addItem(stateWidget,"状态图");
 #endif
-    toolBox->addItem(nodeWidget,"端口");
+    toolBox->addItem(nodeWidget,"原子图");
 #ifdef ADD_STATE_MODEL
     toolBox->addItem(maskWidget,"遮罩");
 #endif
@@ -125,8 +125,13 @@ void LeftIconWidget::initListItems()
     MyListItem * circleMask = ListItemManager::instance()->createListItem(Constants::MASK_CIRCLE_ID,QIcon(":/images/circle.png"),"圆遮罩",maskWidget);
     circleMask->setData(Qt::UserRole,(int)GRA_MASK_CIRCLE);
     maskWidget->addItem(circleMask);
-#endif
+
     //插入节点
+    MyListItem * atomProcessPort = ListItemManager::instance()->createListItem(Constants::NODE_PROCESS_ID,QIcon(":/images/rectange.png"),"原子处理",nodeWidget);
+    atomProcessPort->setData(Qt::UserRole,(int)GRA_NODE_PROCESS);
+    nodeWidget->addItem(atomProcessPort);
+#endif
+
     MyListItem * nodePort = ListItemManager::instance()->createListItem(Constants::NODE_PORT_ID,QIcon(":/images/nodePort.png"),"矩形端口",nodeWidget);
     nodePort->setData(Qt::UserRole,(int)GRA_NODE_PORT);
     nodeWidget->addItem(nodePort);

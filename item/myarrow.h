@@ -17,6 +17,7 @@
 **             添加鼠标进入和离开改变样式，方便状态显示
 **20161008:wey:调整连接线绘制起始点至控件一遍的中点
 **20161017:gx:修复连接线选择区域小的问题(目前在垂直或水平状态下选中效果依然不好)
+**20161110:wey:添加右键菜单功能
 *************************************************/
 #ifndef MYARROW_H
 #define MYARROW_H
@@ -89,6 +90,7 @@ protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);
     void hoverLeaveEvent(QGraphicsSceneHoverEvent *event);
     void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 private:
     void countNodeCrossPoint(QPolygonF polygon,QLineF centerLine,QPointF &endIntersectPoint);

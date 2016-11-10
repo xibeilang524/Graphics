@@ -99,7 +99,7 @@ QDataStream & operator >>(QDataStream &stream,AddLineType & type)
 ////写入属性
 QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 {
-    stream<<prop.startItemID<<prop.endItemID
+    stream<<prop.startItemID<<prop.endItemID<<prop.associativeID
            <<prop.isNeedBrush<<prop.itemBrush
             <<prop.isNeedBorder<<prop.itemPen<<prop.itemRect
              <<prop.alphaValue<<prop.rotateDegree
@@ -113,7 +113,7 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 ////读属性
 QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
 {
-    stream>>prop.startItemID>>prop.endItemID
+    stream>>prop.startItemID>>prop.endItemID>>prop.associativeID
            >>prop.isNeedBrush>>prop.itemBrush
             >>prop.isNeedBorder>>prop.itemPen>>prop.itemRect
              >>prop.alphaValue>>prop.rotateDegree
@@ -201,6 +201,10 @@ MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *pare
         case GRA_MASK_CIRCLE:
                              boundRect = QRectF(-radius,-radius,2*radius,2*radius);
                              break;
+        case GRA_NODE_PROCESS:
+                            radius*=2;
+                            boundRect = QRectF(-radius,-POINT_FIVE*radius,2*radius,radius);
+                            break;
 #endif
         default:
              break;
@@ -210,9 +214,21 @@ MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *pare
 
     property.isMoveable = true;         //默认可以移动
 #ifdef ADD_STATE_MODEL
+    startProp.content = property.content;
+    stateModeProp.stateName = property.content;
+
     if(currItemType == GRA_STATE_START||currItemType == GRA_STATE_END)
     {
         property.itemBrush = QBrush(Qt::black);
+    }
+    //遮罩
+    else if(currItemType == GRA_MASK_RECT || currItemType == GRA_MASK_BOUND_RECT ||currItemType == GRA_MASK_CIRCLE)
+    {
+        property.itemBrush = QBrush(Qt::blue,Qt::BDiagPattern);
+    }
+    else if(currItemType == GRA_NODE_PROCESS)
+    {
+        property.itemBrush = QBrush(QColor(226,226,226));
     }
     else
     {
@@ -466,7 +482,6 @@ void MyItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
     MY_BUILD_MODEL_ONLY
     emit editMe();
     QGraphicsPolygonItem::mouseDoubleClickEvent(event);
-//    myTextItem->setTextInteractionFlags(Qt::TextEditorInteraction);
 }
 
 //在鼠标事件中获取实时的位置并更新至右侧面板
@@ -1072,7 +1087,7 @@ void MyItem::procDeleteNodePort(MyNodePort *nodePort)
 //编辑某个端口
 void MyItem::procEditNodePort(MyNodePort *)
 {
-    emit editMe();
+    emit editItemPort();
 //    MyGraphicsView::instance()->showNodePortEdit(nodePort);
 }
 
@@ -1316,6 +1331,7 @@ void MyItem::procMouseState(MouseType type,PointType pointType,QPointF currPos)
                         case GAR_PARALLE:
 #ifdef ADD_STATE_MODEL
                         case GRA_MASK_RECT:
+                        case GRA_NODE_PROCESS:
 #endif
                             itemPolygon.clear();
                             itemPolygon<<QPointF(-tmpX,-tmpY)<<QPointF(tmpX,-tmpY)<<
@@ -1581,6 +1597,7 @@ void MyItem::setInitalPolygon(QRectF boundRect,qreal tx,qreal ty,qreal tw,qreal 
             case GRA_ANNOTATION:
             case GAR_PARALLE:
 #ifdef ADD_STATE_MODEL
+            case GRA_NODE_PROCESS:
             case GRA_MASK_RECT:
 #endif
                                itemPolygon<<QPointF(-tx,-ty)<<QPointF(tx,-ty)<<
@@ -1775,6 +1792,26 @@ void MyItem::hightLightItem(HightLightLevel level,bool isHigh)
     isSimulateHigh = isHigh;
     update();
 }
+
+#ifdef ADD_STATE_MODEL
+
+void MyItem::setStartProp(StateStartProperty &prop)
+{
+    startProp.content = prop.content;
+}
+
+void MyItem::setModelProp(StateModelProperty &prop)
+{
+    stateModeProp.stateName = prop.stateName;
+    stateModeProp.continueContent = prop.continueContent;
+    stateModeProp.props.clear();
+    foreach(StatInnerProperty tmpProp,prop.props)
+    {
+        stateModeProp.props.append(tmpProp);
+    }
+    setText(prop.stateName);
+}
+#endif
 
 MyItem::~MyItem()
 {

@@ -26,6 +26,7 @@ MyScene::MyScene(QObject * parent):
     isLocalFileOpened = false;
     isDragLine = false;
     isClear = false;
+    isSceneAssociated = false;              //场景是否为关联，如果为false，在保存时需要弹出保存框
     myItemInfo = NULL;
     createItemInfo();
 
@@ -503,6 +504,7 @@ void MyScene::addMyItemConnect(MyItem * item)
     connect(item,SIGNAL(updateSceneDraw()),this,SLOT(update()));
     connect(item,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
     connect(item,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
+    connect(item,SIGNAL(editItemPort()),this,SIGNAL(editCurrPort()));
     connect(item,SIGNAL(itemPosChanged(MyItem *)),this,SLOT(showItemPosInfo(MyItem *)));
     connect(item,SIGNAL(itemRotationChanged(MyItem *)),this,SLOT(showItemRotationInfo(MyItem *)));
     connect(item,SIGNAL(clearOtherSelectedItems(MyItem*)),this,SLOT(respClearOtherSelectedItems(MyItem*)));
@@ -710,6 +712,12 @@ void MyScene::clear()
     isClear = false;
 
     myItemInfo = NULL;
+}
+
+//设置当前场景是否与其它场景关联
+void MyScene::setAssociation(bool flag)
+{
+    isSceneAssociated = flag;
 }
 
 MyScene::~MyScene()

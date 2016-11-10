@@ -22,6 +22,7 @@
 #include "../SelfWidget/mystatemodeldialog.h"
 #include "../SelfWidget/mystatesetdialog.h"
 #include "../SelfWidget/mystatestartdialog.h"
+#include "../SelfWidget/mypageswitch.h"
 #include "../simulate/simulateutil.h"
 #include "../Header.h"
 #include "../global.h"
@@ -31,6 +32,7 @@
 #include "../manager/menumanager.h"
 #include "../Constants.h"
 #include "../fileoperate.h"
+#include "../util.h"
 #include "mytextitem.h"
 #include "myarrow.h"
 #include "myitem.h"
@@ -94,6 +96,7 @@ MyScene * MyGraphicsView::addScene(QString id)
     connect(tmpScene,SIGNAL(itemSizeChanged(int)),this,SLOT(respItemSizeChanged(int)));
     connect(tmpScene,SIGNAL(itemPropChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
     connect(tmpScene,SIGNAL(editCurrItem()),this,SLOT(editTextItem()));
+    connect(tmpScene,SIGNAL(editCurrPort()),this,SLOT(respEditText()));
     connect(tmpScene,SIGNAL(ctrlPropEditKeyPress()),this,SLOT(editPropertyItem()));
 
     return tmpScene;
@@ -811,7 +814,7 @@ void MyGraphicsView::updateActions()
             AddLineType startType = arrowItem->getStartLineType();
             AddLineType endType = arrowItem->getEndLineType();
 
-            ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(false);
+            ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(true);
             ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
             ActionManager::instance()->action(Constants::COPY_ID)->setEnabled(false);
 
@@ -942,12 +945,62 @@ void MyGraphicsView::setSelectedLineType(int type)
     }
 }
 
-//编辑文本
+//响应右键菜单编辑
+void MyGraphicsView::respEditText()
+{
+    MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
+    QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
+    if(selectedItems.size() == 1)
+    {
+        QString itemName = TYPE_ID(*(selectedItems.first()));
+
+        if(itemName == TYPE_ID(MyItem))
+        {
+            MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+            MyTextInput textInput(this);
+
+            textInput.setTex(item->getText());
+            textInput.exec();
+
+            item->setText(textInput.getText());
+
+            //当修改文字后，需要重新将信息发送至右侧的工具栏。
+            emit initToolBox(selectedItems.size(),item->getProperty());
+        }
+        else if(itemName == TYPE_ID(MyArrow))
+        {
+            MyArrow * item = dynamic_cast<MyArrow*>(selectedItems.first());
+            MyTextInput textInput(this);
+
+            textInput.setTex(item->getText());
+            textInput.exec();
+
+            item->setText(textInput.getText());
+        }
+        else if(itemName == TYPE_ID(MyNodePort))
+        {
+            MyNodePort * item = dynamic_cast<MyNodePort*>(selectedItems.first());
+
+            MyTextInput textInput(this);
+
+            textInput.setTex(item->getText());
+            textInput.exec();
+
+            item->setText(textInput.getText());
+        }
+    }
+}
+
+//响应控件双击
 void MyGraphicsView::editTextItem()
 {
     MY_ASSERT(myScene)
     MY_BUILD_MODEL_ONLY
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
+
+    qDebug()<<selectedItems.size()<<"____";
+
     if(selectedItems.size() == 1)
     {
         QString itemName = TYPE_ID(*(selectedItems.first()));
@@ -961,16 +1014,41 @@ void MyGraphicsView::editTextItem()
             if(gType == GRA_STATE_START)
             {
                 MyStateStartDialog dialog(this);
+                dialog.setContent(item->getStartProp().content);
                 dialog.exec();
+                StateStartProperty prop;
+                prop.content = dialog.getContent();
+                item->setStartProp(prop);
             }
             else if(gType == GRA_STATE_PROCESS)
             {
                 MyStateModelDialog dialog(this);
+                dialog.setModelProp(item->getModelProp());
                 dialog.exec();
+                item->setModelProp(dialog.getModelProp());
             }
-            else if(gType == GRA_MASK_RECT || gType == GRA_MASK_BOUND_RECT)
+            else if(gType == GRA_MASK_RECT || gType == GRA_MASK_BOUND_RECT || gType == GRA_MASK_CIRCLE || gType == GRA_NODE_PROCESS)
             {
-
+                QString localAtomID = item->getProperty().associativeID;
+                QString currLocalPath = MyPageSwitch::instance()->currPageMapping()->pathName;
+                QString localFileName = currLocalPath+"\\"+ localAtomID+SaveFileSuffix;
+                if(currLocalPath.size() == 0)
+                {
+                    Util::showWarn("此文件未添加至工程中，无法进行托管!");
+                    return;
+                }
+                QFile file(localFileName);
+                if(!file.open(QFile::ReadWrite))
+                {
+                    Util::showWarn("原子组件图打开失败!");
+                }
+                bool isExisted = MyPageSwitch::instance()->openPage(localAtomID);
+                MyPageSwitch::instance()->updateCurrMappingName(localFileName);
+                MyPageSwitch::instance()->updateCurrMappingPathName(currLocalPath);
+                if(file.size() > 0 && !isExisted)
+                {
+                    openLocalFile(localFileName);
+                }
             }
             else
             {
@@ -1008,21 +1086,31 @@ void MyGraphicsView::editTextItem()
 
             GraphicsType gType = item->getType();
 
+            //输出
             if(gType == GRA_NODE_TRIANGLE_OUT)
             {
                 MyPortOutputDialog dialog(this);
+                dialog.setInOutState(false);
+                dialog.setProp(item->getStateInOutProp());
                 dialog.exec();
+                item->setPortInoutProp(dialog.getProp());
             }
+            //输入
             else if(gType == GRA_NODE_HALF_CIRCLE)
             {
                 MyPortOutputDialog dialog(this);
+                dialog.setInOutState(true);
+                dialog.setProp(item->getStateInOutProp());
                 dialog.exec();
+                item->setPortInoutProp(dialog.getProp());
             }
             //圆形端口
             else if(gType == GRA_NODE_CIRCLE)
             {
                 MyPortInitialDialog dialog(this);
+                dialog.setProp(item->getStatePortProp());
                 dialog.exec();
+                item->setPortProp(dialog.getProp());
             }
             else
             {
@@ -1236,15 +1324,63 @@ void MyGraphicsView::fileSave()
 
     ActionManager::instance()->action(Constants::ARROW_ID)->setChecked(true);
 
-    QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
+    QString saveFileName;
+
+    if(MyPageSwitch::instance()->currPageMapping()->fullPathName.isEmpty())
+    {
+        saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
+    }
+    else
+    {
+        saveFileName = MyPageSwitch::instance()->currPageMapping()->fullPathName;
+    }
     if(!saveFileName.isEmpty())
     {
         ReturnType  result = FileOperate::instance()->saveFile(saveFileName,MyGraphicsView::instance()->scene()->items());
         if(result == RETURN_SUCCESS)
         {
-//            respShowStatusInfo("文件保存成功!");
+            MyPageSwitch::instance()->updateCurrMappingName(saveFileName);
         }
     }
+}
+
+//打开本地文件，将文件的信息保存至每个场景中
+void MyGraphicsView::openLocalFile(QString fileName)
+{
+    QList<CutInfo *> cutInfos;
+    ReturnType returnType = FileOperate::instance()->openFile(fileName,cutInfos);
+    if(returnType == FILE_ILLEGAL)
+    {
+        Util::showWarn("文件格式不符，请重新选择！");
+    }
+    else if(returnType == FILE_VERSION)
+    {
+        Util::showWarn("所选文件与当前软件版本不一致!");
+    }
+    else if(returnType == RETURN_SUCCESS)
+    {
+        scene()->addItem(cutInfos);
+        setKeyCtrlStated(false);
+
+        QFileInfo info(fileName);
+        MyPageSwitch::instance()->updateCurrMappingName(fileName);
+        MyPageSwitch::instance()->updateCurrMappingPathName(info.path());
+    }
+    scene()->update();
+}
+
+//新建工程
+void MyGraphicsView::addPage(QString proPath,QString proName)
+{
+    QString fullPath = proPath+"/"+proName + SaveFileSuffix;
+    MyPageSwitch::instance()->addPage();
+    QFile file(fullPath);
+    if(!file.open(QFile::ReadWrite))
+    {
+
+    }
+    MyPageSwitch::instance()->updateCurrMappingName(fullPath);
+    MyPageSwitch::instance()->updateCurrMappingPathName(proPath);
 }
 
 MyGraphicsView::~MyGraphicsView()

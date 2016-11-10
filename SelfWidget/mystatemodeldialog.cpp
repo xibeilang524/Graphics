@@ -21,13 +21,41 @@ MyStateModelDialog::MyStateModelDialog(QWidget *parent) :
 
     connect(ui->continueAction,SIGNAL(clicked()),this,SLOT(respContinueAction()));
     connect(ui->addItem,SIGNAL(clicked()),this,SLOT(respAddItem()));
+    connect(ui->widget_4,SIGNAL(confirmPressed()),this,SLOT(updateInfo()));
+}
+
+void MyStateModelDialog::setModelProp(StateModelProperty &property)
+{
+    prop.stateName = property.stateName;
+    prop.continueContent = property.continueContent;
+    continueContent = prop.continueContent;
+    prop.props.clear();
+    foreach(StatInnerProperty tmpProp,property.props)
+    {
+        prop.props.append(tmpProp);
+    }
+
+    ui->stateName->setText(prop.stateName);
+}
+
+void MyStateModelDialog::updateInfo()
+{
+    prop.stateName = ui->stateName->text();
+    prop.continueContent = continueContent;
+    prop.props.clear();
+    foreach(StatInnerProperty tmpProp,props)
+    {
+        prop.props.append(tmpProp);
+    }
 }
 
 //显示连续行为对话框
 void MyStateModelDialog::respContinueAction()
 {
     MyStateStartDialog dialog(this);
+    dialog.setContent(continueContent);
     dialog.exec();
+    continueContent = dialog.getContent();
 }
 
 //显示状态内部事件（守卫条件）设置

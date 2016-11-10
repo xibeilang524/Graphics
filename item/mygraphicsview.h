@@ -23,6 +23,8 @@
 **             添加工作区切换后，工具栏依照相应的控件来自动的更改状态
 **20161026:wey:修复旋转控件时，因刷新不及时导致线条显示重叠问题
 **20161108:wey:添加对状态图支持
+**20161109:wey:添加对复合模型组件图支持(双击打开下一层)
+**20161110:wey:调增分离控件右击和双击的事件响应
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -47,6 +49,7 @@ public:
     ~MyGraphicsView();
 
     void showNodePortEdit(MyNodePort * nodePort);
+    void openLocalFile(QString fileName);
 
     QString getFirstSelectedItem();
 
@@ -94,6 +97,7 @@ public slots:
     void showSelectedItemPropEdit(MyItem * item);
 
 private slots:
+    void addPage(QString proPath,QString proName);
     void fileSave();
 
     void undoAndRedoItem();
@@ -111,6 +115,7 @@ private slots:
 
     void updateActions();
     void editTextItem();
+    void respEditText();
     void editPropertyItem();
     void respPropertyUpdate(ItemProperty property);
     void setSelectedLineType(int type);

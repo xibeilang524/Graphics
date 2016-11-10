@@ -53,6 +53,8 @@ public:
     void removeItem(QGraphicsItem *item);
     void setId(QString id){this->uuid = id;}
     QString getId(){return this->uuid;}
+    void setAssociation(bool flag);
+    bool getAssociation(){return this->isSceneAssociated;}
     void clear();
     ~MyScene();
 
@@ -64,6 +66,7 @@ signals:
     void itemSizeChanged(int size);
     void itemPropChanged(ItemProperty);
     void editCurrItem();
+    void editCurrPort();
     void ctrlPropEditKeyPress();
 
 private slots:
@@ -99,6 +102,7 @@ private:
     bool isLocalFileOpened;            //是否是本地文件打开
     bool isDragLine;                   //是否处于添加线条状态
     bool isClear;                      //是否在清空状态，用于控制clear()对MyIemInfo的影响
+    bool isSceneAssociated;            //视图是否被关联，如果为false，保存时需要弹出窗口，
     QString uuid;
     QList<MyItem *> mouseItems;        //拖拽连接线时，记录鼠标位置下产生的item
     QString startMouseItemId;          //拖拽线时按下DragLinePoint的父item的id

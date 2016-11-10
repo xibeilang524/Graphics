@@ -25,6 +25,7 @@
 #include "./SelfWidget/serviceview.h"
 #include "./manager/MyLineComboBox.h"
 #include "./simulate/simulatecontrolpanel.h"
+#include "./project/myprowizard.h"
 #include "fileoperate.h"
 #include "global.h"
 #include "util.h"
@@ -82,9 +83,10 @@ MainWindow::MainWindow(QWidget *parent) :
 //创建窗口的菜单栏，绑定响应事件
 void MainWindow::createActionAndMenus()
 {
-    MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工作区");
+    MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工程");
     newAction->setShortcut(QKeySequence("Ctrl+N"));
-    ActionManager::instance()->registerAction(newAction,MyPageSwitch::instance(),SLOT(addPage()));
+    ActionManager::instance()->registerAction(newAction,MyProWizard::instance(),SLOT(exec()));
+//    ActionManager::instance()->registerAction(newAction,MyPageSwitch::instance(),SLOT(addPage()));
 
     MyAction * saveAction = ActionManager::instance()->crateAction(Constants::SAVE_ID,QIcon(":/images/save.png"),"保存");
     saveAction->setShortcut(QKeySequence("Ctrl+S"));
@@ -163,7 +165,7 @@ void MainWindow::createActionAndMenus()
 
     MyAction * editTextAction = ActionManager::instance()->crateAction(Constants::EDIT_TEXT_ID,QIcon(":/images/editText.png"),"编辑名称");
     editTextAction->setShortcut(QKeySequence("Ctrl+T"));
-    ActionManager::instance()->registerAction(editTextAction,MyGraphicsView::instance(),SLOT(editTextItem()));
+    ActionManager::instance()->registerAction(editTextAction,MyGraphicsView::instance(),SLOT(respEditText()));
 
     MyAction * propertyEditAction = ActionManager::instance()->crateAction(Constants::PROPERTY_EDIT_ID,QIcon(":/images/editProp.png"),"编辑服务");
     propertyEditAction->setShortcut(QKeySequence("Ctrl+E"));
@@ -590,25 +592,8 @@ void MainWindow::fileOpen()
     QString openFileName = QFileDialog::getOpenFileName(this,"选择打开文件","","Files(*"+SaveFileSuffix+")");
     if(!openFileName.isEmpty())
     {
-        QList<CutInfo *> cutInfos;
-        ReturnType returnType = FileOperate::instance()->openFile(openFileName,cutInfos);
-        if(returnType == FILE_ILLEGAL)
-        {
-            Util::showWarn("文件格式不符，请重新选择！");
-        }
-        else if(returnType == FILE_VERSION)
-        {
-            Util::showWarn("所选文件与当前软件版本不一致!");
-        }
-        else if(returnType == RETURN_SUCCESS)
-        {
-            MyGraphicsView::instance()->scene()->addItem(cutInfos);
-            MyGraphicsView::instance()->setKeyCtrlStated(false);
-
-            respShowStatusInfo("文件解析完成!");
-        }
+        MyGraphicsView::instance()->openLocalFile(openFileName);
     }
-    MyGraphicsView::instance()->scene()->update();
 }
 
 //清空当前的控件
@@ -664,6 +649,7 @@ void MainWindow::createSceneAndView()
     QVBoxLayout * vLayout = new QVBoxLayout;
     vLayout->setContentsMargins(1,1,1,1);
     view = new MyGraphicsView(this);
+    connect(MyProWizard::instance(),SIGNAL(proInfo(QString,QString)),MyGraphicsView::instance(),SLOT(addPage(QString,QString)));
 
     vLayout->addWidget(MyPageSwitch::instance());
     vLayout->addWidget(view);

@@ -108,9 +108,18 @@ public:
     void hightLightItem(HightLightLevel level = LEVEL_NORMAL,bool isHigh = true);
     bool isHightShow(){return this->isSimulateHigh;}
 
+#ifdef ADD_STATE_MODEL
+    StateStartProperty & getStartProp(){return this->startProp;}
+    void setStartProp(StateStartProperty & prop);
+
+    StateModelProperty & getModelProp(){return this->stateModeProp;}
+    void setModelProp(StateModelProperty & prop);
+#endif
+
 signals:
     void updateSceneDraw();
     void editMe();
+    void editItemPort();
     void propHasChanged(ItemProperty);
     void itemPosChanged(MyItem  * );
     void itemRotationChanged(MyItem  *);
@@ -190,6 +199,12 @@ private:
     HightLightLevel  lightLevel;       //当前属于哪种显示
 
     GraphicsType dragGraphicsType;     //当前拖入的端口类型，拖拽结束后置为GRA_NONE
+
+#ifdef ADD_STATE_MODEL
+    StateStartProperty startProp;      //开始状态的属性
+    StateModelProperty stateModeProp;  //模型状态属性
+#endif
+
 };
 
 #endif // MYITEM_H

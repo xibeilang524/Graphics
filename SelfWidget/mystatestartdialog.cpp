@@ -17,6 +17,18 @@ MyStateStartDialog::MyStateStartDialog(QWidget *parent) :
 
     ui->widget_3->setParetWidget(this);
 
+    connect(ui->widget_3,SIGNAL(confirmPressed()),this,SLOT(updateInfo()));
+}
+
+void MyStateStartDialog::updateInfo()
+{
+    content = ui->plainTextEdit->toPlainText();
+}
+
+void MyStateStartDialog::setContent(QString content)
+{
+    ui->plainTextEdit->clear();
+    ui->plainTextEdit->setPlainText(content);
 }
 
 MyStateStartDialog::~MyStateStartDialog()

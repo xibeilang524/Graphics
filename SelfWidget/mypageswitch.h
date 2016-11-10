@@ -23,6 +23,24 @@ class MyScene;
 class MyPageItem;
 class QAction;
 
+struct PageMapping
+{
+    PageMapping()
+    {
+        isAssociated = false;
+    }
+    QString id;
+    MyPageItem * pageItem;
+    MyScene * scene;
+    QString pageName;
+    QString pathName;        //路径名(文件夹名)
+    QString fullPathName;    //(如果保存)当前场景文件显示图元的全路径名称
+    bool isAssociated;       //是否被关联，如果false，保存时需要弹出提示框，否则根据id和路径自动保存。
+    qreal hScrollValue;
+    qreal vScrollValue;
+    qreal scaleView;
+};
+
 class MyPageSwitch : public QWidget
 {
     Q_OBJECT
@@ -32,16 +50,11 @@ public:
     void switchFrontBack(bool isFront = true);
     void addSwitchContextMenu();
 
-    struct PageMapping
-    {
-        QString id;
-        MyPageItem * pageItem;
-        MyScene * scene;
-        QString pageName;
-        qreal hScrollValue;
-        qreal vScrollValue;
-        qreal scaleView;
-    };
+    bool openPage(QString pageId);
+    void updateCurrMappingName(QString name);
+    void updateCurrMappingPathName(QString name);
+
+    const PageMapping * currPageMapping();
 
 signals:
     void deletePage();
@@ -63,7 +76,7 @@ private:
 
     void siwtchPage(QString pageId,bool firstView = false);
     int getPageIndex(QString id);
-
+    void addPage(QString id, bool isAssociated = false);
     void initWidget();
 
     QPushButton * addPageButt;

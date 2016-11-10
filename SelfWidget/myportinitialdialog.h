@@ -17,6 +17,8 @@ namespace Ui {
 class MyPortInitialDialog;
 }
 
+#include "../Header.h"
+
 class MyPortInitialDialog : public QDialog
 {
     Q_OBJECT
@@ -24,9 +26,17 @@ class MyPortInitialDialog : public QDialog
 public:
     explicit MyPortInitialDialog(QWidget *parent = 0);
     ~MyPortInitialDialog();
+
+    void setProp(StatePortProperty & prop);
+    StatePortProperty & getProp();
+
+private slots:
+    void updateProp();
     
 private:
     Ui::MyPortInitialDialog *ui;
+
+    StatePortProperty sprop;
 };
 
 #endif // MYPORTINITIALDIALOG_H

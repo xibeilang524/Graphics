@@ -13,6 +13,8 @@
 
 #include <QDialog>
 
+#include "../Header.h"
+
 namespace Ui {
 class MyStateModelDialog;
 }
@@ -24,13 +26,22 @@ class MyStateModelDialog : public QDialog
 public:
     explicit MyStateModelDialog(QWidget *parent = 0);
     ~MyStateModelDialog();
+
+    void setModelProp(StateModelProperty &);
+    StateModelProperty & getModelProp(){return this->prop;}
     
 private slots:
     void respContinueAction();
     void respAddItem();
+    void updateInfo();
 
 private:
     Ui::MyStateModelDialog *ui;
+
+    StateModelProperty prop;
+
+    QList<StatInnerProperty> props;
+    QString continueContent;
 };
 
 #endif // MYSTATEMODELDIALOG_H

@@ -203,6 +203,9 @@ void Util::loadPixmapByGType(GraphicsType type, QPixmap &pixmap)
         case GRA_MASK_CIRCLE:
                            pixmap.load(":/images/circle.png");
                            break;
+        case GRA_NODE_PROCESS:
+                           pixmap.load(":/images/rectange.png");
+                           break;
 #endif
         default:
                            break;

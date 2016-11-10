@@ -76,6 +76,14 @@ public:
     QString getText();
     void setText(QString text);
 
+#ifdef ADD_STATE_MODEL
+    StatePortProperty getStatePortProp(){return this->statePortProp;}
+    void setPortProp(StatePortProperty & prop);
+
+    StateInOutProperty getStateInOutProp(){return this->stateInOutProp;}
+    void setPortInoutProp(StateInOutProperty & prop);
+#endif
+
 signals:
     void deletePort(MyNodePort *);
     void editPort(MyNodePort *);
@@ -106,6 +114,11 @@ private:
     MyTextItem * myTextItem;           //文字信息
 
     QList<MyArrow *> arrows;           //保存添加的箭头
+
+#ifdef ADD_STATE_MODEL
+    StatePortProperty statePortProp;   //初始化端口设置
+    StateInOutProperty stateInOutProp; //输入输出端口设置
+#endif
 };
 
 #endif // MYNODEPORT_H

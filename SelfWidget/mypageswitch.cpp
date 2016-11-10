@@ -60,6 +60,12 @@ void MyPageSwitch::addPage()
 {
     QString id = Util::getUUID();
 
+    addPage(id);
+}
+
+//根据Id创建新场景
+void MyPageSwitch::addPage(QString id,bool isAssociated)
+{
     MyPageItem  * item = PageManager::instance()->addPageItem();
     connect(item,SIGNAL(switchPage(QString)),this,SLOT(switchToPage(QString)));
     connect(item,SIGNAL(deletePage(QString)),this,SLOT(deleteThisPage(QString)));
@@ -69,7 +75,9 @@ void MyPageSwitch::addPage()
     page->id = id;
     page->pageItem = item;
     page->scene = MyGraphicsView::instance()->addScene(id);
+    page->scene->setAssociation(isAssociated);
     page->scaleView = 100;
+    page->isAssociated = isAssociated;
     page->hScrollValue = SceneWidth /2;
     page->vScrollValue = SceneHeight /2;
     page->pageName = QString("工作区%1").arg(PageManager::instance()->getPageCount());
@@ -88,6 +96,30 @@ void MyPageSwitch::addPage()
     {
         switchToPage(id);
     }
+}
+
+//根据id打开一个新的场景，如果不存在，则创建
+bool MyPageSwitch::openPage(QString pageId)
+{
+    bool isExisted = false;
+    foreach(PageMapping * mapping,pages)
+    {
+        if(mapping->id == pageId)
+        {
+            isExisted = true;
+            break;
+        }
+    }
+
+    if(isExisted)
+    {
+        siwtchPage(pageId);
+    }
+    else
+    {
+        addPage(pageId,true);
+    }
+    return isExisted;
 }
 
 //切换页面.切换前需要先保存当前scene中的尺寸信息
@@ -180,6 +212,11 @@ void MyPageSwitch::deleteThisPage(QString pageId)
     }
 }
 
+const PageMapping *MyPageSwitch::currPageMapping()
+{
+    return selectedPage;
+}
+
 //切换前一个页面
 void MyPageSwitch::switchFrontBack(bool isFront)
 {
@@ -252,6 +289,20 @@ int MyPageSwitch::getPageIndex(QString id)
         }
     }
     return -1;
+}
+
+//保存文件后，更新当前场景对应的本地文件路径
+void MyPageSwitch::updateCurrMappingName(QString name)
+{
+    MY_ASSERT(selectedPage)
+    selectedPage->fullPathName = name;
+}
+
+//更新当前的路径名
+void MyPageSwitch::updateCurrMappingPathName(QString name)
+{
+    MY_ASSERT(selectedPage)
+    selectedPage->pathName = name;
 }
 
 MyPageSwitch * MyPageSwitch::pageSwitch = NULL;

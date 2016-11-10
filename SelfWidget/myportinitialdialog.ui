@@ -80,7 +80,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit">
+            <widget class="QLineEdit" name="portName">
              <property name="minimumSize">
               <size>
                <width>180</width>
@@ -148,7 +148,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="lineEdit_2">
+            <widget class="QLineEdit" name="portType">
              <property name="minimumSize">
               <size>
                <width>180</width>

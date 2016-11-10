@@ -24,9 +24,17 @@ class MyStateStartDialog : public QDialog
 public:
     explicit MyStateStartDialog(QWidget *parent = 0);
     ~MyStateStartDialog();
+
+    void setContent(QString content);
+    QString getContent(){return this->content;}
+
+private slots:
+    void updateInfo();
     
 private:
     Ui::MyStateStartDialog *ui;
+
+    QString content;
 };
 
 #endif // MYSTATESTARTDIALOG_H

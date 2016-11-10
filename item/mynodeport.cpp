@@ -282,6 +282,7 @@ void MyNodePort::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 
 void MyNodePort::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
 {
+    setSelected(true);
     nodePortRightMenu->exec(event->screenPos());
 }
 
@@ -365,6 +366,12 @@ void MyNodePort::setText(QString text)
     nodeProperty.content = text;
     myTextItem->setPlainText(text);
     updateTextPosByDirect();
+
+#ifdef ADD_STATE_MODEL
+    statePortProp.portName = text;
+    stateInOutProp.portName = text;
+
+#endif
 }
 
 //根据当前控件所在的Direct来动态的改变文字的位置
@@ -390,6 +397,23 @@ void MyNodePort::updateTextPosByDirect()
                     break;
     }
 }
+
+#ifdef ADD_STATE_MODEL
+void MyNodePort::setPortProp(StatePortProperty &prop)
+{
+    statePortProp.portName = prop.portName;
+    statePortProp.portType = prop.portType;
+    setText(statePortProp.portName);
+}
+
+void MyNodePort::setPortInoutProp(StateInOutProperty &prop)
+{
+    stateInOutProp.portName = prop.portName;
+    stateInOutProp.portType = prop.portType;
+    stateInOutProp.props = prop.props;
+    setText(stateInOutProp.portName);
+}
+#endif
 
 MyNodePort::~MyNodePort()
 {

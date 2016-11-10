@@ -35,6 +35,7 @@ include($$PWD/modelview/modelview.pri)
 include($$PWD/simulate/simulate.pri)
 include($$PWD/sql/sql.pri)
 include($$PWD/assisant/assisant.pri)
+include($$PWD/project/project.pri)
 
 
 RC_FILE = images/log.rc

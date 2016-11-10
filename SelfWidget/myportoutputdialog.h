@@ -13,6 +13,8 @@
 
 #include <QDialog>
 
+#include "../Header.h"
+
 namespace Ui {
 class MyPortOutputDialog;
 }
@@ -24,9 +26,18 @@ class MyPortOutputDialog : public QDialog
 public:
     explicit MyPortOutputDialog(QWidget *parent = 0);
     ~MyPortOutputDialog();
+
+    void setInOutState(bool isInstate = true);
+    void setProp(StateInOutProperty & prop);
+    StateInOutProperty & getProp();
+
+private slots:
+    void updateProp();
     
 private:
     Ui::MyPortOutputDialog *ui;
+
+    StateInOutProperty sprop;
 };
 
 #endif // MYPORTOUTPUTDIALOG_H

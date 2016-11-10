@@ -5,11 +5,13 @@
 #include <QLineF>
 #include <QCursor>
 #include <QDebug>
+#include <QGraphicsSceneContextMenuEvent>
 
 #include "myitem.h"
 #include "mynodeport.h"
 #include "mytextitem.h"
 #include "../global.h"
+#include "../manager/menumanager.h"
 
 #include "math.h"
 
@@ -394,6 +396,12 @@ void MyArrow::hoverLeaveEvent(QGraphicsSceneHoverEvent *event)
 {
     setCursor(Qt::ArrowCursor);
     QGraphicsLineItem::hoverLeaveEvent(event);
+}
+
+void MyArrow::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    setSelected(true);
+    MenuManager::instance()->menu(Constants::MENU_ITEM_RIGHT_MENU)->exec(event->screenPos());
 }
 
 QString MyArrow::getText()

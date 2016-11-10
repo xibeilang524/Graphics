@@ -15,7 +15,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#define M_VERTION 0x0006        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
+#define M_VERTION 0x0007        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
 
 //用于控制是否需要加入状态机模块，如果不需要，将此宏取消定义
 #ifndef ADD_STATE_MODEL
@@ -120,6 +120,7 @@ enum GraphicsType
     GRA_ROTATE_POINT,    //控件旋转点
     GRA_ITEM_INFO,       //控件显示信息
     //端口
+    GRA_NODE_PROCESS,         //原子处理窗口
     GRA_NODE_HALF_CIRCLE,     //D端口
     GRA_NODE_TRIANGLE_IN ,    //三角输入端口
     GRA_NODE_TRIANGLE_OUT,    //三角输出端口
@@ -230,10 +231,14 @@ struct ItemProperty
     void createUUID()
     {
         startItemID = QUuid::createUuid().toString();    //新建对象时创建唯一标识符
+        associativeID = QUuid::createUuid().toString();
     }
 
     QString startItemID;                  //在用于非直线的控件时，只用startItemId标识当前控件
     QString endItemID;                    //在用于直线控件时，两个表示直线两端连接的控件的ID号
+#ifdef ADD_STATE_MODEL
+    QString associativeID;                //用于复合组件寻找原子图，原子图寻找状态图的标识,作为文件名【!!!】
+#endif
 
     friend QDataStream & operator <<(QDataStream &,ItemProperty & item);
     friend QDataStream & operator >>(QDataStream &,ItemProperty & item);
@@ -393,5 +398,46 @@ struct RowToIndex
 };
 
 typedef QList< RowToIndex > RowList;
+
+#ifdef ADD_STATE_MODEL
+/**************************状态机结构体******************************/
+//初始化端口设置
+struct StatePortProperty
+{
+    QString portName;        //端口名称
+    QString portType;        //端口类型
+};
+
+//输入/出端口设置
+struct StateInOutProperty
+{
+    QString portName;        //端口名称
+    QString portType;        //端口类型
+    QList<StatePortProperty> props;    //端口集合
+};
+
+//开始状态属性
+struct StateStartProperty
+{
+    QString content;
+};
+
+//内部事件属性
+struct StatInnerProperty
+{
+    QString propName;
+    QString propType;
+    QString propDesc;
+};
+
+//模型状态属性
+struct StateModelProperty
+{
+    QString stateName;          //状态名
+    QString continueContent;    //持续事件行为
+    QList<StatInnerProperty> props;   //内部事件集合
+};
+
+#endif
 
 #endif // HEADER_H

@@ -69,6 +69,9 @@ const char MASK_CIRCLE_ID[] = "Constants.Mask.Circle";
 const char BUILD_MODEL_ID[] = "Constants.BuildModel";
 const char SIMLUATE_ID[] = "Constants.Simluate";
 
+//¶Ë¿Ú
+const char NODE_PROCESS_ID[] = "Constants.NodeProcess";
+
 //¡¾¿Ø¼þ¡¿
 const char FULL_SCREEN_ID[] = "Constants.FullScreen";
 const char HIDE_ICON_ID[] = "Constants.HideIcon";
