@@ -122,7 +122,7 @@ void MyPropertyEdit::switchServiceInfo(int index)
         {
             for(int i = 0;i<prop->inputParas.size(); i++)
             {
-                inputTableView->insertRow(prop->inputParas.at(0));
+                inputTableView->insertRow(prop->inputParas.at(i));
             }
         }
 
@@ -155,16 +155,15 @@ void MyPropertyEdit::confirmPropety()
 void MyPropertyEdit::updateDelegateList(QList<MyItem *> pItems)
 {
     QStringList list;
+    int index = 0;
     foreach(MyItem * item,pItems)
     {
         ServiceProperty * prop = item->getServiceProp();
         if(prop->outputParas.size() == 1)
         {
-            QString newItem = prop->serviceName+":"+prop->outputParas.at(0)->pName;
-            if(!list.contains(newItem))
-            {
-                list<<newItem;
-            }
+            QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+item->getText()+":"+prop->outputParas.at(0)->pName;
+            list<<newItem;
+            index++;
         }
     }
 

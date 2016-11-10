@@ -19,7 +19,6 @@
 #define M_AUTHOR "南京仁谷系统集成有限公司"
 #define M_YEAR "16"
 
-
 //用于控制是否需要加入状态机模块，如果不需要，将此宏取消定义
 #ifndef ADD_STATE_MODEL
 #define ADD_STATE_MODEL
@@ -34,6 +33,8 @@
 #define ROTATE_MAX_DEGREE 360   //旋转的最大角度
 #define POP_SUB_DIALOG_WIDTH  650    //弹出子窗口固定宽度
 #define POP_SUB_DIALOG_HEIGHT 450    //弹出子窗口固定高度
+
+#define COMBOX_START_FLAG "[QUOTE"   //属性编辑值下拉框开始标识
 
 #include <QString>
 

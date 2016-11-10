@@ -15,6 +15,7 @@
 #include "../item/myscene.h"
 #include "../util.h"
 #include "../global.h"
+#include "../webservice/mywebservice.h"
 
 MyListWidgetItem::MyListWidgetItem(QListWidget *parent, int type)
     :QListWidgetItem(parent,type)
@@ -41,12 +42,15 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     ui->setupUi(this);
 
     setFixedWidth(300);
+    currProcUnit = NULL;
 
     connect(ui->startSimulate,SIGNAL(clicked()),this,SLOT(respStartSimulate()));
     connect(ui->simProcedure,SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem *)),this,SLOT(respItemChanged(QListWidgetItem * , QListWidgetItem *)));
     connect(ui->simProcedure,SIGNAL(itemClicked (QListWidgetItem*)),this,SLOT(respItemActivated(QListWidgetItem*)));
     connect(ui->simProcedure,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(respItemDoubleClicked(QListWidgetItem *)));
     connect(this,SIGNAL(sendSingleSimulate(ProcessUnit*)),this,SLOT(showSimulateOperate(ProcessUnit*)));
+
+    connect(MyWebService::instance(),SIGNAL(lastUnitProcessOver(bool,QString)),this,SLOT(procLastUnitResult(bool,QString)));
 }
 
 /*!
@@ -120,37 +124,145 @@ void SimulateControlPanel::respStartSimulate()
 
 
     //【5】对处理单元进行处理
-    ProcessUnit * currUnit = procUnits.first();
-    while(currUnit && currUnit->ptype != PRO_END)
+    currProcUnit = procUnits.first();
+    startProcUnit();
+
+    setSimulateState(false);
+}
+
+//针对当前处理单元返回的结果进行处理
+void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
+{
+    if(hasFault)
     {
-        emit sendSingleSimulate(currUnit);
-        currUnit->item->hightLightItem(LEVEL_MIDDLE,true);
+        currProcUnit->item->hightLightItem(LEVEL_MIDDLE,true);
+        Util::showWarn("服务访问出错，推演流程终止!");
+        return;
+    }
 
-        if(currUnit->ptype == PRO_JUDGE)
+    currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
+    if(currProcUnit->ptype == PRO_PROCESS)
+    {
+        ServiceProperty * prop = currProcUnit->item->getServiceProp();
+        Parameter * para = prop->outputParas.at(0);
+
+        para->pValue = context;
+
+        currProcUnit = currProcUnit->nextChild;
+    }
+    //判断框
+    else if(currProcUnit->ptype == PRO_JUDGE)
+    {
+
+    }
+    //循环框
+    else if(currProcUnit->ptype == PRO_LOOP)
+    {
+
+    }
+    //结束
+    else if(currProcUnit->ptype == PRO_END)
+    {
+
+    }
+
+    startProcUnit();
+}
+
+//开始处理单元
+void SimulateControlPanel::startProcUnit()
+{
+    while(true)
+    {
+        if(currProcUnit->ptype == PRO_START)
         {
-            int result = QMessageBox::Yes/*Util::getWarnChoice(currUnit->item->getText())*/;
+            currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
+            emit sendSingleSimulate(currProcUnit);
+            currProcUnit = currProcUnit->nextChild;
+        }
+        //处理框
+        else if(currProcUnit->ptype == PRO_PROCESS)
+        {
+            ServiceProperty * prop = currProcUnit->item->getServiceProp();
+            submitUrl(currProcUnit->item,prop);
+            emit sendSingleSimulate(currProcUnit);
+            break;
+        }
+        //判断框
+        else if(currProcUnit->ptype == PRO_JUDGE)
+        {
+break;
+        }
+        //循环框
+        else if(currProcUnit->ptype == PRO_LOOP)
+        {
+break;
+        }
+        //结束
+        else if(currProcUnit->ptype == PRO_END)
+        {
+            emit sendSingleSimulate(currProcUnit);
+            currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
+            break;
+        }
+    }
+}
 
-            if(result == QMessageBox::Yes)
+//组装URL值
+void SimulateControlPanel::submitUrl(MyItem * item, ServiceProperty * prop)
+{
+    QString fullUrl = prop->servicePath+"/"+prop->method;
+
+    if(prop->inputParas.size() > 0)
+    {
+        fullUrl += "?";
+        for(int i = 0;i<prop->inputParas.size();i++)
+        {
+            QString paraValue = prop->inputParas.at(i)->pValue;
+            QString realParaValue;
+            if(paraValue.startsWith(QString(COMBOX_START_FLAG)))
             {
-                currUnit = currUnit->yesChild;
+                realParaValue = getQuoteOutValue(item,paraValue);
             }
             else
             {
-                currUnit = currUnit->noChild;
+                realParaValue = prop->inputParas.at(i)->pValue;
+            }
+
+            fullUrl += (prop->inputParas.at(i)->pName+"="+ realParaValue);
+
+            if(i != prop->inputParas.size() - 1)
+            {
+                fullUrl += "&";
             }
         }
-        else
-        {
-           currUnit = currUnit->nextChild;
-        }
-
-        if(currUnit && currUnit->ptype == PRO_END)
-        {
-            currUnit->item->hightLightItem(LEVEL_MIDDLE,true);
-            emit sendSingleSimulate(currUnit);
-        }
     }
-    setSimulateState(false);
+
+//    qDebug()<<fullUrl;
+
+    MyWebService::instance()->submit(fullUrl);
+}
+
+//根据引用的参数来反向查所引用的输出值
+QString SimulateControlPanel::getQuoteOutValue(MyItem * item,QString value)
+{
+   QList<MyItem *> parentItems =  SimulateUtil::instance()->getCurrParentItem(item);
+   int pos = value.indexOf("]");
+   int startLen = QString(COMBOX_START_FLAG).size();
+   int parentIndex = value.mid(startLen,pos - startLen).toInt();
+
+   if(parentIndex >= 0 && parentIndex < parentItems.size())
+   {
+       ServiceProperty * sp = parentItems.at(parentIndex)->getServiceProp();
+       ParaList out = sp->outputParas;
+
+       if(out.size() > 0 )
+       {
+           return out.at(0)->pValue;
+       }
+   }
+
+   return "0";
 }
 
 //根据是否为推演状态设置控件的状态

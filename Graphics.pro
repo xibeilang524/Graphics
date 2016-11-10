@@ -6,6 +6,8 @@
 
 QT       += core gui
 QT       += sql
+QT       += network
+QT       += xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -36,6 +38,7 @@ include($$PWD/simulate/simulate.pri)
 include($$PWD/sql/sql.pri)
 include($$PWD/assisant/assisant.pri)
 include($$PWD/project/project.pri)
+include($$PWD/webservice/webservice.pri)
 
 
 RC_FILE = images/log.rc

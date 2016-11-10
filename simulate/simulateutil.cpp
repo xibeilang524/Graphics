@@ -47,7 +47,7 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
         {
             QList<MyItem *> pItems = getInOutItems(pItem,pItem->getArrows(),false);
 
-            qDebug()<<pItem->getText();
+//            qDebug()<<pItem->getText();
 
             bool hasAdded = false;
             bool skipCurrLoop = false;
@@ -323,10 +323,10 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
         }
     }
 
-    foreach(MyItem * tmpItem,list)
-    {
-        qDebug()<<"result:"<<tmpItem->getText();
-    }
+//    foreach(MyItem * tmpItem,list)
+//    {
+//        qDebug()<<"result:"<<tmpItem->getText();
+//    }
 
     return list;
 }

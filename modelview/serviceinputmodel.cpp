@@ -187,7 +187,6 @@ bool ServiceInputModel::deleteRow(int rowNum)
 void ServiceInputModel::setPara(ParaList list)
 {
     paraList = list;
-
     if(paraList.size() > 0)
     {
         beginInsertRows(QModelIndex(),0,paraList.size()-1);

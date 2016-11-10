@@ -1882,6 +1882,12 @@ MyItem::~MyItem()
         myTextItem = NULL;
     }
 
+    if(serviceProp)
+    {
+        delete serviceProp;
+        serviceProp = NULL;
+    }
+
 }
 
 /**

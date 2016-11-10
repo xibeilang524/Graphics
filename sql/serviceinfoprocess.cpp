@@ -55,7 +55,6 @@ bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty *> &properties
             bool tFlag = SQLDataAdapter::instance()->getParameterById(fsql,paras);
             if(tFlag)
             {
-
                   foreach(Parameter para,paras)
                   {
                        Parameter * p = new Parameter;

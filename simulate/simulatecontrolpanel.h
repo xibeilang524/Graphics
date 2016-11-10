@@ -12,6 +12,8 @@
 **20161025:wey:增加从过程列表直接双击显示处理单元属性编辑信息
 **20161104:wey:增加禁止从正在模拟的状态退出至建模状态
 **20161107:wey:修复提取出的处理单元部分判断节点左右子节点为null，导致访问出错问题
+**20161110:wey:增加服务推演
+**             增加推演过程中引用前者的输出作为自己的输入
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -21,6 +23,8 @@
 
 class QLabel;
 struct ProcessUnit;
+struct ServiceProperty;
+class MyItem;
 
 namespace Ui {
 class SimulateControlPanel;
@@ -59,14 +63,21 @@ private slots:
     void respItemActivated(QListWidgetItem * current);
     void respItemChanged(QListWidgetItem * current, QListWidgetItem * previous);
     void respItemDoubleClicked(QListWidgetItem * current);
+    void procLastUnitResult(bool hasFault,QString context);
     
 private:
     void setFlagState(QLabel * label,bool isSuccess);
     void setSimulateState(bool isSim);
+    void submitUrl(MyItem *item, ServiceProperty * prop);
+    void startProcUnit();
+
+    QString getQuoteOutValue(MyItem * item,QString value);
 
     Ui::SimulateControlPanel *ui;
 
     QList<ProcessUnit *> procUnits;
+
+    ProcessUnit * currProcUnit;             //当前处理单元
 };
 
 #endif // SIMULATECONTROLPANEL_H
