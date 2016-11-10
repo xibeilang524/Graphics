@@ -23,6 +23,7 @@
 #include "./SelfWidget/righttoolbox.h"
 #include "./SelfWidget/mypageswitch.h"
 #include "./SelfWidget/serviceview.h"
+#include "./SelfWidget/aboutsoft.h"
 #include "./manager/MyLineComboBox.h"
 #include "./simulate/simulatecontrolpanel.h"
 #include "./project/myprowizard.h"
@@ -525,7 +526,9 @@ void MainWindow::getTecSupport()
 //显示关于
 void MainWindow::showAbout()
 {
-    qApp->aboutQt();
+    AboutSoft dialog(this);
+    dialog.exec();
+//    qApp->aboutQt();
 }
 
 //切换工作模式【建模/推演】

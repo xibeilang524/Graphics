@@ -137,6 +137,21 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                         frontUnit->noChild = endUnit;
                     }
                 }
+                else if(frontUnit->ptype == PRO_LOOP)
+                {
+                    if(loopPolygons.size() > 0)
+                    {
+                        PolygonDesc * currDesc = loopPolygons.at(loopPolygons.size() - 1);
+                        if(currDesc->isProcLeft)
+                        {
+                            frontUnit->yesChild = endUnit;
+                        }
+                        else if(currDesc->isProcRight)
+                        {
+                            frontUnit->noChild = endUnit;
+                        }
+                    }
+                }
                 else
                 {
                     frontUnit->nextChild = endUnit;

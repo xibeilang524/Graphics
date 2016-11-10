@@ -999,8 +999,6 @@ void MyGraphicsView::editTextItem()
     MY_BUILD_MODEL_ONLY
     QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
-    qDebug()<<selectedItems.size()<<"____";
-
     if(selectedItems.size() == 1)
     {
         QString itemName = TYPE_ID(*(selectedItems.first()));
