@@ -557,6 +557,7 @@ void MainWindow::switchWorkModel()
         setWindowTitle("多组件模型在线协同调用工具-推演");
         setSimulateWidgetState(false);
         simulatePanel->resetSimluateFlag();
+        MyGraphicsView::instance()->resetItemProcessType();
     }
 
     MyGraphicsView::instance()->addContextMenuItem();

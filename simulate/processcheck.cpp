@@ -793,6 +793,20 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
             }
         }
     }
+
+    foreach(PolygonDesc * tmp,polygons)
+    {
+        delete tmp;
+    }
+
+    polygons.clear();
+
+    foreach(PolygonDesc * tmp,loopPolygons)
+    {
+        delete tmp;
+    }
+    loopPolygons.clear();
+
     //[2]验证逻辑是否正确
     return RETURN_SUCCESS;
 }

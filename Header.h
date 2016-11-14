@@ -31,8 +31,11 @@
 #define FONT_DEAFULT_PIX  9     //字体初始化大小
 #define ROTATE_MIN_DEGREE 0     //旋转的最小角度
 #define ROTATE_MAX_DEGREE 360   //旋转的最大角度
-#define POP_SUB_DIALOG_WIDTH  650    //弹出子窗口固定宽度
-#define POP_SUB_DIALOG_HEIGHT 450    //弹出子窗口固定高度
+
+#define POP_SUB_DIALOG_WIDTH  650    //复合组件弹出子窗口固定宽度
+#define POP_SUB_DIALOG_HEIGHT 450    //复合组件弹出子窗口固定高度
+#define POP_SIMULATE_DIALOG_WIDTH 550       //推演条件编辑框宽高
+#define POP_SIMULATE_DIALOG_HEIGHT 700
 
 #define COMBOX_START_FLAG "[QUOTE"   //属性编辑值下拉框开始标识
 
@@ -402,6 +405,83 @@ struct RowToIndex
 };
 
 typedef QList< RowToIndex > RowList;
+
+/*************************循环结构体各部分参数定义******************************/
+
+enum LoopPart
+{
+    LOOP_VARI,          //循环变量定义
+    LOOP_EXPRESS,       //循环表达式
+    LOOP_FINAL          //循环末尾
+};
+
+//变量定义int i = 0;
+struct VariableDefine
+{
+    QString type;              //int
+    QString name;              //i
+    QString value;             //0
+    QString pRemark;           //备注
+};
+
+typedef QList<VariableDefine *> VariableDefineList;
+
+//表达式定义i < 5
+struct ExpressDefine
+{
+    QString name;              //i
+    QString expressType;       //<
+    QString value;             //5
+    QString pRemark;           //备注
+};
+
+typedef QList<ExpressDefine *> ExpressDefineList;
+
+//末循环体定义i++/i+=4
+struct FinalExpressDefine
+{
+    QString name;             //i
+    QString expressType;      //++
+    QString value;            //4
+    QString pRemark;          //备注
+};
+
+typedef QList<FinalExpressDefine *> FinalExpressDefineList;
+
+//单个条件的映射关系int i = 0;i<5;i++
+struct SignalVari
+{
+    SignalVari()
+    {
+       variName = "";
+       isLegal = false;
+       initialValue = 0;
+       finalValue = 0;
+       middlValue = 0;
+       operateSymbol = "";
+       selfOperateSymbol = "";
+       selfOperateValue = 0;
+    }
+    QString variName;           //变量名i
+    bool isLegal;               //是否合法，如果有某个变量值不存在那么将其置为false，在使用时如果为false那么就不使用
+    int initialValue;           //初始值0
+    int finalValue;             //终止条件值5
+    int middlValue;             //中间值
+    QString operateSymbol;      //操作条件符号<、>、<=...
+    QString selfOperateSymbol;  //自增++、--、+=
+    int selfOperateValue;       //自增值(+=2，表示2)
+};
+
+typedef QList<SignalVari *> SignalVariList;
+
+//循环参数属性
+struct LoopProperty
+{
+    SignalVariList signalList;          //多个条件集合
+    VariableDefineList varList;         //变量集合
+    ExpressDefineList expList;          //表达式集合
+    FinalExpressDefineList fexpList;    //末循环体集合
+};
 
 #ifdef ADD_STATE_MODEL
 /**************************状态机结构体******************************/

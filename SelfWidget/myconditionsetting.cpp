@@ -2,6 +2,7 @@
 #include "ui_myconditionsetting.h"
 
 #include "../global.h"
+#include "../Header.h"
 
 MyConditionSetting::MyConditionSetting(QWidget *parent) :
     QDialog(parent),
@@ -11,10 +12,7 @@ MyConditionSetting::MyConditionSetting(QWidget *parent) :
 
     setWindowTitle("ÅÐ¶ÏÌõ¼þ±à¼­");
 
-    int width = 550;
-    int height = 600;
-
-    setGeometry((ScreenWidth - width)/2,(ScreenHeight - height)/2,width,height);
+    setGeometry((ScreenWidth - POP_SIMULATE_DIALOG_WIDTH)/2,(ScreenHeight - POP_SIMULATE_DIALOG_HEIGHT)/2,POP_SIMULATE_DIALOG_WIDTH,POP_SIMULATE_DIALOG_HEIGHT);
 }
 
 MyConditionSetting::~MyConditionSetting()

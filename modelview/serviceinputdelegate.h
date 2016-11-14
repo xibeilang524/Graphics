@@ -31,10 +31,9 @@ protected:
     void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const;
 
 private:
-    QStringList  stringList;            //代理下拉控件子item
+    QStringList  stringList;             //代理下拉控件子item
 
     bool column2IsCombox;                //用于区分列表2代理类型
-
 };
 
 #endif // SERVICEINPUTDELEGATE_H

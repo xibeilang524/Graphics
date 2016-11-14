@@ -69,7 +69,8 @@ public:
     void  setScaleValue(int);
     void  setKeyCtrlStated(bool isPressed){this->isCtrlPressed = isPressed;}
 
-    int getItemSize();
+    int  getItemSize();
+    void resetItemProcessType();
 
 protected:
     void dragEnterEvent(QDragEnterEvent *event);

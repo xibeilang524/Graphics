@@ -23,6 +23,7 @@
 #include "../SelfWidget/mystatesetdialog.h"
 #include "../SelfWidget/mystatestartdialog.h"
 #include "../SelfWidget/mypageswitch.h"
+#include "../SelfWidget/myloopdialog.h"
 #include "../simulate/simulateutil.h"
 #include "../Header.h"
 #include "../global.h"
@@ -1135,8 +1136,10 @@ void MyGraphicsView::editPropertyItem()
         if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
-
-            showSelectedItemPropEdit(item);
+            if(item)
+            {
+                showSelectedItemPropEdit(item);
+            }
         }
     }
 }
@@ -1152,9 +1155,35 @@ void MyGraphicsView::showSelectedItemPropEdit(MyItem * item)
     //判断框
     else if(type == GRA_POLYGON)
     {
-        MyConditionSetting dialog(this);
+        ProcessType ptype = item->getProcessType();
 
-        dialog.exec();
+        QMessageBox::StandardButton result;
+
+        if(ptype == PRO_NONE)
+        {
+            result = QMessageBox::information(this,"提示","是否将此控件设置为判断框? \n【Yes】作为判断框\n【No】作为循环框",
+                                       QMessageBox::Yes|QMessageBox::No,QMessageBox::Yes);
+        }
+        else if(ptype == PRO_LOOP)
+        {
+            result = QMessageBox::No;
+        }
+        else if(ptype == PRO_JUDGE)
+        {
+            result = QMessageBox::Yes;
+        }
+
+        if(result == QMessageBox::Yes)
+        {
+            MyConditionSetting dialog(this);
+            dialog.exec();
+        }
+        else
+        {
+            MyLoopDialog dialog(this);
+            dialog.setLoopItemProp(item->getLoopProp());
+            dialog.exec();
+        }
     }
     else
     {
@@ -1379,6 +1408,24 @@ void MyGraphicsView::addPage(QString proPath,QString proName)
     }
     MyPageSwitch::instance()->updateCurrMappingName(fullPath);
     MyPageSwitch::instance()->updateCurrMappingPathName(proPath);
+}
+
+//从【建模】->【推演】，将控件的处理单元类型进行重置
+void MyGraphicsView::resetItemProcessType()
+{
+    MY_ASSERT(myScene)
+    QList<QGraphicsItem *> items = myScene->items();
+    foreach(QGraphicsItem * item,items)
+    {
+        if(TYPE_ID(*item) == TYPE_ID(MyItem))
+        {
+            MyItem * tmpItem = dynamic_cast<MyItem *>(item);
+            if(tmpItem)
+            {
+                tmpItem->setProcessType(PRO_NONE);
+            }
+        }
+    }
 }
 
 MyGraphicsView::~MyGraphicsView()

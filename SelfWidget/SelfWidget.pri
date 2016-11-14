@@ -18,7 +18,8 @@ HEADERS += \
     SelfWidget/mystateinternaleventdialog.h \
     SelfWidget/mystatesetdialog.h \
     SelfWidget/mychoosebar.h \
-    SelfWidget/aboutsoft.h
+    SelfWidget/aboutsoft.h \
+    SelfWidget/myloopdialog.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -40,7 +41,8 @@ SOURCES += \
     SelfWidget/mystateinternaleventdialog.cpp \
     SelfWidget/mystatesetdialog.cpp \
     SelfWidget/mychoosebar.cpp \
-    SelfWidget/aboutsoft.cpp
+    SelfWidget/aboutsoft.cpp \
+    SelfWidget/myloopdialog.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
@@ -57,4 +59,5 @@ FORMS += \
     SelfWidget/mystatemodeldialog.ui \
     SelfWidget/mystateinternaleventdialog.ui \
     SelfWidget/mystatesetdialog.ui \
-    SelfWidget/mychoosebar.ui
+    SelfWidget/mychoosebar.ui \
+    SelfWidget/myloopdialog.ui

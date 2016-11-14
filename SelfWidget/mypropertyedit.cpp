@@ -21,11 +21,9 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
 
     setWindowTitle("·þÎñ±à¼­");
 
-    int width = 550;
-    int height = 600;
     isComboxAutoChanged = false;
 
-    setGeometry((ScreenWidth - width)/2,(ScreenHeight - height)/2,width,height);
+    setGeometry((ScreenWidth - POP_SIMULATE_DIALOG_WIDTH)/2,(ScreenHeight - POP_SIMULATE_DIALOG_HEIGHT)/2,POP_SIMULATE_DIALOG_WIDTH,POP_SIMULATE_DIALOG_HEIGHT);
 
     inputTableView = new ServiceInputTableView(0,4);
 

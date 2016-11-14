@@ -42,7 +42,7 @@ protected:
 private:
     int row,column;
 
-    ParaList paraList;               //当前控件的属性
+    ParaList paraList;                 //当前控件的属性
     QStringList horizonalHeadList;     //水平表头
 };
 

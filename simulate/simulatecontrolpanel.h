@@ -14,6 +14,7 @@
 **20161107:wey:修复提取出的处理单元部分判断节点左右子节点为null，导致访问出错问题
 **20161110:wey:增加服务推演
 **             增加推演过程中引用前者的输出作为自己的输入
+**20161114:wey:增加对循环、嵌套循环的支持(目前仅支持一个条件循环判断)
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -21,10 +22,12 @@
 #include <QWidget>
 #include <QListWidgetItem>
 
+#include "../global.h"
+
 class QLabel;
+class MyItem;
 struct ProcessUnit;
 struct ServiceProperty;
-class MyItem;
 
 namespace Ui {
 class SimulateControlPanel;
@@ -64,18 +67,23 @@ private slots:
     void respItemChanged(QListWidgetItem * current, QListWidgetItem * previous);
     void respItemDoubleClicked(QListWidgetItem * current);
     void procLastUnitResult(bool hasFault,QString context);
+    void stopCurrSimulate();
     
 private:
     void setFlagState(QLabel * label,bool isSuccess);
     void setSimulateState(bool isSim);
     void submitUrl(MyItem *item, ServiceProperty * prop);
     void startProcUnit();
+    bool countLoopValue(SignalVariList & loopList);
+    void clearLastSimluteRecord();
 
     QString getQuoteOutValue(MyItem * item,QString value);
 
     Ui::SimulateControlPanel *ui;
 
     QList<ProcessUnit *> procUnits;
+
+    bool isSimulateState;                   //是否为模拟状态
 
     ProcessUnit * currProcUnit;             //当前处理单元
 };

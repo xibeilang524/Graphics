@@ -19,6 +19,7 @@ class MyItem;
 //单元类型
 enum ProcessType
 {
+    PRO_NONE,               //无
     PRO_START,              //开始:圆角矩形
     PRO_INPUT,              //输入输出:平行四边形
     PRO_PROCESS,            //处理:矩形

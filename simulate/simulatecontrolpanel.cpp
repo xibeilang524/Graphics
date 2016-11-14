@@ -14,7 +14,7 @@
 #include "../item/mygraphicsview.h"
 #include "../item/myscene.h"
 #include "../util.h"
-#include "../global.h"
+
 #include "../webservice/mywebservice.h"
 
 MyListWidgetItem::MyListWidgetItem(QListWidget *parent, int type)
@@ -43,11 +43,13 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
 
     setFixedWidth(300);
     currProcUnit = NULL;
+    isSimulateState = false;
 
     connect(ui->startSimulate,SIGNAL(clicked()),this,SLOT(respStartSimulate()));
     connect(ui->simProcedure,SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem *)),this,SLOT(respItemChanged(QListWidgetItem * , QListWidgetItem *)));
     connect(ui->simProcedure,SIGNAL(itemClicked (QListWidgetItem*)),this,SLOT(respItemActivated(QListWidgetItem*)));
     connect(ui->simProcedure,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(respItemDoubleClicked(QListWidgetItem *)));
+    connect(ui->terminalSimulate,SIGNAL(clicked()),this,SLOT(stopCurrSimulate()));
     connect(this,SIGNAL(sendSingleSimulate(ProcessUnit*)),this,SLOT(showSimulateOperate(ProcessUnit*)));
 
     connect(MyWebService::instance(),SIGNAL(lastUnitProcessOver(bool,QString)),this,SLOT(procLastUnitResult(bool,QString)));
@@ -104,9 +106,11 @@ void SimulateControlPanel::respStartSimulate()
 
     foreach(ProcessUnit * tmpUnit,procUnits)
     {
+        tmpUnit->item->setProcessType(tmpUnit->ptype);
+
         if(tmpUnit->gtype == GRA_POLYGON)
         {
-            qDebug()<<tmpUnit->item->getText()<<"__"<<tmpUnit->yesChild->item->getText()<<"_"<<tmpUnit->noChild->item->getText();
+            qDebug()<<tmpUnit->ptype<<"_"<<tmpUnit->item->getText()<<"__"<<tmpUnit->yesChild->item->getText()<<"_"<<tmpUnit->noChild->item->getText();
         }
         else
         {
@@ -118,16 +122,34 @@ void SimulateControlPanel::respStartSimulate()
             {
                 qDebug()<<tmpUnit->item->getText();
             }
-
         }
     }
 
+    clearLastSimluteRecord();
 
+    isSimulateState = true;
     //【5】对处理单元进行处理
     currProcUnit = procUnits.first();
     startProcUnit();
 
     setSimulateState(false);
+}
+
+//清空上一次推演的记录
+void SimulateControlPanel::clearLastSimluteRecord()
+{
+    //再次推演时先清空上一次的记录
+    foreach(ProcessUnit * unit,procUnits)
+    {
+        if(unit->ptype == PRO_LOOP )
+        {
+            LoopProperty * lprop = unit->item->getLoopProp();
+            foreach(SignalVari  * tmp ,lprop->signalList)
+            {
+                tmp->middlValue = 0;
+            }
+        }
+    }
 }
 
 //针对当前处理单元返回的结果进行处理
@@ -137,6 +159,7 @@ void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
     {
         currProcUnit->item->hightLightItem(LEVEL_MIDDLE,true);
         Util::showWarn("服务访问出错，推演流程终止!");
+        isSimulateState = false;
         return;
     }
 
@@ -172,12 +195,12 @@ void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
 //开始处理单元
 void SimulateControlPanel::startProcUnit()
 {
-    while(true)
+    while(isSimulateState)
     {
+        emit sendSingleSimulate(currProcUnit);
         if(currProcUnit->ptype == PRO_START)
         {
             currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
-            emit sendSingleSimulate(currProcUnit);
             currProcUnit = currProcUnit->nextChild;
         }
         //处理框
@@ -185,27 +208,122 @@ void SimulateControlPanel::startProcUnit()
         {
             ServiceProperty * prop = currProcUnit->item->getServiceProp();
             submitUrl(currProcUnit->item,prop);
-            emit sendSingleSimulate(currProcUnit);
+
             break;
         }
         //判断框
         else if(currProcUnit->ptype == PRO_JUDGE)
         {
-break;
+            break;
         }
         //循环框
         else if(currProcUnit->ptype == PRO_LOOP)
         {
-break;
+            LoopProperty * loopProp = currProcUnit->item->getLoopProp();
+            SignalVariList slist = loopProp->signalList;
+
+            bool loopResult = countLoopValue(slist);
+
+            if(loopResult)
+            { 
+                currProcUnit = currProcUnit->yesChild;
+            }
+            else
+            {
+                //在执行否时，需要将上次循环的中间值置为0(嵌套循环)
+                currProcUnit = currProcUnit->noChild;
+                foreach(SignalVari * tmpVari,slist)
+                {
+                    tmpVari->middlValue = 0;
+                }
+            }
         }
         //结束
         else if(currProcUnit->ptype == PRO_END)
         {
-            emit sendSingleSimulate(currProcUnit);
             currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
             break;
         }
     }
+}
+
+//根据循环框中设定的值，计算当前条件是否满足；若满足，执行循环框yes分支，否则执行no分支
+bool SimulateControlPanel::countLoopValue(SignalVariList &loopList)
+{
+    if(loopList.size() == 0)
+    {
+        return false;
+    }
+
+    bool finalResult = false;
+
+    //先判断条件是否成立
+    foreach(SignalVari * sv,loopList)
+    {
+        if(sv->operateSymbol == "<")
+        {
+            if(sv->middlValue < sv->finalValue)
+            {
+                finalResult = true;
+            }
+        }
+        else if(sv->operateSymbol == "<=")
+        {
+            if(sv->middlValue <= sv->finalValue)
+            {
+                finalResult = true;
+            }
+        }
+        else if(sv->operateSymbol == ">")
+        {
+            if(sv->middlValue > sv->finalValue)
+            {
+                finalResult = true;
+            }
+        }
+        else if(sv->operateSymbol == ">=")
+        {
+            if(sv->middlValue >= sv->finalValue)
+            {
+                finalResult = true;
+            }
+        }
+        else if(sv->operateSymbol == "==")
+        {
+            if(sv->middlValue == sv->finalValue)
+            {
+                finalResult = true;
+            }
+        }
+    }
+
+    //条件成立，对变量进行改变操作
+    if(finalResult)
+    {
+        foreach(SignalVari * sv,loopList)
+        {
+            int middval = sv->middlValue;
+
+            if(sv->selfOperateSymbol == "++")
+            {
+                sv->middlValue = middval+1;
+            }
+            else if(sv->selfOperateSymbol == "--")
+            {
+                sv->middlValue = middval-1;
+            }
+            else if(sv->selfOperateSymbol == "+=")
+            {
+                sv->middlValue = middval + sv->selfOperateValue;
+            }
+            else if(sv->selfOperateSymbol == "-=")
+            {
+                sv->middlValue = middval - sv->selfOperateValue;
+            }
+        }
+    }
+
+    return finalResult;
 }
 
 //组装URL值
@@ -263,6 +381,12 @@ QString SimulateControlPanel::getQuoteOutValue(MyItem * item,QString value)
    }
 
    return "0";
+}
+
+//终止当前的推演
+void SimulateControlPanel::stopCurrSimulate()
+{
+    isSimulateState = false;
 }
 
 //根据是否为推演状态设置控件的状态

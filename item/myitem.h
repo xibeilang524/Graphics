@@ -39,6 +39,7 @@
 **20161018: gx:修复旋转后尺寸缩放的问题【!!!】
 **             修复本地打开后，拖拽点鼠标样式不随角度改变问题
 **20161108:wey:添加状态机的图标(开始、结束、处理)
+**20161111:wey:添加循环参数属性LoopProperty
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -59,7 +60,7 @@ class DragLinePoint;
 
 #include <QDataStream>
 
-#include "../Header.h"
+#include "../simulate/SimulateHeader.h"
 
 class MyItem : public MySuperItem
 {
@@ -78,6 +79,9 @@ public:
 
     QString getText();
     void setText(QString text);
+
+    void setProcessType(ProcessType ptype){this->simulateProcessType = ptype;}
+    ProcessType getProcessType(){return this->simulateProcessType;}
 
     const QList<MyNodePort *> & getNodePorts(){return this->ports;}
 
@@ -104,6 +108,7 @@ public:
     friend QDataStream & operator >>(QDataStream &,MyItem * item);
 
     ServiceProperty * getServiceProp(){return this->serviceProp;}
+    LoopProperty * getLoopProp(){return this->loopProperty;}
 
     void hightLightItem(HightLightLevel level = LEVEL_NORMAL,bool isHigh = true);
     bool isHightShow(){return this->isSimulateHigh;}
@@ -194,11 +199,14 @@ private:
     bool isPrepareLine;                //是否准备绘制线条，如果是，则在鼠标进入时，在四边的中点绘制允许接入点
 
     ServiceProperty * serviceProp;     //属性信息
+    LoopProperty * loopProperty;       //循环体的属性
 
     bool isSimulateHigh;               //是否为推演状态下的高亮显示
     HightLightLevel  lightLevel;       //当前属于哪种显示
 
     GraphicsType dragGraphicsType;     //当前拖入的端口类型，拖拽结束后置为GRA_NONE
+
+    ProcessType simulateProcessType;   //在推演模式下，此item所代表的处理单元类型。默认为【PRO_NONE】
 
 #ifdef ADD_STATE_MODEL
     StateStartProperty startProp;      //开始状态的属性

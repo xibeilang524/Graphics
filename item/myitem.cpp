@@ -155,6 +155,7 @@ MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *pare
     isPrepareLine = false;
     isSimulateHigh = false;
     lightLevel = LEVEL_NORMAL;
+    simulateProcessType = PRO_NONE;
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -248,6 +249,7 @@ MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *pare
     setBrush(property.itemBrush);
 
     serviceProp = new ServiceProperty;
+    loopProperty = new LoopProperty;
 
     currMouseType = MOUSE_NONE;
     isNeedBorder = false;
@@ -1884,8 +1886,50 @@ MyItem::~MyItem()
 
     if(serviceProp)
     {
+        foreach(Parameter * para,serviceProp->inputParas)
+        {
+            delete para;
+        }
+        serviceProp->inputParas.clear();;
+
+        foreach(Parameter * para,serviceProp->outputParas)
+        {
+            delete para;
+        }
+        serviceProp->outputParas.clear();
+
         delete serviceProp;
         serviceProp = NULL;
+    }
+
+    if(loopProperty)
+    {
+        foreach(VariableDefine * para,loopProperty->varList)
+        {
+            delete para;
+        }
+        loopProperty->varList.clear();
+
+        foreach(ExpressDefine * para,loopProperty->expList)
+        {
+            delete para;
+        }
+        loopProperty->expList.clear();
+
+        foreach(FinalExpressDefine * para,loopProperty->fexpList)
+        {
+            delete para;
+        }
+        loopProperty->fexpList.clear();
+
+        foreach(SignalVari * para,loopProperty->signalList)
+        {
+            delete para;
+        }
+        loopProperty->signalList.clear();
+
+        delete loopProperty;
+        loopProperty = NULL;
     }
 
 }
