@@ -16,7 +16,7 @@
 **             增加推演过程中引用前者的输出作为自己的输入
 **20161114:wey:增加对循环、嵌套循环的支持(目前仅支持一个条件循环判断)
 **20161115:wey:修复循环计算--的错误
-**
+**             添加自动和单步运行
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -70,6 +70,8 @@ private slots:
     void respItemDoubleClicked(QListWidgetItem * current);
     void procLastUnitResult(bool hasFault,QString context);
     void stopCurrSimulate();
+    void chooseRunMethod(bool flag);
+    void stepByStep();
     
 private:
     void setFlagState(QLabel * label,bool isSuccess);
@@ -78,7 +80,6 @@ private:
     void startProcUnit();
     bool countLoopValue(SignalVariList & loopList);
     void clearLastSimluteRecord();
-
     QString getQuoteOutValue(MyItem * item,QString value);
 
     Ui::SimulateControlPanel *ui;
@@ -86,6 +87,7 @@ private:
     QList<ProcessUnit *> procUnits;
 
     bool isSimulateState;                   //是否为模拟状态
+    bool isAutoRun;                         //是否为自动运行
 
     ProcessUnit * currProcUnit;             //当前处理单元
 };

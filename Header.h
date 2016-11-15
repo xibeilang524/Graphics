@@ -38,6 +38,7 @@
 #define POP_SIMULATE_DIALOG_HEIGHT 700
 
 #define COMBOX_START_FLAG "[QUOTE"   //属性编辑值下拉框开始标识
+#define COMBOX_LOOP_QUOTE "[QUOTE]"  //循环属性编辑时，引用前面输出的变量
 
 #include <QString>
 

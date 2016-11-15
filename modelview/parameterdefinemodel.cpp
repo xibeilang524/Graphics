@@ -149,6 +149,7 @@ QVariant ParameterDefineModel::headerData(int section, Qt::Orientation orientati
             return QString("%1").arg(section +1);
         }
     }
+
     return QVariant();
 }
 

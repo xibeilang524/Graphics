@@ -44,6 +44,7 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     setFixedWidth(300);
     currProcUnit = NULL;
     isSimulateState = false;
+    isAutoRun = true;
 
     connect(ui->startSimulate,SIGNAL(clicked()),this,SLOT(respStartSimulate()));
     connect(ui->simProcedure,SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem *)),this,SLOT(respItemChanged(QListWidgetItem * , QListWidgetItem *)));
@@ -52,7 +53,46 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     connect(ui->terminalSimulate,SIGNAL(clicked()),this,SLOT(stopCurrSimulate()));
     connect(this,SIGNAL(sendSingleSimulate(ProcessUnit*)),this,SLOT(showSimulateOperate(ProcessUnit*)));
 
+    connect(ui->autoRun,SIGNAL(toggled(bool)),this,SLOT(chooseRunMethod(bool)));
+    connect(ui->signalRun,SIGNAL(toggled(bool)),this,SLOT(chooseRunMethod(bool)));
+    connect(ui->nextStep,SIGNAL(clicked()),this,SLOT(stepByStep()));
+
+    ui->autoRun->setChecked(true);
+    ui->terminalSimulate->setEnabled(false);
+
     connect(MyWebService::instance(),SIGNAL(lastUnitProcessOver(bool,QString)),this,SLOT(procLastUnitResult(bool,QString)));
+}
+
+//自动运行
+void SimulateControlPanel::chooseRunMethod(bool flag)
+{
+    QString objName = QObject::sender()->objectName();
+
+    if(objName == "autoRun")
+    {
+        if(flag)
+        {
+            isAutoRun = true;
+            ui->nextStep->setEnabled(false);
+        }
+    }
+    else if(objName == "signalRun")
+    {
+        if(flag)
+        {
+            isAutoRun = false;
+            ui->nextStep->setEnabled(true);
+        }
+    }
+}
+
+//下一步
+void SimulateControlPanel::stepByStep()
+{
+    if(isSimulateState)
+    {
+        startProcUnit();
+    }
 }
 
 /*!
@@ -130,9 +170,7 @@ void SimulateControlPanel::respStartSimulate()
     isSimulateState = true;
     //【5】对处理单元进行处理
     currProcUnit = procUnits.first();
-    startProcUnit();
-
-    setSimulateState(false);
+    startProcUnit();   
 }
 
 //清空上一次推演的记录
@@ -189,7 +227,10 @@ void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
 
     }
 
-    startProcUnit();
+    if(isAutoRun)
+    {
+        startProcUnit();
+    }
 }
 
 //开始处理单元
@@ -246,6 +287,12 @@ void SimulateControlPanel::startProcUnit()
         else if(currProcUnit->ptype == PRO_END)
         {
             currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
+            setSimulateState(false);
+            break;
+        }
+
+        if(!isAutoRun)
+        {
             break;
         }
     }
@@ -307,8 +354,6 @@ bool SimulateControlPanel::countLoopValue(SignalVariList &loopList)
         foreach(SignalVari * sv,loopList)
         {
             int middval = sv->middlValue;
-
-            qDebug()<<sv->middlValue<<"====="<<sv->finalValue;
 
             if(sv->selfOperateSymbol == "++")
             {
@@ -393,13 +438,37 @@ QString SimulateControlPanel::getQuoteOutValue(MyItem * item,QString value)
 void SimulateControlPanel::stopCurrSimulate()
 {
     isSimulateState = false;
+    setSimulateState(false);
 }
 
 //根据是否为推演状态设置控件的状态
 void SimulateControlPanel::setSimulateState(bool isSim)
 {
+    isSimulateState = isSim;
     GlobalIsSimulateState = isSim;
     ui->startSimulate->setEnabled(!isSim);
+    ui->terminalSimulate->setEnabled(isSim);
+
+    if(isSim)
+    {
+        ui->autoRun->setEnabled(false);
+        ui->signalRun->setEnabled(false);
+    }
+    else
+    {
+        if(isAutoRun)
+        {
+            ui->autoRun->setEnabled(true);
+            ui->signalRun->setEnabled(true);
+            ui->nextStep->setEnabled(false);
+        }
+        else
+        {
+            ui->autoRun->setEnabled(true);
+            ui->signalRun->setEnabled(true);
+            ui->nextStep->setEnabled(true);
+        }
+    }
 }
 
 //显示每一步的推演的操作信息
@@ -416,6 +485,7 @@ void SimulateControlPanel::showSimulateOperate(ProcessUnit *unit)
     item->bindProscessUnit(unit);
 
     ui->simProcedure->addItem(item);
+    ui->simProcedure->scrollToBottom();
 }
 
 //点击控件时，高亮显示

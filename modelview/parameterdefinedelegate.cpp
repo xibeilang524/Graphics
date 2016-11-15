@@ -11,7 +11,8 @@ ParameterDefineDelegate::ParameterDefineDelegate(LoopPart loopPart):
     switch(loopPart)
     {
         case LOOP_VARI:
-                        stringList<<QString("short")<<QString("int")<<QString("long");
+                        stringList<<QString("short")<<QString("int")<<QString("long")
+                                 <<QString(COMBOX_LOOP_QUOTE);
                         break;
         case LOOP_EXPRESS:
                         stringList<<">"<<">="<<"<"<<"<="<<"==";
@@ -74,15 +75,15 @@ void ParameterDefineDelegate::setEditorData(QWidget *editor, const QModelIndex &
             QComboBox * box = dynamic_cast<QComboBox *>(editor);
             if(box)
             {
-                if(!stringList.contains(value))
-                {
-                    box->insertItem(0,value);
-                    box->setCurrentIndex(0);
-                }
-                else
-                {
+//                if(!stringList.contains(value))
+//                {
+//                    box->insertItem(0,value);
+//                    box->setCurrentIndex(0);
+//                }
+//                else
+//                {
                     box->setCurrentIndex(stringList.indexOf(value));
-                }
+//                }
             }
         }
         else
