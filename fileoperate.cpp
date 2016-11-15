@@ -133,6 +133,20 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
         {
             CutInfo * info = new CutInfo;
             stream>>info->itemProperty;
+
+            if(info->itemProperty.ptype == PRO_PROCESS)
+            {
+                stream>>(&info->serviceProp);
+            }
+            else if(info->itemProperty.ptype == PRO_LOOP)
+            {
+                stream>>(info->loopProp);
+            }
+            else if(info->itemProperty.ptype == PRO_JUDGE)
+            {
+
+            }
+
             info->graphicsType = (GraphicsType)type;
 
             if(info->itemProperty.zValue > maxZvalue)

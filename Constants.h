@@ -7,6 +7,7 @@ namespace Constants {
 //ÎÄ¼þ²Ù×÷
 const char FILE_ID[] = "Constants.File";
 const char SAVE_ID[] = "Constants.Save";
+const char SAVE_AS_ID[] = "Constants.SaveAs";
 const char OPEN_ID[] = "Constants.Open";
 const char CLEAR_ID[] = "Constants.Clear";
 const char EXIT_ID[] = "Constants.Exit";

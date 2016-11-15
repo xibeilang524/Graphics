@@ -49,24 +49,29 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
     connect(ui->cancel,SIGNAL(clicked()),this,SLOT(cancelProperty()));
 }
 
-//初始显示信息
+//初始显示信息,先依照全局的服务信息添加下拉列表；然后根据当前控件是否已经添加服务再设定下拉列表索引
 void MyPropertyEdit::initProp(ServiceProperty *prop)
 {
     currItemProp = prop;
+    initServiceData();
 
     if(prop->hasSettInfo)
     {
+        inputTableView->clearTable();
+        outputTableView->clearTable();
+
+        isComboxAutoChanged = true;
+
         inputTableView->model()->setPara(prop->inputParas);
         outputTableView->model()->setPara(prop->outputParas);
 
-        isComboxAutoChanged = true;
         int index = -1;
         for(int i = 0;i<GlobalServiceProperties.size();i++)
         {
-            ui->serviceName->addItem(GlobalServiceProperties.at(i)->serviceName);
             if(GlobalServiceProperties.at(i)->serviceName == prop->serviceName)
             {
                 index = i;
+                break;
             }
         }
 
@@ -80,13 +85,9 @@ void MyPropertyEdit::initProp(ServiceProperty *prop)
         ui->servicePort->setText(prop->method);
         ui->outputAsNextInput->setChecked(prop->isAsNextInput);
     }
-    else
-    {
-        initServiceData();
-    }
 }
 
-//从数据库加载数据
+//从数据库加载数据,只在第一次加载后刷新下拉列表
 void MyPropertyEdit::initServiceData()
 {
     if(GlobalServiceProperties.size() == 0)
@@ -95,7 +96,7 @@ void MyPropertyEdit::initServiceData()
        if(!flag)
        {
            Util::showWarn(ServiceInfoProcess::instance()->getLastError());
-       }
+       }     
     }
 
     foreach(ServiceProperty * prop,GlobalServiceProperties)

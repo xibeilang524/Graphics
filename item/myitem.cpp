@@ -30,13 +30,196 @@
 #define QCOS(a) qCos(a*M_PI/180)
 #define QSIN(a) qSin(a*M_PI/180)
 
-#define CROSS_RADIUS 8        //绘制拖入十字星半径
-#define POINT_FIVE   0.5      //控件竖直和水平的长度比例，用于绘制矩形等非等边图形
+#define CROSS_RADIUS 8               //绘制拖入十字星半径
+#define POINT_FIVE   0.5             //控件竖直和水平的长度比例，用于绘制矩形等非等边图形
 #define POINT_TWO_FIVE 0.25
 #define POINT_ONE_EIGHTH 0.125
 #define ANNOTATION_SHORT_LINE  7     //注解短边的长度
 #define MAX_LOOP_RADIUS    25        //注解短边最大长度
 #define STATE_END_RADIUS   3         //状态机结束圆与Circle半径差
+
+//对服务的参数进行重载
+QDataStream & operator <<(QDataStream & stream,Parameter * para)
+{
+    stream<<para->pId<<para->pName<<para->pType<<para->pValue<<para->pRemark;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream & stream,Parameter * para)
+{
+    stream>>para->pId>>para->pName>>para->pType>>para->pValue>>para->pRemark;
+    return stream;
+}
+
+//对ServiceProperty进行重载
+QDataStream & operator <<(QDataStream & stream,ServiceProperty * prop)
+{
+    int inputSize = prop->inputParas.size();
+    int outputSize = prop->outputParas.size();
+
+    stream<<prop->hasSettInfo<<prop->id<<prop->serviceName<<prop->status
+            <<prop->descirption<<prop->servicePath<<prop->method<<inputSize
+              <<outputSize<<prop->isAsNextInput;
+    //分别对输入和输出的参数进行保存
+    foreach(Parameter * para,prop->inputParas)
+    {
+        stream<<para;
+    }
+
+    foreach(Parameter * para,prop->outputParas)
+    {
+        stream<<para;
+    }
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream & stream,ServiceProperty * prop)
+{
+    int inputSize = 0;
+    int outputSize = 0;
+
+    stream>>prop->hasSettInfo>>prop->id>>prop->serviceName>>prop->status
+            >>prop->descirption>>prop->servicePath>>prop->method>>inputSize
+              >>outputSize>>prop->isAsNextInput;
+
+    //分别对输入和输出的参数进行保存
+    for(int i = 0; i < inputSize ; i++)
+    {
+        Parameter * para = new Parameter;
+        stream>>para;
+        prop->inputParas.append(para);
+    }
+
+    for(int i = 0; i < outputSize ; i++)
+    {
+        Parameter * para = new Parameter;
+        stream>>para;
+        prop->outputParas.append(para);
+    }
+    return stream;
+}
+
+//对循环条件进行重载
+QDataStream & operator <<(QDataStream &stream,LoopProperty * loopProp)
+{
+    stream<<loopProp->signalList.size()<<loopProp->varList.size()
+            <<loopProp->expList.size()<<loopProp->fexpList.size();
+
+    foreach(SignalVari * vari,loopProp->signalList)
+    {
+        stream<<vari;
+    }
+
+    foreach(VariableDefine * vari,loopProp->varList)
+    {
+        stream<<vari;
+    }
+
+    foreach(ExpressDefine * vari,loopProp->expList)
+    {
+        stream<<vari;
+    }
+
+    foreach(FinalExpressDefine * vari,loopProp->fexpList)
+    {
+        stream<<vari;
+    }
+    return stream;
+}
+
+//对循环条件进行重载
+QDataStream & operator >>(QDataStream &stream,LoopProperty * loopProp)
+{
+    int slist = 0;
+    int vlist = 0;
+    int elist = 0;
+    int felist = 0;
+    stream>>slist>>vlist>>elist>>felist;
+
+    for(int i = 0; i < slist; i++)
+    {
+        SignalVari * vari = new SignalVari;
+        stream>>vari;
+        loopProp->signalList.append(vari);
+    }
+
+    for(int i = 0; i < vlist; i++)
+    {
+        VariableDefine * vari = new VariableDefine;
+        stream>>vari;
+        loopProp->varList.append(vari);
+    }
+
+    for(int i = 0; i < elist; i++)
+    {
+        ExpressDefine * vari = new ExpressDefine;
+        stream>>vari;
+        loopProp->expList.append(vari);
+    }
+
+    for(int i = 0; i < felist; i++)
+    {
+        FinalExpressDefine * vari = new FinalExpressDefine;
+        stream>>vari;
+        loopProp->fexpList.append(vari);
+    }
+
+    return stream;
+}
+
+//VariableDefine
+QDataStream & operator <<(QDataStream & stream ,VariableDefine * vari)
+{
+    stream<<vari->type<<vari->name<<vari->value<<vari->pRemark;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream & stream ,VariableDefine * vari)
+{
+    stream>>vari->type>>vari->name>>vari->value>>vari->pRemark;
+    return stream;
+}
+
+//ExpressDefine
+QDataStream & operator <<(QDataStream & stream ,ExpressDefine * vari)
+{
+    stream<<vari->name<<vari->expressType<<vari->value<<vari->pRemark;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream & stream ,ExpressDefine * vari)
+{
+    stream>>vari->name>>vari->expressType>>vari->value>>vari->pRemark;
+    return stream;
+}
+
+//FinalExpressDefine
+QDataStream & operator <<(QDataStream & stream ,FinalExpressDefine * vari)
+{
+    stream<<vari->name<<vari->expressType<<vari->value<<vari->pRemark;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream & stream ,FinalExpressDefine * vari)
+{
+    stream>>vari->name>>vari->expressType>>vari->value>>vari->pRemark;
+    return stream;
+}
+
+//SignalVari
+QDataStream & operator <<(QDataStream & stream ,SignalVari * vari)
+{
+    stream<<vari->variName<<vari->isLegal<<vari->initialValue<<vari->finalValue
+            <<vari->middlValue<<vari->operateSymbol<<vari->selfOperateSymbol<<vari->selfOperateValue;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream & stream ,SignalVari * vari)
+{
+    stream>>vari->variName>>vari->isLegal>>vari->initialValue>>vari->finalValue
+            >>vari->middlValue>>vari->operateSymbol>>vari->selfOperateSymbol>>vari->selfOperateValue;
+    return stream;
+}
 
 //对MyRect的输出进行重载
 QDataStream & operator <<(QDataStream &stream,MyRect & rect)
@@ -96,7 +279,7 @@ QDataStream & operator >>(QDataStream &stream,AddLineType & type)
     return stream;
 }
 
-////写入属性
+//写入属性
 QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
 {
     stream<<prop.startItemID<<prop.endItemID<<prop.associativeID
@@ -105,21 +288,22 @@ QDataStream & operator <<(QDataStream & stream,ItemProperty & prop)
              <<prop.alphaValue<<prop.rotateDegree
               <<prop.isFont<<prop.content<<prop.itemFont<<prop.fontColor
                <<prop.zValue<<prop.lineType<<prop.startLineType<<prop.endLineType<<prop.startPointType<<prop.endPointType
-                <<prop.isMoveable;
-
+                <<prop.isMoveable<<prop.ptype;
     return stream;
 }
 
-////读属性
+//读属性
 QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
 {
+    int ptype = 0;
     stream>>prop.startItemID>>prop.endItemID>>prop.associativeID
            >>prop.isNeedBrush>>prop.itemBrush
             >>prop.isNeedBorder>>prop.itemPen>>prop.itemRect
              >>prop.alphaValue>>prop.rotateDegree
               >>prop.isFont>>prop.content>>prop.itemFont>>prop.fontColor
                >>prop.zValue>>prop.lineType>>prop.startLineType>>prop.endLineType>>prop.startPointType>>prop.endPointType
-                >>prop.isMoveable;
+                >>prop.isMoveable>>ptype;
+    prop.ptype = (ProcessType)ptype;
 
     return stream;
 }
@@ -129,6 +313,18 @@ QDataStream & operator <<(QDataStream &stream,MyItem * item)
     int type = item->currItemType;
 
     stream<<type<<item->property;
+    if(item->getProperty().ptype == PRO_PROCESS)
+    {
+        stream<<item->getServiceProp();
+    }
+    else if(item->getProperty().ptype == PRO_JUDGE)
+    {
+
+    }
+    else if(item->getProperty().ptype == PRO_LOOP)
+    {
+        stream<<item->getLoopProp();
+    }
 
     return stream;
 }
@@ -143,6 +339,28 @@ QDataStream & operator >>(QDataStream &stream,MyItem * item)
 
     item->setProperty(prop);
 
+    if(prop.ptype == PRO_PROCESS)
+    {
+        ServiceProperty * sprop = new ServiceProperty;
+
+        stream>>sprop;
+        item->setServiceProperty(sprop);
+
+        delete sprop;
+    }
+    else if(prop.ptype == PRO_LOOP)
+    {
+        LoopProperty * lprop = new LoopProperty;
+        stream>>lprop;
+        item->setLoopProp(lprop);
+
+        delete lprop;
+    }
+    else if(prop.ptype == PRO_JUDGE)
+    {
+
+    }
+
     return stream;
 }
 
@@ -155,7 +373,6 @@ MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *pare
     isPrepareLine = false;
     isSimulateHigh = false;
     lightLevel = LEVEL_NORMAL;
-    simulateProcessType = PRO_NONE;
 
     setFlag(QGraphicsItem::ItemIsMovable,true);
     setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -1814,6 +2031,87 @@ void MyItem::setModelProp(StateModelProperty &prop)
     setText(prop.stateName);
 }
 #endif
+
+//设置服务的属性
+void MyItem::setServiceProperty(ServiceProperty *prop)
+{
+    serviceProp->hasSettInfo = prop->hasSettInfo;
+    serviceProp->id = prop->id;
+    serviceProp->serviceName = prop->serviceName;
+    serviceProp->status = prop->status;
+    serviceProp->descirption = prop->descirption;
+    serviceProp->servicePath = prop->servicePath;
+    serviceProp->method = prop->method;
+    foreach(Parameter * para, prop->inputParas)
+    {
+        Parameter * p = new Parameter;
+        p->pId = para->pId;
+        p->pName = para->pName;
+        p->pRemark = para->pRemark;
+        p->pType = para->pType;
+        p->pValue = para->pValue;
+
+        serviceProp->inputParas.append(p);
+    }
+    foreach(Parameter * para, prop->outputParas)
+    {
+        Parameter * p = new Parameter;
+        p->pId = para->pId;
+        p->pName = para->pName;
+        p->pRemark = para->pRemark;
+        p->pType = para->pType;
+        p->pValue = para->pValue;
+        serviceProp->outputParas.append(para);
+    }
+    serviceProp->isAsNextInput = prop->isAsNextInput;
+}
+
+//设置循环属性
+void MyItem::setLoopProp(LoopProperty *prop)
+{
+    foreach(SignalVari * tmp,prop->signalList)
+    {
+        SignalVari * s = new SignalVari;
+        s->isLegal = tmp->isLegal;
+        s->initialValue = tmp->initialValue;
+        s->finalValue = tmp->finalValue;
+        s->middlValue = tmp->middlValue;
+        s->operateSymbol = tmp->operateSymbol;
+        s->selfOperateSymbol = tmp->selfOperateSymbol;
+        s->selfOperateValue = tmp->selfOperateValue;
+        loopProperty->signalList.append(s);
+    }
+
+    foreach(VariableDefine * tmp,prop->varList)
+    {
+        VariableDefine * v = new VariableDefine;
+        v->type = tmp->type;
+        v->name = tmp->name;
+        v->value = tmp->value;
+        v->pRemark = tmp->pRemark;
+        loopProperty->varList.append(v);
+    }
+
+    foreach(ExpressDefine * tmp,prop->expList)
+    {
+        ExpressDefine * v = new ExpressDefine;
+        v->name = tmp->name;
+        v->expressType = tmp->expressType;
+        v->value = tmp->value;
+        v->pRemark = tmp->pRemark;
+        loopProperty->expList.append(v);
+    }
+
+    foreach(FinalExpressDefine * tmp,prop->fexpList)
+    {
+        FinalExpressDefine * v = new FinalExpressDefine;
+        v->name = tmp->name;
+        v->expressType = tmp->expressType;
+        v->value = tmp->value;
+        v->pRemark = tmp->pRemark;
+        loopProperty->fexpList.append(v);
+    }
+}
 
 MyItem::~MyItem()
 {

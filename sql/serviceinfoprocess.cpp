@@ -35,7 +35,7 @@ bool ServiceInfoProcess::getServiceInfo(ServiceInfoList &list, const int startIn
 //获取所有的属性信息
 bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty *> &properties)
 {
-    QString sql = "select s.id,s.name,s.status,s.descirption,sd.url,s.method,s.outputName,s.outputType from\
+    QString sql = "select s.id,s.name,s.status,s.description,sd.url,s.method,s.outputName,s.outputType from\
             business_softwareonline s left join business_softwareonline_deploy sd\
                 on s.id = sd.relationId where s.status = '可用'";
     bool flag = SQLDataAdapter::instance()->getSericeProperties(sql,properties);

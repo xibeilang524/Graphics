@@ -146,7 +146,7 @@ void SimulateControlPanel::clearLastSimluteRecord()
             LoopProperty * lprop = unit->item->getLoopProp();
             foreach(SignalVari  * tmp ,lprop->signalList)
             {
-                tmp->middlValue = 0;
+                tmp->middlValue = tmp->initialValue;
             }
         }
     }
@@ -197,7 +197,9 @@ void SimulateControlPanel::startProcUnit()
 {
     while(isSimulateState)
     {
+        //在右侧模拟面板中加入当前推演控件
         emit sendSingleSimulate(currProcUnit);
+
         if(currProcUnit->ptype == PRO_START)
         {
             currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
@@ -219,6 +221,8 @@ void SimulateControlPanel::startProcUnit()
         //循环框
         else if(currProcUnit->ptype == PRO_LOOP)
         {
+            currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
+
             LoopProperty * loopProp = currProcUnit->item->getLoopProp();
             SignalVariList slist = loopProp->signalList;
 
@@ -234,7 +238,7 @@ void SimulateControlPanel::startProcUnit()
                 currProcUnit = currProcUnit->noChild;
                 foreach(SignalVari * tmpVari,slist)
                 {
-                    tmpVari->middlValue = 0;
+                    tmpVari->middlValue = tmpVari->initialValue;
                 }
             }
         }
@@ -303,6 +307,8 @@ bool SimulateControlPanel::countLoopValue(SignalVariList &loopList)
         foreach(SignalVari * sv,loopList)
         {
             int middval = sv->middlValue;
+
+            qDebug()<<sv->middlValue<<"====="<<sv->finalValue;
 
             if(sv->selfOperateSymbol == "++")
             {

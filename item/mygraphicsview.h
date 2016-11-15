@@ -100,6 +100,7 @@ public slots:
 private slots:
     void addPage(QString proPath,QString proName);
     void fileSave();
+    void fileSaveAs();
 
     void undoAndRedoItem();
     void cutItem();

@@ -93,6 +93,10 @@ void MainWindow::createActionAndMenus()
     saveAction->setShortcut(QKeySequence("Ctrl+S"));
     ActionManager::instance()->registerAction(saveAction,MyGraphicsView::instance(),SLOT(fileSave()));
 
+    MyAction * saveAsAction = ActionManager::instance()->crateAction(Constants::SAVE_AS_ID,QIcon(""),"Áí´æÎª");
+    saveAsAction->setShortcut(QKeySequence("Ctrl+Shift+S"));
+    ActionManager::instance()->registerAction(saveAsAction,MyGraphicsView::instance(),SLOT(fileSaveAs()));
+
     MyAction * openAction = ActionManager::instance()->crateAction(Constants::OPEN_ID,QIcon(":/images/open.png"),"´ò¿ª");
     openAction->setShortcut(QKeySequence("Ctrl+O"));
     ActionManager::instance()->registerAction(openAction,this,SLOT(fileOpen()));
@@ -110,6 +114,7 @@ void MainWindow::createActionAndMenus()
     fileMenu->addAction(newAction);
     fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
+    fileMenu->addAction(saveAsAction);
     fileMenu->addAction(clearAction);
     fileMenu->addSeparator();
     fileMenu->addAction(exitAction);
@@ -810,6 +815,23 @@ MainWindow::~MainWindow()
     {
         delete view;
         view = NULL;
+    }
+
+    foreach(ServiceProperty * prop,GlobalServiceProperties)
+    {
+        foreach (Parameter * para, prop->inputParas)
+        {
+            delete para;
+        }
+        prop->inputParas.clear();
+
+        foreach (Parameter * para, prop->outputParas)
+        {
+            delete para;
+        }
+        prop->outputParas.clear();
+
+        delete prop;
     }
 
     delete ui;

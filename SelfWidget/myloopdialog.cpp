@@ -130,7 +130,7 @@ void MyLoopDialog::respButtYesPress()
         SignalVari * svari = new SignalVari;
         svari->variName = loopProp->varList.at(i)->name;
         svari->initialValue = loopProp->varList.at(i)->value.toInt();
-        svari->middlValue = svari->middlValue;
+        svari->middlValue = svari->initialValue;
         loopProp->signalList.append(svari);
     }
 

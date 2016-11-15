@@ -1371,6 +1371,23 @@ void MyGraphicsView::fileSave()
     }
 }
 
+//另存为
+void MyGraphicsView::fileSaveAs()
+{
+    MY_ASSERT(myScene)
+    MY_BUILD_MODEL_ONLY
+
+    QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
+    if(!saveFileName.isEmpty())
+    {
+        ReturnType  result = FileOperate::instance()->saveFile(saveFileName,MyGraphicsView::instance()->scene()->items());
+        if(result == RETURN_SUCCESS)
+        {
+//            MyPageSwitch::instance()->updateCurrMappingName(saveFileName);
+        }
+    }
+}
+
 //打开本地文件，将文件的信息保存至每个场景中
 void MyGraphicsView::openLocalFile(QString fileName)
 {
@@ -1422,7 +1439,7 @@ void MyGraphicsView::resetItemProcessType()
             MyItem * tmpItem = dynamic_cast<MyItem *>(item);
             if(tmpItem)
             {
-                tmpItem->setProcessType(PRO_NONE);
+//                tmpItem->setProcessType(PRO_NONE);
             }
         }
     }

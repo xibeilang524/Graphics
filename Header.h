@@ -15,7 +15,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#define M_VERTION 0x0007        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
+#define M_VERTION 0x0008        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
 #define M_AUTHOR "南京仁谷系统集成有限公司"
 #define M_YEAR "16"
 
@@ -58,6 +58,9 @@
 
 typedef  QList<QVariant> VariantList;
 typedef  QList<VariantList> DataList;
+
+class MyItem;
+class QGraphicsItem;
 
 #include <QBrush>
 #include <QPen>
@@ -143,6 +146,19 @@ enum GraphicsType
     GRA_MASK_CIRCLE,          //圆形遮罩
 #endif
     GRA_NO_MEAN               //无意义值
+};
+
+//单元类型
+enum ProcessType
+{
+    PRO_NONE,               //无
+    PRO_START,              //开始:圆角矩形
+    PRO_INPUT,              //输入输出:平行四边形
+    PRO_PROCESS,            //处理:矩形
+    PRO_JUDGE,              //判断:菱形
+    PRO_PARALLEL,           //并行:平行线
+    PRO_LOOP,               //循环
+    PRO_END                 //结束:圆角矩形
 };
 
 //拖入端口的方向
@@ -231,6 +247,7 @@ struct ItemProperty
         zValue = 0;
         startLineType = LINE_HORIZONTAL;
         endLineType = LINE_HORIZONTAL;
+        ptype = PRO_NONE;
         createUUID();
     }
 
@@ -273,6 +290,8 @@ struct ItemProperty
     PointType endPointType;         //线条在【LINE_MYITEM】模式下，终点点所在item边的位置
 
     bool isMoveable;                //是否被锁定
+
+    ProcessType ptype;              //推演模式代表的类型
 };
 
 //节点属性
@@ -295,32 +314,14 @@ struct NodePortProperty
     QString startItemID;        //在用于非直线的控件时，只用startItemId标识当前控件(用于箭头寻找父节点)
 };
 
-//暂存一个剪切时的控件信息
-struct CutInfo
-{
-    CutInfo()
-    {
-        hasContent = false;
-    }
-    bool  hasContent;                            //是否包拷贝内容,在剪切和复制后置为true，清空后置为false
-    GraphicsType graphicsType;
-    ItemProperty itemProperty;
-    QString content;
-    QList<NodePortProperty> nodeProperties;      //控件包含端口的信息
-};
-
-//高亮等级
-enum HightLightLevel
-{
-    LEVEL_NORMAL,        //普通(黑)
-    LEVEL_MIDDLE,        //中级(红)推演流程
-    LEVEL_HIGH           //高级(蓝)推演流程选中
-};
-
 /****************************************属性编辑**************************************************/
 //输入参数的属性
 struct Parameter
 {
+
+    friend QDataStream& operator <<(QDataStream &,Parameter * rect);
+    friend QDataStream& operator >>(QDataStream &,Parameter * rect);
+
     QString pId;               //主键值
     QString pName;             //参数名
     QString pType;             //参数类型
@@ -337,6 +338,10 @@ struct ServiceProperty
     {
         hasSettInfo = false;
     }
+
+    friend QDataStream & operator <<(QDataStream &,ServiceProperty * item);
+    friend QDataStream & operator >>(QDataStream &,ServiceProperty * item);
+
     bool hasSettInfo;                 //是否已经设置了信息，用于在显示属性编辑时作为标识是否要从数据库读取
     QString id;                       //数据库主键值
     QString serviceName;              //服务名
@@ -397,17 +402,6 @@ struct ServiceDeploy
 
 typedef QList<ServiceInfo> ServiceInfoList;
 
-//数据显示表的行号和数据在数据库中index对应关系
-struct RowToIndex
-{
-    int rowNum;
-    QString indexNum;
-};
-
-typedef QList< RowToIndex > RowList;
-
-/*************************循环结构体各部分参数定义******************************/
-
 enum LoopPart
 {
     LOOP_VARI,          //循环变量定义
@@ -418,6 +412,9 @@ enum LoopPart
 //变量定义int i = 0;
 struct VariableDefine
 {
+    friend QDataStream & operator <<(QDataStream & stream,VariableDefine *);
+    friend QDataStream & operator >>(QDataStream & stream,VariableDefine *);
+
     QString type;              //int
     QString name;              //i
     QString value;             //0
@@ -429,6 +426,9 @@ typedef QList<VariableDefine *> VariableDefineList;
 //表达式定义i < 5
 struct ExpressDefine
 {
+    friend QDataStream & operator <<(QDataStream & stream,ExpressDefine *);
+    friend QDataStream & operator >>(QDataStream & stream,ExpressDefine *);
+
     QString name;              //i
     QString expressType;       //<
     QString value;             //5
@@ -440,6 +440,9 @@ typedef QList<ExpressDefine *> ExpressDefineList;
 //末循环体定义i++/i+=4
 struct FinalExpressDefine
 {
+    friend QDataStream & operator <<(QDataStream & stream,FinalExpressDefine *);
+    friend QDataStream & operator >>(QDataStream & stream,FinalExpressDefine *);
+
     QString name;             //i
     QString expressType;      //++
     QString value;            //4
@@ -462,6 +465,10 @@ struct SignalVari
        selfOperateSymbol = "";
        selfOperateValue = 0;
     }
+
+    friend QDataStream & operator <<(QDataStream & stream,SignalVari *);
+    friend QDataStream & operator >>(QDataStream & stream,SignalVari *);
+
     QString variName;           //变量名i
     bool isLegal;               //是否合法，如果有某个变量值不存在那么将其置为false，在使用时如果为false那么就不使用
     int initialValue;           //初始值0
@@ -474,13 +481,105 @@ struct SignalVari
 
 typedef QList<SignalVari *> SignalVariList;
 
+#include <QDebug>
+
 //循环参数属性
 struct LoopProperty
 {
+    friend QDataStream & operator <<(QDataStream & stream,LoopProperty *);
+    friend QDataStream & operator >>(QDataStream & stream,LoopProperty *);
+
+    ~LoopProperty()
+    {
+//        foreach(SignalVari * tmp,signalList)
+//        {
+//            delete tmp;
+//        }
+//        signalList.clear();
+
+//        foreach(VariableDefine * tmp,varList)
+//        {
+//            delete tmp;
+//        }
+//        varList.clear();
+
+//        foreach(ExpressDefine * tmp,expList)
+//        {
+//            delete tmp;
+//        }
+//        expList.clear();
+
+//        foreach(FinalExpressDefine * tmp,fexpList)
+//        {
+//            delete tmp;
+//        }
+//        fexpList.clear();
+    }
+
     SignalVariList signalList;          //多个条件集合
     VariableDefineList varList;         //变量集合
     ExpressDefineList expList;          //表达式集合
     FinalExpressDefineList fexpList;    //末循环体集合
+};
+
+//数据显示表的行号和数据在数据库中index对应关系
+struct RowToIndex
+{
+    int rowNum;
+    QString indexNum;
+};
+
+typedef QList< RowToIndex > RowList;
+
+//暂存一个剪切时的控件信息
+struct CutInfo
+{
+    CutInfo()
+    {
+        hasContent = false;
+        loopProp = new LoopProperty;
+    }
+
+    ~CutInfo()
+    {
+//        delete loopProp;
+    }
+
+    bool  hasContent;                            //是否包拷贝内容,在剪切和复制后置为true，清空后置为false
+    GraphicsType graphicsType;
+    ItemProperty itemProperty;
+    ServiceProperty serviceProp;                 //服务属性信息
+    LoopProperty * loopProp;                     //服务循环属性信息
+    QString content;
+    QList<NodePortProperty> nodeProperties;      //控件包含端口的信息
+};
+
+//高亮等级
+enum HightLightLevel
+{
+    LEVEL_NORMAL,        //普通(黑)
+    LEVEL_MIDDLE,        //中级(红)推演流程
+    LEVEL_HIGH           //高级(蓝)推演流程选中
+};
+
+/*************************循环结构体各部分参数定义******************************/
+//处理单元
+struct ProcessUnit
+{
+    ProcessUnit()
+    {
+        item = NULL;
+        nextChild = NULL;
+        yesChild = NULL;
+        noChild = NULL;
+    }
+    ProcessType ptype;               //处理单元类型
+    GraphicsType gtype;              //控件的类型
+
+    MyItem * item;                   //处理单元对应的控件Item
+    ProcessUnit * nextChild;         //非判断框下，指向后面索引
+    ProcessUnit * yesChild;          //判断框状态下，yes和no child启用
+    ProcessUnit * noChild;           //
 };
 
 #ifdef ADD_STATE_MODEL

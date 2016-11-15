@@ -46,6 +46,7 @@
 
 #include <QPolygonF>
 #include <QPen>
+#include <QDebug>
 
 #include "ItemHeader.h"
 #include "mysuperitem.h"
@@ -80,8 +81,8 @@ public:
     QString getText();
     void setText(QString text);
 
-    void setProcessType(ProcessType ptype){this->simulateProcessType = ptype;}
-    ProcessType getProcessType(){return this->simulateProcessType;}
+    void setProcessType(ProcessType ptype){qDebug()<<ptype<<"+++"; this->property.ptype = ptype;}
+    ProcessType getProcessType(){return this->property.ptype;}
 
     const QList<MyNodePort *> & getNodePorts(){return this->ports;}
 
@@ -108,7 +109,10 @@ public:
     friend QDataStream & operator >>(QDataStream &,MyItem * item);
 
     ServiceProperty * getServiceProp(){return this->serviceProp;}
+    void setServiceProperty(ServiceProperty * prop);
+
     LoopProperty * getLoopProp(){return this->loopProperty;}
+    void setLoopProp(LoopProperty * prop);
 
     void hightLightItem(HightLightLevel level = LEVEL_NORMAL,bool isHigh = true);
     bool isHightShow(){return this->isSimulateHigh;}
@@ -205,8 +209,6 @@ private:
     HightLightLevel  lightLevel;       //当前属于哪种显示
 
     GraphicsType dragGraphicsType;     //当前拖入的端口类型，拖拽结束后置为GRA_NONE
-
-    ProcessType simulateProcessType;   //在推演模式下，此item所代表的处理单元类型。默认为【PRO_NONE】
 
 #ifdef ADD_STATE_MODEL
     StateStartProperty startProp;      //开始状态的属性

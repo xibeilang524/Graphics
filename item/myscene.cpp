@@ -314,6 +314,19 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
         item->setText(cutInfo.content);
         item->setProperty(cutInfo.itemProperty);
 
+        if(cutInfo.itemProperty.ptype == PRO_PROCESS)
+        {
+            item->setServiceProperty(&cutInfo.serviceProp);
+        }
+        else if(cutInfo.itemProperty.ptype == PRO_LOOP)
+        {
+            item->setLoopProp(cutInfo.loopProp);
+        }
+        else if(cutInfo.itemProperty.ptype == PRO_JUDGE)
+        {
+
+        }
+
         if(isCopy)
         {
             item->setPos(SceneLastClickPoint);
