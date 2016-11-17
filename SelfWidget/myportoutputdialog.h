@@ -15,6 +15,8 @@
 
 #include "../Header.h"
 
+class MyChooseBar;
+
 namespace Ui {
 class MyPortOutputDialog;
 }
@@ -38,6 +40,7 @@ private:
     Ui::MyPortOutputDialog *ui;
 
     StateInOutProperty sprop;
+    MyChooseBar * chooseBar;
 };
 
 #endif // MYPORTOUTPUTDIALOG_H

@@ -6,6 +6,8 @@
 
 #include <QDebug>
 
+#include "../Header.h"
+
 ServiceInputDelegate::ServiceInputDelegate()
 {
     column2IsCombox = true;
@@ -29,7 +31,7 @@ QWidget * ServiceInputDelegate::createEditor(QWidget *parent, const QStyleOption
         {
             QComboBox * box = new QComboBox(parent);
             box->setView(new QListView);
-            box->setStyleSheet("QComboBox QAbstractItemView::item{height:23px;}QComboBox QAbstractItemView::item:hover{background-color:#567dbc;}");
+            box->setStyleSheet(COMBOX_STYLESHEET);
             box->setEditable(true);
             box->addItems(stringList);
             return box;

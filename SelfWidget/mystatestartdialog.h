@@ -12,6 +12,7 @@
 #define MYSTATESTARTDIALOG_H
 
 #include <QDialog>
+class MyChooseBar;
 
 namespace Ui {
 class MyStateStartDialog;
@@ -35,6 +36,7 @@ private:
     Ui::MyStateStartDialog *ui;
 
     QString content;
+    MyChooseBar * chooseBar;
 };
 
 #endif // MYSTATESTARTDIALOG_H

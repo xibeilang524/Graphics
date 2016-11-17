@@ -5,6 +5,7 @@ namespace Graphics {
 namespace Constants {
 
 //ÎÄ¼þ²Ù×÷
+const char PROJECT_ID[] = "Constants.NewProject";
 const char FILE_ID[] = "Constants.File";
 const char SAVE_ID[] = "Constants.Save";
 const char SAVE_AS_ID[] = "Constants.SaveAs";

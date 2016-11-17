@@ -24,7 +24,7 @@ SimulateUtil * SimulateUtil::instance()
 }
 
 /*!
- *获取当前控件的父控件，只考虑处理框(GRA_RECT).
+ *获取当前控件的父控件，只考虑父控件为处理框(GRA_RECT).
  *【1】20161101增加对循环条件的引单功能
  *【2】20161107修复因dowhile产生的rect无限循环问题(尚未对判断框功能的区分(判断/循环))
  *!*/
@@ -33,7 +33,7 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
     QList<MyItem *> list;
 
     MyItem * pItem = item;
-    bool isFirst = true;
+    bool isFirst = true;                  //是否第一次循环，避免因pItem==Item导致判断出错问题
 
     QStack<MultiPathDesc * > descs;       //记录推演过程中某个控件因多个输入产生的多路径
     QStack<MyItem * > polygons;           //记录推到过程中遇到的多边形(可能是判断，也可能是循环)
@@ -41,13 +41,14 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
 
     bool isSearchOver = false;
 
-    if(item->getType() == GRA_RECT)
+    if(item->getType()/* == GRA_RECT*/)
     {
         while(pItem&&!isSearchOver)
         {
-            QList<MyItem *> pItems = getInOutItems(pItem,pItem->getArrows(),false);
+            QList<MyArrow *> arrows = pItem->getArrows();
+            QList<MyItem *> pItems = getInOutItems(pItem,arrows,false);
 
-//            qDebug()<<pItem->getText();
+            qDebug()<<pItem->getText();
 
             bool hasAdded = false;
             bool skipCurrLoop = false;
@@ -56,17 +57,20 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
             {
                 bool hasAddPolygon = false;
 
-                if(pItem == item)
+                if(!isFirst)
                 {
-                    hasAddPolygon = true;
-                }
-
-                foreach(MyItem * tmpItem,polygons)
-                {
-                    if(tmpItem == pItem)
+                    if(pItem == item)
                     {
                         hasAddPolygon = true;
-                        break;
+                    }
+
+                    foreach(MyItem * tmpItem,polygons)
+                    {
+                        if(tmpItem == pItem)
+                        {
+                            hasAddPolygon = true;
+                            break;
+                        }
                     }
                 }
 
@@ -110,7 +114,7 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                             spathDesc->hasAddItem++;
                         }
 
-                        qDebug()<<"===add:"<<pItem->getText();
+//                        qDebug()<<"===add:"<<pItem->getText();
                         list.append(pItem);
                     }
                     else
@@ -129,7 +133,7 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                             {
                                 for(int i=0;i<spathDesc->hasAddItem;i++)
                                 {
-                                    qDebug()<<"===remve:"<<list.last()->getText();
+//                                    qDebug()<<"===remve:"<<list.last()->getText();
                                     list.removeLast();
                                 }
 
@@ -148,7 +152,7 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                                     SignalPathDesc * spathDesc = lastDesc->pathes.at(lastDesc->currPathNum);
                                     pItem = spathDesc->startItem;
                                     skipCurrLoop = true;
-                                    qDebug()<<"+++"<<pItem->getText();
+//                                    qDebug()<<"+++"<<pItem->getText();
                                     break;
                                 }
                             }

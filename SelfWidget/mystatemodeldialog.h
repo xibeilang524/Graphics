@@ -12,6 +12,7 @@
 #define MYSTATEMODELDIALOG_H
 
 #include <QDialog>
+class MyChooseBar;
 
 #include "../Header.h"
 
@@ -37,6 +38,7 @@ private slots:
 
 private:
     Ui::MyStateModelDialog *ui;
+    MyChooseBar * chooseBar;
 
     StateModelProperty prop;
 

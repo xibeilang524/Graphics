@@ -26,6 +26,22 @@ ParameterDefineTableView::ParameterDefineTableView(LoopPart loopPart, int row, i
 
     horizontalHeader()->setStretchLastSection(true);
 
+    //设置表头宽度
+    QHeaderView * view = new QHeaderView(Qt::Horizontal,this);
+    view->setResizeMode(QHeaderView::Custom);
+    setHorizontalHeader(view);
+
+    view->setStretchLastSection(true);
+
+    if(loopPart == LOOP_VARI)
+    {
+        view->resizeSection(1,200);
+    }
+    else
+    {
+        view->resizeSection(0,200);
+    }
+
     initContextMenu();
 }
 

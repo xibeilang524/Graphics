@@ -14,6 +14,8 @@
 #include <QDialog>
 
 class ParameterDefineTableView;
+class MyItem;
+class MyChooseBar;
 struct LoopProperty;
 
 namespace Ui {
@@ -43,6 +45,7 @@ private:
     ParameterDefineTableView * express3View;
 
     LoopProperty * loopProp;
+    MyChooseBar * chooseBar;
 };
 
 #endif // MYLOOPDIALOG_H

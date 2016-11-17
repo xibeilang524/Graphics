@@ -40,6 +40,9 @@
 #define COMBOX_START_FLAG "[QUOTE"   //属性编辑值下拉框开始标识
 #define COMBOX_LOOP_QUOTE "[QUOTE]"  //循环属性编辑时，引用前面输出的变量
 
+#define COMBOX_STYLESHEET "QComboBox QAbstractItemView::item{height:23px;}\
+                            QComboBox QAbstractItemView::item:hover{background-color:#567dbc;}"
+
 #include <QString>
 
 #if defined(Q_CC_MSVC)
@@ -459,6 +462,8 @@ struct SignalVari
     {
        variName = "";
        isLegal = false;
+       isQuoted = false;
+       isAssignedValue = false;
        initialValue = 0;
        finalValue = 0;
        middlValue = 0;
@@ -471,6 +476,8 @@ struct SignalVari
     friend QDataStream & operator >>(QDataStream & stream,SignalVari *);
 
     QString variName;           //变量名i
+    bool isQuoted;              //是否为引用值,若为引用值那么initialValue和middlValue值需要在运算过程中通过获取前面的服务的输出进行初始化
+    bool isAssignedValue;       //在isQuoted为true时，此值有效。如果为false，则需要获取引用的值之后置为true。
     bool isLegal;               //是否合法，如果有某个变量值不存在那么将其置为false，在使用时如果为false那么就不使用
     int initialValue;           //初始值0
     int finalValue;             //终止条件值5

@@ -5,6 +5,10 @@
 #include <QListView>
 #include <QDebug>
 
+#include "../item/mygraphicsview.h"
+#include "../item/myitem.h"
+#include "../simulate/simulateutil.h"
+
 ParameterDefineDelegate::ParameterDefineDelegate(LoopPart loopPart):
     loopPart(loopPart)
 {
@@ -31,12 +35,47 @@ QWidget * ParameterDefineDelegate::createEditor(QWidget *parent, const QStyleOpt
     {
         if(index.column() == 0)
         {
-                QComboBox * box = new QComboBox(parent);
-                box->setView(new QListView);
-                box->setStyleSheet("QComboBox QAbstractItemView::item{height:23px;}QComboBox QAbstractItemView::item:hover{background-color:#567dbc;}");
+             QComboBox * box = new QComboBox(parent);
+             box->setView(new QListView);
+             box->setStyleSheet(COMBOX_STYLESHEET);
 //                box->setEditable(true);
-                box->addItems(stringList);
-                return box;
+             box->addItems(stringList);
+             return box;
+        }
+        //【！！目前判断框引用前面值还存在问题，此功能暂时不添加】
+        else if(index.column() == 1)
+        {
+             //判断第0列的值，如果为引用，则需要获取当前控件的父类可引用的值，进行下拉显示
+             const QAbstractItemModel * pmodel = index.model();
+             if(pmodel)
+             {
+                 QString column0Text = pmodel->index(index.row(),0).data(Qt::DisplayRole).toString();
+                 if(column0Text == QString(COMBOX_LOOP_QUOTE))
+                 {
+                     MyItem * item =  MyGraphicsView::instance()->getTopSelectedItem();
+
+                     if(item)
+                     {
+                         QList<MyItem *> pItems = SimulateUtil::instance()->getCurrParentItem(item);
+                         QComboBox * box = new QComboBox(parent);
+                         box->setView(new QListView);
+                         box->setStyleSheet(COMBOX_STYLESHEET);
+
+                         int index = 1;
+                         foreach(MyItem * tmpItem,pItems)
+                         {
+                             ServiceProperty * prop = tmpItem->getServiceProp();
+                             if(prop->outputParas.size() == 1)
+                             {
+                                 QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+tmpItem->getText()+":"+prop->outputParas.at(0)->pName;
+                                 index++;
+                                 box->addItem(newItem);
+                             }
+                         }
+                         return box;
+                     }
+                 }
+             }
         }
     }
     else if(loopPart == LOOP_EXPRESS || loopPart == LOOP_FINAL)
@@ -45,7 +84,7 @@ QWidget * ParameterDefineDelegate::createEditor(QWidget *parent, const QStyleOpt
         {
                 QComboBox * box = new QComboBox(parent);
                 box->setView(new QListView);
-                box->setStyleSheet("QComboBox QAbstractItemView::item{height:23px;}QComboBox QAbstractItemView::item:hover{background-color:#567dbc;}");
+                box->setStyleSheet(COMBOX_STYLESHEET);
 //                box->setEditable(true);
                 if(index.column() == 0)
                 {

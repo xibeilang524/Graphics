@@ -84,10 +84,12 @@ MainWindow::MainWindow(QWidget *parent) :
 //创建窗口的菜单栏，绑定响应事件
 void MainWindow::createActionAndMenus()
 {
-    MyAction * newAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工程");
-    newAction->setShortcut(QKeySequence("Ctrl+N"));
-    ActionManager::instance()->registerAction(newAction,MyProWizard::instance(),SLOT(exec()));
-//    ActionManager::instance()->registerAction(newAction,MyPageSwitch::instance(),SLOT(addPage()));
+    MyAction * newProAction = ActionManager::instance()->crateAction(Constants::PROJECT_ID,QIcon(":/images/new.png"),"新建工程");
+    ActionManager::instance()->registerAction(newProAction,MyProWizard::instance(),SLOT(exec()));
+
+    MyAction * newFileAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工作区");
+    newFileAction->setShortcut(QKeySequence("Ctrl+N"));
+    ActionManager::instance()->registerAction(newFileAction,MyPageSwitch::instance(),SLOT(addPage()));
 
     MyAction * saveAction = ActionManager::instance()->crateAction(Constants::SAVE_ID,QIcon(":/images/save.png"),"保存");
     saveAction->setShortcut(QKeySequence("Ctrl+S"));
@@ -111,7 +113,8 @@ void MainWindow::createActionAndMenus()
     MyMenu * fileMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_FILE_MENU,QString("文件(&F)"));
     menuBar()->addMenu(fileMenu);
 
-    fileMenu->addAction(newAction);
+    fileMenu->addAction(newProAction);
+    fileMenu->addAction(newFileAction);
     fileMenu->addAction(openAction);
     fileMenu->addAction(saveAction);
     fileMenu->addAction(saveAsAction);

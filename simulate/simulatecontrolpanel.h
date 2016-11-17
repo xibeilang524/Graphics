@@ -17,6 +17,8 @@
 **20161114:wey:增加对循环、嵌套循环的支持(目前仅支持一个条件循环判断)
 **20161115:wey:修复循环计算--的错误
 **             添加自动和单步运行
+**20161117:wey:增加循环依照引单计算
+**
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -78,7 +80,7 @@ private:
     void setSimulateState(bool isSim);
     void submitUrl(MyItem *item, ServiceProperty * prop);
     void startProcUnit();
-    bool countLoopValue(SignalVariList & loopList);
+    bool countLoopValue(MyItem *item, SignalVariList & loopList);
     void clearLastSimluteRecord();
     QString getQuoteOutValue(MyItem * item,QString value);
 

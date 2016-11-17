@@ -13,6 +13,8 @@
 
 #include <QDialog>
 
+class MyChooseBar;
+
 namespace Ui {
 class MyConditionSetting;
 }
@@ -24,9 +26,14 @@ class MyConditionSetting : public QDialog
 public:
     explicit MyConditionSetting(QWidget *parent = 0);
     ~MyConditionSetting();
+
+private slots:
+    void addQuote();
     
 private:
     Ui::MyConditionSetting *ui;
+
+    MyChooseBar * chooseBar;
 };
 
 #endif // MYCONDITIONSETTING_H

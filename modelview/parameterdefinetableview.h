@@ -2,7 +2,7 @@
 **版  权：RenGu Company
 **文件名: parameterdefinetableview.h
 **作  者: wey       Version: 1.0       Date: 2016.11.11
-**描  述: 参数定义视图
+**描  述: 参数定义视图(循环框)
 **Others:
 **
 **修改历史:

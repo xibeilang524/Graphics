@@ -179,11 +179,12 @@ void SimulateControlPanel::clearLastSimluteRecord()
     //再次推演时先清空上一次的记录
     foreach(ProcessUnit * unit,procUnits)
     {
-        if(unit->ptype == PRO_LOOP )
+        if(unit->ptype == PRO_LOOP)
         {
             LoopProperty * lprop = unit->item->getLoopProp();
             foreach(SignalVari  * tmp ,lprop->signalList)
             {
+                tmp->isAssignedValue = false;
                 tmp->middlValue = tmp->initialValue;
             }
         }
@@ -197,7 +198,7 @@ void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
     {
         currProcUnit->item->hightLightItem(LEVEL_MIDDLE,true);
         Util::showWarn("服务访问出错，推演流程终止!");
-        isSimulateState = false;
+        setSimulateState(false);
         return;
     }
 
@@ -210,21 +211,6 @@ void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
         para->pValue = context;
 
         currProcUnit = currProcUnit->nextChild;
-    }
-    //判断框
-    else if(currProcUnit->ptype == PRO_JUDGE)
-    {
-
-    }
-    //循环框
-    else if(currProcUnit->ptype == PRO_LOOP)
-    {
-
-    }
-    //结束
-    else if(currProcUnit->ptype == PRO_END)
-    {
-
     }
 
     if(isAutoRun)
@@ -267,7 +253,7 @@ void SimulateControlPanel::startProcUnit()
             LoopProperty * loopProp = currProcUnit->item->getLoopProp();
             SignalVariList slist = loopProp->signalList;
 
-            bool loopResult = countLoopValue(slist);
+            bool loopResult = countLoopValue(currProcUnit->item,slist);
 
             if(loopResult)
             { 
@@ -298,8 +284,10 @@ void SimulateControlPanel::startProcUnit()
     }
 }
 
-//根据循环框中设定的值，计算当前条件是否满足；若满足，执行循环框yes分支，否则执行no分支
-bool SimulateControlPanel::countLoopValue(SignalVariList &loopList)
+/*!根据循环框中设定的值，计算当前条件是否满足；若满足，执行循环框yes分支，否则执行no分支
+ *20161117:添加循环中引用前面服务计算出的结果值
+ **/
+bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopList)
 {
     if(loopList.size() == 0)
     {
@@ -308,7 +296,35 @@ bool SimulateControlPanel::countLoopValue(SignalVariList &loopList)
 
     bool finalResult = false;
 
-    //先判断条件是否成立
+    //判断循环条件中是否包含引用，如果包含则需要对引用的值进行获取
+    foreach(SignalVari * sv,loopList)
+    {
+        if(sv->isQuoted && !sv->isAssignedValue)
+        {
+            QList<MyItem *> pItems = SimulateUtil::instance()->getCurrParentItem(item);
+            int index = 1;
+            foreach(MyItem * tmpItem,pItems)
+            {
+                ServiceProperty * prop = tmpItem->getServiceProp();
+
+                if(prop->outputParas.size() == 1)
+                {
+                    QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+tmpItem->getText()+":"+prop->outputParas.at(0)->pName;
+                    index++;
+                    if(newItem == sv->variName)
+                    {
+                        sv->initialValue = prop->outputParas.at(0)->pValue.toInt();
+                        sv->middlValue = sv->initialValue;
+                        sv->isAssignedValue = true;
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+
+    //判断条件是否成立
     foreach(SignalVari * sv,loopList)
     {
         if(sv->operateSymbol == "<")
@@ -527,8 +543,6 @@ void SimulateControlPanel::respItemDoubleClicked(QListWidgetItem *current)
     if(citem)
     {
         MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item);
-//        QEvent * event(QEvent::GraphicsSceneContextMenu);
-//        MyGraphicsView::instance()->scene()->sendEvent(citem->getUnit()->item,event);
     }
 }
 

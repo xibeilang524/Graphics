@@ -19,7 +19,6 @@ ParameterDefineModel::ParameterDefineModel(const LoopPart loopType, int row, int
                         horizonalHeadList<<"变量名"<<"操作运算符"<<"值"<<"备注信息";
                         break;
     }
-
 }
 
 //返回行数

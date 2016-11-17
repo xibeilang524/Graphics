@@ -14,7 +14,15 @@ MyStateInternalEventDialog::MyStateInternalEventDialog(QWidget *parent) :
 
     this->setGeometry((ScreenWidth-POP_SUB_DIALOG_WIDTH)/2,(ScreenHeight-POP_SUB_DIALOG_HEIGHT)/2
                       ,POP_SUB_DIALOG_WIDTH,POP_SUB_DIALOG_HEIGHT);
-    ui->widget_3->setParetWidget(this);
+
+    chooseBar = new MyChooseBar(ui->widget_3);
+
+    chooseBar->setParetWidget(this);
+
+    QHBoxLayout * layout = new QHBoxLayout;
+    layout->addWidget(chooseBar);
+    layout->setContentsMargins(1,1,1,1);
+    ui->widget_3->setLayout(layout);
 }
 
 MyStateInternalEventDialog::~MyStateInternalEventDialog()

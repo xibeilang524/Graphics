@@ -198,7 +198,7 @@
        </widget>
       </item>
       <item>
-       <widget class="MyChooseBar" name="widget_3" native="true">
+       <widget class="QWidget" name="widget_3" native="true">
         <property name="maximumSize">
          <size>
           <width>16777215</width>
@@ -212,14 +212,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>MyChooseBar</class>
-   <extends>QWidget</extends>
-   <header>mychoosebar.h</header>
-   <container>1</container>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

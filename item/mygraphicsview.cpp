@@ -1090,7 +1090,8 @@ void MyGraphicsView::editTextItem()
             {
                 MyPortOutputDialog dialog(this);
                 dialog.setInOutState(false);
-                dialog.setProp(item->getStateInOutProp());
+                StateInOutProperty prop = item->getStateInOutProp();
+                dialog.setProp(prop);
                 dialog.exec();
                 item->setPortInoutProp(dialog.getProp());
             }
@@ -1099,7 +1100,8 @@ void MyGraphicsView::editTextItem()
             {
                 MyPortOutputDialog dialog(this);
                 dialog.setInOutState(true);
-                dialog.setProp(item->getStateInOutProp());
+                StateInOutProperty prop = item->getStateInOutProp();
+                dialog.setProp(prop);
                 dialog.exec();
                 item->setPortInoutProp(dialog.getProp());
             }
@@ -1107,7 +1109,8 @@ void MyGraphicsView::editTextItem()
             else if(gType == GRA_NODE_CIRCLE)
             {
                 MyPortInitialDialog dialog(this);
-                dialog.setProp(item->getStatePortProp());
+                StatePortProperty prop = item->getStatePortProp();
+                dialog.setProp(prop);
                 dialog.exec();
                 item->setPortProp(dialog.getProp());
             }
@@ -1377,6 +1380,10 @@ void MyGraphicsView::fileSaveAs()
     MY_ASSERT(myScene)
     MY_BUILD_MODEL_ONLY
 
+    if(myScene->items().size() <= 1)
+    {
+        return;
+    }
     QString saveFileName = QFileDialog::getSaveFileName(this,"选择路径");
     if(!saveFileName.isEmpty())
     {
@@ -1443,6 +1450,21 @@ void MyGraphicsView::resetItemProcessType()
             }
         }
     }
+}
+
+//获取当前视图被选中的顶层item
+MyItem * MyGraphicsView::getTopSelectedItem()
+{
+    if(myScene && myScene->selectedItems().size() == 1)
+    {
+        QGraphicsItem * topItem = myScene->selectedItems().at(0);
+        if(TYPE_ID(*topItem) == TYPE_ID(MyItem))
+        {
+            MyItem * item = dynamic_cast<MyItem *>(topItem);
+            return item;
+        }
+    }
+    return NULL;
 }
 
 MyGraphicsView::~MyGraphicsView()

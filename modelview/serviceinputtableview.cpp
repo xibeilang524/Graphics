@@ -23,6 +23,14 @@ ServiceInputTableView::ServiceInputTableView(int row, int column, QWidget *paren
 
     horizontalHeader()->setStretchLastSection(true);
 
+    //设置表头宽度
+    QHeaderView * view = new QHeaderView(Qt::Horizontal,this);
+    view->setResizeMode(QHeaderView::Custom);
+    setHorizontalHeader(view);
+
+    view->resizeSection(2,200);
+    view->setStretchLastSection(true);
+
     initContextMenu();
 }
 

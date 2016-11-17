@@ -15,9 +15,15 @@ MyStateStartDialog::MyStateStartDialog(QWidget *parent) :
     this->setGeometry((ScreenWidth-POP_SUB_DIALOG_WIDTH)/2,(ScreenHeight-POP_SUB_DIALOG_HEIGHT)/2
                       ,POP_SUB_DIALOG_WIDTH,POP_SUB_DIALOG_HEIGHT);
 
-    ui->widget_3->setParetWidget(this);
+    chooseBar = new MyChooseBar(ui->widget_3);
+    chooseBar->setParetWidget(this);
 
-    connect(ui->widget_3,SIGNAL(confirmPressed()),this,SLOT(updateInfo()));
+    QHBoxLayout * layout = new QHBoxLayout;
+    layout->addWidget(chooseBar);
+    layout->setContentsMargins(1,1,1,1);
+    ui->widget_3->setLayout(layout);
+
+    connect(chooseBar,SIGNAL(confirmPressed()),this,SLOT(updateInfo()));
 }
 
 void MyStateStartDialog::updateInfo()

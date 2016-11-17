@@ -13,6 +13,8 @@
 
 #include <QDialog>
 
+class MyChooseBar;
+
 namespace Ui {
 class MyStateInternalEventDialog;
 }
@@ -27,6 +29,8 @@ public:
     
 private:
     Ui::MyStateInternalEventDialog *ui;
+
+    MyChooseBar * chooseBar;
 };
 
 #endif // MYSTATEINTERNALEVENTDIALOG_H

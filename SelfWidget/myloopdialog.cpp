@@ -20,8 +20,14 @@ MyLoopDialog::MyLoopDialog(QWidget *parent) :
 
     setGeometry((ScreenWidth - POP_SIMULATE_DIALOG_WIDTH)/2,(ScreenHeight - POP_SIMULATE_DIALOG_HEIGHT)/2,POP_SIMULATE_DIALOG_WIDTH,POP_SIMULATE_DIALOG_HEIGHT);
 
-    ui->widget_2->setParetWidget(this);
-    connect(ui->widget_2,SIGNAL(confirmPressed()),this,SLOT(respButtYesPress()));
+    chooseBar = new MyChooseBar(ui->widget_2);
+    chooseBar->setParetWidget(this);
+    connect(chooseBar,SIGNAL(confirmPressed()),this,SLOT(respButtYesPress()));
+
+    QHBoxLayout * layout = new QHBoxLayout;
+    layout->addWidget(chooseBar);
+    layout->setContentsMargins(1,1,1,1);
+    ui->widget_2->setLayout(layout);
 
     express1View = new ParameterDefineTableView(LOOP_VARI,0,4,ui->express1);
     express2View = new ParameterDefineTableView(LOOP_EXPRESS,0,4,ui->express1);
@@ -56,7 +62,7 @@ void MyLoopDialog::setLoopItemProp(LoopProperty *prop)
     respVariEdited();
 }
 
-//点击确定后，对设置的属性进行保存
+//点击确定后，对设置的属性进行保存;同时对产生的判断条件进行组装
 void MyLoopDialog::respButtYesPress()
 {
     MY_ASSERT(loopProp)
@@ -128,9 +134,17 @@ void MyLoopDialog::respButtYesPress()
     for(int i = 0; i < loopProp->varList.size(); i++)
     {
         SignalVari * svari = new SignalVari;
-        svari->variName = loopProp->varList.at(i)->name;
-        svari->initialValue = loopProp->varList.at(i)->value.toInt();
-        svari->middlValue = svari->initialValue;
+        if(loopProp->varList.at(i)->type == QString(COMBOX_LOOP_QUOTE))
+        {
+            svari->isQuoted = true;
+            svari->variName = loopProp->varList.at(i)->name;
+        }
+        else
+        {
+            svari->variName = loopProp->varList.at(i)->name;
+            svari->initialValue = loopProp->varList.at(i)->value.toInt();
+            svari->middlValue = svari->initialValue;
+        }
         loopProp->signalList.append(svari);
     }
 

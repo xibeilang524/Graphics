@@ -48,6 +48,8 @@ public:
     MyGraphicsView(MainWindow * parent = 0);
     ~MyGraphicsView();
 
+    MyItem * getTopSelectedItem();
+
     void showNodePortEdit(MyNodePort * nodePort);
     void openLocalFile(QString fileName);
 

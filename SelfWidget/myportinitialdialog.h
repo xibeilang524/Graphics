@@ -17,6 +17,8 @@ namespace Ui {
 class MyPortInitialDialog;
 }
 
+class MyChooseBar;
+
 #include "../Header.h"
 
 class MyPortInitialDialog : public QDialog
@@ -37,6 +39,7 @@ private:
     Ui::MyPortInitialDialog *ui;
 
     StatePortProperty sprop;
+    MyChooseBar * chooseBar;
 };
 
 #endif // MYPORTINITIALDIALOG_H
