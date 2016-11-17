@@ -84,7 +84,7 @@ MainWindow::MainWindow(QWidget *parent) :
 //创建窗口的菜单栏，绑定响应事件
 void MainWindow::createActionAndMenus()
 {
-    MyAction * newProAction = ActionManager::instance()->crateAction(Constants::PROJECT_ID,QIcon(":/images/new.png"),"新建工程");
+    MyAction * newProAction = ActionManager::instance()->crateAction(Constants::PROJECT_ID,QIcon(":/images/project.png"),"新建工程");
     ActionManager::instance()->registerAction(newProAction,MyProWizard::instance(),SLOT(exec()));
 
     MyAction * newFileAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工作区");

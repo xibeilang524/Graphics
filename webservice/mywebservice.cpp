@@ -28,24 +28,29 @@ MyWebService::MyWebService()
 void MyWebService::submit(QString currUrl)
 {
     QNetworkRequest url;
+    url.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
     url.setUrl(QUrl(currUrl));
     QString b("");
     accessManager->post(url,b.toAscii());
 }
 
-//获取访问返回信息
+//获取访问返回信息,200是正确的返回码
 void MyWebService::replyFinshed(QNetworkReply *reply)
 {
     QVariant code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
     QTextCodec * codec = QTextCodec::codecForName("utf8");
     QString replyText = codec->toUnicode(reply->readAll());
 
-    bool hasFault = true;
-    QString result = parseResult(replyText,hasFault);
-    qDebug()<<replyText;
-    qDebug()<<code.toInt();
-
-    emit lastUnitProcessOver(hasFault,result);
+    if(code != 200)
+    {
+        emit lastUnitProcessOver(true,"执行服务失败!");
+    }
+    else
+    {
+        bool hasFault = true;
+        QString result = parseResult(replyText,hasFault);
+        emit lastUnitProcessOver(hasFault,result);
+    }
 }
 
 QString MyWebService::parseResult(QString result,bool & hasFault)

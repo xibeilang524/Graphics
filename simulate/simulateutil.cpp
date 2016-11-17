@@ -27,6 +27,7 @@ SimulateUtil * SimulateUtil::instance()
  *获取当前控件的父控件，只考虑父控件为处理框(GRA_RECT).
  *【1】20161101增加对循环条件的引单功能
  *【2】20161107修复因dowhile产生的rect无限循环问题(尚未对判断框功能的区分(判断/循环))
+ *【3】20161117增加对判断循环框的引单功能
  *!*/
 QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
 {
@@ -41,14 +42,14 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
 
     bool isSearchOver = false;
 
-    if(item->getType()/* == GRA_RECT*/)
+    if(item->getType())
     {
         while(pItem&&!isSearchOver)
         {
             QList<MyArrow *> arrows = pItem->getArrows();
             QList<MyItem *> pItems = getInOutItems(pItem,arrows,false);
 
-            qDebug()<<pItem->getText();
+//            qDebug()<<pItem->getText();
 
             bool hasAdded = false;
             bool skipCurrLoop = false;
@@ -277,7 +278,7 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                         {
                             for(int i=0;i<spathDesc->hasAddItem;i++)
                             {
-                                qDebug()<<"===remve:"<<list.last()->getText();
+//                                qDebug()<<"===remve:"<<list.last()->getText();
                                 list.removeLast();
                             }
 

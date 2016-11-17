@@ -86,9 +86,9 @@ void ParameterDefineTableView::deleteRow()
     }
 }
 
-void ParameterDefineTableView::setLoopItemProp(LoopProperty *prop)
+void ParameterDefineTableView::setLoopItemProp(LoopProperty *prop,QVariant userRoleData)
 {
-    paraModel->setParameterProp(prop);
+    paraModel->setParameterProp(prop,userRoleData);
 }
 
 //返回当前的模型

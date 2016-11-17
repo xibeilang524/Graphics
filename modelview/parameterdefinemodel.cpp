@@ -402,7 +402,7 @@ void ParameterDefineModel::deleteRow(QString name)
 }
 
 //初始设置,每次窗口显示的时均为新建，因此需要手动的添加行显示数据
-void ParameterDefineModel::setParameterProp(LoopProperty * prop)
+void ParameterDefineModel::setParameterProp(LoopProperty * prop,QVariant userRoleData)
 {
     int totalSize = 0;
     if(loopPart == LOOP_VARI)
@@ -439,7 +439,17 @@ void ParameterDefineModel::setParameterProp(LoopProperty * prop)
             newFexp->name = tmp->name;
             newFexp->expressType = tmp->expressType;
             newFexp->value = tmp->value;
-            newFexp->pRemark = tmp->pRemark;
+
+            if(prop->signalList.size() > 0)
+            {
+                int middleSize = prop->signalList.at(0)->middleResults.size();
+                if(middleSize > 0 && middleSize >  userRoleData.toInt())
+                {
+                    newFexp->pRemark = QString::number(prop->signalList.at(0)->middleResults.at(userRoleData.toInt()));
+                }
+            }
+
+//            newFexp->pRemark = tmp->pRemark;
             fexpList.push_back(newFexp);
         }
         totalSize =  prop->fexpList.size();

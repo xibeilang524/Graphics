@@ -52,12 +52,12 @@ MyLoopDialog::MyLoopDialog(QWidget *parent) :
     ui->express3->setLayout(layout3);
 }
 
-void MyLoopDialog::setLoopItemProp(LoopProperty *prop)
+void MyLoopDialog::setLoopItemProp(LoopProperty *prop,QVariant userRoleData)
 {
     this->loopProp = prop;
-    express1View->setLoopItemProp(prop);
-    express2View->setLoopItemProp(prop);
-    express3View->setLoopItemProp(prop);
+    express1View->setLoopItemProp(prop,userRoleData);
+    express2View->setLoopItemProp(prop,userRoleData);
+    express3View->setLoopItemProp(prop,userRoleData);
 
     respVariEdited();
 }
@@ -88,6 +88,13 @@ void MyLoopDialog::respButtYesPress()
 
     loopProp->fexpList.clear();
 
+    foreach(SignalVari * tmpValue,loopProp->signalList)
+    {
+        delete tmpValue;
+    }
+
+    loopProp->signalList.clear();
+
     foreach (VariableDefine * tmp, express1View->model()->getPara1())
     {
         VariableDefine * newVari = new VariableDefine;
@@ -117,13 +124,6 @@ void MyLoopDialog::respButtYesPress()
         newFexp->pRemark = tmp->pRemark;
         loopProp->fexpList.push_back(newFexp);
     }
-
-    foreach(SignalVari * tmpValue,loopProp->signalList)
-    {
-        delete tmpValue;
-    }
-
-    loopProp->signalList.clear();
 
     if(loopProp->expList.size() != loopProp->fexpList.size())
     {

@@ -18,7 +18,8 @@
 **20161115:wey:修复循环计算--的错误
 **             添加自动和单步运行
 **20161117:wey:增加循环依照引单计算
-**
+**             增加推演高亮提示(用于指示当前推演的进度)
+**             增加对循环过程的记录，支持点击右侧记录查看当前循环的值
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -36,6 +37,18 @@ struct ServiceProperty;
 namespace Ui {
 class SimulateControlPanel;
 }
+
+//循环记录
+struct LoopRecord
+{
+    LoopRecord()
+    {
+        item = NULL;
+        record = 0;
+    }
+    MyItem * item;
+    int record;         //循环执行的次数
+};
 
 class MyListWidgetItem : public QListWidgetItem
 {
@@ -66,7 +79,7 @@ signals:
 
 private slots:
     void respStartSimulate();
-    void showSimulateOperate(ProcessUnit * unit);
+    MyListWidgetItem * showSimulateOperate(ProcessUnit * unit);
     void respItemActivated(QListWidgetItem * current);
     void respItemChanged(QListWidgetItem * current, QListWidgetItem * previous);
     void respItemDoubleClicked(QListWidgetItem * current);
@@ -92,6 +105,9 @@ private:
     bool isAutoRun;                         //是否为自动运行
 
     ProcessUnit * currProcUnit;             //当前处理单元
+    ProcessUnit * beforeUnit;               //之前处理单元(推演结束置为NULL)
+
+    QList<LoopRecord *>  loopRecords;       //记录每个循环的状态信息
 };
 
 #endif // SIMULATECONTROLPANEL_H

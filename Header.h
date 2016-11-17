@@ -53,6 +53,7 @@
 
 #define TYPE_ID(a) typeid(a).name()
 #define MY_ASSERT(a) {if(!a) return;}
+#define MY_ASSERT_RETURN_NULL(a) {if(!a) return NULL;}
 #define MY_ASSERT_GT_ZERO(a) {if(a <=0 ) return;}
 
 #define MY_BUILD_MODEL_ONLY {if(GlobalWindowState != WINDOW_BUILD_MODEL) return;}
@@ -485,6 +486,7 @@ struct SignalVari
     QString operateSymbol;      //操作条件符号<、>、<=...
     QString selfOperateSymbol;  //自增++、--、+=
     int selfOperateValue;       //自增值(+=2，表示2)
+    QList<int> middleResults;   //循环过程中产生的中间值<key:第几次循环；value：当前循环状态下变量的值>
 };
 
 typedef QList<SignalVari *> SignalVariList;

@@ -97,7 +97,7 @@ public slots:
     void sceneScaled(int currScale);
     void respResetSimluate();
     void respItemSizeChanged(int size);
-    void showSelectedItemPropEdit(MyItem * item);
+    void showSelectedItemPropEdit(MyItem * item,QVariant userRoleData = "");
 
 private slots:
     void addPage(QString proPath,QString proName);

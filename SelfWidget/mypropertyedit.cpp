@@ -154,7 +154,7 @@ void MyPropertyEdit::confirmPropety()
 void MyPropertyEdit::updateDelegateList(QList<MyItem *> pItems)
 {
     QStringList list;
-    int index = 0;
+    int index = 1;
     foreach(MyItem * item,pItems)
     {
         ServiceProperty * prop = item->getServiceProp();

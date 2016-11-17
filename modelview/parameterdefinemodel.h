@@ -33,7 +33,7 @@ public:
     VariableDefineList getPara1(){return this->paraList;}
     ExpressDefineList  getPara2(){return this->expList;}
     FinalExpressDefineList getPara3(){return this->fexpList;}
-    void setParameterProp(LoopProperty * prop);
+    void setParameterProp(LoopProperty * prop, QVariant userRoleData);
     void clearTable();
 
 signals:

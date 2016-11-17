@@ -14,7 +14,6 @@
 #include "../item/mygraphicsview.h"
 #include "../item/myscene.h"
 #include "../util.h"
-
 #include "../webservice/mywebservice.h"
 
 MyListWidgetItem::MyListWidgetItem(QListWidget *parent, int type)
@@ -43,6 +42,7 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
 
     setFixedWidth(300);
     currProcUnit = NULL;
+    beforeUnit = NULL;
     isSimulateState = false;
     isAutoRun = true;
 
@@ -51,7 +51,6 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     connect(ui->simProcedure,SIGNAL(itemClicked (QListWidgetItem*)),this,SLOT(respItemActivated(QListWidgetItem*)));
     connect(ui->simProcedure,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(respItemDoubleClicked(QListWidgetItem *)));
     connect(ui->terminalSimulate,SIGNAL(clicked()),this,SLOT(stopCurrSimulate()));
-    connect(this,SIGNAL(sendSingleSimulate(ProcessUnit*)),this,SLOT(showSimulateOperate(ProcessUnit*)));
 
     connect(ui->autoRun,SIGNAL(toggled(bool)),this,SLOT(chooseRunMethod(bool)));
     connect(ui->signalRun,SIGNAL(toggled(bool)),this,SLOT(chooseRunMethod(bool)));
@@ -176,7 +175,6 @@ void SimulateControlPanel::respStartSimulate()
 //清空上一次推演的记录
 void SimulateControlPanel::clearLastSimluteRecord()
 {
-    //再次推演时先清空上一次的记录
     foreach(ProcessUnit * unit,procUnits)
     {
         if(unit->ptype == PRO_LOOP)
@@ -186,6 +184,7 @@ void SimulateControlPanel::clearLastSimluteRecord()
             {
                 tmp->isAssignedValue = false;
                 tmp->middlValue = tmp->initialValue;
+                tmp->middleResults.clear();
             }
         }
     }
@@ -202,7 +201,6 @@ void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
         return;
     }
 
-    currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
     if(currProcUnit->ptype == PRO_PROCESS)
     {
         ServiceProperty * prop = currProcUnit->item->getServiceProp();
@@ -225,11 +223,10 @@ void SimulateControlPanel::startProcUnit()
     while(isSimulateState)
     {
         //在右侧模拟面板中加入当前推演控件
-        emit sendSingleSimulate(currProcUnit);
+        MyListWidgetItem * currListItem = showSimulateOperate(currProcUnit);
 
         if(currProcUnit->ptype == PRO_START)
         {
-            currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
             currProcUnit = currProcUnit->nextChild;
         }
         //处理框
@@ -248,7 +245,31 @@ void SimulateControlPanel::startProcUnit()
         //循环框
         else if(currProcUnit->ptype == PRO_LOOP)
         {
-            currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
+            int loopRecord = 0;
+            bool isExisted = false;
+            foreach(LoopRecord  * lr,loopRecords)
+            {
+                if(lr->item == currProcUnit->item)
+                {
+                    lr->record+=1;
+                    loopRecord = lr->record;
+                    isExisted = true;
+                    break;
+                }
+            }
+
+            if(!isExisted)
+            {
+                LoopRecord  * lr = new LoopRecord;
+                lr->item = currProcUnit->item;
+                lr->record = 0;
+                loopRecord = lr->record;
+                loopRecords.push_back(lr);
+            }
+            if(currListItem)
+            {
+                currListItem->setData(Qt::UserRole,loopRecord);
+            }
 
             LoopProperty * loopProp = currProcUnit->item->getLoopProp();
             SignalVariList slist = loopProp->signalList;
@@ -256,24 +277,37 @@ void SimulateControlPanel::startProcUnit()
             bool loopResult = countLoopValue(currProcUnit->item,slist);
 
             if(loopResult)
-            { 
+            {
                 currProcUnit = currProcUnit->yesChild;
             }
             else
             {
                 //在执行否时，需要将上次循环的中间值置为0(嵌套循环)
-                currProcUnit = currProcUnit->noChild;
+
                 foreach(SignalVari * tmpVari,slist)
                 {
                     tmpVari->middlValue = tmpVari->initialValue;
                 }
+                int index = 0;
+                for(int i = 0; i < loopRecords.size(); i++)
+                {
+                    if(loopRecords.at(i)->item == currProcUnit->item)
+                    {
+                        index = i;
+                        delete loopRecords.at(i);
+                        break;
+                    }
+                }
+                loopRecords.removeAt(index);
+
+                currProcUnit = currProcUnit->noChild;
             }
         }
         //结束
         else if(currProcUnit->ptype == PRO_END)
         {
-            currProcUnit->item->hightLightItem(LEVEL_HIGH,true);
             setSimulateState(false);
+            currProcUnit->item->hightLightItem(LEVEL_NORMAL,true);
             break;
         }
 
@@ -286,6 +320,7 @@ void SimulateControlPanel::startProcUnit()
 
 /*!根据循环框中设定的值，计算当前条件是否满足；若满足，执行循环框yes分支，否则执行no分支
  *20161117:添加循环中引用前面服务计算出的结果值
+ *         添加对循环次数的记录，将其保存至备注信息中
  **/
 bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopList)
 {
@@ -322,7 +357,6 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
             }
         }
     }
-
 
     //判断条件是否成立
     foreach(SignalVari * sv,loopList)
@@ -362,6 +396,12 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
                 finalResult = true;
             }
         }
+    }
+
+    //记录每次循环过程中产生变量的中间值
+    foreach(SignalVari * sv,loopList)
+    {
+        sv->middleResults.append(sv->middlValue);
     }
 
     //条件成立，对变量进行改变操作
@@ -436,9 +476,9 @@ QString SimulateControlPanel::getQuoteOutValue(MyItem * item,QString value)
    int startLen = QString(COMBOX_START_FLAG).size();
    int parentIndex = value.mid(startLen,pos - startLen).toInt();
 
-   if(parentIndex >= 0 && parentIndex < parentItems.size())
+   if(parentIndex >= 1 && parentIndex <= parentItems.size())
    {
-       ServiceProperty * sp = parentItems.at(parentIndex)->getServiceProp();
+       ServiceProperty * sp = parentItems.at(parentIndex - 1)->getServiceProp();
        ParaList out = sp->outputParas;
 
        if(out.size() > 0 )
@@ -464,6 +504,13 @@ void SimulateControlPanel::setSimulateState(bool isSim)
     GlobalIsSimulateState = isSim;
     ui->startSimulate->setEnabled(!isSim);
     ui->terminalSimulate->setEnabled(isSim);
+    beforeUnit = NULL;
+
+    foreach(LoopRecord * lr,loopRecords)
+    {
+        delete lr;
+    }
+    loopRecords.clear();
 
     if(isSim)
     {
@@ -488,10 +535,18 @@ void SimulateControlPanel::setSimulateState(bool isSim)
 }
 
 //显示每一步的推演的操作信息
-void SimulateControlPanel::showSimulateOperate(ProcessUnit *unit)
+MyListWidgetItem * SimulateControlPanel::showSimulateOperate(ProcessUnit *unit)
 {
-    MY_ASSERT(unit)
+    MY_ASSERT_RETURN_NULL(unit)
     QPixmap pixmap;
+
+    if(beforeUnit)
+    {
+       beforeUnit->item->hightLightItem(LEVEL_NORMAL,true);
+    }
+    unit->item->hightLightItem(LEVEL_HIGH,true);
+
+    beforeUnit = unit;
 
     Util::loadPixmapByGType(unit->gtype,pixmap);
 
@@ -502,6 +557,8 @@ void SimulateControlPanel::showSimulateOperate(ProcessUnit *unit)
 
     ui->simProcedure->addItem(item);
     ui->simProcedure->scrollToBottom();
+
+    return item;
 }
 
 //点击控件时，高亮显示
@@ -528,7 +585,7 @@ void SimulateControlPanel::respItemChanged(QListWidgetItem *current, QListWidget
 
     if(pitem)
     {
-        pitem->getUnit()->item->hightLightItem(LEVEL_MIDDLE,true);
+        pitem->getUnit()->item->hightLightItem(LEVEL_NORMAL,true);
     }
 
     MyGraphicsView::instance()->update();
@@ -542,7 +599,7 @@ void SimulateControlPanel::respItemDoubleClicked(QListWidgetItem *current)
 
     if(citem)
     {
-        MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item);
+        MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item,citem->data(Qt::UserRole));
     }
 }
 

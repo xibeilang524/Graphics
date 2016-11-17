@@ -30,7 +30,7 @@ public:
     explicit MyLoopDialog(QWidget *parent = 0);
     ~MyLoopDialog();
 
-    void setLoopItemProp(LoopProperty * prop);
+    void setLoopItemProp(LoopProperty * prop, QVariant userRoleData);
 
 private slots:
     void respButtYesPress();

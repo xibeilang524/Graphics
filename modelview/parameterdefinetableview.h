@@ -28,7 +28,7 @@ public:
     ParameterDefineTableView(LoopPart loopPart,int row,int column,QWidget * parent = 0);
     ~ParameterDefineTableView();
 
-    void setLoopItemProp(LoopProperty * prop);
+    void setLoopItemProp(LoopProperty * prop, QVariant userRoleData);
     ParameterDefineModel * model()const;
     ParameterDefineDelegate * delegate();
 

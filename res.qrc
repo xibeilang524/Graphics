@@ -85,5 +85,6 @@
         <file>images/nodeTriangle.png</file>
         <file>images/State_End.png</file>
         <file>images/State_Start.png</file>
+        <file>images/project.png</file>
     </qresource>
 </RCC>

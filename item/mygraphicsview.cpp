@@ -1148,7 +1148,7 @@ void MyGraphicsView::editPropertyItem()
 }
 
 //右键显示选择控件的属性编辑窗口
-void MyGraphicsView::showSelectedItemPropEdit(MyItem * item)
+void MyGraphicsView::showSelectedItemPropEdit(MyItem * item, QVariant userRoleData)
 {
     GraphicsType type = item->getType();
     if(type == GRA_ROUND_RECT )
@@ -1184,7 +1184,7 @@ void MyGraphicsView::showSelectedItemPropEdit(MyItem * item)
         else
         {
             MyLoopDialog dialog(this);
-            dialog.setLoopItemProp(item->getLoopProp());
+            dialog.setLoopItemProp(item->getLoopProp(),userRoleData);
             dialog.exec();
         }
     }

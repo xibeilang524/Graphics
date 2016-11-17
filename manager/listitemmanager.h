@@ -1,3 +1,13 @@
+/*************************************************
+**版  权：RenGu Company
+**文件名: listitemmanager.h
+**作  者: wey       Version: 1.0       Date: 2016.11.01
+**描  述: 列表框管理
+**Others:
+**
+**修改历史:
+**
+*************************************************/
 #ifndef LISTITEMMANAGER_H
 #define LISTITEMMANAGER_H
 
