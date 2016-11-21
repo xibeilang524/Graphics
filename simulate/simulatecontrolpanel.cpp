@@ -169,7 +169,7 @@ void SimulateControlPanel::respStartSimulate()
     isSimulateState = true;
     //【5】对处理单元进行处理
     currProcUnit = procUnits.first();
-    startProcUnit();   
+    startProcUnit();
 }
 
 //清空上一次推演的记录
@@ -234,13 +234,22 @@ void SimulateControlPanel::startProcUnit()
         {
             ServiceProperty * prop = currProcUnit->item->getServiceProp();
             submitUrl(currProcUnit->item,prop);
-
             break;
         }
         //判断框
         else if(currProcUnit->ptype == PRO_JUDGE)
         {
-            break;
+            JudgeProperty * jprop = currProcUnit->item->getJudegeProp();
+
+            bool judgeResult = countJudgeValue(currProcUnit->item,jprop->express);
+            if(judgeResult)
+            {
+                currProcUnit = currProcUnit->yesChild;
+            }
+            else
+            {
+                currProcUnit = currProcUnit->noChild;
+            }
         }
         //循环框
         else if(currProcUnit->ptype == PRO_LOOP)
@@ -283,7 +292,6 @@ void SimulateControlPanel::startProcUnit()
             else
             {
                 //在执行否时，需要将上次循环的中间值置为0(嵌套循环)
-
                 foreach(SignalVari * tmpVari,slist)
                 {
                     tmpVari->middlValue = tmpVari->initialValue;
@@ -630,6 +638,71 @@ void SimulateControlPanel::setFlagState(QLabel * label,bool isSuccess)
     {
         label->setStyleSheet("background-color:red;color:white;border-radius:4px;");
     }
+}
+
+/*!针对逻辑表达式求值,目前不支持表达式里调用方法
+  【1】对表达式中出现的变量或者引用进行替换
+  【2】对表达式正确性验证
+  【3】对表达式整体进行逻辑处理
+!*/
+bool SimulateControlPanel::countJudgeValue(MyItem * item, QString express)
+{
+    //【1】
+    QString switchResult = switchQuoteParameter(item,express);
+    item->getJudegeProp()->switchExpress = switchResult;
+
+    qDebug() <<__FUNCTION__
+            <<switchResult<<"++++++++++"<<express
+            <<"\n";
+
+    return true;
+}
+
+//对表达式中的引用参数进行替换，中括号要使用"\\["
+QString SimulateControlPanel::switchQuoteParameter(MyItem * item,QString & express)
+{
+    QString finalResult = express;
+    QRegExp exp("(\\[([a-zA-Z]+):(\\d{1}):([a-zA-Z]+)\\])");
+
+    QList<QString> quoteResults;
+    int pos = 0;
+    while((pos = exp.indexIn(express,pos))>=0)
+    {
+        QString quoteName = exp.cap(3);
+        QString result = findQuoteResult(item,quoteName);
+        quoteResults.append(result);
+        pos += exp.matchedLength();
+    }
+
+    foreach(QString result,quoteResults)
+    {
+        int firstIndex = exp.indexIn(finalResult);
+        if(firstIndex >= 0)
+        {
+            finalResult.replace(firstIndex,exp.matchedLength(),result);
+        }
+    }
+
+    return finalResult;
+}
+
+//针对引用的名称，查找其对应的输出结果值
+QString SimulateControlPanel::findQuoteResult(MyItem * item,QString quoteName)
+{
+    QList<MyItem *> parentItems =  SimulateUtil::instance()->getCurrParentItem(item);
+    foreach(MyItem * item,parentItems)
+    {
+        if(item->getText() == quoteName)
+        {
+            ParaList out = item->getServiceProp()->outputParas;
+            if(out.size() > 0 )
+            {
+                return out.at(0)->pValue;
+            }
+        }
+    }
+
+    return "0";
 }
 
 SimulateControlPanel::~SimulateControlPanel()

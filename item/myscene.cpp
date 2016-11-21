@@ -324,7 +324,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
         }
         else if(cutInfo.itemProperty.ptype == PRO_JUDGE)
         {
-
+            item->setJudgeProp(cutInfo.judgeProp);
         }
 
         if(isCopy)
@@ -471,11 +471,6 @@ void MyScene::addItem(QList<CutInfo *> &cutInfos)
     foreach (CutInfo * cutInfo, lines)
     {
         addItem(*cutInfo);
-    }
-
-    foreach (CutInfo * info, cutInfos)
-    {
-        delete info;
     }
 
     myItemInfo->setVisible(false);

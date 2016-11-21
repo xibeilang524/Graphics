@@ -30,6 +30,20 @@ FileOperate * FileOperate::fileOperate =  NULL;
 
 ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &items)
 {
+    QRegExp exp("_v(\\d)+");
+
+    if(!fileName.contains(exp))
+    {
+        //包含后缀名，但不包含版本号
+        int hasSuffix = fileName.indexOf(SaveFileSuffix);
+        if(hasSuffix > 0)
+        {
+            fileName = fileName.left(hasSuffix);
+        }
+
+        fileName += QString("_v"+QString::number(M_VERTION));
+    }
+
     if(!fileName.contains(SaveFileSuffix))
     {
         fileName += SaveFileSuffix;
@@ -144,7 +158,7 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
             }
             else if(info->itemProperty.ptype == PRO_JUDGE)
             {
-
+                stream>>(info->judgeProp);
             }
 
             info->graphicsType = (GraphicsType)type;

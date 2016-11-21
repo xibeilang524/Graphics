@@ -6,7 +6,7 @@
 **Others:
 **
 **修改历史:
-**
+**20161118:wey:修复调用服务内存一直增长问题【reply->deleteLater()】
 *************************************************/
 #ifndef MYWEBSERVICE_H
 #define MYWEBSERVICE_H

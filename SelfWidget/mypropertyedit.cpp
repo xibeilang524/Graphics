@@ -8,6 +8,7 @@
 #include "../sql/serviceinfoprocess.h"
 #include "../item/myitem.h"
 #include "../util.h"
+#include "mychoosebar.h"
 
 #include <QHBoxLayout>
 #include <QListView>
@@ -32,6 +33,15 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
 
     ui->serviceName->setView(new QListView());
 
+    chooseBar = new MyChooseBar(ui->widget_2);
+    chooseBar->setParetWidget(this);
+    connect(chooseBar,SIGNAL(confirmPressed()),this,SLOT(confirmPropety()));
+
+    QHBoxLayout * layout = new QHBoxLayout;
+    layout->addWidget(chooseBar);
+    layout->setContentsMargins(1,1,1,1);
+    ui->widget_2->setLayout(layout);
+
     QHBoxLayout * inputLayout = new QHBoxLayout;
     inputLayout->addWidget(inputTableView);
     inputLayout->setContentsMargins(2,2,2,2);
@@ -45,8 +55,6 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
     currItemProp = NULL;
 
     connect(ui->serviceName,SIGNAL(currentIndexChanged(int)),this,SLOT(switchServiceInfo(int)));
-    connect(ui->confirm,SIGNAL(clicked()),this,SLOT(confirmPropety()));
-    connect(ui->cancel,SIGNAL(clicked()),this,SLOT(cancelProperty()));
 }
 
 //初始显示信息,先依照全局的服务信息添加下拉列表；然后根据当前控件是否已经添加服务再设定下拉列表索引
@@ -146,8 +154,6 @@ void MyPropertyEdit::confirmPropety()
     currItemProp->method = ui->servicePort->text();
     currItemProp->inputParas = inputTableView->model()->getPara();
     currItemProp->outputParas = outputTableView->model()->getPara();
-
-    cancelProperty();
 }
 
 //更新代理下拉列表显示引单的列表
@@ -167,12 +173,6 @@ void MyPropertyEdit::updateDelegateList(QList<MyItem *> pItems)
     }
 
     inputTableView->delegate()->updateStringList(list);
-}
-
-//取消
-void MyPropertyEdit::cancelProperty()
-{
-    this->close();
 }
 
 MyPropertyEdit::~MyPropertyEdit()

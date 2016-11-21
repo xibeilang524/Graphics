@@ -114,6 +114,9 @@ public:
     LoopProperty * getLoopProp(){return this->loopProperty;}
     void setLoopProp(LoopProperty * prop);
 
+    JudgeProperty * getJudegeProp(){return this->judgeProperty;}
+    void setJudgeProp(JudgeProperty * prop);
+
     void hightLightItem(HightLightLevel level = LEVEL_NORMAL,bool isHigh = true);
     bool isHightShow(){return this->isSimulateHigh;}
 
@@ -203,7 +206,8 @@ private:
     bool isPrepareLine;                //是否准备绘制线条，如果是，则在鼠标进入时，在四边的中点绘制允许接入点
 
     ServiceProperty * serviceProp;     //属性信息
-    LoopProperty * loopProperty;       //循环体的属性
+    LoopProperty * loopProperty;       //循环体属性
+    JudgeProperty * judgeProperty;     //判断框属性
 
     bool isSimulateHigh;               //是否为推演状态下的高亮显示
     HightLightLevel  lightLevel;       //当前属于哪种显示

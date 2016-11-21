@@ -15,6 +15,7 @@
 
 class ServiceInputTableView;
 class MyItem;
+class MyChooseBar;
 struct ServiceProperty;
 
 namespace Ui {
@@ -34,7 +35,6 @@ public:
 
 private slots:
     void confirmPropety();
-    void cancelProperty();
     void switchServiceInfo(int index);
     
 private:
@@ -48,6 +48,7 @@ private:
     ServiceProperty * currItemProp;
 
     bool isComboxAutoChanged;               //下拉框如果自动改变，则无需响应槽函数
+    MyChooseBar * chooseBar;
 };
 
 #endif // MYPROPERTYEDIT_H

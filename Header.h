@@ -15,9 +15,8 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#define M_VERTION 0x0008        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
+#define M_VERTION 0x000A        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
 #define M_AUTHOR "南京仁谷系统集成有限公司"
-#define M_YEAR "16"
 
 //用于控制是否需要加入状态机模块，如果不需要，将此宏取消定义
 #ifndef ADD_STATE_MODEL
@@ -501,35 +500,45 @@ struct LoopProperty
 
     ~LoopProperty()
     {
-//        foreach(SignalVari * tmp,signalList)
-//        {
-//            delete tmp;
-//        }
-//        signalList.clear();
+        foreach(SignalVari * tmp,signalList)
+        {
+            delete tmp;
+        }
+        signalList.clear();
 
-//        foreach(VariableDefine * tmp,varList)
-//        {
-//            delete tmp;
-//        }
-//        varList.clear();
+        foreach(VariableDefine * tmp,varList)
+        {
+            delete tmp;
+        }
+        varList.clear();
 
-//        foreach(ExpressDefine * tmp,expList)
-//        {
-//            delete tmp;
-//        }
-//        expList.clear();
+        foreach(ExpressDefine * tmp,expList)
+        {
+            delete tmp;
+        }
+        expList.clear();
 
-//        foreach(FinalExpressDefine * tmp,fexpList)
-//        {
-//            delete tmp;
-//        }
-//        fexpList.clear();
+        foreach(FinalExpressDefine * tmp,fexpList)
+        {
+            delete tmp;
+        }
+        fexpList.clear();
     }
 
     SignalVariList signalList;          //多个条件集合
     VariableDefineList varList;         //变量集合
     ExpressDefineList expList;          //表达式集合
     FinalExpressDefineList fexpList;    //末循环体集合
+};
+
+//判断框属性
+struct JudgeProperty
+{
+    friend QDataStream & operator <<(QDataStream &,JudgeProperty *prop);
+    friend QDataStream & operator >>(QDataStream &,JudgeProperty * prop);
+
+    QString express;            //表达式
+    QString switchExpress;      //如果引用，则保存将引用转换成对应参数后的表达式
 };
 
 //数据显示表的行号和数据在数据库中index对应关系
@@ -548,11 +557,7 @@ struct CutInfo
     {
         hasContent = false;
         loopProp = new LoopProperty;
-    }
-
-    ~CutInfo()
-    {
-//        delete loopProp;
+        judgeProp = new JudgeProperty;
     }
 
     bool  hasContent;                            //是否包拷贝内容,在剪切和复制后置为true，清空后置为false
@@ -560,6 +565,7 @@ struct CutInfo
     ItemProperty itemProperty;
     ServiceProperty serviceProp;                 //服务属性信息
     LoopProperty * loopProp;                     //服务循环属性信息
+    JudgeProperty * judgeProp;                   //服务判断属性信息
     QString content;
     QList<NodePortProperty> nodeProperties;      //控件包含端口的信息
 };

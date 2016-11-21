@@ -145,7 +145,11 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                                 //当前已经搜索结束,
                                 if(lastDesc->currPathNum >= lastDesc->totalPathNum)
                                 {
-                                    delete lastDesc;
+                                    foreach(SignalPathDesc* tmpSignalPath,lastDesc->pathes)
+                                    {
+                                        delete tmpSignalPath;
+                                    }
+                                    lastDesc->pathes.clear();
                                     descs.pop();
                                 }
                                 else
@@ -244,7 +248,11 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
                         //当前已经搜索结束
                         if(lastDesc->currPathNum >= lastDesc->totalPathNum)
                         {
-                            delete lastDesc;
+                            foreach(SignalPathDesc* tmpSignalPath,lastDesc->pathes)
+                            {
+                                delete tmpSignalPath;
+                            }
+                            lastDesc->pathes.clear();
                             descs.pop();
                         }
                         else

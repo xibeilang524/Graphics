@@ -38,6 +38,18 @@
 #define MAX_LOOP_RADIUS    25        //注解短边最大长度
 #define STATE_END_RADIUS   3         //状态机结束圆与Circle半径差
 
+QDataStream & operator <<(QDataStream & stream,JudgeProperty * prop)
+{
+    stream<<prop->express<<prop->switchExpress;
+    return stream;
+}
+
+QDataStream & operator >>(QDataStream & stream,JudgeProperty * prop)
+{
+    stream>>prop->express>>prop->switchExpress;
+    return stream;
+}
+
 //对服务的参数进行重载
 QDataStream & operator <<(QDataStream & stream,Parameter * para)
 {
@@ -319,7 +331,7 @@ QDataStream & operator <<(QDataStream &stream,MyItem * item)
     }
     else if(item->getProperty().ptype == PRO_JUDGE)
     {
-
+        stream<<item->getJudegeProp();
     }
     else if(item->getProperty().ptype == PRO_LOOP)
     {
@@ -358,7 +370,11 @@ QDataStream & operator >>(QDataStream &stream,MyItem * item)
     }
     else if(prop.ptype == PRO_JUDGE)
     {
+        JudgeProperty * jprop = new JudgeProperty;
+        stream>>jprop;
+        item->setJudgeProp(jprop);
 
+        delete jprop;
     }
 
     return stream;
@@ -467,6 +483,7 @@ MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *pare
 
     serviceProp = new ServiceProperty;
     loopProperty = new LoopProperty;
+    judgeProperty = new JudgeProperty;
 
     currMouseType = MOUSE_NONE;
     isNeedBorder = false;
@@ -2111,6 +2128,12 @@ void MyItem::setLoopProp(LoopProperty *prop)
         v->pRemark = tmp->pRemark;
         loopProperty->fexpList.append(v);
     }
+}
+
+//设置判断框属性
+void MyItem::setJudgeProp(JudgeProperty *prop)
+{
+    this->judgeProperty->express = prop->express;
 }
 
 MyItem::~MyItem()

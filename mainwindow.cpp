@@ -542,12 +542,18 @@ void MainWindow::showAbout()
 //切换工作模式【建模/推演】
 void MainWindow::switchWorkModel()
 {
+    QString objName = QObject::sender()->objectName();
     if(GlobalIsSimulateState)
     {
-        Util::showWarn("推演尚未结束，无法切换至建模状态!");
+        if(objName == QString(Constants::SIMLUATE_ID))
+        {
+            return;
+        }
+        ActionManager::instance()->action(Constants::SIMLUATE_ID)->setChecked(true);
+
+//        Util::showWarn("推演尚未结束，无法切换至建模状态!");
         return;
     }
-    QString objName = QObject::sender()->objectName();
     bool enable = false;
 
     MyGraphicsView::instance()->respResetSimluate();

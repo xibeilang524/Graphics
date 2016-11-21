@@ -51,6 +51,7 @@ void MyWebService::replyFinshed(QNetworkReply *reply)
         QString result = parseResult(replyText,hasFault);
         emit lastUnitProcessOver(hasFault,result);
     }
+    reply->deleteLater();
 }
 
 QString MyWebService::parseResult(QString result,bool & hasFault)

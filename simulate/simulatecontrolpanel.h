@@ -20,6 +20,7 @@
 **20161117:wey:增加循环依照引单计算
 **             增加推演高亮提示(用于指示当前推演的进度)
 **             增加对循环过程的记录，支持点击右侧记录查看当前循环的值
+**
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -89,6 +90,7 @@ private slots:
     void stepByStep();
     
 private:
+
     void setFlagState(QLabel * label,bool isSuccess);
     void setSimulateState(bool isSim);
     void submitUrl(MyItem *item, ServiceProperty * prop);
@@ -96,6 +98,9 @@ private:
     bool countLoopValue(MyItem *item, SignalVariList & loopList);
     void clearLastSimluteRecord();
     QString getQuoteOutValue(MyItem * item,QString value);
+    bool countJudgeValue(MyItem *item, QString express);
+    QString switchQuoteParameter(MyItem *item, QString & express);
+    QString findQuoteResult(MyItem * item,QString quoteName);
 
     Ui::SimulateControlPanel *ui;
 

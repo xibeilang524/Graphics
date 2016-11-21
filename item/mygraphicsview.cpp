@@ -1179,6 +1179,7 @@ void MyGraphicsView::showSelectedItemPropEdit(MyItem * item, QVariant userRoleDa
         if(result == QMessageBox::Yes)
         {
             MyConditionSetting dialog(this);
+            dialog.setJudgeProp(item);
             dialog.exec();
         }
         else
@@ -1411,6 +1412,14 @@ void MyGraphicsView::openLocalFile(QString fileName)
     else if(returnType == RETURN_SUCCESS)
     {
         scene()->addItem(cutInfos);
+
+        foreach (CutInfo * info, cutInfos)
+        {
+            delete info->loopProp;
+            delete info->judgeProp;
+            delete info;
+        }
+
         setKeyCtrlStated(false);
 
         QFileInfo info(fileName);
