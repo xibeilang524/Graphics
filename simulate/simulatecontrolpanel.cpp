@@ -642,8 +642,9 @@ void SimulateControlPanel::setFlagState(QLabel * label,bool isSuccess)
 
 /*!针对逻辑表达式求值,目前不支持表达式里调用方法
   【1】对表达式中出现的变量或者引用进行替换
-  【2】对表达式正确性验证
-  【3】对表达式整体进行逻辑处理
+  【2】对表达式正确性验证(暂未考虑)
+  【3】对输入的字符进行词法分析，将一个字符串按照类别进行提取
+  【4】对表达式整体进行逻辑处理，返回计算的结果
 !*/
 bool SimulateControlPanel::countJudgeValue(MyItem * item, QString express)
 {
@@ -655,6 +656,21 @@ bool SimulateControlPanel::countJudgeValue(MyItem * item, QString express)
             <<switchResult<<"++++++++++"<<express
             <<"\n";
 
+    //【2】：无
+
+    //【3】
+    QStringList result ;
+    bool flag = SimulateUtil::instance()->parseText(switchResult,result);
+    if(flag)
+    {
+        //【4】
+        qDebug()<<result;
+    }
+    else
+    {
+        Util::showWarn("判断条件解析出错，请检查判断条件!");
+        return false;
+    }
     return true;
 }
 

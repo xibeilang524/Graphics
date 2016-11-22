@@ -90,7 +90,6 @@ private slots:
     void stepByStep();
     
 private:
-
     void setFlagState(QLabel * label,bool isSuccess);
     void setSimulateState(bool isSim);
     void submitUrl(MyItem *item, ServiceProperty * prop);

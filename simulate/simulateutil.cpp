@@ -12,6 +12,8 @@ SimulateUtil * SimulateUtil::util = NULL;
 
 SimulateUtil::SimulateUtil()
 {
+    relationList<<">"<<">="<<"=="<<"!="<<"<"<<"<=";
+    logicalList<<"&&"<<"||"<<"!";
 }
 
 SimulateUtil * SimulateUtil::instance()
@@ -447,4 +449,251 @@ bool SimulateUtil::getIsItemEnd(MyItem *item)
     }
 
     return false;
+}
+
+//是否为关系运算符
+bool SimulateUtil::isRelationOperation(QString text)
+{
+    return relationList.contains(text);
+}
+
+//是否为逻辑运算符
+bool SimulateUtil::isLogicalOperation(QString text)
+{
+    return logicalList.contains(text);
+}
+
+/**
+ *利用状态机词法分析判断条件
+ *【1】替换存在的空格
+ *【2】逐个对字符串进行分析
+ */
+bool SimulateUtil::parseText(QString text,QStringList & result)
+{
+    //【1】
+    QRegExp exp("\\s+");
+    QString nonWhileSpace = text.replace(exp,"");
+
+    //【2】
+    CharacterType ctype = CHAR_START;        //上一次的字符类型状态
+    QString hasChar;
+    QChar ch;
+    bool isRight = true;
+    for(int index = 0;  index < nonWhileSpace.length() && isRight; index ++)
+    {
+        ch = nonWhileSpace.at(index);
+
+        switch(ctype)
+        {
+            case CHAR_START:
+                            {
+                                if(ch == '>' || ch == '=' || ch == '<' || ch == '!' || ch == '&' || ch == '|' || ch =='!' || ch == ')')
+                                {
+                                    ctype = CHAR_ILLEGAL;
+                                }
+                                else if(ch == '(')
+                                {
+                                    ctype = CHAR_LEFT_AGGRE;
+                                }
+                                else
+                                {
+                                    hasChar.append(ch);
+                                    ctype = CHAR_NORMAL;
+                                }
+                            }
+                            break;
+            case CHAR_NORMAL:
+                            {
+                                if(ch == '>' || ch == '=' || ch == '<' )
+                                {
+                                    result.append(hasChar);
+                                    hasChar.clear();
+                                    hasChar.append(ch);
+                                    ctype = CHAR_RELATION;
+                                }
+                                else if( ch == '!' || ch == '&' || ch == '|')
+                                {
+                                    result.append(hasChar);
+                                    hasChar.clear();
+                                    hasChar.append(ch);
+                                    ctype = CHAR_LOGICAL;
+                                }
+                                else if(ch == '(')
+                                {
+                                    ctype = CHAR_ILLEGAL;
+                                }
+                                else if(ch == ')')
+                                {
+                                    result.append(hasChar);
+                                    hasChar.clear();
+                                    hasChar.append(ch);
+                                    ctype = CHAR_RIGHT_AGGRE;
+                                }
+                                else
+                                {
+                                    hasChar.append(ch);
+                                    ctype = CHAR_NORMAL;
+                                }
+                            }
+                            break;
+            case CHAR_RELATION:
+                            {
+                                if(ch == '>' || ch == '=' || ch == '<' || ch == '!' )
+                                {
+                                    hasChar.append(ch);
+                                    ctype = CHAR_RELATION;
+                                }
+                                else if(ch == '(')
+                                {
+                                    if(isRelationOperation(hasChar))
+                                    {
+                                        result.append(hasChar);
+                                        hasChar.clear();
+                                        hasChar.append(ch);
+                                        ctype = CHAR_LEFT_AGGRE;
+                                    }
+                                    else
+                                    {
+                                        ctype = CHAR_ILLEGAL;
+                                    }
+                                }
+                                else if(ch == ')' || ch == '&' || ch == '|' || ch =='!')
+                                {
+                                    ctype = CHAR_ILLEGAL;
+                                }
+                                else
+                                {
+                                    if(isRelationOperation(hasChar))
+                                    {
+                                        result.append(hasChar);
+                                        hasChar.clear();
+                                        hasChar.append(ch);
+                                        ctype = CHAR_NORMAL;
+                                    }
+                                    else
+                                    {
+                                        ctype = CHAR_ILLEGAL;
+                                    }
+                                }
+                            }
+                            break;
+            case CHAR_LOGICAL:
+                            {
+                                if(ch == '>' || ch == '=' || ch == '<' )
+                                {
+                                    if(hasChar == "!")
+                                    {
+                                        hasChar.append(ch);
+                                        ctype = CHAR_LOGICAL;
+                                    }
+                                    else
+                                    {
+                                        ctype = CHAR_ILLEGAL;
+                                    }
+                                }
+                                else if(ch == '(')
+                                {
+                                    if(isLogicalOperation(hasChar)||isRelationOperation(hasChar))
+                                    {
+                                        result.append(hasChar);
+                                        hasChar.clear();
+                                        hasChar.append(ch);
+                                        ctype = CHAR_LEFT_AGGRE;
+                                    }
+                                    else
+                                    {
+                                        ctype = CHAR_ILLEGAL;
+                                    }
+                                }
+                                else if(ch == '&' || ch == '|' || ch =='!')
+                                {
+                                    hasChar.append(ch);
+                                    ctype = CHAR_LOGICAL;
+                                }
+                                else if(ch == ')' )
+                                {
+                                    ctype = CHAR_ILLEGAL;
+                                }
+                                else
+                                {
+                                    if(isLogicalOperation(hasChar)||isRelationOperation(hasChar))
+                                    {
+                                        result.append(hasChar);
+                                        hasChar.clear();
+                                        hasChar.append(ch);
+                                        ctype = CHAR_NORMAL;
+                                    }
+                                    else
+                                    {
+                                        ctype = CHAR_ILLEGAL;
+                                    }
+                                }
+                            }
+                            break;
+            case CHAR_LEFT_AGGRE:
+                            {
+                                if(ch == '>' || ch == '=' || ch == '<' || ch == '!' ||ch == ')' || ch == '&' || ch == '|')
+                                {
+                                    ctype = CHAR_ILLEGAL;
+                                }
+                                else if(ch == '(')
+                                {
+                                    result.append(hasChar);
+                                    hasChar.clear();
+                                    hasChar.append(ch);
+                                    ctype = CHAR_LEFT_AGGRE;
+                                }
+                                else
+                                {
+                                    result.append(hasChar);
+                                    hasChar.clear();
+                                    hasChar.append(ch);
+                                    ctype = CHAR_NORMAL;
+                                }
+                            }
+                            break;
+            case CHAR_RIGHT_AGGRE:
+                            {
+                                if(ch == '>' || ch == '=' || ch == '<' )
+                                {
+                                    result.append(hasChar);
+                                    hasChar.clear();
+                                    hasChar.append(ch);
+                                    ctype = CHAR_RELATION;
+                                }
+                                else if(ch == '&' || ch == '|')
+                                {
+                                    result.append(hasChar);
+                                    hasChar.clear();
+                                    hasChar.append(ch);
+                                    ctype = CHAR_LOGICAL;
+                                }
+                                else
+                                {
+                                    ctype = CHAR_ILLEGAL;
+                                }
+                            }
+                            break;
+            case CHAR_ILLEGAL:
+                            {
+                                isRight = false;
+                            }
+                            break;
+        }
+    }
+
+    if(ctype == CHAR_RIGHT_AGGRE)
+    {
+        result.append(")");
+    }
+    else if(ctype == CHAR_NORMAL)
+    {
+        hasChar.append(ch);
+        result.append(hasChar);
+    }
+    else
+    {
+        return false;
+    }
+    return true;
 }

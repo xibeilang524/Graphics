@@ -33,9 +33,27 @@ public:
     bool getIsItemStart(MyItem * item);
     bool getIsItemEnd(MyItem * item);
 
+    bool parseText(QString text,QStringList & result);
+
 private:
     SimulateUtil();
     static SimulateUtil * util;
+
+    bool isRelationOperation(QString text);
+    bool isLogicalOperation(QString text);
+
+    //用于词法分析判断框并提取字符
+    enum CharacterType
+    {
+        CHAR_START,         //未开始解析
+        CHAR_NORMAL,        //普通字符(变量)
+        CHAR_RELATION,      //关系运算符
+        CHAR_LOGICAL,       //逻辑运算符
+        CHAR_LEFT_AGGRE,    //左括号
+        CHAR_RIGHT_AGGRE,   //右括号
+        CHAR_NOT_EXIST,     //组合的字符未存在
+        CHAR_ILLEGAL        //非法字符
+    };
 
     //单条路径的状态
     struct SignalPathDesc
@@ -67,8 +85,10 @@ private:
         MyItem * currItem;      //产生分支的GRA_RECT
 
         QList<SignalPathDesc*> pathes;      //总共存在的路径
-
     };
+
+    QStringList relationList;       //关系运算符表
+    QStringList logicalList;        //逻辑运算符表
 };
 
 #endif // SIMULATEUTIL_H
