@@ -487,9 +487,25 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
         {
             case CHAR_START:
                             {
-                                if(ch == '>' || ch == '=' || ch == '<' || ch == '!' || ch == '&' || ch == '|' || ch =='!' || ch == ')')
+                                if(ch == '>' || ch == '=' || ch == '<' || ch == '&' || ch == '|' || ch == ')')
                                 {
                                     ctype = CHAR_ILLEGAL;
+                                }
+                                else if(ch == '!' )
+                                {
+                                    hasChar.append(ch);
+                                    if(index + 1 < nonWhileSpace.length())
+                                    {
+                                        QChar nextChar = nonWhileSpace.at(index+1);
+                                        if(nextChar == '>' || nextChar == '=' || nextChar == '<' || nextChar == '&' || nextChar == '|' || nextChar == ')')
+                                        {
+                                            ctype = CHAR_ILLEGAL;
+                                        }
+                                        else
+                                        {
+                                            ctype = CHAR_OPPOSE;
+                                        }
+                                    }
                                 }
                                 else if(ch == '(')
                                 {
@@ -541,6 +557,23 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
                                 if(ch == '>' || ch == '=' || ch == '<' || ch == '!' )
                                 {
                                     hasChar.append(ch);
+                                    if(!isRelationOperation(hasChar))
+                                    {
+                                        if(ch == '!')
+                                        {
+                                            hasChar.remove(hasChar.size() - 1);
+                                            result.append(hasChar);
+                                            hasChar.clear();
+                                            hasChar.append(ch);
+                                            ctype = CHAR_OPPOSE;
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            ctype = CHAR_ILLEGAL;
+                                            break;
+                                        }
+                                    }
                                     ctype = CHAR_RELATION;
                                 }
                                 else if(ch == '(')
@@ -581,7 +614,7 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
                             {
                                 if(ch == '>' || ch == '=' || ch == '<' )
                                 {
-                                    if(hasChar == "!")
+                                    if(ch == '=' && hasChar == "!")
                                     {
                                         hasChar.append(ch);
                                         ctype = CHAR_LOGICAL;
@@ -608,7 +641,24 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
                                 else if(ch == '&' || ch == '|' || ch =='!')
                                 {
                                     hasChar.append(ch);
-                                    ctype = CHAR_LOGICAL;
+                                    if(isLogicalOperation(hasChar))
+                                    {
+                                        ctype = CHAR_LOGICAL;
+                                    }
+                                    else
+                                    {
+                                        //修复&&!2的情况
+                                        QString beforeString = hasChar.remove(hasChar.length()-1,1);
+                                        if(isLogicalOperation(beforeString) && ch == '!')
+                                        {
+                                            result.append(hasChar);
+                                            hasChar.clear();
+                                            hasChar.append(ch);
+                                            ctype = CHAR_OPPOSE;
+                                            break;
+                                        }
+                                        ctype = CHAR_ILLEGAL;
+                                    }
                                 }
                                 else if(ch == ')' )
                                 {
@@ -632,9 +682,27 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
                             break;
             case CHAR_LEFT_AGGRE:
                             {
-                                if(ch == '>' || ch == '=' || ch == '<' || ch == '!' ||ch == ')' || ch == '&' || ch == '|')
+                                if(ch == '>' || ch == '=' || ch == '<' ||ch == ')' || ch == '&' || ch == '|')
                                 {
                                     ctype = CHAR_ILLEGAL;
+                                }
+                                else if(ch == '!')
+                                {
+                                    if(index + 1 < nonWhileSpace.length())
+                                    {
+                                        QChar nextChar = nonWhileSpace.at(index+1);
+                                        if(nextChar == '>' || nextChar == '=' || nextChar == '<' || nextChar == '&' || nextChar == '|' || nextChar == ')')
+                                        {
+                                            ctype = CHAR_ILLEGAL;
+                                        }
+                                        else
+                                        {
+                                            result.append(hasChar);
+                                            hasChar.clear();
+                                            hasChar.append(ch);
+                                            ctype = CHAR_OPPOSE;
+                                        }
+                                    }
                                 }
                                 else if(ch == '(')
                                 {
@@ -668,12 +736,55 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
                                     hasChar.append(ch);
                                     ctype = CHAR_LOGICAL;
                                 }
+                                else if(ch == ')')
+                                {
+                                    result.append(hasChar);
+                                    hasChar.clear();
+                                    hasChar.append(ch);
+                                    ctype = CHAR_RIGHT_AGGRE;
+                                }
                                 else
                                 {
                                     ctype = CHAR_ILLEGAL;
                                 }
                             }
                             break;
+            case CHAR_OPPOSE:
+                            {
+                                if(ch == '>' || ch == '=' || ch == '<' || ch == '&' || ch== '|' || ch==')')
+                                {
+                                    ctype = CHAR_ILLEGAL;
+                                }
+                                else if(ch == '(')
+                                {
+                                    if(isLogicalOperation(hasChar))
+                                    {
+                                        result.append(hasChar);
+                                        hasChar.clear();
+                                        hasChar.append(ch);
+                                        ctype = CHAR_LEFT_AGGRE;
+                                    }
+                                    else
+                                    {
+                                        ctype = CHAR_ILLEGAL;
+                                    }
+                                }
+                                else
+                                {
+                                    if(isLogicalOperation(hasChar))
+                                    {
+                                        result.append(hasChar);
+                                        hasChar.clear();
+                                        hasChar.append(ch);
+                                        ctype = CHAR_NORMAL;
+                                    }
+                                    else
+                                    {
+                                        ctype = CHAR_ILLEGAL;
+                                    }
+                                }
+                            }
+                break;
             case CHAR_ILLEGAL:
                             {
                                 isRight = false;
@@ -688,7 +799,6 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
     }
     else if(ctype == CHAR_NORMAL)
     {
-        hasChar.append(ch);
         result.append(hasChar);
     }
     else
@@ -696,4 +806,136 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
         return false;
     }
     return true;
+}
+
+//计算词法分析产生的判断条件
+bool SimulateUtil::getResult(QStringList &wordList)
+{
+    bool correct = true;
+    int  index = 0;
+    QVariant finalResult = calcLogical(wordList,index,correct);
+
+    return finalResult.toBool();
+}
+
+//逻辑运算
+QVariant SimulateUtil::calcLogical(QStringList & result,int &index,bool & correct)
+{
+    QVariant tmpResult1 = calcRelation(result,index,correct);
+    QString textA;
+    while(index < result.size())
+    {
+        textA = result.at(index);
+        index++;
+
+        if(textA != "&&" && textA != "||" && textA != "!")
+        {
+            index--;
+            return tmpResult1;
+        }
+        QVariant tmpResult2 = calcRelation(result,index,correct);
+        if(correct)
+        {
+            bool tmpA = tmpResult1.toBool();
+            bool tmpB = tmpResult2.toBool();
+            if(textA == "&&")
+            {
+                tmpResult1 = (tmpA && tmpB);
+            }
+            else if(textA == "||")
+            {
+                tmpResult1 = (tmpA || tmpB);
+            }
+            else if(textA == "!")
+            {
+                tmpResult1 = !tmpA;
+            }
+        }
+    }
+
+    return tmpResult1;
+}
+
+//进行关系运算
+QVariant SimulateUtil::calcRelation(QStringList & result, int &index, bool & correct)
+{
+    QVariant tmpResult1 = getNext(result,index,correct);
+    QString textA;
+    while(index < result.length())
+    {
+        textA = result.at(index);
+        index++;
+        if(!isRelationOperation(textA))
+        {
+            index--;
+            return tmpResult1;
+        }
+
+        QVariant tmpResult2 = getNext(result,index,correct);
+        if(correct)
+        {
+            double result1 = tmpResult1.toDouble();
+            double result2 = tmpResult2.toDouble();
+            if(textA == ">")
+            {
+                tmpResult1 = (result1 > result2);
+            }
+            else if(textA == ">=")
+            {
+                tmpResult1 = (result1 >= result2);
+            }
+            else if(textA == "==")
+            {
+                tmpResult1 = (result1 == result2);
+            }
+            else if(textA == "!=")
+            {
+                tmpResult1 = (result1 != result2);
+            }
+            else if(textA == "<")
+            {
+                tmpResult1 = (result1 < result2);
+            }
+            else if(textA == "<=")
+            {
+                tmpResult1 = (result1 <= result2);
+            }
+        }
+        else
+        {
+            return QVariant(0);
+        }
+    }
+
+    return tmpResult1;
+}
+
+//返回
+QVariant SimulateUtil::getNext(QStringList & result,int &index,bool & correct)
+{
+    QVariant tmpResult = false;
+    QString text;
+    if(index < result.size())
+    {
+        text = result.at(index);
+        index++;
+
+        if( text == "(")
+        {
+            tmpResult = calcRelation(result,index,correct);
+            text = result.at(index);
+            index++;
+            if(text == ")")
+            {
+                correct = false;
+                return QVariant(false);
+            }
+            else
+            {
+                return tmpResult;
+            }
+        }
+    }
+
+    return QVariant(text);
 }

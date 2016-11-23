@@ -9,6 +9,8 @@
 **20161101:wey:增加GRA_RECT引单功能[!!!]
 **20161107:wey:修复因dowhile产生的rect无限循环问题(尚未对判断框功能的区分(判断/循环))
 **20161117:wey:增加对循环或判断控件的引单功能
+**20161122:wey:添加状态机词法解析判断框语句
+**             添加对!的支持
 *************************************************/
 #ifndef SIMULATEUTIL_H
 #define SIMULATEUTIL_H
@@ -34,6 +36,7 @@ public:
     bool getIsItemEnd(MyItem * item);
 
     bool parseText(QString text,QStringList & result);
+    bool getResult(QStringList & wordList);
 
 private:
     SimulateUtil();
@@ -42,15 +45,21 @@ private:
     bool isRelationOperation(QString text);
     bool isLogicalOperation(QString text);
 
+    //运算符计算
+    QVariant calcRelation(QStringList & result,int &index,bool & correct);
+    QVariant calcLogical(QStringList & result,int &index,bool & correct);
+    QVariant getNext(QStringList & result,int &index,bool & correct);
+
     //用于词法分析判断框并提取字符
     enum CharacterType
     {
         CHAR_START,         //未开始解析
         CHAR_NORMAL,        //普通字符(变量)
-        CHAR_RELATION,      //关系运算符
-        CHAR_LOGICAL,       //逻辑运算符
-        CHAR_LEFT_AGGRE,    //左括号
-        CHAR_RIGHT_AGGRE,   //右括号
+        CHAR_RELATION,      //关系运算符>、>=、==、!=、<、<=
+        CHAR_LOGICAL,       //逻辑运算符&&、||、！
+        CHAR_LEFT_AGGRE,    //左括号'('
+        CHAR_RIGHT_AGGRE,   //右括号')'
+        CHAR_OPPOSE,        //逻辑非'!'
         CHAR_NOT_EXIST,     //组合的字符未存在
         CHAR_ILLEGAL        //非法字符
     };

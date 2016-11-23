@@ -76,7 +76,7 @@
             </size>
            </property>
            <property name="text">
-            <string>转换后的表达式:</string>
+            <string>转意表达式:</string>
            </property>
           </widget>
          </item>

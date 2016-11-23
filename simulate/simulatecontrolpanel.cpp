@@ -659,19 +659,19 @@ bool SimulateControlPanel::countJudgeValue(MyItem * item, QString express)
     //【2】：无
 
     //【3】
-    QStringList result ;
-    bool flag = SimulateUtil::instance()->parseText(switchResult,result);
+    QStringList wordList ;
+    bool flag = SimulateUtil::instance()->parseText(switchResult,wordList);
     if(flag)
     {
         //【4】
-        qDebug()<<result;
+        return SimulateUtil::instance()->getResult(wordList);
     }
     else
     {
         Util::showWarn("判断条件解析出错，请检查判断条件!");
         return false;
     }
-    return true;
+    return false;
 }
 
 //对表达式中的引用参数进行替换，中括号要使用"\\["
