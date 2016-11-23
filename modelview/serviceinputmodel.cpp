@@ -186,7 +186,17 @@ bool ServiceInputModel::deleteRow(int rowNum)
 //初始设置,每次窗口显示的时均为新建，因此需要手动的添加行显示数据
 void ServiceInputModel::setPara(ParaList list)
 {
-    paraList = list;
+    foreach(Parameter * para,list)
+    {
+        Parameter * pp = new Parameter;
+        pp->pId = para->pId;
+        pp->pName = para->pName;
+        pp->pRemark = para->pRemark;
+        pp->pType = para->pType;
+        pp->pRemark = para->pRemark;
+        paraList.append(pp);
+    }
+
     if(paraList.size() > 0)
     {
         beginInsertRows(QModelIndex(),0,paraList.size()-1);
@@ -198,16 +208,16 @@ void ServiceInputModel::setPara(ParaList list)
 //清空表格内容
 void ServiceInputModel::clearTable()
 {
-    foreach(Parameter * para,paraList)
-    {
-        delete para;
-    }
-
     if(paraList.size() > 0)
     {
         beginRemoveRows(QModelIndex(),0,paraList.size() - 1);
 
         endRemoveRows();
+    }
+
+    foreach(Parameter * para,paraList)
+    {
+        delete para;
     }
 
     paraList.clear();

@@ -717,7 +717,6 @@ QString SimulateControlPanel::findQuoteResult(MyItem * item,QString quoteName)
             }
         }
     }
-
     return "0";
 }
 

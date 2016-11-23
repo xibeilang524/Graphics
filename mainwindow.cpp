@@ -24,7 +24,7 @@
 #include "./SelfWidget/mypageswitch.h"
 #include "./SelfWidget/serviceview.h"
 #include "./SelfWidget/aboutsoft.h"
-#include "./manager/MyLineComboBox.h"
+#include "./manager/mylinecombobox.h"
 #include "./simulate/simulatecontrolpanel.h"
 #include "./project/myprowizard.h"
 #include "fileoperate.h"

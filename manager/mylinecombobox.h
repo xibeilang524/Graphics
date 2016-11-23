@@ -15,7 +15,7 @@
 #include <QMap>
 
 #include "../Header.h"
-#include "Id.h"
+#include "id.h"
 
 class MyLineComboBox : public QComboBox
 {

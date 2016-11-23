@@ -61,6 +61,9 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
 void MyPropertyEdit::initProp(ServiceProperty *prop)
 {
     currItemProp = prop;
+
+    isComboxAutoChanged = true;
+
     initServiceData();
 
     if(prop->hasSettInfo)
@@ -68,7 +71,7 @@ void MyPropertyEdit::initProp(ServiceProperty *prop)
         inputTableView->clearTable();
         outputTableView->clearTable();
 
-        isComboxAutoChanged = true;
+
 
         inputTableView->model()->setPara(prop->inputParas);
         outputTableView->model()->setPara(prop->outputParas);
@@ -85,14 +88,14 @@ void MyPropertyEdit::initProp(ServiceProperty *prop)
 
         ui->serviceName->setCurrentIndex(index);
 
-        isComboxAutoChanged = false;
-
         ui->serviceState->setText(prop->status);
         ui->serviceDesc->setText(prop->descirption);
         ui->servicePath->setText(prop->servicePath);
         ui->servicePort->setText(prop->method);
         ui->outputAsNextInput->setChecked(prop->isAsNextInput);
     }
+
+    isComboxAutoChanged = false;
 }
 
 //从数据库加载数据,只在第一次加载后刷新下拉列表
@@ -125,12 +128,9 @@ void MyPropertyEdit::switchServiceInfo(int index)
         ui->servicePort->setText(prop->method);
 
         inputTableView->clearTable();
-        if(prop->inputParas.size() > 0)
+        for(int i = 0;i<prop->inputParas.size(); i++)
         {
-            for(int i = 0;i<prop->inputParas.size(); i++)
-            {
-                inputTableView->insertRow(prop->inputParas.at(i));
-            }
+            inputTableView->insertRow(prop->inputParas.at(i));
         }
 
         outputTableView->clearTable();
