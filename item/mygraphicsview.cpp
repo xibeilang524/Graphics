@@ -1148,7 +1148,7 @@ void MyGraphicsView::editPropertyItem()
 }
 
 //右键显示选择控件的属性编辑窗口
-void MyGraphicsView::showSelectedItemPropEdit(MyItem * item, QVariant userRoleData)
+void MyGraphicsView::showSelectedItemPropEdit(MyItem * item, QVariant userRoleData, bool isPanelEditable)
 {
     GraphicsType type = item->getType();
     if(type == GRA_ROUND_RECT )
@@ -1179,13 +1179,13 @@ void MyGraphicsView::showSelectedItemPropEdit(MyItem * item, QVariant userRoleDa
         if(result == QMessageBox::Yes)
         {
             MyConditionSetting dialog(this);
-            dialog.setJudgeProp(item);
+            dialog.setJudgeProp(item,isPanelEditable);
             dialog.exec();
         }
         else
         {
             MyLoopDialog dialog(this);
-            dialog.setLoopItemProp(item->getLoopProp(),userRoleData);
+            dialog.setLoopItemProp(item->getLoopProp(),userRoleData,isPanelEditable);
             dialog.exec();
         }
     }
@@ -1193,7 +1193,7 @@ void MyGraphicsView::showSelectedItemPropEdit(MyItem * item, QVariant userRoleDa
     {
         MyPropertyEdit propertyEdit(this);
         propertyEdit.updateDelegateList(SimulateUtil::instance()->getCurrParentItem(item));
-        propertyEdit.initProp(item->getServiceProp());
+        propertyEdit.initProp(item->getServiceProp(),isPanelEditable);
 
         propertyEdit.exec();
     }

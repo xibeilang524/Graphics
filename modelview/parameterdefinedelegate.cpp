@@ -22,7 +22,7 @@ ParameterDefineDelegate::ParameterDefineDelegate(LoopPart loopPart):
                         stringList<<">"<<">="<<"<"<<"<="<<"==";
                         break;
         case LOOP_FINAL:
-                        stringList<<"++"<<"--"<<"+="<<"-=";
+                        stringList<<"++"<<"--"<<"+="<<"-="<<QString(LOOP_UNTIL_EXPRESS_ILLEGAL);
                         break;
     }
 }
@@ -65,9 +65,9 @@ QWidget * ParameterDefineDelegate::createEditor(QWidget *parent, const QStyleOpt
                          foreach(MyItem * tmpItem,pItems)
                          {
                              ServiceProperty * prop = tmpItem->getServiceProp();
-                             if(prop->outputParas.size() == 1)
+                             foreach(Parameter * outPara,prop->outputParas)
                              {
-                                 QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+tmpItem->getText()+":"+prop->outputParas.at(0)->pName;
+                                 QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+tmpItem->getText()+":"+outPara->pName;
                                  index++;
                                  box->addItem(newItem);
                              }
@@ -76,6 +76,18 @@ QWidget * ParameterDefineDelegate::createEditor(QWidget *parent, const QStyleOpt
                      }
                  }
              }
+        }
+        else if(index.column() == 2)
+        {
+            const QAbstractItemModel * pmodel = index.model();
+            if(pmodel)
+            {
+                QString firstColumnData = pmodel->index(index.row(),0).data().toString();
+                if(firstColumnData.startsWith(COMBOX_LOOP_QUOTE))
+                {
+                    return NULL;
+                }
+            }
         }
     }
     else if(loopPart == LOOP_EXPRESS || loopPart == LOOP_FINAL)
@@ -213,7 +225,6 @@ void ParameterDefineDelegate::setModelData(QWidget *editor, QAbstractItemModel *
             }
         }
     }
-
     model->setData(index,value,Qt::EditRole);
 }
 

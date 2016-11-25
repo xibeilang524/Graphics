@@ -52,12 +52,18 @@ MyLoopDialog::MyLoopDialog(QWidget *parent) :
     ui->express3->setLayout(layout3);
 }
 
-void MyLoopDialog::setLoopItemProp(LoopProperty *prop,QVariant userRoleData)
+void MyLoopDialog::setLoopItemProp(LoopProperty *prop,QVariant userRoleData,bool isEditable)
 {
     this->loopProp = prop;
+    isEditState = isEditable;
+
     express1View->setLoopItemProp(prop,userRoleData);
     express2View->setLoopItemProp(prop,userRoleData);
     express3View->setLoopItemProp(prop,userRoleData);
+
+    express1View->setEnabled(isEditable);
+    express2View->setEnabled(isEditable);
+    express3View->setEnabled(isEditable);
 
     respVariEdited();
 }
@@ -66,6 +72,11 @@ void MyLoopDialog::setLoopItemProp(LoopProperty *prop,QVariant userRoleData)
 void MyLoopDialog::respButtYesPress()
 {
     MY_ASSERT(loopProp)
+
+    if(!isEditState)
+    {
+        return;
+    }
 
     foreach(VariableDefine * tmp,loopProp->varList)
     {

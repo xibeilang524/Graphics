@@ -10,7 +10,7 @@ ServiceInputModel::ServiceInputModel(int row, int column):
     row(row),
     column(column)
 {
-    horizonalHeadList<<"参数名"<<"参数类型"<<"参数值"<<"备注信息";
+    horizonalHeadList<<"参数名"<<"参数类型"<<"参数值"/*<<"备注信息"*/;
 }
 
 //返回行数
@@ -59,6 +59,10 @@ QVariant ServiceInputModel::data(const QModelIndex &index, int role) const
                       QColor color;
                       color.setRgb(255,0,0);
                       return color;
+                  }
+         case Qt::TextAlignmentRole:
+                  {
+                       return Qt::AlignCenter;
                   }
         default:
              break;
@@ -191,7 +195,7 @@ void ServiceInputModel::setPara(ParaList list)
         Parameter * pp = new Parameter;
         pp->pId = para->pId;
         pp->pName = para->pName;
-        pp->pRemark = para->pRemark;
+        pp->pValue = para->pValue;
         pp->pType = para->pType;
         pp->pRemark = para->pRemark;
         paraList.append(pp);

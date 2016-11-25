@@ -38,13 +38,19 @@ MyConditionSetting::MyConditionSetting(QWidget *parent) :
     layout1->setContentsMargins(1,1,1,1);
     ui->widget_3->setLayout(layout1);
 
+    ui->switchExpress->setEnabled(false);
+
     connect(ui->quoteList,SIGNAL(itemPressed(QListWidgetItem*)),this,SLOT(addQuote(QListWidgetItem*)));
     connect(chooseBar,SIGNAL(confirmPressed()),this,SLOT(respConfirmPressed()));
 }
 
 //初始化控件
-void MyConditionSetting::setJudgeProp(MyItem * item)
+void MyConditionSetting::setJudgeProp(MyItem * item,bool isEditable)
 {
+    isEditState = isEditable;
+    ui->quoteList->setEnabled(isEditable);
+    plainEdit->setReadOnly(!isEditable);
+
     jprop = item->getJudegeProp();
     plainEdit->clear();
     plainEdit->setPlainText(jprop->express);
@@ -54,9 +60,9 @@ void MyConditionSetting::setJudgeProp(MyItem * item)
     foreach(MyItem * tmpItem,items)
     {
         ServiceProperty * prop = tmpItem->getServiceProp();
-        if(prop->outputParas.size() == 1)
+        foreach(Parameter * para,prop->outputParas)
         {
-            QString newItem = QString(COMBOX_START_FLAG)+":"+tmpItem->getText()+":"+prop->outputParas.at(0)->pName+"]";
+            QString newItem = QString(COMBOX_START_FLAG)+":"+tmpItem->getText()+":"+para->pName+"]";
             ui->quoteList->addItem(newItem);
         }
     }
@@ -80,7 +86,11 @@ void MyConditionSetting::addQuote(QListWidgetItem* item)
 //目前暂未添加对表达式结果的验证
 void MyConditionSetting::respConfirmPressed()
 {
-   jprop->express = plainEdit->toPlainText();
+    if(!isEditState)
+    {
+        return;
+    }
+    jprop->express = plainEdit->toPlainText();
 }
 
 MyConditionSetting::~MyConditionSetting()

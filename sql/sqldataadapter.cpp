@@ -65,10 +65,18 @@ bool SQLDataAdapter::getSericeProperties(QString sql, QList<ServiceProperty *> &
         property->servicePath = variant.at(4).toString();
         property->method = variant.at(5).toString();
 
-        Parameter * output = new Parameter;
-        output->pName = variant.at(6).toString();
-        output->pType = variant.at(7).toString();
-        property->outputParas.append(output);
+        QStringList nameList = variant.at(6).toString().split(",");
+        QStringList typeList = variant.at(7).toString().split(",");
+        if(nameList.size() == typeList.size())
+        {
+            for(int i = 0; i< nameList.size(); i++)
+            {
+                Parameter * output = new Parameter;
+                output->pName = nameList.at(i);
+                output->pType = typeList.at(i);
+                property->outputParas.append(output);
+            }
+        }
 
         list.append(property);
     }

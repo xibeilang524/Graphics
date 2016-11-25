@@ -36,8 +36,10 @@
 #define POP_SIMULATE_DIALOG_WIDTH 550       //推演条件编辑框宽高
 #define POP_SIMULATE_DIALOG_HEIGHT 700
 
-#define COMBOX_START_FLAG "[QUOTE"   //属性编辑值下拉框开始标识
-#define COMBOX_LOOP_QUOTE "[QUOTE]"  //循环属性编辑时，引用前面输出的变量
+#define COMBOX_START_FLAG "[Q"   //属性编辑值下拉框开始标识
+#define COMBOX_LOOP_QUOTE "[Q]"  //循环属性编辑时，引用前面输出的变量
+
+#define LOOP_UNTIL_EXPRESS_ILLEGAL "直到引用值不符合条件"   //循环终止条件无需++、--，直到引用值不满足条件
 
 #define COMBOX_STYLESHEET "QComboBox QAbstractItemView::item{height:23px;}\
                             QComboBox QAbstractItemView::item:hover{background-color:#567dbc;}"

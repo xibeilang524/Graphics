@@ -21,6 +21,7 @@
 **             增加推演高亮提示(用于指示当前推演的进度)
 **             增加对循环过程的记录，支持点击右侧记录查看当前循环的值
 **20161123:wey:增加判断框条件的词法分析和逻辑运算
+**             调整服务返回结果，将结果包装成map集合
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -84,7 +85,7 @@ private slots:
     void respItemActivated(QListWidgetItem * current);
     void respItemChanged(QListWidgetItem * current, QListWidgetItem * previous);
     void respItemDoubleClicked(QListWidgetItem * current);
-    void procLastUnitResult(bool hasFault,QString context);
+    void procLastUnitResult(bool hasFault, QMap<QString, QString> result);
     void stopCurrSimulate();
     void chooseRunMethod(bool flag);
     void stepByStep();
@@ -99,7 +100,8 @@ private:
     QString getQuoteOutValue(MyItem * item,QString value);
     bool countJudgeValue(MyItem *item, QString express);
     QString switchQuoteParameter(MyItem *item, QString & express);
-    QString findQuoteResult(MyItem * item,QString quoteName);
+    QString findQuoteResult(MyItem * item, QString quoteServiceName, QString quoteParaName);
+    void showCurrProcessResultPanel(bool isPanelEditable);
 
     Ui::SimulateControlPanel *ui;
 

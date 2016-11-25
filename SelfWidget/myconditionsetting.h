@@ -31,7 +31,7 @@ public:
     explicit MyConditionSetting(QWidget *parent = 0);
     ~MyConditionSetting();
 
-    void setJudgeProp(MyItem *item);
+    void setJudgeProp(MyItem *item, bool isEditable = true);
 
 private slots:
     void addQuote(QListWidgetItem *item);
@@ -43,6 +43,8 @@ private:
     MyPlainTextEdit * plainEdit;
     MyChooseBar * chooseBar;
     JudgeProperty * jprop;
+
+    bool isEditState;               //�Ƿ�Ϊ�ɱ༭״̬
 };
 
 #endif // MYCONDITIONSETTING_H

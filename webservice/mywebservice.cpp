@@ -41,25 +41,30 @@ void MyWebService::replyFinshed(QNetworkReply *reply)
     QTextCodec * codec = QTextCodec::codecForName("utf8");
     QString replyText = codec->toUnicode(reply->readAll());
 
+    QMap<QString,QString> result;
+
     if(code != 200)
     {
-        emit lastUnitProcessOver(true,"执行服务失败!");
+        result.insert("result","执行服务失败!");
+        emit lastUnitProcessOver(true,result);
     }
     else
     {
         bool hasFault = true;
-        QString result = parseResult(replyText,hasFault);
+        result = parseResult(replyText,hasFault);
         emit lastUnitProcessOver(hasFault,result);
     }
     reply->deleteLater();
 }
 
-QString MyWebService::parseResult(QString result,bool & hasFault)
+QMap<QString,QString> MyWebService::parseResult(QString result,bool & hasFault)
 {
     QDomDocument doc;
     doc.setContent(result);
 
     hasFault = true;
+
+    QMap<QString,QString> results;
 
     //是否存在错误
     QDomNodeList nodeList = doc.elementsByTagName("faultstring");
@@ -67,17 +72,38 @@ QString MyWebService::parseResult(QString result,bool & hasFault)
     if(nodeList.size() > 0)
     {
         QDomNode node = nodeList.at(0);
-        return node.toElement().text();
+        results.insert("result",node.toElement().text());
+        return results;
     }
 
     nodeList = doc.elementsByTagName("ns:return");
 
-    if(nodeList.size() > 0 )
+    //输出参数个数为1，将其转换为二维数组
+    if(nodeList.size() == 1)
     {
         hasFault = false;
         QDomNode node = nodeList.at(0);
-        return node.toElement().text();
+        results.insert("result",node.toElement().text());
+        return results;
+    }
+    //输出参数为2维数组,对2维数组进行解析
+    else if(nodeList.size() == 2)
+    {
+        hasFault = false;
+
+        QDomNodeList keyList = nodeList.at(0).toElement().elementsByTagName("ns:array");
+        QDomNodeList valueList = nodeList.at(1).toElement().elementsByTagName("ns:array");
+
+        if(keyList.size() == valueList.size())
+        {
+            for(int i = 0; i < keyList.size(); i++)
+            {
+                QString key = keyList.at(i).toElement().text();
+                QString value = valueList.at(i).toElement().text();
+                results.insert(key,value);
+            }
+        }
     }
 
-    return "";
+    return results;
 }

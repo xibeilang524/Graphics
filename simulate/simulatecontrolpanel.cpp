@@ -59,7 +59,7 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     ui->autoRun->setChecked(true);
     ui->terminalSimulate->setEnabled(false);
 
-    connect(MyWebService::instance(),SIGNAL(lastUnitProcessOver(bool,QString)),this,SLOT(procLastUnitResult(bool,QString)));
+    connect(MyWebService::instance(),SIGNAL(lastUnitProcessOver(bool,QMap<QString,QString>)),this,SLOT(procLastUnitResult(bool,QMap<QString,QString>)));
 }
 
 //自动运行
@@ -191,7 +191,7 @@ void SimulateControlPanel::clearLastSimluteRecord()
 }
 
 //针对当前处理单元返回的结果进行处理
-void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
+void SimulateControlPanel::procLastUnitResult(bool hasFault,QMap<QString,QString> result)
 {
     if(hasFault)
     {
@@ -204,9 +204,16 @@ void SimulateControlPanel::procLastUnitResult(bool hasFault,QString context)
     if(currProcUnit->ptype == PRO_PROCESS)
     {
         ServiceProperty * prop = currProcUnit->item->getServiceProp();
-        Parameter * para = prop->outputParas.at(0);
 
-        para->pValue = context;
+        foreach(Parameter * para,prop->outputParas)
+        {
+            para->pValue = result.value(para->pName);
+        }
+
+        if(!isAutoRun)
+        {
+            showCurrProcessResultPanel(false);
+        }
 
         currProcUnit = currProcUnit->nextChild;
     }
@@ -350,13 +357,13 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
             {
                 ServiceProperty * prop = tmpItem->getServiceProp();
 
-                if(prop->outputParas.size() == 1)
+                foreach(Parameter * outPara,prop->outputParas)
                 {
-                    QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+tmpItem->getText()+":"+prop->outputParas.at(0)->pName;
+                    QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+tmpItem->getText()+":"+outPara->pName;
                     index++;
                     if(newItem == sv->variName)
                     {
-                        sv->initialValue = prop->outputParas.at(0)->pValue.toInt();
+                        sv->initialValue = outPara->pValue.toInt();
                         sv->middlValue = sv->initialValue;
                         sv->isAssignedValue = true;
                         break;
@@ -435,6 +442,10 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
             {
                 sv->middlValue = middval - sv->selfOperateValue;
             }
+            else if(sv->selfOperateSymbol == QString(LOOP_UNTIL_EXPRESS_ILLEGAL))
+            {
+
+            }
         }
     }
 
@@ -471,7 +482,9 @@ void SimulateControlPanel::submitUrl(MyItem * item, ServiceProperty * prop)
         }
     }
 
-//    qDebug()<<fullUrl;
+//    qDebug() <<__FUNCTION__
+//            <<fullUrl
+//            <<"\n";
 
     MyWebService::instance()->submit(fullUrl);
 }
@@ -481,17 +494,23 @@ QString SimulateControlPanel::getQuoteOutValue(MyItem * item,QString value)
 {
    QList<MyItem *> parentItems =  SimulateUtil::instance()->getCurrParentItem(item);
    int pos = value.indexOf("]");
-   int startLen = QString(COMBOX_START_FLAG).size();
-   int parentIndex = value.mid(startLen,pos - startLen).toInt();
+   int colonPos = value.indexOf(":");
 
-   if(parentIndex >= 1 && parentIndex <= parentItems.size())
+   QString quoteParentText = value.mid(pos + 1,colonPos - pos - 1);
+   QString quoteParaText = value.right(value.size() - colonPos -1);
+
+   for(int i = 0; i < parentItems.size() ; i++)
    {
-       ServiceProperty * sp = parentItems.at(parentIndex - 1)->getServiceProp();
-       ParaList out = sp->outputParas;
-
-       if(out.size() > 0 )
+       if(parentItems.at(i)->getText() == quoteParentText)
        {
-           return out.at(0)->pValue;
+           ServiceProperty * prop = parentItems.at(i)->getServiceProp();
+           for(int j = 0; j < prop->outputParas.size(); j++)
+           {
+               if(prop->outputParas.at(j)->pName == quoteParaText)
+               {
+                   return prop->outputParas.at(j)->pValue;
+               }
+           }
        }
    }
 
@@ -607,7 +626,7 @@ void SimulateControlPanel::respItemDoubleClicked(QListWidgetItem *current)
 
     if(citem)
     {
-        MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item,citem->data(Qt::UserRole));
+        MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item,citem->data(Qt::UserRole),false);
     }
 }
 
@@ -678,14 +697,15 @@ bool SimulateControlPanel::countJudgeValue(MyItem * item, QString express)
 QString SimulateControlPanel::switchQuoteParameter(MyItem * item,QString & express)
 {
     QString finalResult = express;
-    QRegExp exp("(\\[([a-zA-Z]+):(\\d{1}):([a-zA-Z]+)\\])");
+    QRegExp exp("(\\[([a-zA-Z]+):(\\w+):(\\w+)\\])");
 
     QList<QString> quoteResults;
     int pos = 0;
     while((pos = exp.indexIn(express,pos))>=0)
     {
-        QString quoteName = exp.cap(3);
-        QString result = findQuoteResult(item,quoteName);
+        QString quoteServiceName = exp.cap(3);
+        QString quoteParaName = exp.cap(4);
+        QString result = findQuoteResult(item,quoteServiceName,quoteParaName);
         quoteResults.append(result);
         pos += exp.matchedLength();
     }
@@ -703,21 +723,36 @@ QString SimulateControlPanel::switchQuoteParameter(MyItem * item,QString & expre
 }
 
 //针对引用的名称，查找其对应的输出结果值
-QString SimulateControlPanel::findQuoteResult(MyItem * item,QString quoteName)
+QString SimulateControlPanel::findQuoteResult(MyItem * item,QString quoteServiceName,QString quoteParaName)
 {
     QList<MyItem *> parentItems =  SimulateUtil::instance()->getCurrParentItem(item);
     foreach(MyItem * item,parentItems)
     {
-        if(item->getText() == quoteName)
+        if(item->getText() == quoteServiceName)
         {
             ParaList out = item->getServiceProp()->outputParas;
-            if(out.size() > 0 )
+
+            foreach(Parameter * para,out)
             {
-                return out.at(0)->pValue;
+                if(para->pName == quoteParaName)
+                {
+                    return para->pValue;
+                }
             }
         }
     }
     return "0";
+}
+
+//显示当前处理单元的控制面板
+void SimulateControlPanel::showCurrProcessResultPanel(bool isPanelEditable)
+{
+    if(ui->simProcedure->count() > 0)
+    {
+        QListWidgetItem  * lastItem = ui->simProcedure->item(ui->simProcedure->count() - 1);
+        MyListWidgetItem * citem = dynamic_cast<MyListWidgetItem *>(lastItem);
+        MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item,citem->data(Qt::UserRole),isPanelEditable);
+    }
 }
 
 SimulateControlPanel::~SimulateControlPanel()

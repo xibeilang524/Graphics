@@ -24,14 +24,17 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
 
     isComboxAutoChanged = false;
 
-    setGeometry((ScreenWidth - POP_SIMULATE_DIALOG_WIDTH)/2,(ScreenHeight - POP_SIMULATE_DIALOG_HEIGHT)/2,POP_SIMULATE_DIALOG_WIDTH,POP_SIMULATE_DIALOG_HEIGHT);
+    int width = POP_SIMULATE_DIALOG_WIDTH + 100;
 
-    inputTableView = new ServiceInputTableView(0,4);
+    setGeometry((ScreenWidth - width)/2,(ScreenHeight - POP_SIMULATE_DIALOG_HEIGHT)/2,width,POP_SIMULATE_DIALOG_HEIGHT);
 
-    outputTableView = new ServiceInputTableView(0,4);
+    inputTableView = new ServiceInputTableView(0,3);
+
+    outputTableView = new ServiceInputTableView(0,3);
     outputTableView->delegate()->setColumnState(false);
 
     ui->serviceName->setView(new QListView());
+    ui->quoteTable->setSelectionBehavior(QAbstractItemView::SelectRows);
 
     chooseBar = new MyChooseBar(ui->widget_2);
     chooseBar->setParetWidget(this);
@@ -58,11 +61,14 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
 }
 
 //初始显示信息,先依照全局的服务信息添加下拉列表；然后根据当前控件是否已经添加服务再设定下拉列表索引
-void MyPropertyEdit::initProp(ServiceProperty *prop)
+void MyPropertyEdit::initProp(ServiceProperty *prop,bool isEditable)
 {
     currItemProp = prop;
 
-    isComboxAutoChanged = true;
+    isEditState = isEditable;
+    ui->serviceName->setEnabled(isEditable);
+    inputTableView->setEnabled(isEditable);
+    outputTableView->setEnabled(isEditable);
 
     initServiceData();
 
@@ -71,10 +77,11 @@ void MyPropertyEdit::initProp(ServiceProperty *prop)
         inputTableView->clearTable();
         outputTableView->clearTable();
 
-
+        isComboxAutoChanged = true;
 
         inputTableView->model()->setPara(prop->inputParas);
         outputTableView->model()->setPara(prop->outputParas);
+
 
         int index = -1;
         for(int i = 0;i<GlobalServiceProperties.size();i++)
@@ -134,9 +141,9 @@ void MyPropertyEdit::switchServiceInfo(int index)
         }
 
         outputTableView->clearTable();
-        if(prop->outputParas.size() > 0)
+        for(int i = 0;i<prop->outputParas.size(); i++)
         {
-            outputTableView->insertRow(prop->outputParas.at(0));
+            outputTableView->insertRow(prop->outputParas.at(i));
         }
     }
 }
@@ -146,33 +153,103 @@ void MyPropertyEdit::confirmPropety()
 {
     MY_ASSERT(currItemProp)
 
+    if(!isEditState)
+    {
+        return;
+    }
+
     currItemProp->hasSettInfo = true;
     currItemProp->serviceName = ui->serviceName->currentText();
     currItemProp->status = ui->serviceState->text();
     currItemProp->descirption = ui->serviceDesc->text();
     currItemProp->servicePath = ui->servicePath->text();
     currItemProp->method = ui->servicePort->text();
-    currItemProp->inputParas = inputTableView->model()->getPara();
-    currItemProp->outputParas = outputTableView->model()->getPara();
+
+    foreach(Parameter * para,currItemProp->inputParas)
+    {
+        delete para;
+    }
+    currItemProp->inputParas.clear();
+
+    foreach(Parameter * para,currItemProp->outputParas)
+    {
+        delete para;
+    }
+    currItemProp->outputParas.clear();
+
+    foreach(Parameter * para,inputTableView->model()->getPara())
+    {
+        Parameter * pp = new Parameter;
+        pp->pId = para->pId;
+        pp->pName = para->pName;
+        pp->pValue = para->pValue;
+        pp->pType = para->pType;
+        pp->pRemark = para->pRemark;
+        currItemProp->inputParas.append(pp);
+    }
+
+    foreach(Parameter * para,outputTableView->model()->getPara())
+    {
+        Parameter * pp = new Parameter;
+        pp->pId = para->pId;
+        pp->pName = para->pName;
+        pp->pValue = para->pValue;
+        pp->pType = para->pType;
+        pp->pRemark = para->pRemark;
+        currItemProp->outputParas.append(pp);
+    }
 }
 
-//更新代理下拉列表显示引单的列表
+/*!
+  更新代理下拉列表显示引单的列表
+  【20161125】修改成只引用上一个服务
+*/
 void MyPropertyEdit::updateDelegateList(QList<MyItem *> pItems)
 {
     QStringList list;
     int index = 1;
-    foreach(MyItem * item,pItems)
+
+    if(pItems.size() >= 1)
     {
-        ServiceProperty * prop = item->getServiceProp();
-        if(prop->outputParas.size() == 1)
+        ServiceProperty * prop = pItems.at(0)->getServiceProp();
+        foreach(Parameter * para,prop->outputParas)
         {
-            QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+item->getText()+":"+prop->outputParas.at(0)->pName;
+            QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+pItems.at(0)->getText()+":"+para->pName;
             list<<newItem;
             index++;
         }
     }
 
     inputTableView->delegate()->updateStringList(list);
+    updateLeftQuoteTable(pItems);
+}
+
+//更新左侧表格引用列表信息
+void MyPropertyEdit::updateLeftQuoteTable(QList<MyItem *> & pItems)
+{
+    Util::removeTableItem(ui->quoteTable);
+
+    if(pItems.size() >= 1)
+    {
+        ServiceProperty * prop = pItems.at(0)->getServiceProp();
+        Util::createTableItem(prop->outputParas.size(),ui->quoteTable);
+        for(int i = 0 ;i < prop->outputParas.size() ;i++)
+        {
+            Parameter * para = prop->outputParas.at(i);
+            ui->quoteTable->item(i,0)->setText(para->pName);
+            ui->quoteTable->item(i,0)->setToolTip(para->pName);
+            ui->quoteTable->item(i,1)->setText(para->pType);
+            ui->quoteTable->item(i,1)->setToolTip(para->pType);
+        }
+    }
+    else
+    {
+        Util::createTableItem(1,ui->quoteTable);
+        ui->quoteTable->item(0,0)->setText("无");
+        ui->quoteTable->item(0,1)->setToolTip("无");
+        ui->quoteTable->item(0,0)->setText("无");
+        ui->quoteTable->item(0,1)->setToolTip("无");
+    }
 }
 
 MyPropertyEdit::~MyPropertyEdit()

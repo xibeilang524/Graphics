@@ -805,6 +805,7 @@ bool SimulateUtil::parseText(QString text,QStringList & result)
     {
         return false;
     }
+
     return true;
 }
 

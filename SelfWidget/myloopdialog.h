@@ -30,7 +30,7 @@ public:
     explicit MyLoopDialog(QWidget *parent = 0);
     ~MyLoopDialog();
 
-    void setLoopItemProp(LoopProperty * prop, QVariant userRoleData);
+    void setLoopItemProp(LoopProperty * prop, QVariant userRoleData, bool isEditable = true);
 
 private slots:
     void respButtYesPress();
@@ -46,6 +46,8 @@ private:
 
     LoopProperty * loopProp;
     MyChooseBar * chooseBar;
+
+    bool isEditState;           //ÊÇ·ñÎª±à¼­×´Ì¬
 };
 
 #endif // MYLOOPDIALOG_H

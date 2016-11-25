@@ -35,11 +35,12 @@ ParameterDefineTableView::ParameterDefineTableView(LoopPart loopPart, int row, i
 
     if(loopPart == LOOP_VARI)
     {
-        view->resizeSection(1,200);
+        view->resizeSection(1,180);
     }
     else
     {
-        view->resizeSection(0,200);
+        view->resizeSection(0,180);
+        view->resizeSection(1,120);
     }
 
     initContextMenu();

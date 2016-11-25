@@ -117,6 +117,10 @@ QVariant ParameterDefineModel::data(const QModelIndex &index, int role) const
                       color.setRgb(255,0,0);
                       return color;
                   }
+        case Qt::TextAlignmentRole:
+                  {
+                      return Qt::AlignCenter;
+                  }
         default:
              break;
     }
@@ -179,6 +183,14 @@ bool ParameterDefineModel::setData(const QModelIndex &index, const QVariant &val
             {
                 case 0:
                        paraList.at(index.row())->type = value.toString();
+                       if(value.toString() == QString(COMBOX_LOOP_QUOTE))
+                       {
+                           if(!paraList.at(index.row())->name.startsWith(COMBOX_START_FLAG))
+                           {
+                               paraList.at(index.row())->name = "";
+                           }
+                           paraList.at(index.row())->value = "";
+                       }
                        break;
                 case 1:
                        paraList.at(index.row())->name = value.toString();
@@ -236,6 +248,7 @@ bool ParameterDefineModel::setData(const QModelIndex &index, const QVariant &val
         }
         return true;
     }
+
     return false;
 }
 

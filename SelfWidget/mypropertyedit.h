@@ -7,6 +7,8 @@
 **
 **修改历史:
 **20160120:wey:修改服务的属性信息，增加从数据库读取信息
+**20161123:wey:调整服务引用由一个输出至可引用多个输出中的一个
+**20161125:wey:调整输出参数自动解析，支持多个参数输出。
 *************************************************/
 #ifndef MYPROPERTYEDIT_H
 #define MYPROPERTYEDIT_H
@@ -30,7 +32,7 @@ public:
     explicit MyPropertyEdit(QWidget *parent = 0);
     ~MyPropertyEdit();
 
-    void initProp(ServiceProperty * prop);
+    void initProp(ServiceProperty * prop, bool isEditable = true);
     void updateDelegateList(QList<MyItem *> pItems);
 
 private slots:
@@ -39,6 +41,7 @@ private slots:
     
 private:
     void initServiceData();
+    void updateLeftQuoteTable(QList<MyItem *> & pItems);
 
     Ui::MyPropertyEdit *ui;
 
@@ -49,6 +52,7 @@ private:
 
     bool isComboxAutoChanged;               //下拉框如果自动改变，则无需响应槽函数
     MyChooseBar * chooseBar;
+    bool isEditState;                       //是否为编辑状态
 };
 
 #endif // MYPROPERTYEDIT_H
