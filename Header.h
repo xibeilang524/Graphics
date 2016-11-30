@@ -15,7 +15,7 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#define M_VERTION 0x000A        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
+#define M_VERTION 0x000B        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
 #define M_AUTHOR "南京仁谷系统集成有限公司"
 
 //用于控制是否需要加入状态机模块，如果不需要，将此宏取消定义

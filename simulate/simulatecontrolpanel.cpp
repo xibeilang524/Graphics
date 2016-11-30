@@ -318,6 +318,20 @@ void SimulateControlPanel::startProcUnit()
                 currProcUnit = currProcUnit->noChild;
             }
         }
+        //平行四边形输入输出框
+        else if(currProcUnit->ptype == PRO_INPUT)
+        {
+            JudgeProperty * jprop = currProcUnit->item->getJudegeProp();
+            QString switchResult = switchQuoteParameter(currProcUnit->item,jprop->express);
+            currProcUnit->item->getJudegeProp()->switchExpress = switchResult;
+
+            if(!isAutoRun)
+            {
+                showCurrProcessResultPanel(false);
+            }
+
+            currProcUnit = currProcUnit->nextChild;
+        }
         //结束
         else if(currProcUnit->ptype == PRO_END)
         {
@@ -670,10 +684,6 @@ bool SimulateControlPanel::countJudgeValue(MyItem * item, QString express)
     //【1】
     QString switchResult = switchQuoteParameter(item,express);
     item->getJudegeProp()->switchExpress = switchResult;
-
-    qDebug() <<__FUNCTION__
-            <<switchResult<<"++++++++++"<<express
-            <<"\n";
 
     //【2】：无
 

@@ -2,7 +2,6 @@
 #include "ui_myloopdialog.h"
 
 #include "../global.h"
-#include "../Header.h"
 #include "../modelview/parameterdefinetableview.h"
 #include "../modelview/parameterdefinemodel.h"
 #include "../modelview/parameterdefinedelegate.h"

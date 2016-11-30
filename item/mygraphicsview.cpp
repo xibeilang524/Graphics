@@ -24,6 +24,7 @@
 #include "../SelfWidget/mystatestartdialog.h"
 #include "../SelfWidget/mypageswitch.h"
 #include "../SelfWidget/myloopdialog.h"
+#include "../SelfWidget/myoutputdialog.h"
 #include "../simulate/simulateutil.h"
 #include "../Header.h"
 #include "../global.h"
@@ -1188,6 +1189,12 @@ void MyGraphicsView::showSelectedItemPropEdit(MyItem * item, QVariant userRoleDa
             dialog.setLoopItemProp(item->getLoopProp(),userRoleData,isPanelEditable);
             dialog.exec();
         }
+    }
+    else if(type == GRA_PARALLELOGRAM)
+    {
+        MyOutputDialog dialog(this);
+        dialog.setOutput(item,isPanelEditable);
+        dialog.exec();
     }
     else
     {

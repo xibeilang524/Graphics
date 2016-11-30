@@ -329,7 +329,7 @@ QDataStream & operator <<(QDataStream &stream,MyItem * item)
     {
         stream<<item->getServiceProp();
     }
-    else if(item->getProperty().ptype == PRO_JUDGE)
+    else if(item->getProperty().ptype == PRO_JUDGE || item->getProperty().ptype == PRO_INPUT)
     {
         stream<<item->getJudegeProp();
     }
@@ -368,7 +368,7 @@ QDataStream & operator >>(QDataStream &stream,MyItem * item)
 
         delete lprop;
     }
-    else if(prop.ptype == PRO_JUDGE)
+    else if(prop.ptype == PRO_JUDGE || prop.ptype == PRO_INPUT)
     {
         JudgeProperty * jprop = new JudgeProperty;
         stream>>jprop;

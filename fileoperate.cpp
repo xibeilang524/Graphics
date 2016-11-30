@@ -156,7 +156,7 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
             {
                 stream>>(info->loopProp);
             }
-            else if(info->itemProperty.ptype == PRO_JUDGE)
+            else if(info->itemProperty.ptype == PRO_JUDGE || info->itemProperty.ptype == PRO_INPUT)
             {
                 stream>>(info->judgeProp);
             }

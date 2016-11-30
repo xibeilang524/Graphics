@@ -322,7 +322,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
         {
             item->setLoopProp(cutInfo.loopProp);
         }
-        else if(cutInfo.itemProperty.ptype == PRO_JUDGE)
+        else if(cutInfo.itemProperty.ptype == PRO_JUDGE || cutInfo.itemProperty.ptype == PRO_INPUT)
         {
             item->setJudgeProp(cutInfo.judgeProp);
         }
