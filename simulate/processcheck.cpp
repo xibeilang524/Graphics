@@ -83,7 +83,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
 
         QList<MyArrow *> arrows = currItem->getArrows();
 
-//        qDebug()<< currItem->getText();
+        qDebug()<< currItem->getText();
 
         //开始点
         if(currItem == startItem)
@@ -414,7 +414,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                 }
             }
             //[1个输入(判断)/2个输入(循环)，2个输出]
-            //在作为dowhile循环时，可能会出现与if条件功能重合现象，因此要先一步判断【是】的分支是否指向前面产生的doWhileRects
+            //在作为dowhile循环时，可能会出现与if条件功能重合现象，因此要先一步判断【是/否】的分支是否指向前面产生的doWhileRects
             else if(gtype == GRA_POLYGON)
             {
                 if(inNum !=2 || outNum < 1)
@@ -431,14 +431,22 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     return FLOW_ERROR;
                 }
 
-                bool isYesItemProcced = false;
+                bool isYesItemProcced = false;     //yes分支是否指向了前面，如果为yes，则认定为dowhile循环
+                bool isLoopYes = true;             //dowhile循环时，默认为yes分支循环，支持no分支循环【20161130】
                 ProcessUnit * yesProcessUnit = NULL;
 
-                //如果yes分支指向的rect在之前的doWhileRects存在，避免无限循环
+                //如果yes/no分支指向的rect在之前的doWhileRects存在，避免无限循环
                 foreach(ProcessUnit * unit,doWhileRects)
                 {
-                    if(unit->item == yesItem)
+                    if(unit->item == yesItem )
                     {
+                        isYesItemProcced = true;
+                        yesProcessUnit = unit;
+                        break;
+                    }
+                    else if(unit->item == noItem)
+                    {
+                        isLoopYes = false;
                         isYesItemProcced = true;
                         yesProcessUnit = unit;
                         break;

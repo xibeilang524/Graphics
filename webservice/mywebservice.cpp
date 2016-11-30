@@ -5,6 +5,7 @@
 #include <QNetworkReply>
 #include <QTextCodec>
 #include <QDomDocument>
+#include <QStringList>
 #include <QDebug>
 
 MyWebService * MyWebService::service = NULL;
@@ -57,6 +58,8 @@ void MyWebService::replyFinshed(QNetworkReply *reply)
     reply->deleteLater();
 }
 
+//【20161130】目前服务的输出结果格式存在多种情况，但基本还是满足在有二维数组时，第1行表示变量名，第二行表示变量值
+//此时也会出现变量名的集合和变量值的集合不一致，如果变量值集合的长度小于变量名集合长度，变量名对应不存在部分需要填空
 QMap<QString,QString> MyWebService::parseResult(QString result,bool & hasFault)
 {
     QDomDocument doc;
@@ -94,14 +97,39 @@ QMap<QString,QString> MyWebService::parseResult(QString result,bool & hasFault)
         QDomNodeList keyList = nodeList.at(0).toElement().elementsByTagName("ns:array");
         QDomNodeList valueList = nodeList.at(1).toElement().elementsByTagName("ns:array");
 
-        if(keyList.size() == valueList.size())
+        /*<ns:return>
+          <ns:array>结果</ns:array><ns:array>发现目标</ns:array><ns:array>飞机纬度</ns:array>
+          <ns:array>飞机经度</ns:array><ns:array>飞机高度</ns:array><ns:array>飞机数量</ns:array>
+          </ns:return>
+        */
+        if(keyList.size() > 1)
         {
             for(int i = 0; i < keyList.size(); i++)
             {
                 QString key = keyList.at(i).toElement().text();
-                QString value = valueList.at(i).toElement().text();
+                QString value = "";
+                if(i < valueList.size())
+                {
+                    value = valueList.at(i).toElement().text();
+                }
+
                 results.insert(key,value);
             }
+        }
+        //输出变量名格式：<ns:array>纬度，经度，海拔，速度，架数</ns:array>
+        else if(keyList.size() == 1 && valueList.size() > 0)
+        {
+           QString varName =  keyList.at(0).toElement().text();
+           QStringList varList = varName.split("，");
+
+           if(varList.size() == valueList.size())
+           {
+               for(int i = 0; i < varList.size(); i++)
+               {
+                   QString value = valueList.at(i).toElement().text();
+                   results.insert(varList.at(i),value);
+               }
+           }
         }
     }
 

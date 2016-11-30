@@ -82,7 +82,6 @@ void MyPropertyEdit::initProp(ServiceProperty *prop,bool isEditable)
         inputTableView->model()->setPara(prop->inputParas);
         outputTableView->model()->setPara(prop->outputParas);
 
-
         int index = -1;
         for(int i = 0;i<GlobalServiceProperties.size();i++)
         {
@@ -203,6 +202,7 @@ void MyPropertyEdit::confirmPropety()
 /*!
   更新代理下拉列表显示引单的列表
   【20161125】修改成只引用上一个服务
+  【20161130】取消只引用上一个服务
 */
 void MyPropertyEdit::updateDelegateList(QList<MyItem *> pItems)
 {
@@ -211,12 +211,15 @@ void MyPropertyEdit::updateDelegateList(QList<MyItem *> pItems)
 
     if(pItems.size() >= 1)
     {
-        ServiceProperty * prop = pItems.at(0)->getServiceProp();
-        foreach(Parameter * para,prop->outputParas)
+        foreach(MyItem * tmpItem,pItems)
         {
-            QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+pItems.at(0)->getText()+":"+para->pName;
-            list<<newItem;
-            index++;
+            ServiceProperty * prop = tmpItem->getServiceProp();
+            foreach(Parameter * para,prop->outputParas)
+            {
+                QString newItem = QString(COMBOX_START_FLAG)+QString::number(index)+"]"+tmpItem->getText()+":"+para->pName;
+                list<<newItem;
+                index++;
+            }
         }
     }
 

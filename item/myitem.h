@@ -81,7 +81,7 @@ public:
     QString getText();
     void setText(QString text);
 
-    void setProcessType(ProcessType ptype){qDebug()<<ptype<<"+++"; this->property.ptype = ptype;}
+    void setProcessType(ProcessType ptype){this->property.ptype = ptype;}
     ProcessType getProcessType(){return this->property.ptype;}
 
     const QList<MyNodePort *> & getNodePorts(){return this->ports;}

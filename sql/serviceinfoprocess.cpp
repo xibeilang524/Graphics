@@ -57,12 +57,15 @@ bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty *> &properties
             {
                   foreach(Parameter para,paras)
                   {
-                       Parameter * p = new Parameter;
-                       p->pId = para.pId;
-                       p->pName = para.pName;
-                       p->pType = para.pType;
-                       p->pRemark = para.pRemark;
-                       prop->inputParas.append(p);
+                    if(para.pId.size() > 0)
+                    {
+                        Parameter * p = new Parameter;
+                        p->pId = para.pId;
+                        p->pName = para.pName;
+                        p->pType = para.pType;
+                        p->pRemark = para.pRemark;
+                        prop->inputParas.append(p);
+                    }
                   }
             }
         }

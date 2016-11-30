@@ -13,6 +13,7 @@
 **20161027:wey:修复因多个判断未完全处理结束而导致流程自动退出
 **20161104:wey:添加对for和while循环的支持【！！！】
 **20161106:wey:添加对doWhile循环的支持【！！doWhile循环和是否判断会重合】
+**20161130:wey:【！！未修复】发现dowhile循环时no分支作为循环体导致无限循环,PolygonDesc增加isLoopYes字段描述
 *************************************************/
 #ifndef PROCESSCHECK_H
 #define PROCESSCHECK_H
@@ -25,7 +26,7 @@ class MyArrow;
 class ProcessCheck
 {
 public:
-    //用于记录推演过程中遇到的判断框
+    //用于记录推演过程中遇到的判断框(和循环框复用)
     struct PolygonDesc
     {
         PolygonDesc()
@@ -34,6 +35,7 @@ public:
             isProcRight = false;
             isLeftOver = false;
             isRightOver = false;
+            isLoopYes = true;
             currItem = NULL;
             leftItem = NULL;
             rightItem = NULL;
@@ -50,6 +52,7 @@ public:
         MyItem * currItem;                   //当前指向的控件
         MyItem * leftItem;                   //当前左控件
         MyItem * rightItem;                  //当前右控件
+        bool isLoopYes;                      //在作为循环框时，表示yes分支作为循环条件，还是no分支作为循环。默认为yes
         PolygonDesc * leftChild;             //左子树直属判断框
         PolygonDesc * rightChild;            //右子树直属判断框
         PolygonDesc * parent;                //父框

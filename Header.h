@@ -597,7 +597,7 @@ struct ProcessUnit
     MyItem * item;                   //处理单元对应的控件Item
     ProcessUnit * nextChild;         //非判断框下，指向后面索引
     ProcessUnit * yesChild;          //判断框状态下，yes和no child启用
-    ProcessUnit * noChild;           //
+    ProcessUnit * noChild;
 };
 
 #ifdef ADD_STATE_MODEL
