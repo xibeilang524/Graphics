@@ -82,6 +82,7 @@ const char HIDE_SIMULATE_ID[] = "Constants.HideSimulate";
 const char HIDE_WORKSPACE_ID[] = "Constants.HideWorkspace";
 
 //¡¾°ïÖú¡¿
+const char ASSISANT_KEY_LIST[] = "Constants.AssisantKeyList";
 const char TEC_SUPPORT_ID[] = "Constants.TecSupport";
 const char ABOUT_ID[] = "Constants.About";
 

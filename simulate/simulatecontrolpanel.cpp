@@ -363,8 +363,8 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
     //判断循环条件中是否包含引用，如果包含则需要对引用的值进行获取
     foreach(SignalVari * sv,loopList)
     {
-        if(sv->isQuoted && !sv->isAssignedValue)
-        {
+//        if(sv->isQuoted && !sv->isAssignedValue)
+//        {
             QList<MyItem *> pItems = SimulateUtil::instance()->getCurrParentItem(item);
             int index = 1;
             foreach(MyItem * tmpItem,pItems)
@@ -383,7 +383,7 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
                         break;
                     }
                 }
-            }
+//            }
         }
     }
 
@@ -422,6 +422,7 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
         {
             if(sv->middlValue == sv->finalValue)
             {
+
                 finalResult = true;
             }
         }
@@ -458,7 +459,6 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
             }
             else if(sv->selfOperateSymbol == QString(LOOP_UNTIL_EXPRESS_ILLEGAL))
             {
-
             }
         }
     }
@@ -640,7 +640,7 @@ void SimulateControlPanel::respItemDoubleClicked(QListWidgetItem *current)
 
     if(citem)
     {
-        MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item,citem->data(Qt::UserRole),false);
+        MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item,citem->data(Qt::UserRole),true);
     }
 }
 

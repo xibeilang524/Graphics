@@ -24,6 +24,7 @@
 #include "./SelfWidget/mypageswitch.h"
 #include "./SelfWidget/serviceview.h"
 #include "./SelfWidget/aboutsoft.h"
+#include "./SelfWidget/myshortkey.h"
 #include "./manager/mylinecombobox.h"
 #include "./simulate/simulatecontrolpanel.h"
 #include "./project/myprowizard.h"
@@ -92,18 +93,22 @@ void MainWindow::createActionAndMenus()
     MyAction * newFileAction = ActionManager::instance()->crateAction(Constants::FILE_ID,QIcon(":/images/new.png"),"新建工作区");
     newFileAction->setShortcut(QKeySequence("Ctrl+N"));
     ActionManager::instance()->registerAction(newFileAction,MyPageSwitch::instance(),SLOT(addPage()));
+    GlobalKeyMap.insert(newFileAction->shortcut().toString(),newFileAction->text());
 
     MyAction * saveAction = ActionManager::instance()->crateAction(Constants::SAVE_ID,QIcon(":/images/save.png"),"保存");
     saveAction->setShortcut(QKeySequence("Ctrl+S"));
     ActionManager::instance()->registerAction(saveAction,MyGraphicsView::instance(),SLOT(fileSave()));
+    GlobalKeyMap.insert(saveAction->shortcut().toString(),"保存");
 
     MyAction * saveAsAction = ActionManager::instance()->crateAction(Constants::SAVE_AS_ID,QIcon(""),"另存为");
     saveAsAction->setShortcut(QKeySequence("Ctrl+Shift+S"));
     ActionManager::instance()->registerAction(saveAsAction,MyGraphicsView::instance(),SLOT(fileSaveAs()));
+    GlobalKeyMap.insert(saveAsAction->shortcut().toString(),saveAsAction->text());
 
     MyAction * openAction = ActionManager::instance()->crateAction(Constants::OPEN_ID,QIcon(":/images/open.png"),"打开");
     openAction->setShortcut(QKeySequence("Ctrl+O"));
     ActionManager::instance()->registerAction(openAction,this,SLOT(fileOpen()));
+    GlobalKeyMap.insert(openAction->shortcut().toString(),"打开本地");
 
     MyAction * clearAction = ActionManager::instance()->crateAction(Constants::CLEAR_ID,QIcon(":/images/clear.png"),"清空");
     ActionManager::instance()->registerAction(clearAction,this,SLOT(fileClear()));
@@ -111,6 +116,7 @@ void MainWindow::createActionAndMenus()
     MyAction * exitAction = ActionManager::instance()->crateAction(Constants::EXIT_ID,"退出");
     exitAction->setShortcut(QKeySequence("Ctrl+Q"));
     ActionManager::instance()->registerAction(exitAction,this,SLOT(close()));
+    GlobalKeyMap.insert(exitAction->shortcut().toString(),exitAction->text());
 
     MyMenu * fileMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_FILE_MENU,QString("文件(&F)"));
     menuBar()->addMenu(fileMenu);
@@ -127,24 +133,29 @@ void MainWindow::createActionAndMenus()
     MyAction * undoAction = ActionManager::instance()->crateAction(Constants::UNDO_ID,QIcon(":/images/undo.png"),"撤销");
     ActionManager::instance()->registerAction(undoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
     undoAction->setShortcut(QKeySequence("Ctrl+Z"));
+    GlobalKeyMap.insert(undoAction->shortcut().toString(),undoAction->text());
     undoAction->setEnabled(false);
 
     MyAction * redoAction = ActionManager::instance()->crateAction(Constants::REDO_ID,QIcon(":/images/redo.png"),"重做");
     ActionManager::instance()->registerAction(redoAction,MyGraphicsView::instance(),SLOT(undoAndRedoItem()));
     redoAction->setShortcut(QKeySequence("Ctrl+Y"));
+    GlobalKeyMap.insert(redoAction->shortcut().toString(),redoAction->text());
     redoAction->setEnabled(false);
 
     MyAction * cutAction = ActionManager::instance()->crateAction(Constants::CUT_ID,QIcon(":/images/cut.png"),"剪切");
     cutAction->setShortcut(QKeySequence("Ctrl+X"));
     ActionManager::instance()->registerAction(cutAction,MyGraphicsView::instance(),SLOT(cutItem()));
+    GlobalKeyMap.insert(cutAction->shortcut().toString(),cutAction->text());
 
     MyAction * copyAction = ActionManager::instance()->crateAction(Constants::COPY_ID,QIcon(":/images/copy.png"),"复制");
     copyAction->setShortcut(QKeySequence("Ctrl+C"));
     ActionManager::instance()->registerAction(copyAction,MyGraphicsView::instance(),SLOT(copyItem()));
+    GlobalKeyMap.insert(copyAction->shortcut().toString(),copyAction->text());
 
     MyAction * pasteAction = ActionManager::instance()->crateAction(Constants::PASTE_ID,QIcon(":/images/paste.png"),"粘贴");
     pasteAction->setShortcut(QKeySequence("Ctrl+V"));
     ActionManager::instance()->registerAction(pasteAction,MyGraphicsView::instance(),SLOT(pasteItem()));
+    GlobalKeyMap.insert(pasteAction->shortcut().toString(),pasteAction->text());
 
     MyAction * clearPasteAction = ActionManager::instance()->crateAction(Constants::CLEAR_PASTE_ID,QIcon(":/images/clearPaste.png"),"清空剪切板");
     ActionManager::instance()->registerAction(clearPasteAction,MyGraphicsView::instance(),SLOT(clearPasteItem()));
@@ -165,22 +176,27 @@ void MainWindow::createActionAndMenus()
     MyAction * lockAction = ActionManager::instance()->crateAction(Constants::LOCK_ID,QIcon(":/images/lock.png"),"锁定");
     lockAction->setShortcut(QKeySequence("Ctrl+L"));
     ActionManager::instance()->registerAction(lockAction,MyGraphicsView::instance(),SLOT(lockAndunlockItem()));
+    GlobalKeyMap.insert(lockAction->shortcut().toString(),lockAction->text());
 
     MyAction * unlockAction = ActionManager::instance()->crateAction(Constants::UNLOCK_ID,QIcon(":/images/unlock.png"),"解锁");
     unlockAction->setShortcut(QKeySequence("Ctrl+Shift+L"));
     ActionManager::instance()->registerAction(unlockAction,MyGraphicsView::instance(),SLOT(lockAndunlockItem()));
+    GlobalKeyMap.insert(unlockAction->shortcut().toString(),unlockAction->text());
 
     MyAction * deleteAction = ActionManager::instance()->crateAction(Constants::DELETE_ID,QIcon(":/images/delete.png"),"删除");
     ActionManager::instance()->registerAction(deleteAction,MyGraphicsView::instance(),SLOT(deleteItem()));
     deleteAction->setShortcut(QKeySequence("Delete"));
+    GlobalKeyMap.insert(deleteAction->shortcut().toString(),deleteAction->text());
 
     MyAction * editTextAction = ActionManager::instance()->crateAction(Constants::EDIT_TEXT_ID,QIcon(":/images/editText.png"),"编辑名称");
     editTextAction->setShortcut(QKeySequence("Ctrl+T"));
     ActionManager::instance()->registerAction(editTextAction,MyGraphicsView::instance(),SLOT(respEditText()));
+    GlobalKeyMap.insert(editTextAction->shortcut().toString(),editTextAction->text());
 
     MyAction * propertyEditAction = ActionManager::instance()->crateAction(Constants::PROPERTY_EDIT_ID,QIcon(":/images/editProp.png"),"编辑服务");
     propertyEditAction->setShortcut(QKeySequence("Ctrl+E"));
     ActionManager::instance()->registerAction(propertyEditAction,MyGraphicsView::instance(),SLOT(editPropertyItem()));
+    GlobalKeyMap.insert(propertyEditAction->shortcut().toString(),propertyEditAction->text());
 
     MyMenu * editMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_EDIT_MENU,QString("编辑(&E)"));
     menuBar()->addMenu(editMenu);
@@ -241,10 +257,12 @@ void MainWindow::createActionAndMenus()
     MyAction * buildModelAction = ActionManager::instance()->crateAction(Constants::BUILD_MODEL_ID,QIcon(":/images/buildmodel.png"),"建模");
     buildModelAction->setShortcut(QKeySequence("Ctrl+M"));
     ActionManager::instance()->registerAction(buildModelAction,this,SLOT(switchWorkModel()),true);
+    GlobalKeyMap.insert(buildModelAction->shortcut().toString(),"切换至建模模式");
 
     MyAction *simulateAction = ActionManager::instance()->crateAction(Constants::SIMLUATE_ID,QIcon(":/images/simulate.png"),"推演");
     simulateAction->setShortcut(QKeySequence("Ctrl+Shift+M"));
     ActionManager::instance()->registerAction(simulateAction,this,SLOT(switchWorkModel()),true);
+    GlobalKeyMap.insert(simulateAction->shortcut().toString(),"切换至推演模式");
 
     workModelGroup = new QActionGroup(this);
     workModelGroup->addAction(buildModelAction);
@@ -254,18 +272,22 @@ void MainWindow::createActionAndMenus()
     MyAction * fullScreenAction = ActionManager::instance()->crateAction(Constants::FULL_SCREEN_ID,QIcon(":/images/fullscreen.png"),"全屏");
     fullScreenAction->setShortcut(QKeySequence("Ctrl+Shift+F11"));
     ActionManager::instance()->registerAction(fullScreenAction,this,SLOT(switchFullScreen()));
+    GlobalKeyMap.insert(fullScreenAction->shortcut().toString(),fullScreenAction->text());
 
     MyAction * hideIconAction = ActionManager::instance()->crateAction(Constants::HIDE_ICON_ID,QIcon(""),"隐藏控件区");
     hideIconAction->setShortcut(QKeySequence("Alt+L"));
     ActionManager::instance()->registerAction(hideIconAction,this,SLOT(hideSubWidget()));
+    GlobalKeyMap.insert(hideIconAction->shortcut().toString(),hideIconAction->text());
 
     MyAction * hideToolAction = ActionManager::instance()->crateAction(Constants::HIDE_TOOL_ID,QIcon(""),"隐藏属性编辑区");
     hideToolAction->setShortcut(QKeySequence("Alt+R"));
     ActionManager::instance()->registerAction(hideToolAction,this,SLOT(hideSubWidget()));
+    GlobalKeyMap.insert(hideToolAction->shortcut().toString(),hideToolAction->text());
 
     MyAction * hideSpaceAction = ActionManager::instance()->crateAction(Constants::HIDE_WORKSPACE_ID,QIcon(""),"隐藏工作区");
     hideSpaceAction->setShortcut(QKeySequence("Alt+U"));
     ActionManager::instance()->registerAction(hideSpaceAction,this,SLOT(hideSubWidget()));
+    GlobalKeyMap.insert(hideSpaceAction->shortcut().toString(),hideSpaceAction->text());
 
     MyMenu * widgetMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_WIDGET_MENU,QString("窗口(&W)"));
     menuBar()->addMenu(widgetMenu);
@@ -278,6 +300,9 @@ void MainWindow::createActionAndMenus()
     widgetMenu->addAction(simulateAction);
 
     //【帮助菜单栏】
+    MyAction * assisantAction = ActionManager::instance()->crateAction(Constants::ASSISANT_KEY_LIST,QIcon(),"快捷键列表");
+    ActionManager::instance()->registerAction(assisantAction,this,SLOT(showAssisantList()));
+
     MyAction * supportAction = ActionManager::instance()->crateAction(Constants::TEC_SUPPORT_ID,QIcon(":/images/getsupport.png"),"技术支持");
 //    supportAction->setShortcut(QKeySequence("Ctrl+Q"));
     ActionManager::instance()->registerAction(supportAction,this,SLOT(getTecSupport()));
@@ -285,9 +310,11 @@ void MainWindow::createActionAndMenus()
     MyAction * aboutAction = ActionManager::instance()->crateAction(Constants::ABOUT_ID,QIcon(":/images/about.png"),"关于");
     aboutAction->setShortcut(QKeySequence("Ctrl+P"));
     ActionManager::instance()->registerAction(aboutAction,this,SLOT(showAbout()));
+    GlobalKeyMap.insert(aboutAction->shortcut().toString(),aboutAction->text());
 
     MyMenu * helpMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_HELP_MENU,QString("帮助(&H)"));
     menuBar()->addMenu(helpMenu);
+    helpMenu->addAction(assisantAction);
     helpMenu->addAction(supportAction);
     helpMenu->addAction(aboutAction);
 
@@ -310,6 +337,8 @@ void MainWindow::createActionAndMenus()
 
     MyAction * closeRightWorkAction = ActionManager::instance()->crateAction(Constants::CLOSE_RIGHT_WORKSPACE,QIcon(""),"关闭右侧所有");
     ActionManager::instance()->registerAction(closeRightWorkAction,MyPageSwitch::instance(),SLOT(closeRightPage()));
+
+    GlobalKeyMap.insert("Alt+<-,->","左右切换工作区");
 }
 
 //直接处理，无需再出发KeyPressEvent，否则一个事件会处理两遍
@@ -680,6 +709,13 @@ void MainWindow::respDeletePage()
     }
 
     rightToolBox->enableButtState(false);
+}
+
+//显示快捷键列表
+void MainWindow::showAssisantList()
+{
+    MyShortKey dialog(this);
+    dialog.exec();
 }
 
 //创建场景和视图

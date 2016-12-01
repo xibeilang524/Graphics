@@ -143,9 +143,10 @@ void MyLoopDialog::respButtYesPress()
     //设置变量名
     for(int i = 0; i < loopProp->varList.size(); i++)
     {
-        SignalVari * svari = new SignalVari;
+        SignalVari * svari = new SignalVari;  
+
         if(loopProp->varList.at(i)->type == QString(COMBOX_LOOP_QUOTE))
-        {
+        {  
             svari->isQuoted = true;
             svari->variName = loopProp->varList.at(i)->name;
         }
@@ -165,8 +166,10 @@ void MyLoopDialog::respButtYesPress()
         {
             if(loopProp->expList.at(i)->name == loopProp->signalList.at(j)->variName)
             {
+
                 loopProp->signalList.at(j)->finalValue = loopProp->expList.at(i)->value.toInt();
                 loopProp->signalList.at(j)->operateSymbol = loopProp->expList.at(i)->expressType;
+                qDebug()<<loopProp->signalList.at(j)->finalValue<<"__"<<loopProp->signalList.at(i)->operateSymbol;
                 break;
             }
         }
@@ -179,6 +182,8 @@ void MyLoopDialog::respButtYesPress()
         {
             if(loopProp->fexpList.at(i)->name == loopProp->signalList.at(j)->variName)
             {
+
+
                 loopProp->signalList.at(j)->selfOperateSymbol = loopProp->fexpList.at(i)->expressType;
                 loopProp->signalList.at(j)->selfOperateValue = loopProp->fexpList.at(i)->value.toInt();
                 break;

@@ -32,6 +32,7 @@
 **20161115:wey:添加另存为功能
 **20161118:wey:修复推演模式下切换至建模状态，建模按钮可以切换的问题。
 **20161201:wey:增加切换工作区后，窗口显示工作区信息
+**             增加快捷键列表显示
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -81,6 +82,7 @@ private slots:
     void respDeletePage();
     void switchWorkModel();
     void updateWindowTitle();
+    void showAssisantList();
 
 private:
     void createActionAndMenus();

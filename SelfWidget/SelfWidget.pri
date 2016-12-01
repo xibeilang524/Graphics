@@ -21,7 +21,8 @@ HEADERS += \
     SelfWidget/aboutsoft.h \
     SelfWidget/myloopdialog.h \
     SelfWidget/myplaintextedit.h \
-    SelfWidget/myoutputdialog.h
+    SelfWidget/myoutputdialog.h \
+    SelfWidget/myshortkey.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -46,7 +47,8 @@ SOURCES += \
     SelfWidget/aboutsoft.cpp \
     SelfWidget/myloopdialog.cpp \
     SelfWidget/myplaintextedit.cpp \
-    SelfWidget/myoutputdialog.cpp
+    SelfWidget/myoutputdialog.cpp \
+    SelfWidget/myshortkey.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
@@ -65,4 +67,5 @@ FORMS += \
     SelfWidget/mystatesetdialog.ui \
     SelfWidget/mychoosebar.ui \
     SelfWidget/myloopdialog.ui \
-    SelfWidget/myoutputdialog.ui
+    SelfWidget/myoutputdialog.ui \
+    SelfWidget/myshortkey.ui

@@ -152,6 +152,7 @@ QDataStream & operator >>(QDataStream &stream,LoopProperty * loopProp)
     {
         SignalVari * vari = new SignalVari;
         stream>>vari;
+
         loopProp->signalList.append(vari);
     }
 
@@ -2089,6 +2090,9 @@ void MyItem::setLoopProp(LoopProperty *prop)
     foreach(SignalVari * tmp,prop->signalList)
     {
         SignalVari * s = new SignalVari;
+        s->variName = tmp->variName;
+        s->isQuoted = tmp->isQuoted;
+        s->isAssignedValue = tmp->isAssignedValue;
         s->isLegal = tmp->isLegal;
         s->initialValue = tmp->initialValue;
         s->finalValue = tmp->finalValue;
