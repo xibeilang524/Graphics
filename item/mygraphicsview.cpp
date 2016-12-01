@@ -10,6 +10,7 @@
 #include <QDebug>
 #include <QKeyEvent>
 #include <QApplication>
+#include <QUrl>
 
 #include "myscene.h"
 #include "../SelfWidget/nodeeditdialog.h"
@@ -292,6 +293,10 @@ void MyGraphicsView::dragEnterEvent(QDragEnterEvent *event)
            event->acceptProposedAction();
         }
     }
+    else if(event->mimeData()->hasUrls())
+    {
+        event->acceptProposedAction();
+    }
     else
     {
         event->ignore();
@@ -306,12 +311,17 @@ void MyGraphicsView::dragMoveEvent(QDragMoveEvent *event)
     {
         event->acceptProposedAction();
     }
+    else if(event->mimeData()->hasUrls())
+    {
+        event->acceptProposedAction();
+    }
 }
 
 /*!
 *【拖入事件】：
 *【1】View用于接收大控件
 *【2】端口控件，view不处理，将事件抛出交由每个控件处理drop
+*【3】20161201增加拖入本地文件打开
 *
 */
 void MyGraphicsView::dropEvent(QDropEvent *event)
@@ -335,6 +345,45 @@ void MyGraphicsView::dropEvent(QDropEvent *event)
         {
             myScene->clearSelection();
             myScene->addItem((GraphicsType)graphicsType,mapToScene(event->pos()));
+        }
+    }
+    else if(event->mimeData()->hasUrls())
+    {
+        QList<QString> acceptUrls;
+        foreach(QUrl url,event->mimeData()->urls())
+        {
+            QFileInfo info(url.toLocalFile());
+            if(info.isFile())
+            {
+                if(info.suffix() == SaveFileSuffix.right(SaveFileSuffix.size() - 1))
+                {
+                    QFile file(url.toLocalFile());
+                    if(file.open(QFile::ReadWrite))
+                    {
+                        QDataStream stream;
+                        stream.setDevice(&file);
+
+                        ReturnType  rtype = Util::isIllegalFile(stream);
+
+                        if( rtype == RETURN_SUCCESS)
+                        {
+                            acceptUrls.push_back(url.toLocalFile());
+                        }
+                    }
+                }
+            }
+        }
+
+        if(acceptUrls.size() > 0)
+        {
+            foreach(QString fileName,acceptUrls)
+            {
+                if(!MyPageSwitch::instance()->hasContainFile(fileName))
+                {
+                    MyPageSwitch::instance()->addPage();
+                }
+                openLocalFile(fileName);
+            }
         }
     }
 }
@@ -1031,20 +1080,20 @@ void MyGraphicsView::editTextItem()
             {
                 QString localAtomID = item->getProperty().associativeID;
                 QString currLocalPath = MyPageSwitch::instance()->currPageMapping()->pathName;
-                QString localFileName = currLocalPath+"\\"+ localAtomID+SaveFileSuffix;
                 if(currLocalPath.size() == 0)
                 {
                     Util::showWarn("此文件未添加至工程中，无法进行托管!");
                     return;
                 }
+                QString localFileName = currLocalPath+"\\"+ localAtomID+SaveFileSuffix;
+
                 QFile file(localFileName);
                 if(!file.open(QFile::ReadWrite))
                 {
                     Util::showWarn("原子组件图打开失败!");
                 }
                 bool isExisted = MyPageSwitch::instance()->openPage(localAtomID);
-                MyPageSwitch::instance()->updateCurrMappingName(localFileName);
-                MyPageSwitch::instance()->updateCurrMappingPathName(currLocalPath);
+                MyPageSwitch::instance()->updateCurrMappingInfo(localFileName);
                 if(file.size() > 0 && !isExisted)
                 {
                     openLocalFile(localFileName);
@@ -1223,7 +1272,7 @@ void MyGraphicsView::clearItems()
     myScene->clear();
 }
 
-//当删除最后一个工作区后，将scene置为空，并判断
+//当删除最后一个工作区后，将scene置为空
 void MyGraphicsView::deleteScene()
 {
     myScene = NULL;
@@ -1377,7 +1426,8 @@ void MyGraphicsView::fileSave()
         ReturnType  result = FileOperate::instance()->saveFile(saveFileName,MyGraphicsView::instance()->scene()->items());
         if(result == RETURN_SUCCESS)
         {
-            MyPageSwitch::instance()->updateCurrMappingName(saveFileName);
+            MyPageSwitch::instance()->updateCurrMappingInfo(saveFileName);
+            MyPageSwitch::instance()->emitSwitchPage();
         }
     }
 }
@@ -1398,14 +1448,22 @@ void MyGraphicsView::fileSaveAs()
         ReturnType  result = FileOperate::instance()->saveFile(saveFileName,MyGraphicsView::instance()->scene()->items());
         if(result == RETURN_SUCCESS)
         {
-//            MyPageSwitch::instance()->updateCurrMappingName(saveFileName);
+            MyPageSwitch::instance()->updateCurrMappingInfo(saveFileName);
+            MyPageSwitch::instance()->emitSwitchPage();
         }
     }
 }
 
 //打开本地文件，将文件的信息保存至每个场景中
+//【20161201】新增对所打开的文件先判断是否已存在
 void MyGraphicsView::openLocalFile(QString fileName)
 {
+    if(MyPageSwitch::instance()->hasContainFile(fileName))
+    {
+        MyPageSwitch::instance()->switchToPageByFileName(fileName);
+        return;
+    }
+
     QList<CutInfo *> cutInfos;
     ReturnType returnType = FileOperate::instance()->openFile(fileName,cutInfos);
     if(returnType == FILE_ILLEGAL)
@@ -1418,6 +1476,8 @@ void MyGraphicsView::openLocalFile(QString fileName)
     }
     else if(returnType == RETURN_SUCCESS)
     {
+        qDebug()<<scene()<<"======";
+
         scene()->addItem(cutInfos);
 
         foreach (CutInfo * info, cutInfos)
@@ -1429,9 +1489,8 @@ void MyGraphicsView::openLocalFile(QString fileName)
 
         setKeyCtrlStated(false);
 
-        QFileInfo info(fileName);
-        MyPageSwitch::instance()->updateCurrMappingName(fileName);
-        MyPageSwitch::instance()->updateCurrMappingPathName(info.path());
+        MyPageSwitch::instance()->updateCurrMappingInfo(fileName);
+        MyPageSwitch::instance()->emitSwitchPage();
     }
     scene()->update();
 }
@@ -1439,15 +1498,14 @@ void MyGraphicsView::openLocalFile(QString fileName)
 //新建工程
 void MyGraphicsView::addPage(QString proPath,QString proName)
 {
-    QString fullPath = proPath+"/"+proName + SaveFileSuffix;
+    QString saveFileName = proPath+"/"+proName + SaveFileSuffix;
     MyPageSwitch::instance()->addPage();
-    QFile file(fullPath);
+    QFile file(saveFileName);
     if(!file.open(QFile::ReadWrite))
     {
 
     }
-    MyPageSwitch::instance()->updateCurrMappingName(fullPath);
-    MyPageSwitch::instance()->updateCurrMappingPathName(proPath);
+    MyPageSwitch::instance()->updateCurrMappingInfo(saveFileName);
 }
 
 //从【建模】->【推演】，将控件的处理单元类型进行重置

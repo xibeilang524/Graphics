@@ -31,6 +31,7 @@
 **20161026:wey:修复工作区切换键盘事件多次响应问题
 **20161115:wey:添加另存为功能
 **20161118:wey:修复推演模式下切换至建模状态，建模按钮可以切换的问题。
+**20161201:wey:增加切换工作区后，窗口显示工作区信息
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -79,6 +80,7 @@ private slots:
     void showAbout();
     void respDeletePage();
     void switchWorkModel();
+    void updateWindowTitle();
 
 private:
     void createActionAndMenus();
@@ -109,6 +111,9 @@ private:
     QToolBar * databaseBar;
 
     CutInfo cutTmpInfo;               //保存剪切信息
+
+    QStringList windowTitles;         //窗口标题
+    QString currWorkspaceFullPath;    //当前工作区全路径
 };
 
 #endif // MAINWINDOW_H

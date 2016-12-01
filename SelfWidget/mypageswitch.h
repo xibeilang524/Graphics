@@ -11,6 +11,7 @@
 **20161015:wey:增加Alt+左右键快速切换工作区间
 **20161025:wey:增加工作区间右键菜单，支持关闭、保存、关闭左侧所有、关闭右侧所有
 **20161026:wey:修复工作区间个数为0时，依然可以响应Ctrl+w的事件
+**20161201:wey:增加根据文件名全路径切换
 *************************************************/
 #ifndef MYPAGESWITCH_H
 #define MYPAGESWITCH_H
@@ -23,6 +24,7 @@ class MyScene;
 class MyPageItem;
 class QAction;
 
+//建立文件与页面、场景之间的关系，此实例可以描述当前页面的基本信息
 struct PageMapping
 {
     PageMapping()
@@ -31,14 +33,14 @@ struct PageMapping
     }
     QString id;
     MyPageItem * pageItem;
-    MyScene * scene;
-    QString pageName;
-    QString pathName;        //路径名(文件夹名)
-    QString fullPathName;    //(如果保存)当前场景文件显示图元的全路径名称
+    MyScene * scene;         //关联的scene
+    QString pageName;        //工作区名
+    QString pathName;        //路径名(文件夹名):c:/abc
+    QString fullPathName;    //(如果保存)当前场景文件显示图元的全路径名称:c:/abc/123.bin
     bool isAssociated;       //是否被关联，如果false，保存时需要弹出提示框，否则根据id和路径自动保存。
-    qreal hScrollValue;
-    qreal vScrollValue;
-    qreal scaleView;
+    qreal hScrollValue;      //当前页面水平滚动条值
+    qreal vScrollValue;      //当前页面竖直滚动条值
+    qreal scaleView;         //当前页面缩放比例值
 };
 
 class MyPageSwitch : public QWidget
@@ -51,10 +53,18 @@ public:
     void addSwitchContextMenu();
 
     bool openPage(QString pageId);
-    void updateCurrMappingName(QString name);
-    void updateCurrMappingPathName(QString name);
+    void updateCurrMappingInfo(QString & fileName);
+
+    void switchToPageByFileName(QString fileName);
+
+    void emitSwitchPage();
 
     const PageMapping * currPageMapping();
+
+    QStringList getOpenedFullFileNames();
+    bool hasContainFile(QString & fileName);
+
+    int  count()const;
 
 signals:
     void deletePage();

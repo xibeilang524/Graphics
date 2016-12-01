@@ -55,6 +55,8 @@ MainWindow::MainWindow(QWidget *parent) :
     databaseBar = NULL;
 
     GlobalItemZValue = 0;
+    windowTitles<<"多组件模型在线协同调用工具-建模"<<"多组件模型在线协同调用工具-推演";
+    currWorkspaceFullPath = "";
 
     createSceneAndView();
 
@@ -313,7 +315,6 @@ void MainWindow::createActionAndMenus()
 //直接处理，无需再出发KeyPressEvent，否则一个事件会处理两遍
 void MainWindow::keyPress(QKeyEvent *event)
 {
-//    keyPressEvent(event);
     //左右切换工作区间
     if(event->modifiers() == Qt::AltModifier && event->key() == Qt::Key_Left)
     {
@@ -562,17 +563,16 @@ void MainWindow::switchWorkModel()
     {
         enable = true;
         GlobalWindowState = WINDOW_BUILD_MODEL;
-        setWindowTitle("多组件模型在线协同调用工具-建模");
         setToolWidgetState(false);
     }
     else
     {
         GlobalWindowState = WINDOW_SIMULATE;
-        setWindowTitle("多组件模型在线协同调用工具-推演");
         setSimulateWidgetState(false);
         simulatePanel->resetSimluateFlag();
         MyGraphicsView::instance()->resetItemProcessType();
     }
+    updateWindowTitle();
 
     MyGraphicsView::instance()->addContextMenuItem();
 
@@ -594,6 +594,27 @@ void MainWindow::switchWorkModel()
     itemBar->setEnabled(enable);
     editBar->setEnabled(enable);
     databaseBar->setEnabled(!enable);
+}
+
+//切换工作区更新窗口标题
+void MainWindow::updateWindowTitle()
+{
+    QString  fullTitle = windowTitles.at(GlobalWindowState);
+
+    if(MyPageSwitch::instance()->currPageMapping())
+    {
+        currWorkspaceFullPath = MyPageSwitch::instance()->currPageMapping()->fullPathName;
+    }
+    else
+    {
+        currWorkspaceFullPath = "";
+    }
+
+    if(currWorkspaceFullPath.size() > 0)
+    {
+        fullTitle += ("-"+currWorkspaceFullPath);
+    }
+    this->setWindowTitle(fullTitle);
 }
 
 //打开本地保存的文件，会先提示是否要保存当前添加的控件
@@ -653,6 +674,11 @@ void MainWindow::respDeletePage()
         ActionManager::instance()->action(Constants::SAVE_ID)->setEnabled(false);
     }
 
+    if(MyPageSwitch::instance()->count() == 0)
+    {
+
+    }
+
     rightToolBox->enableButtState(false);
 }
 
@@ -673,6 +699,7 @@ void MainWindow::createSceneAndView()
     vLayout->addWidget(view);
 
     connect(MyPageSwitch::instance(),SIGNAL(switchPage()),MyGraphicsView::instance(),SLOT(setToolBarState()));
+    connect(MyPageSwitch::instance(),SIGNAL(switchPage()),this,SLOT(updateWindowTitle()));
     connect(MyPageSwitch::instance(),SIGNAL(deletePage()),this,SLOT(respDeletePage()));
 
     leftIconWidget = new LeftIconWidget;

@@ -4,6 +4,7 @@
 #include <QHeaderView>
 #include <QTableWidget>
 #include <QUuid>
+#include <QFile>
 
 #include "qmath.h"
 #include "global.h"
@@ -236,4 +237,25 @@ void Util::showInfo(QString tipText)
 QMessageBox::StandardButton Util::getInfoChoice(QString tipText,QMessageBox::StandardButton butt)
 {
     return QMessageBox::information(GlobalMainWindow,"提示",tipText,QMessageBox::Yes|butt,butt);
+}
+
+//是否是合法的文件，在本地打开和拖入时使用
+ReturnType Util::isIllegalFile(QDataStream & stream)
+{
+    int softVersion;
+    stream >>softVersion;
+    if(softVersion != M_VERTION)
+    {
+        return FILE_VERSION;
+    }
+
+    QString fileFlag;
+    stream>>fileFlag;
+
+    if(fileFlag != SaveFileHeadFlag)
+    {
+        return FILE_ILLEGAL;
+    }
+
+    return RETURN_SUCCESS;
 }

@@ -5,6 +5,7 @@
 #include <QList>
 #include <QMessageBox>
 #include <QDebug>
+#include <QFileInfo>
 #include <QMenu>
 
 #include "../manager/mypageitem.h"
@@ -184,6 +185,7 @@ void MyPageSwitch::deleteThisPage(QString pageId)
                 break;
             }
         }
+
         if( index >=0  && index < pages.size()-1)
         {
             switchToPage(pages.at(index + 1)->id);
@@ -204,14 +206,18 @@ void MyPageSwitch::deleteThisPage(QString pageId)
         pages.removeAt(index);
 
         --pagePosition;
+
         if(pages.size() == 0)
         {
+            selectedPage = NULL;
             MyGraphicsView::instance()->deleteScene();
+            emit switchPage();
         }
         emit deletePage();
     }
 }
 
+//获取当前页面的映射关系
 const PageMapping *MyPageSwitch::currPageMapping()
 {
     return selectedPage;
@@ -291,18 +297,65 @@ int MyPageSwitch::getPageIndex(QString id)
     return -1;
 }
 
-//保存文件后，更新当前场景对应的本地文件路径
-void MyPageSwitch::updateCurrMappingName(QString name)
+//更新当前文件的描述信息
+void MyPageSwitch::updateCurrMappingInfo(QString & fileName)
 {
     MY_ASSERT(selectedPage)
-    selectedPage->fullPathName = name;
+    QFileInfo info(fileName);
+    selectedPage->fullPathName = fileName;
+    selectedPage->pathName = info.absolutePath();
 }
 
-//更新当前的路径名
-void MyPageSwitch::updateCurrMappingPathName(QString name)
+//手动的发射信号
+void MyPageSwitch::emitSwitchPage()
 {
-    MY_ASSERT(selectedPage)
-    selectedPage->pathName = name;
+    emit switchPage();
+}
+
+//获取当前页面的数量
+int MyPageSwitch::count()const
+{
+    return pages.size();
+}
+
+//获取当前所有打开文件全路径列表
+QStringList MyPageSwitch::getOpenedFullFileNames()
+{
+    QStringList list;
+
+    foreach(PageMapping * mapping,pages)
+    {
+        list<<mapping->fullPathName;
+    }
+
+    return list;
+}
+
+//是否已经包含待打开的文件
+bool MyPageSwitch::hasContainFile(QString & fileName)
+{
+    foreach(PageMapping * mapping,pages)
+    {
+        if(mapping->fullPathName == fileName)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+//将页面切换至此文件对应处
+void MyPageSwitch::switchToPageByFileName(QString fileName)
+{
+    foreach(PageMapping * mapping,pages)
+    {
+        if(mapping->fullPathName == fileName)
+        {
+            siwtchPage(mapping->id);
+            break;
+        }
+    }
 }
 
 MyPageSwitch * MyPageSwitch::pageSwitch = NULL;

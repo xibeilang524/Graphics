@@ -6,6 +6,7 @@
 #include "./item/myarrow.h"
 #include "./item/mytextitem.h"
 #include "./item/mynodeport.h"
+#include "util.h"
 #include "global.h"
 
 #include <QFile>
@@ -28,7 +29,7 @@ FileOperate * FileOperate::instance()
 
 FileOperate * FileOperate::fileOperate =  NULL;
 
-ReturnType FileOperate::saveFile(QString fileName,const QList<QGraphicsItem *> &items)
+ReturnType FileOperate::saveFile(QString & fileName,const QList<QGraphicsItem *> &items)
 {
     QRegExp exp("_v(\\d)+");
 
@@ -106,21 +107,15 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
         return FILE_CANT_READ;
     }
 
-    QDataStream stream(&file);
+    QDataStream stream;
+    stream.setDevice(&file);
 
-    int softVersion;
-    stream >>softVersion;
-    if(softVersion != M_VERTION)
-    {
-        return FILE_VERSION;
-    }
+    ReturnType  rtype = Util::isIllegalFile(stream);
 
-    QString fileFlag;
-    stream>>fileFlag;
-    if(fileFlag != SaveFileHeadFlag)
+    if(rtype != RETURN_SUCCESS)
     {
         file.close();
-        return FILE_ILLEGAL;
+        return rtype;
     }
 
     QList<NodePortProperty > localNodePorts;

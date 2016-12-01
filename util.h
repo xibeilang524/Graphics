@@ -17,6 +17,7 @@
 #include <QColor>
 #include <QFont>
 #include <QPixmap>
+#include <QDataStream>
 #include <QMessageBox>
 
 #include "Header.h"
@@ -45,6 +46,8 @@ public:
     static int getWarnChoice(QString tipText, QMessageBox::StandardButton butt = QMessageBox::No);
     static void showInfo(QString tipText);
     static QMessageBox::StandardButton getInfoChoice(QString tipText,QMessageBox::StandardButton butt = QMessageBox::Yes);
+
+    static ReturnType isIllegalFile(QDataStream &stream);
 
 private:
 

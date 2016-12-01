@@ -31,7 +31,7 @@ class FileOperate
 public:
     static FileOperate * instance();
 
-    ReturnType saveFile(QString fileName, const QList<QGraphicsItem *> &items);
+    ReturnType saveFile(QString &fileName, const QList<QGraphicsItem *> &items);
     ReturnType openFile(QString fileName, QList<CutInfo *> &items);
 
 private:
