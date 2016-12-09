@@ -2153,6 +2153,8 @@ void MyItem::updateLinePos()
     leftLinePoint->updateLinePos();
     rightLinePoint->updateLinePos();
     bottomLinePoint->updateLinePos();
+
+    emit updateSceneDraw();
 }
 
 MyItem::~MyItem()

@@ -54,6 +54,8 @@ MyPathItem::MyPathItem(QObject * parent, QGraphicsItem * parent1):
     setFlags(ItemIsSelectable);
 
     type = GRA_VECTOR_LINE;
+    property.itemBrush = QBrush(Qt::black);
+    property.itemPen = QPen(Qt::red,3);
 
     startItem = NULL;
     endItem = NULL;
@@ -106,16 +108,9 @@ void MyPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
         painter->setPen(Qt::NoPen);
     }
 
-    if(property.isNeedBrush)
-    {
-        painter->setBrush(property.itemBrush);
-    }
+    painter->setBrush(Qt::NoBrush);
 
-    QPen itemPen;
-    itemPen.setWidth(3);
-    itemPen.setColor(Qt::red);
-    painter->setPen(itemPen);
-
+    painter->setPen(QPen(Qt::red,3));
     painter->drawPath(painterPath);
 
     painter->restore();
@@ -173,6 +168,20 @@ void MyPathItem::setEndPointType(PointType type)
     property.endPointType = type;
 }
 
+//设置起点的条类型
+void MyPathItem::setStartLineType(int type)
+{
+    this->property.startLineType = (AddLineType)type;
+    emit updateSceneDraw();
+}
+
+//设置终点的条类型
+void MyPathItem::setEndLineType(int type)
+{
+    this->property.endLineType = (AddLineType)type;
+    emit updateSceneDraw();
+}
+
 //根据传入的起点和终点item，计算出一条折线，然后将折线上的折点保存下来
 void MyPathItem::countPathItemPoints()
 {
@@ -200,35 +209,12 @@ void MyPathItem::setEndPoint(QPointF endPoint)
 //根据当前设置的起点和终点，实时更新折线
 void MyPathItem::getNewLine()
 {
-    points.clear();
-
     QPointF startPoint,endPoint;       //折点的起点和终点
     startPoint = QPointF(0,0);
 
     endPoint = endPosPoint - startPosPoint;
 
-    QLineF line(startPosPoint,endPosPoint);
-    qreal  breakLinePos = qAbs(line.dx() * PATH_ITEM_SCALE);
-    if(breakLinePos < PATH_ITEM_MIN_DIS)
-    {
-        breakLinePos = PATH_ITEM_MIN_DIS;
-    }
-
-    //起始点在终点的左侧
-    if(startPosPoint.x() <= endPosPoint.x())
-    {
-        points.append(startPoint);
-        points.append(QPointF(startPoint.x() + breakLinePos,startPoint.y()));
-        points.append(QPointF(startPoint.x() + breakLinePos,endPoint.y()));
-        points.append(endPoint);
-    }
-    else if(startPosPoint.x() > endPosPoint.x())
-    {
-        points.append(endPoint);
-        points.append(QPointF(endPoint.x() + breakLinePos,endPoint.y()));
-        points.append(QPointF(endPoint.x() + breakLinePos,startPoint.y()));
-        points.append(startPoint);
-    }
+    detectItem(startPoint,endPoint);
 
     prepareGeometryChange();
     painterPath = QPainterPath();
@@ -256,6 +242,338 @@ void MyPathItem::getNewLine()
     }
 
     update();
+}
+
+//根据所连接的两Item，进行路径生成。
+void MyPathItem::detectItem(QPointF startPoint,QPointF endPoint)
+{
+    points.clear();
+
+    QLineF line(startPosPoint,endPosPoint);
+    qreal  pointDistance =qAbs(line.dx());
+
+    int startItemRadius , endItemRadius;
+
+    if(startItem)
+    {
+        MyItem * sitem = dynamic_cast<MyItem *>(startItem->getParentItem());
+        if(sitem)
+        {
+            startItemRadius = sitem->getProperty().itemRect.width / 2;
+        }
+    }
+
+    if(endItem)
+    {
+        MyItem * eitem = dynamic_cast<MyItem *>(endItem->getParentItem());
+        if(eitem)
+        {
+            endItemRadius = eitem->getProperty().itemRect.width / 2;
+        }
+    }
+
+    qDebug()<<startPoint<<"+++++++++"<<endPoint;
+
+    //左上
+    if(startPoint.x() <= endPoint.x() && startPoint.y() <= endPoint.y())
+    {
+        if(property.startPointType == TOP_MIDDLE && property.endPointType == TOP_MIDDLE)
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x(),startPoint.y() - PATH_ITEM_MIN_DIS));
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(startPoint.x() + startItemRadius,startPoint.y() - PATH_ITEM_MIN_DIS));
+                points.append(QPoint(startPoint.x() + startItemRadius,endPoint.y() - PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
+            }
+            else
+            {
+                points.append(QPoint(endPoint.x(),startPoint.y() - PATH_ITEM_MIN_DIS));
+            }
+            points.append(endPoint);
+        }
+        else if(property.startPointType == MIDDLE_LEFT && property.endPointType == MIDDLE_LEFT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == MIDDLE_RIGHT && property.endPointType == MIDDLE_RIGHT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == BOTTOM_MIDDLE && property.endPointType == BOTTOM_MIDDLE)
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(startPoint.x() ,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() - startItemRadius ,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() - startItemRadius ,endPoint.y() + PATH_ITEM_MIN_DIS));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x(),endPoint.y() + PATH_ITEM_MIN_DIS));
+            }
+            points.append(QPoint(endPoint.x(),endPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(endPoint);
+        }
+        else if((property.startPointType == BOTTOM_MIDDLE && property.endPointType == MIDDLE_LEFT))
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x(),endPoint.y()));
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if((property.startPointType == MIDDLE_RIGHT && property.endPointType == TOP_MIDDLE))
+        {
+            points.append(startPoint);
+            points.append(QPoint(endPoint.x(),startPoint.y()));
+            points.append(endPoint);
+        }
+    }
+    //左下
+    else if(startPoint.x() <= endPoint.x() && startPoint.y() > endPoint.y())
+    {
+        if(property.startPointType == TOP_MIDDLE && property.endPointType == TOP_MIDDLE)
+        {
+            if(property.startPointType == TOP_MIDDLE && property.endPointType == TOP_MIDDLE)
+            {
+                points.append(startPoint);
+                points.append(QPoint(startPoint.x(),startPoint.y() - PATH_ITEM_MIN_DIS));
+                if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+                {
+                    points.append(QPoint(startPoint.x() - startItemRadius,startPoint.y() - PATH_ITEM_MIN_DIS));
+                    points.append(QPoint(startPoint.x() - startItemRadius,endPoint.y() - PATH_ITEM_MIN_DIS));
+                    points.append(QPoint(endPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
+                }
+                else
+                {
+                    points.append(QPoint(startPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
+                    points.append(QPoint(endPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
+                }
+                points.append(endPoint);
+            }
+        }
+        else if(property.startPointType == MIDDLE_LEFT && property.endPointType == MIDDLE_LEFT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == MIDDLE_RIGHT && property.endPointType == MIDDLE_RIGHT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == BOTTOM_MIDDLE && property.endPointType == BOTTOM_MIDDLE)
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() + startItemRadius ,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() + startItemRadius ,endPoint.y() + PATH_ITEM_MIN_DIS));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+            }
+            points.append(QPoint(endPoint.x(),endPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == BOTTOM_MIDDLE && property.endPointType == MIDDLE_LEFT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(startPoint.x() - startItemRadius,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(startPoint.x() - startItemRadius,endPoint.y()));
+            }
+            else
+            {
+                points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
+            }
+            points.append(endPoint);
+        }
+        else if((property.startPointType == MIDDLE_RIGHT && property.endPointType == TOP_MIDDLE))
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(endPoint.x() + startItemRadius,startPoint.y()));
+                points.append(QPoint(endPoint.x() + startItemRadius,endPoint.y() - PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
+                points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
+            }
+            points.append(endPoint);
+        }
+    }
+    //右上
+    else if(startPoint.x() >= endPoint.x() && startPoint.y() <= endPoint.y())
+    {
+        if(property.startPointType == TOP_MIDDLE && property.endPointType == TOP_MIDDLE)
+        {
+            if(property.startPointType == TOP_MIDDLE && property.endPointType == TOP_MIDDLE)
+            {
+                points.append(startPoint);
+                points.append(QPoint(startPoint.x(),startPoint.y() - PATH_ITEM_MIN_DIS));
+                if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+                {
+                    points.append(QPoint(startPoint.x() - startItemRadius,startPoint.y() - PATH_ITEM_MIN_DIS));
+                    points.append(QPoint(startPoint.x() - startItemRadius,endPoint.y() - PATH_ITEM_MIN_DIS));
+                    points.append(QPoint(endPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
+                }
+                else
+                {
+                    points.append(QPoint(endPoint.x(),startPoint.y() - PATH_ITEM_MIN_DIS));
+                }
+                points.append(endPoint);
+            }
+        }
+        else if(property.startPointType == MIDDLE_LEFT && property.endPointType == MIDDLE_LEFT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == MIDDLE_RIGHT && property.endPointType == MIDDLE_RIGHT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == BOTTOM_MIDDLE && property.endPointType == BOTTOM_MIDDLE)
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() + startItemRadius ,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() + startItemRadius ,endPoint.y() + PATH_ITEM_MIN_DIS));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x(),endPoint.y() + PATH_ITEM_MIN_DIS));
+            }
+            points.append(QPoint(endPoint.x(),endPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == BOTTOM_MIDDLE && property.endPointType == MIDDLE_LEFT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if((property.startPointType == MIDDLE_RIGHT && property.endPointType == TOP_MIDDLE))
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
+            points.append(endPoint);
+        }
+    }
+    //右下
+    else if(startPoint.x() >= endPoint.x() && startPoint.y() > endPoint.y())
+    {
+        if(property.startPointType == TOP_MIDDLE && property.endPointType == TOP_MIDDLE)
+        {
+            if(property.startPointType == TOP_MIDDLE && property.endPointType == TOP_MIDDLE)
+            {
+                points.append(startPoint);
+                points.append(QPoint(startPoint.x(),startPoint.y() - PATH_ITEM_MIN_DIS));
+                if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+                {
+                    points.append(QPoint(startPoint.x() + startItemRadius,startPoint.y() - PATH_ITEM_MIN_DIS));
+                    points.append(QPoint(startPoint.x() + startItemRadius,endPoint.y() - PATH_ITEM_MIN_DIS));
+                    points.append(QPoint(endPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
+                }
+                else
+                {
+                    points.append(QPoint(startPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
+                    points.append(QPoint(endPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
+                }
+                points.append(endPoint);
+            }
+        }
+        else if(property.startPointType == MIDDLE_LEFT && property.endPointType == MIDDLE_LEFT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == MIDDLE_RIGHT && property.endPointType == MIDDLE_RIGHT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if(property.startPointType == BOTTOM_MIDDLE && property.endPointType == BOTTOM_MIDDLE)
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(startPoint.x() - startItemRadius ,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(startPoint.x() - startItemRadius ,endPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x(),endPoint.y() + PATH_ITEM_MIN_DIS));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+            }
+            points.append(endPoint);
+        }
+        else if(property.startPointType == BOTTOM_MIDDLE && property.endPointType == MIDDLE_LEFT)
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
+        else if((property.startPointType == MIDDLE_RIGHT && property.endPointType == TOP_MIDDLE))
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(endPoint.x() + startItemRadius,startPoint.y()));
+                points.append(QPoint(endPoint.x() + startItemRadius,endPoint.y() - PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
+                points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
+            }
+            points.append(endPoint);
+        }
+    }
 }
 
 //当item位置改变后，更新当前折线，避免在paint中直接调用(会影响刷新速度)

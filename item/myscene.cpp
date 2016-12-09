@@ -539,6 +539,8 @@ MyPathItem * MyScene::createPathItem(LineType type, MyNodeLine *startNode, MyNod
     pathItem->setStartPoint(startNode->getParentItem()->mapToScene(startNode->pos()));
     pathItem->setEndPoint(endNode->getParentItem()->mapToScene(endNode->pos()));
 
+    qDebug()<<pathItem->getStartPoint()<<"_createPathItem__"<<pathItem->getEndPoint();
+
     pathItem->setStartItem(startNode);
     pathItem->setEndItem(endNode);
 

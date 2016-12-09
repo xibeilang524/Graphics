@@ -6,7 +6,7 @@
 **Others:
 **
 **修改历史:
-**20161209:wey:
+**20161209:wey:完成折线功能(暂不支持旋转)
 *************************************************/
 #ifndef MYPATHITEM_H
 #define MYPATHITEM_H
@@ -23,6 +23,7 @@ class MyNodeLine;
 
 class MyPathItem : public QObject, public QGraphicsPathItem
 {
+    Q_OBJECT
 public:
     MyPathItem(QObject * parent = 0,QGraphicsItem * parent1 = 0);
     ~MyPathItem();
@@ -40,6 +41,13 @@ public:
 
     void setEndPoint(QPointF endPoint);
     QPointF getEndPoint(){return this->endPosPoint;}
+
+    //获取起始和结束端线条箭头的类型(直线、箭头、实心箭头)
+    AddLineType getStartLineType(){return this->property.startLineType;}
+    void setStartLineType(int type);
+
+    AddLineType getEndLineType(){return this->property.endLineType;}
+    void setEndLineType(int type);
 
     void setStartPointType(PointType type);
     void setEndPointType(PointType type);
@@ -63,9 +71,13 @@ public:
     friend QDataStream & operator <<(QDataStream &,MyPathItem * item);
     friend QDataStream & operator >>(QDataStream &,MyPathItem * item);
 
+signals:
+    void updateSceneDraw();
+
 private:
     void countPathItemPoints();
     void getNewLine();
+    void detectItem(QPointF startPoint, QPointF endPoint);
 
     MyNodeLine * startItem;
     MyNodeLine * endItem;

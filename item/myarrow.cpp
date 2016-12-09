@@ -223,7 +223,6 @@ void MyArrow::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, Q
     else if(property.startLineType == LINE_SOLID_TRIANGLE)
     {
         QPolygonF polygon = countArrowPolygon(line().p1(),false);
-
         painter->setBrush(property.itemBrush);
         painter->drawPolygon(polygon);
     }
@@ -274,6 +273,7 @@ QPolygonF MyArrow::countArrowPolygon(QPointF startPoint,bool isStart)
     return polygon;
 }
 
+//¼ÆËã¼ýÍ·
 void MyArrow::countArrowPoint(bool isStart,QPointF  startPoint,QPointF & point1, QPointF & point2)
 {
     double angle = ::acos(line().dx() / line().length());
