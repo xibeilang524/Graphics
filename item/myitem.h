@@ -40,6 +40,7 @@
 **             修复本地打开后，拖拽点鼠标样式不随角度改变问题
 **20161108:wey:添加状态机的图标(开始、结束、处理)
 **20161111:wey:添加循环参数属性LoopProperty
+**20161209:wey:添加旋转和移动时同步修改折线
 *************************************************/
 #ifndef MYITEM_H
 #define MYITEM_H
@@ -175,6 +176,7 @@ private:
     qreal getLoopMaxSidLength(qreal width, qreal height);
     void setInitalPolygon(QRectF boundRect, qreal tx, qreal ty, qreal tw, qreal th);
     void initComponentItem();
+    void updateLinePos();
 
     QPen selectedPen;
     int selectedPenWidth;

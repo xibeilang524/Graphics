@@ -31,6 +31,9 @@
 #define ROTATE_MIN_DEGREE 0     //旋转的最小角度
 #define ROTATE_MAX_DEGREE 360   //旋转的最大角度
 
+#define PATH_ITEM_SCALE 0.5     //绘制折线时，折点在AB间的位置
+#define PATH_ITEM_MIN_DIS 15    //折点距离某个端点的最小距离
+
 #define POP_SUB_DIALOG_WIDTH  650    //复合组件弹出子窗口固定宽度
 #define POP_SUB_DIALOG_HEIGHT 450    //复合组件弹出子窗口固定高度
 #define POP_SIMULATE_DIALOG_WIDTH 550       //推演条件编辑框宽高
@@ -570,6 +573,7 @@ struct CutInfo
     JudgeProperty * judgeProp;                   //服务判断属性信息
     QString content;
     QList<NodePortProperty> nodeProperties;      //控件包含端口的信息
+    QList<QPointF> pathPoints;                   //折线中路径的信息
 };
 
 //高亮等级

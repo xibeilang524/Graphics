@@ -24,6 +24,7 @@
 **20161008:wey:修复本地打开后，临时数据未清空问题
 **20161025:wey:修复从同一控件多次删除连线后，导致奔溃问题
 **20161026:wey:添加确保右键菜单只选中一个控件
+**20161208:wey:添加折线
 *************************************************/
 #ifndef MYSCENE_H
 #define MYSCENE_H
@@ -89,6 +90,7 @@ private:
     void addMyTextConnect(MyTextItem  * item);
     void createItemInfo();
     MyArrow *createArrow(LineType type, MyNodeLine * startNode,MyNodeLine * endNode);
+    MyPathItem * createPathItem(LineType type, MyNodeLine *startNode, MyNodeLine *endNode);
     QRectF getHorizonalRoundedRect(MyItem *item);
     void resetItemSelection();
 
@@ -100,7 +102,8 @@ private:
     QList<MyNodePort*> localNodeports;
 
     bool isLocalFileOpened;            //是否是本地文件打开
-    bool isDragLine;                   //是否处于添加线条状态
+    bool isDragLine;                   //是否处于从nodeline上添加线条状态
+    bool isDragPathLine;               //是否处于添加折线的状态
     bool isClear;                      //是否在清空状态，用于控制clear()对MyIemInfo的影响
     bool isSceneAssociated;            //视图是否被关联，如果为false，保存时需要弹出窗口，
     QString uuid;

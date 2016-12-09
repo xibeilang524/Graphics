@@ -6,7 +6,7 @@
 **Others:
 **
 **修改历史:
-**
+**20161208:wey:添加折线
 *************************************************/
 #ifndef MYNODELINE_H
 #define MYNODELINE_H
@@ -15,6 +15,7 @@
 
 class MyArrow;
 class MyItem;
+class MyPathItem;
 
 class MyNodeLine : public MySuperItem
 {
@@ -24,10 +25,16 @@ public:
     void addArrow(MyArrow * arrow);
     void removeArrows();
     void removeArrow(MyArrow * arrow);
+
+    void addPathLine(MyPathItem * item);
+    void removePathLines();
+    void removePathLine(MyPathItem * item);
+
     QList<MyArrow *> & getArrows(){return this->arrows;}
 
 protected:
     QList<MyArrow *> arrows;           //保存添加的箭头
+    QList<MyPathItem *> pathLines;     //保存添加的折线
 };
 
 #endif // MYNODELINE_H

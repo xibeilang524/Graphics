@@ -6,7 +6,7 @@
 **Others:
 **
 **修改历史:
-**
+**20161209:wey:
 *************************************************/
 #ifndef MYPATHITEM_H
 #define MYPATHITEM_H
@@ -15,18 +15,34 @@
 #include <QPainterPath>
 #include <QObject>
 
-class MyItem;
+class MyNodePort;
+class MyTextItem;
+class MyNodeLine;
 
 #include "../Header.h"
 
 class MyPathItem : public QObject, public QGraphicsPathItem
 {
 public:
-    MyPathItem(MyItem  * startItem,MyItem  * endItem,QObject * parent = 0,QGraphicsItem * parent1 = 0);
+    MyPathItem(QObject * parent = 0,QGraphicsItem * parent1 = 0);
     ~MyPathItem();
 
-    MyItem * getStartItem() const{ return startItem; }
-    MyItem * getEndItem() const{ return endItem; }
+    void setStartItem(MyNodeLine * startItem);
+    MyNodeLine * getStartItem() const{ return startItem; }
+    void setStartItemID(const QString id);
+
+    void setEndItem(MyNodeLine * endItem);
+    MyNodeLine * getEndItem() const{ return endItem; }
+    void setEndItemID(const QString id);
+
+    void setStartPoint(QPointF startPoint);
+    QPointF getStartPoint(){return this->startPosPoint;}
+
+    void setEndPoint(QPointF endPoint);
+    QPointF getEndPoint(){return this->endPosPoint;}
+
+    void setStartPointType(PointType type);
+    void setEndPointType(PointType type);
 
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
@@ -36,21 +52,34 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
     QRectF boundingRect()const;
 
+    QList<QPointF> getPathPoints();
+    void setPathPoints(QList<QPointF> & points);
+
     QPainterPath  shape() const;
 
+    void updateCurrItemPos();
+    void setLineType(LineType lineType);
+
+    friend QDataStream & operator <<(QDataStream &,MyPathItem * item);
+    friend QDataStream & operator >>(QDataStream &,MyPathItem * item);
+
 private:
-    MyItem  * startItem;
-    MyItem  * endItem;
+    void countPathItemPoints();
+    void getNewLine();
+
+    MyNodeLine * startItem;
+    MyNodeLine * endItem;
+
+    QPointF startPosPoint,endPosPoint; //折线在scene中的位置
 
     GraphicsType currItemType;
     ItemProperty property;             //保存当前属性
+    GraphicsType type;
 
     QRectF boundRect;                  //包裹的矩形
-
     QPainterPath painterPath;          //当前路径
 
-    QList<QPointF> points;
-
+    QList<QPointF> points;             //根据起点和终点坐标计算出当前折线的每个关键点(折线点)
 };
 
 #endif // MYPATHITEM_H

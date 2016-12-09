@@ -42,6 +42,7 @@
 #include "mynodeport.h"
 #include "rotateline.h"
 #include "draglinepoint.h"
+#include "mypathitem.h"
 
 using namespace Graphics;
 
@@ -516,9 +517,9 @@ void MyGraphicsView::deleteItem()
 {
     MY_ASSERT(myScene)
     MY_BUILD_MODEL_ONLY
-    QList<QGraphicsItem *> selectedItems = myScene->selectedItems();
 
-    foreach(QGraphicsItem * item, selectedItems)
+    //É¾³ý¼ýÍ·
+    foreach(QGraphicsItem * item, myScene->selectedItems())
     {
         QString itemName = TYPE_ID(*item);
         if(itemName == TYPE_ID(MyArrow))
@@ -533,9 +534,24 @@ void MyGraphicsView::deleteItem()
         }
     }
 
-    selectedItems = myScene->selectedItems();
+    //É¾³ýÕÛÏß
+    foreach(QGraphicsItem * item, myScene->selectedItems())
+    {
+        QString itemName = TYPE_ID(*item);
+        if(itemName == TYPE_ID(MyPathItem))
+        {
+            MyPathItem * tmp = dynamic_cast<MyPathItem *>(item);
 
-    foreach (QGraphicsItem * item, selectedItems)
+            tmp->getStartItem()->removePathLine(tmp);
+            tmp->getEndItem()->removePathLine(tmp);
+            myScene->removeItem(tmp);
+
+            delete tmp;
+        }
+    }
+
+    //É¾³ýitem
+    foreach (QGraphicsItem * item, myScene->selectedItems())
     {
         QString itemName = TYPE_ID(*item);
         if(itemName == TYPE_ID(MyItem))
@@ -547,9 +563,8 @@ void MyGraphicsView::deleteItem()
         }
     }
 
-    selectedItems = myScene->selectedItems();
-
-    foreach (QGraphicsItem * item, selectedItems)
+    //É¾³ýÎÄ±¾
+    foreach (QGraphicsItem * item, myScene->selectedItems())
     {
         QString itemName = TYPE_ID(*item);
         if(itemName == TYPE_ID(MyTextItem))
@@ -560,9 +575,8 @@ void MyGraphicsView::deleteItem()
         }
     }
 
-    selectedItems = myScene->selectedItems();
-
-    foreach (QGraphicsItem * item, selectedItems)
+    //É¾³ý¶Ë¿Ú
+    foreach (QGraphicsItem * item, myScene->selectedItems())
     {
         QString itemName = TYPE_ID(*item);
         if(itemName == TYPE_ID(MyNodePort))
@@ -1476,8 +1490,6 @@ void MyGraphicsView::openLocalFile(QString fileName)
     }
     else if(returnType == RETURN_SUCCESS)
     {
-        qDebug()<<scene()<<"======";
-
         scene()->addItem(cutInfos);
 
         foreach (CutInfo * info, cutInfos)

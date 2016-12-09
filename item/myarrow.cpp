@@ -111,8 +111,7 @@ void MyArrow::createTextItem()
 
 QRectF MyArrow::boundingRect()const
 {
-    return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(),
-                                           line().p2().y() - line().p1().y()));
+    return QRectF(line().p1(), QSizeF(line().p2().x() - line().p1().x(), line().p2().y() - line().p1().y()));
 }
 
 //增加选中直线的区间范围

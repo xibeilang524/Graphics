@@ -6,6 +6,7 @@
 #include <QDebug>
 
 #include "myitem.h"
+#include "mypathitem.h"
 
 DragLinePoint::DragLinePoint(const PointType pointType, GraphicsType type, MyItem *parent1, QObject *parent):
     pointType(pointType),
@@ -86,6 +87,15 @@ void DragLinePoint::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
     emit currMouseState(MOUSE_RELEASE);
 
     MySuperItem::mouseReleaseEvent(event);
+}
+
+//更新线条的位置
+void DragLinePoint::updateLinePos()
+{
+    foreach(MyPathItem * pathItem,pathLines)
+    {
+        pathItem->updateCurrItemPos();
+    }
 }
 
 

@@ -3,7 +3,7 @@
 **文件名: draglinepoint.h
 **作  者: wey       Version: 1.0       Date: 2016.09.30
 **描  述:
-**Others: 拖拽线条节点
+**Others: 拖拽线条节点，在Item四边中点
 **
 **修改历史:
 **
@@ -28,6 +28,8 @@ public:
     void paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget);
 
     PointType getPointType(){return this->pointType;}
+
+    void updateLinePos();
 
 protected:
     void hoverEnterEvent(QGraphicsSceneHoverEvent *event);

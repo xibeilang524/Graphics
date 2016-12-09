@@ -1398,12 +1398,13 @@ QVariant MyItem::itemChange(GraphicsItemChange change, const QVariant &value)
     else if(change == QGraphicsItem::ItemRotationHasChanged && scene())
     {
         updateDragPointCursor();
-
+        updateLinePos();
         emit itemRotationChanged(this);
     }
     else if(change == QGraphicsItem::ItemPositionHasChanged)
     {
         emit itemPosChanged(this);
+        updateLinePos();
     }
     return QGraphicsPolygonItem::itemChange(change,value);
 }
@@ -2009,6 +2010,11 @@ void MyItem::removeDragLineArrows()
     leftLinePoint->removeArrows();
     rightLinePoint->removeArrows();
     bottomLinePoint->removeArrows();
+
+    topLinePoint->removePathLines();
+    leftLinePoint->removePathLines();
+    rightLinePoint->removePathLines();
+    bottomLinePoint->removePathLines();
 }
 
 //获取当前控件所有的箭头
@@ -2138,6 +2144,15 @@ void MyItem::setLoopProp(LoopProperty *prop)
 void MyItem::setJudgeProp(JudgeProperty *prop)
 {
     this->judgeProperty->express = prop->express;
+}
+
+//当item移动后，同时更新当前item所连接的线条
+void MyItem::updateLinePos()
+{
+    topLinePoint->updateLinePos();
+    leftLinePoint->updateLinePos();
+    rightLinePoint->updateLinePos();
+    bottomLinePoint->updateLinePos();
 }
 
 MyItem::~MyItem()

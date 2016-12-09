@@ -29,6 +29,6 @@ extern QList<ServiceProperty *> GlobalServiceProperties;     //全局的服务信息
 
 extern bool GlobalIsSimulateState;               //是否为推演状态，如果是则不允许进行状态变更
 
-extern QMap<QString,QString> GlobalKeyMap;             //快捷键注册信息
+extern QMap<QString,QString> GlobalKeyMap;       //快捷键注册信息
 
 #endif // GLOBAL_H

@@ -6,6 +6,7 @@
 #include "./item/myarrow.h"
 #include "./item/mytextitem.h"
 #include "./item/mynodeport.h"
+#include "./item/mypathitem.h"
 #include "util.h"
 #include "global.h"
 
@@ -76,6 +77,11 @@ ReturnType FileOperate::saveFile(QString & fileName,const QList<QGraphicsItem *>
             MyArrow * myItem = dynamic_cast<MyArrow *>(item);
             stream<<myItem;
         }
+        else if(itemName == TYPE_ID(MyPathItem))
+        {
+            MyPathItem * myItem = dynamic_cast<MyPathItem *>(item);
+            stream<<myItem;
+        }
         else if(itemName == TYPE_ID(MyTextItem))
         {
             MyTextItem * myItem = dynamic_cast<MyTextItem *>(item);
@@ -130,6 +136,7 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
 
         GraphicsType gtype = (GraphicsType)type;
 
+        //item上的端口信息
         if(gtype == GRA_NODE_PORT ||gtype == GRA_NODE_HALF_CIRCLE
                 ||gtype == GRA_NODE_TRIANGLE_OUT ||gtype == GRA_NODE_TRIANGLE_IN ||gtype == GRA_NODE_CIRCLE)
         {
@@ -143,17 +150,31 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
             CutInfo * info = new CutInfo;
             stream>>info->itemProperty;
 
-            if(info->itemProperty.ptype == PRO_PROCESS)
+            if(gtype == GRA_VECTOR_LINE)
             {
-                stream>>(&info->serviceProp);
+                int pointSize = 0;
+                stream>>pointSize;
+                for(int i = 0; i < pointSize; i++)
+                {
+                    QPointF point;
+                    stream>>point;
+                    info->pathPoints.push_back(point);
+                }
             }
-            else if(info->itemProperty.ptype == PRO_LOOP)
+            else
             {
-                stream>>(info->loopProp);
-            }
-            else if(info->itemProperty.ptype == PRO_JUDGE || info->itemProperty.ptype == PRO_INPUT)
-            {
-                stream>>(info->judgeProp);
+                if(info->itemProperty.ptype == PRO_PROCESS)
+                {
+                    stream>>(&info->serviceProp);
+                }
+                else if(info->itemProperty.ptype == PRO_LOOP)
+                {
+                    stream>>(info->loopProp);
+                }
+                else if(info->itemProperty.ptype == PRO_JUDGE || info->itemProperty.ptype == PRO_INPUT)
+                {
+                    stream>>(info->judgeProp);
+                }
             }
 
             info->graphicsType = (GraphicsType)type;

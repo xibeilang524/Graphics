@@ -25,6 +25,7 @@ MyScene::MyScene(QObject * parent):
     insertTmpPath = NULL;
     isLocalFileOpened = false;
     isDragLine = false;
+    isDragPathLine = false;
     isClear = false;
     isSceneAssociated = false;              //场景是否为关联，如果为false，在保存时需要弹出保存框
     myItemInfo = NULL;
@@ -38,10 +39,10 @@ MyScene::MyScene(QObject * parent):
 void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 {
     SceneLastClickPoint = event->scenePos();
-
     if(event->button () == Qt::LeftButton)
     {
-        //从控件四边中点拖拽产生直线
+        bool isNeedProcess = true;
+        //从item控件四边中点(DragLinePoint)拖拽产生直线
         if(itemAt(event->scenePos()) && TYPE_ID(*itemAt(event->scenePos())) == TYPE_ID(DragLinePoint))
         {
             DragLinePoint * tmpDrag = dynamic_cast<DragLinePoint *>(itemAt(event->scenePos()));
@@ -52,40 +53,58 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
                 if(tmpItem)
                 {
                     startMouseItemId = tmpItem->getProperty().startItemID;
-                    insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
-                    insertTmpLine->setPen(QPen(Qt::red, 2));
-                    insertTmpLine->setZValue(1000);
-                    addItem(insertTmpLine);
-                    isDragLine = true;
+                    if(CurrAddGraType == GRA_VECTOR_LINE)
+                    {
+                        insertTmpPath = new MyPathItem;
+                        insertTmpPath->setPos(event->scenePos());
+                        insertTmpPath->setStartPoint(event->scenePos());
+                        insertTmpPath->setEndPoint(event->scenePos());
+                        addItem(insertTmpPath);
+                        isDragPathLine = true;
+                        isNeedProcess = false;
+                    }
+                    else
+                    {
+                        insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
+                        insertTmpLine->setPen(QPen(Qt::red, 2));
+                        insertTmpLine->setZValue(1000);
+                        addItem(insertTmpLine);
+                        isDragLine = true;
+                        isNeedProcess = false;
+                    }
                 }
             }
         }
 
-        if(!isDragLine && CurrAddGraType == GRA_LINE)
+        if(isNeedProcess)
         {
-            insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
-            insertTmpLine->setPen(QPen(Qt::red, 2));
-            addItem(insertTmpLine);
-        }
-        else if(CurrAddGraType == GRA_TEXT)
-        {
-            MyTextItem  * item = new MyTextItem(CurrAddGraType);
-            connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
-//            connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
+            if(!isDragLine && CurrAddGraType == GRA_LINE)
+            {
+                insertTmpLine = new QGraphicsLineItem(QLineF(event->scenePos(),event->scenePos()));
+                insertTmpLine->setPen(QPen(Qt::red, 2));
+                addItem(insertTmpLine);
+            }
+            else if(CurrAddGraType == GRA_TEXT)
+            {
+                MyTextItem  * item = new MyTextItem(CurrAddGraType);
+                connect(item,SIGNAL(textLostFocus(MyTextItem *)),this,SLOT(respTextLostFocus(MyTextItem *)));
+    //            connect(item,SIGNAL(posHasChanged(MyRect)),this,SIGNAL(selectedItemPosChanged(MyRect)));
 
-            item->setPos(event->scenePos());
-            addItem(item);
-        }
-        else if(CurrAddGraType == GRA_VECTOR_LINE)
-        {
-//            insertTmpPath = new MyPathItem;
-//            insertTmpPath->setPen(QPen(Qt::blue,2));
-//            insertTmpPath->setPos(event->scenePos());
-//            addItem(insertTmpPath);
-        }
-        else if(CurrAddGraType != GRA_NONE)
-        {
-            addItem(CurrAddGraType,event->scenePos());
+                item->setPos(event->scenePos());
+                addItem(item);
+            }
+            else if(!isDragPathLine && CurrAddGraType == GRA_VECTOR_LINE)
+            {
+                insertTmpPath = new MyPathItem;
+                insertTmpPath->setPos(event->scenePos());
+                insertTmpPath->setStartPoint(event->scenePos());
+                insertTmpPath->setEndPoint(event->scenePos());
+                addItem(insertTmpPath);
+            }
+            else if(CurrAddGraType != GRA_NONE)
+            {
+                addItem(CurrAddGraType,event->scenePos());
+            }
         }
     }
     else if(event->button() == Qt::RightButton)
@@ -106,13 +125,21 @@ void MyScene::mousePressEvent(QGraphicsSceneMouseEvent *event)
 void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 {
     //从线段拖拽点中产生的线段，在产生鼠标移动事件时因鼠标一直按下，无法主动的对其它控件产生鼠标进入事件，因此需要对事件进行分发
-    if((isDragLine||CurrAddGraType == GRA_LINE)&& insertTmpLine)
+    if(insertTmpLine || insertTmpPath)
     {
-        QLineF newLine(insertTmpLine->line().p1(), event->scenePos());
-        insertTmpLine->setLine(newLine);
+        if(isDragLine||CurrAddGraType == GRA_LINE)
+        {
+            QLineF newLine(insertTmpLine->line().p1(), event->scenePos());
+            insertTmpLine->setLine(newLine);
+        }
+        else if(isDragPathLine || CurrAddGraType == GRA_VECTOR_LINE)
+        {
+            insertTmpPath->setEndPoint(event->scenePos());
+        }
 
         QList<QGraphicsItem *> currPosItems = items(event->scenePos());
 
+        bool isItemProcc = false;
         foreach (QGraphicsItem * item, currPosItems)
         {
             if(item && TYPE_ID(*item) == TYPE_ID(MyItem))
@@ -124,21 +151,18 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
                     //主动对鼠标点位置下Item产生进入事件
                     QEvent eve(QEvent::GraphicsSceneHoverEnter);
                     sendEvent(tmpItem,&eve);
+                    isItemProcc = true;
                 }
             }
         }
 
         if(currPosItems.size() == 1)
         {
-            resetItemSelection();
+            if(!isItemProcc)
+            {
+                resetItemSelection();
+            }
         }
-    }
-    else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
-    {
-        QPainterPath path;
-        path.moveTo(0,0);
-        path.lineTo(event->scenePos());
-        insertTmpPath->setPath(path);
     }
     else
     {
@@ -147,7 +171,7 @@ void MyScene::mouseMoveEvent(QGraphicsSceneMouseEvent *event)
 
         }
         QGraphicsScene::mouseMoveEvent(event);
-    }    
+    }
 }
 
 //在拖拽产生直线时，可能鼠标按在控件的Text上，那么需要进一步的判断
@@ -200,8 +224,6 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         {
             endItems.removeFirst();
         }
-        removeItem(insertTmpLine);
-        delete insertTmpLine;
 
         if (startItems.count() > 0 && endItems.count() > 0 &&
             startItems.first() != endItems.first())
@@ -217,12 +239,50 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 createArrow(LINE_NODEPORT,startItem,endItem);
             }
         }
+
+        removeItem(insertTmpLine);
+        delete insertTmpLine;
     }
-    else if(CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
+    else if(isDragPathLine)
     {
+        QList<QGraphicsItem *> startItems = items(SceneLastClickPoint);
+        if (startItems.count() && startItems.first() == insertTmpPath)
+        {
+            startItems.removeFirst();
+        }
 
+        QList<QGraphicsItem *> endItems = items(insertTmpPath->getEndPoint());
+        if (endItems.count() && endItems.first() == insertTmpPath)
+        {
+            endItems.removeFirst();
+        }
+
+        if (startItems.count() > 0 && endItems.count() > 0 &&
+            startItems.first() != endItems.first())
+        {
+            QString firstItemId = TYPE_ID(* startItems.first());
+            QString secondItemId = TYPE_ID(* endItems.first());
+
+            DragLinePoint *startItem = qgraphicsitem_cast<DragLinePoint *>(startItems.first());
+            DragLinePoint *endItem = qgraphicsitem_cast<DragLinePoint *>(endItems.first());
+
+            if(firstItemId == TYPE_ID(DragLinePoint) && secondItemId == TYPE_ID(DragLinePoint) &&
+                    startItem && endItem)
+            {
+                MyPathItem * pathItem = createPathItem(LINE_MYITEM,startItem,endItem);
+                pathItem->setStartPointType(startItem->getPointType());
+                pathItem->setEndPointType(endItem->getPointType());
+            }
+        }
+        removeItem(insertTmpPath);
+        delete insertTmpPath;
+    }
+    else if(!isDragPathLine && CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
+    {
+        insertTmpPath->updateCurrItemPos();
     }
 
+    isDragPathLine = false;
     isDragLine = false;
     insertTmpLine = NULL;
     insertTmpPath = NULL;
@@ -301,7 +361,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
 
         addItem(item);
     }
-    else if(cutInfo.graphicsType != GRA_NONE && cutInfo.graphicsType != GRA_LINE)
+    else if(cutInfo.graphicsType != GRA_NONE && cutInfo.graphicsType != GRA_LINE && cutInfo.graphicsType != GRA_VECTOR_LINE)
     {
         MyItem * item = new MyItem(cutInfo.graphicsType,this);
         addMyItemConnect(item);
@@ -394,6 +454,25 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
             }
         }
     }
+    else if(cutInfo.graphicsType == GRA_VECTOR_LINE)
+    {
+        if(cutInfo.itemProperty.lineType == LINE_MYITEM)
+        {
+            int startIndex = findItemById(localItems,cutInfo.itemProperty.startItemID);
+            int endIndex = findItemById(localItems,cutInfo.itemProperty.endItemID);
+
+            if(startIndex>=0&&startIndex<localItems.size() &&
+                    endIndex>=0&&endIndex<localItems.size())
+            {
+                DragLinePoint * startItem = localItems.at(startIndex)->getDragLinePoint(cutInfo.itemProperty.startPointType);
+                DragLinePoint * endItem = localItems.at(endIndex)->getDragLinePoint(cutInfo.itemProperty.endPointType);
+
+                MyPathItem * pathItem = createPathItem(LINE_MYITEM,startItem,endItem);
+                pathItem->setProperty(cutInfo.itemProperty);
+                pathItem->setPathPoints(cutInfo.pathPoints);
+            }
+        }
+    }
 }
 
 ///*****************************************************
@@ -444,6 +523,47 @@ MyArrow * MyScene::createArrow(LineType type, MyNodeLine *startNode, MyNodeLine 
 
 ///*****************************************************
 ///**Function:
+///**Description:创建折线
+///**Input:
+///**Output:
+///**Return:
+///**Others:
+///****************************************************/
+MyPathItem * MyScene::createPathItem(LineType type, MyNodeLine *startNode, MyNodeLine *endNode)
+{
+    MyPathItem * pathItem = new MyPathItem;
+
+    startNode->addPathLine(pathItem);
+    endNode->addPathLine(pathItem);
+
+    pathItem->setStartPoint(startNode->getParentItem()->mapToScene(startNode->pos()));
+    pathItem->setEndPoint(endNode->getParentItem()->mapToScene(endNode->pos()));
+
+    pathItem->setStartItem(startNode);
+    pathItem->setEndItem(endNode);
+
+    pathItem->setPos(startNode->getParentItem()->mapToScene(startNode->pos()));
+
+    //对于从拖拽点产生的线条，需要保存其父类的ID和线条在父类的位置
+    if( type == LINE_MYITEM)
+    {
+        MyItem * pStart = dynamic_cast<MyItem *>(startNode->getParentItem());
+        MyItem * pEnd = dynamic_cast<MyItem *>(endNode->getParentItem());
+        pathItem->setStartItemID(pStart->getProperty().startItemID);
+        pathItem->setEndItemID(pEnd->getProperty().startItemID);
+    }
+
+    pathItem->setZValue(-1000.0);
+    pathItem->setLineType(type);
+
+    pathItem->updateCurrItemPos();
+    addItem(pathItem);
+
+    return pathItem;
+}
+
+///*****************************************************
+///**Function:
 ///**Description:本地打开保存文件后，对解析的内容进行界面显示
 ///**Input:
 ///**Output:
@@ -458,7 +578,7 @@ void MyScene::addItem(QList<CutInfo *> &cutInfos)
 
     foreach (CutInfo * cutInfo, cutInfos)
     {
-        if(cutInfo->graphicsType == GRA_LINE)
+        if(cutInfo->graphicsType == GRA_LINE || cutInfo->graphicsType == GRA_VECTOR_LINE)
         {
             lines.push_back(cutInfo);
         }
