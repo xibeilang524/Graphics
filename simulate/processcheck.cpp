@@ -167,12 +167,15 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     {
                         topDesc->isLeftOver = true;
                         topDesc->isProcLeft = false;
-                        topDesc->isProcRight = true;
+                        if(!topDesc->isProcRight)
+                        {
+                            topDesc->isProcRight = true;
 
-                        currItem = topDesc->rightItem;
-                        frontUnit = topDesc->processUnit;
+                            currItem = topDesc->rightItem;
+                            frontUnit = topDesc->processUnit;
 
-                        break;
+                            break;
+                        }
                     }
                     //右侧未处理完，标记右控件处理完成
                     else if(topDesc->isProcRight && !topDesc->isRightOver)
@@ -193,12 +196,14 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     {
                         parent->isProcLeft = false;
                         parent->isLeftOver = true;
-                        parent->isProcRight = true;
+                        if(!parent->isRightOver)
+                        {
+                            parent->isProcRight = true;
+                            currItem = parent->rightItem;
 
-                        currItem = parent->rightItem;
-
-                        frontUnit = parent->processUnit;
-                        break;
+                            frontUnit = parent->processUnit;
+                            break;
+                        }
                     }
                     else if(parent && !parent->isRightOver)
                     {
@@ -435,7 +440,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                 bool isLoopYes = true;             //dowhile循环时，默认为yes分支循环，支持no分支循环【20161130】
                 ProcessUnit * yesProcessUnit = NULL;
 
-                //如果yes/no分支指向的rect在之前的doWhileRects存在，避免无限循环
+                //如果yes分支指向的rect在之前的doWhileRects存在，避免无限循环
                 foreach(ProcessUnit * unit,doWhileRects)
                 {
                     if(unit->item == yesItem )
@@ -447,13 +452,14 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     else if(unit->item == noItem)
                     {
                         isLoopYes = false;
-                        isYesItemProcced = true;
+                        isYesItemProcced = false;
                         yesProcessUnit = unit;
                         break;
                     }
                 }
 
                 //判断处理
+                //【20161210】当no分支指向前面的控件，则认定为判断框
                 if(!isYesItemProcced && outNum == 1)
                 {
                     PolygonDesc * desc = new PolygonDesc;
@@ -514,6 +520,22 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     desc->isProcLeft = true;
                     desc->leftItem = yesItem;
                     desc->rightItem = noItem;
+
+                    //当no分支指向了前面的控件，则默认其no分支已经处理完。
+                    if(!isLoopYes)
+                    {
+                        desc->isProcRight = false;
+                        desc->isRightOver = true;
+
+                        foreach(ProcessUnit * beforeUnit,procUnits)
+                        {
+                            if(beforeUnit->item == noItem)
+                            {
+                                unit->noChild = beforeUnit;
+                                break;
+                            }
+                        }
+                    }
 
                     currItem = yesItem;
                 }
@@ -614,12 +636,13 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                                     {
                                         topDesc->isLeftOver = true;
                                         topDesc->isProcLeft = false;
-                                        topDesc->isProcRight = true;
-
-                                        currItem = topDesc->rightItem;
-                                        frontUnit = topDesc->processUnit;
-
-                                        break;
+                                        if(!topDesc->isRightOver)
+                                        {
+                                            topDesc->isProcRight = true;
+                                            currItem = topDesc->rightItem;
+                                            frontUnit = topDesc->processUnit;
+                                            break;
+                                        }
                                     }
                                     //右侧未处理完，标记右控件处理完成
                                     else if(topDesc->isProcRight && !topDesc->isRightOver)

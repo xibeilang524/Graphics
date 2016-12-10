@@ -14,6 +14,7 @@
 **20161104:wey:添加对for和while循环的支持【！！！】
 **20161106:wey:添加对doWhile循环的支持【！！doWhile循环和是否判断会重合】
 **20161130:wey:【！！未修复】发现dowhile循环时no分支作为循环体导致无限循环,PolygonDesc增加isLoopYes字段描述
+**20161210:wey:【！！】调整若菱形的no分支指向前面的控件，则将菱形认定为判断框而非dowhile循环，只有菱形的yes分支指向以前控件，才认定为dowhile循环。
 *************************************************/
 #ifndef PROCESSCHECK_H
 #define PROCESSCHECK_H
