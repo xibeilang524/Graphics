@@ -86,5 +86,6 @@
         <file>images/State_End.png</file>
         <file>images/State_Start.png</file>
         <file>images/project.png</file>
+        <file>images/startup.png</file>
     </qresource>
 </RCC>
