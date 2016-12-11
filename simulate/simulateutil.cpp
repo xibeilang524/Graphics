@@ -2,6 +2,7 @@
 
 #include "../item/myitem.h"
 #include "../item/myarrow.h"
+#include "../item/mypathitem.h"
 #include "../item/draglinepoint.h"
 
 #include <QStack>
@@ -49,7 +50,8 @@ QList<MyItem *> SimulateUtil::getCurrParentItem(MyItem * item)
         while(pItem&&!isSearchOver)
         {
             QList<MyArrow *> arrows = pItem->getArrows();
-            QList<MyItem *> pItems = getInOutItems(pItem,arrows,false);
+            QList<MyPathItem *> pathItems = pItem->getPathItems();
+            QList<MyItem *> pItems = getInOutItems(pItem,arrows,pathItems,false);
 
 //            qDebug()<<pItem->getText();
 
@@ -370,8 +372,32 @@ MyItem * SimulateUtil::getMyItem(MyArrow * arrow, bool isEnd)
     return NULL;
 }
 
+//获取箭头起始点/终点Item
+MyItem * SimulateUtil::getMyItem(MyPathItem * pathItem, bool isEnd)
+{
+    if(pathItem->getLineType() == LINE_MYITEM)
+    {
+        DragLinePoint * dragLine = NULL;
+        if(isEnd)
+        {
+            dragLine = dynamic_cast<DragLinePoint *>(pathItem->getEndItem());
+        }
+        else
+        {
+            dragLine = dynamic_cast<DragLinePoint *>(pathItem->getStartItem());
+        }
+
+        if(dragLine)
+        {
+            MyItem * item = dynamic_cast<MyItem *>(dragLine->getParentItem());
+            return item;
+        }
+    }
+    return NULL;
+}
+
 //获取控件上作为箭头起点或终点控件集合
-QList<MyItem *> SimulateUtil::getInOutItems(MyItem *currItem,QList<MyArrow *> &arrows, bool isEnd)
+QList<MyItem *> SimulateUtil::getInOutItems(MyItem *currItem,QList<MyArrow *> &arrows,QList<MyPathItem *> &pathItems, bool isEnd)
 {
     QList<MyItem *> resultList;
 
@@ -383,11 +409,20 @@ QList<MyItem *> SimulateUtil::getInOutItems(MyItem *currItem,QList<MyArrow *> &a
            resultList.append(item);
        }
     }
+
+    foreach (MyPathItem * pathItem, pathItems)
+    {
+       MyItem * item = SimulateUtil::instance()->getMyItem(pathItem,isEnd);
+       if(item != currItem)
+       {
+           resultList.append(item);
+       }
+    }
     return resultList;
 }
 
 //获取某个控件作为箭头起点和终点个数
-void SimulateUtil::getItemInOutNum(MyItem *currItem, QList<MyArrow *> &arrows, int &inputNum, int &outputNum)
+void SimulateUtil::getItemInOutNum(MyItem *currItem, QList<MyArrow *> &arrows,QList<MyPathItem *> &pathItems, int &inputNum, int &outputNum)
 {
     QString currItemId = currItem->getProperty().startItemID;
 
@@ -407,10 +442,27 @@ void SimulateUtil::getItemInOutNum(MyItem *currItem, QList<MyArrow *> &arrows, i
             outputNum++;
         }
     }
+
+    foreach(MyPathItem * pahtItem,pathItems)
+    {
+        MyItem * startItem = SimulateUtil::instance()->getMyItem(pahtItem,false);
+        MyItem * endItem = SimulateUtil::instance()->getMyItem(pahtItem,true);
+        QString startItemId = startItem->getProperty().startItemID;
+        QString endItemId = endItem->getProperty().startItemID;
+
+        if(startItemId == currItemId)
+        {
+            inputNum++;
+        }
+        else if(endItemId == currItemId)
+        {
+            outputNum++;
+        }
+    }
 }
 
 //分别获取条件成立和不成立的item
-MyItem * SimulateUtil::getConditionItem(MyItem * currItem,QList<MyArrow *> &arrows, bool isYes)
+MyItem * SimulateUtil::getConditionItem(MyItem * currItem,QList<MyArrow *> &arrows,QList<MyPathItem *> &pathItems, bool isYes)
 {
     foreach(MyArrow * arrow,arrows)
     {
@@ -420,6 +472,19 @@ MyItem * SimulateUtil::getConditionItem(MyItem * currItem,QList<MyArrow *> &arro
             return item;
         }
         else if(item != currItem && !isYes && (arrow->getText().toLower()== "no" || arrow->getText() == "否"))
+        {
+            return item;
+        }
+    }
+
+    foreach(MyPathItem * pathItem,pathItems)
+    {
+        MyItem * item = SimulateUtil::instance()->getMyItem(pathItem,true);
+        if(item != currItem && isYes && (pathItem->getText().toLower()== "yes" || pathItem->getText() == "是"))
+        {
+            return item;
+        }
+        else if(item != currItem && !isYes && (pathItem->getText().toLower()== "no" || pathItem->getText() == "否"))
         {
             return item;
         }

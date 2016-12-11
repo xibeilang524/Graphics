@@ -31,6 +31,7 @@ public:
     void removePathLine(MyPathItem * item);
 
     QList<MyArrow *> & getArrows(){return this->arrows;}
+    QList<MyPathItem *> & getPathItems(){return this->pathLines;}
 
 protected:
     QList<MyArrow *> arrows;           //保存添加的箭头

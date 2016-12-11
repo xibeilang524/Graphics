@@ -68,7 +68,9 @@ public:
     QPainterPath  shape() const;
 
     void updateCurrItemPos();
+
     void setLineType(LineType lineType);
+    LineType getLineType()const {return this->property.lineType;}
 
     QString getText();
     void setText(QString text);

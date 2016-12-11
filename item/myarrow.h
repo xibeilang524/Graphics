@@ -48,8 +48,6 @@ public:
     QPainterPath shape()const;
     void updatePosition();
 
-    void setLineType(LineType lineType);
-
     void setStartItem(MyNodeLine * startItem);
     MyNodeLine * getStartItem() const{ return startItem; }
 
@@ -72,6 +70,7 @@ public:
     AddLineType getEndLineType(){return this->property.endLineType;}
     void setEndLineType(int type);
 
+    void setLineType(LineType lineType);
     LineType getLineType()const {return this->property.lineType;}
 
     void setProperty(ItemProperty property);

@@ -12,6 +12,7 @@
 **20161122:wey:添加状态机词法解析判断框语句
 **             添加对!的支持
 **20161123:wey:添加对判断条件执行，实现判断框[!!!]
+**20161211:wey:在进行模拟时，在原来直线基础上添加折线
 *************************************************/
 #ifndef SIMULATEUTIL_H
 #define SIMULATEUTIL_H
@@ -20,6 +21,7 @@
 
 class MyItem;
 class MyArrow;
+class MyPathItem;
 
 class SimulateUtil
 {
@@ -29,9 +31,10 @@ public:
     QList<MyItem *> getCurrParentItem(MyItem *);
 
     MyItem * getMyItem(MyArrow * arrow,bool isEnd = true);
-    QList<MyItem *> getInOutItems(MyItem *currItem, QList<MyArrow *>& arrows, bool isEnd = true);
-    void getItemInOutNum(MyItem * currItem,QList<MyArrow *>& arrows,int &inputNum,int &outputNum);
-    MyItem * getConditionItem(MyItem *currItem, QList<MyArrow *>& arrows, bool isYes = true);
+    MyItem * getMyItem(MyPathItem * pathItem,bool isEnd = true);
+    QList<MyItem *> getInOutItems(MyItem *currItem, QList<MyArrow *>& arrows, QList<MyPathItem *> &pathItems, bool isEnd = true);
+    void getItemInOutNum(MyItem * currItem, QList<MyArrow *>& arrows, QList<MyPathItem *> &pathItems, int &inputNum, int &outputNum);
+    MyItem * getConditionItem(MyItem *currItem, QList<MyArrow *>& arrows, QList<MyPathItem *> &pathItems, bool isYes = true);
 
     bool getIsItemStart(MyItem * item);
     bool getIsItemEnd(MyItem * item);

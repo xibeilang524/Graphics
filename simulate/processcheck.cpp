@@ -82,18 +82,27 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
         resortedItems.append(currItem);
 
         QList<MyArrow *> arrows = currItem->getArrows();
+        QList<MyPathItem *> pathItems = currItem->getPathItems();
+        int totalLineSize = arrows.size() + pathItems.size();
 
         qDebug()<< currItem->getText();
 
         //开始点
         if(currItem == startItem)
         {
-            if(arrows.size() == 0 || arrows.size() > 1)
+            if(totalLineSize == 0 || totalLineSize > 1)
             {
                 return FLOW_ERROR;
             }
 
-            currItem = SimulateUtil::instance()->getMyItem(arrows.at(0));
+            if(arrows.size() == 1)
+            {
+                currItem = SimulateUtil::instance()->getMyItem(arrows.at(0));
+            }
+            else if(pathItems.size() == 1)
+            {
+                currItem = SimulateUtil::instance()->getMyItem(pathItems.at(0));
+            }
 
             ProcessUnit  * unit = new ProcessUnit;
             unit->gtype = startItem->getType();
@@ -107,7 +116,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
         //结束点
         else if(currItem == endItem)
         {
-            if(arrows.size() == 0)
+            if(totalLineSize == 0)
             {
                 return FLOW_ERROR;
             }
@@ -302,7 +311,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
             GraphicsType gtype = currItem->getType();
 
             int inNum = 0,outNum = 0;               //当前控件分别作为起点和终点引出直线的个数
-            SimulateUtil::instance()->getItemInOutNum(currItem,arrows,inNum,outNum);
+            SimulateUtil::instance()->getItemInOutNum(currItem,arrows,pathItems,inNum,outNum);
 
             //输入输出框/处理框[关注箭头指向点]
             if(gtype == GRA_PARALLELOGRAM || gtype == GRA_RECT)
@@ -313,7 +322,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                 }
 
                 //当前控件的下一个节点
-                QList<MyItem *> outItems = SimulateUtil::instance()->getInOutItems(currItem,arrows,true);
+                QList<MyItem *> outItems = SimulateUtil::instance()->getInOutItems(currItem,arrows,pathItems,true);
 
                 if(outItems.size() == 1)
                 {
@@ -428,8 +437,8 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                 }
 
                 //分别获取条件成立和不成立的item，将条件成立item赋值left，不成立item赋值right
-                MyItem * yesItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,true);
-                MyItem * noItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,false);
+                MyItem * yesItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,pathItems,true);
+                MyItem * noItem = SimulateUtil::instance()->getConditionItem(currItem,arrows,pathItems,false);
 
                 if(yesItem == NULL || noItem == NULL)
                 {

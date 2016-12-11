@@ -59,6 +59,7 @@ class MyArrow;
 class MyTextItem;
 class MyNodePort;
 class DragLinePoint;
+class MyPathItem;
 
 #include <QDataStream>
 
@@ -103,6 +104,7 @@ public:
 
     DragLinePoint * getDragLinePoint(PointType pointType);
     QList<MyArrow *> getArrows();
+    QList<MyPathItem * > getPathItems();
 
     void resetItemUUID();                  //重新设定控件的UUID编号，同时更新子节点的父索引值
 

@@ -2028,6 +2028,17 @@ QList<MyArrow *> MyItem::getArrows()
     return arrows;
 }
 
+//获取控件的所有折线
+QList<MyPathItem * > MyItem::getPathItems()
+{
+    QList<MyPathItem *> pathItems;
+    pathItems.append(topLinePoint->getPathItems());
+    pathItems.append(rightLinePoint->getPathItems());
+    pathItems.append(bottomLinePoint->getPathItems());
+    pathItems.append(leftLinePoint->getPathItems());
+    return pathItems;
+}
+
 //设置此控件是否高亮显示
 void MyItem::hightLightItem(HightLightLevel level,bool isHigh)
 {

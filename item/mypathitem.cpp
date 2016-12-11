@@ -174,12 +174,12 @@ void MyPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 
     painter->restore();
 
-    QPen itemPen1;
-    itemPen1.setWidth(1);
-    itemPen1.setColor(Qt::blue);
-    itemPen1.setStyle(Qt::DashLine);
-    painter->setPen(itemPen1);
-    painter->drawRect(boundRect);
+//    QPen itemPen1;
+//    itemPen1.setWidth(1);
+//    itemPen1.setColor(Qt::blue);
+//    itemPen1.setStyle(Qt::DashLine);
+//    painter->setPen(itemPen1);
+//    painter->drawRect(boundRect);
 }
 
 void MyPathItem::setProperty(ItemProperty property)
