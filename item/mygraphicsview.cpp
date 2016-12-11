@@ -872,12 +872,23 @@ void MyGraphicsView::updateActions()
             ActionManager::instance()->action(Constants::LOCK_ID)->setEnabled(false);
             ActionManager::instance()->action(Constants::UNLOCK_ID)->setEnabled(false);
         }
-        else if(itemName == TYPE_ID(MyArrow))
+        else if(itemName == TYPE_ID(MyArrow) || itemName == TYPE_ID(MyPathItem))
         {
-            MyArrow  * arrowItem = dynamic_cast<MyArrow *>(myScene->selectedItems().first());
-            property = arrowItem->getProperty();
-            AddLineType startType = arrowItem->getStartLineType();
-            AddLineType endType = arrowItem->getEndLineType();
+            AddLineType startType,endType;
+            if(itemName == TYPE_ID(MyArrow))
+            {
+                MyArrow  * arrowItem = dynamic_cast<MyArrow *>(myScene->selectedItems().first());
+                property = arrowItem->getProperty();
+                startType = arrowItem->getStartLineType();
+                endType = arrowItem->getEndLineType();
+            }
+            else
+            {
+                MyPathItem  * pathItem = dynamic_cast<MyPathItem *>(myScene->selectedItems().first());
+                property = pathItem->getProperty();
+                startType = pathItem->getStartLineType();
+                endType = pathItem->getEndLineType();
+            }
 
             ActionManager::instance()->action(Constants::EDIT_TEXT_ID)->setEnabled(true);
             ActionManager::instance()->action(Constants::CUT_ID)->setEnabled(false);
@@ -1036,6 +1047,16 @@ void MyGraphicsView::respEditText()
         else if(itemName == TYPE_ID(MyArrow))
         {
             MyArrow * item = dynamic_cast<MyArrow*>(selectedItems.first());
+            MyTextInput textInput(this);
+
+            textInput.setTex(item->getText());
+            textInput.exec();
+
+            item->setText(textInput.getText());
+        }
+        else if(itemName == TYPE_ID(MyPathItem))
+        {
+            MyPathItem * item = dynamic_cast<MyPathItem*>(selectedItems.first());
             MyTextInput textInput(this);
 
             textInput.setTex(item->getText());

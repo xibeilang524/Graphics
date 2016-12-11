@@ -4,6 +4,7 @@
 #include "../item/myscene.h"
 #include "../item/myitem.h"
 #include "../item/myarrow.h"
+#include "../item/mypathitem.h"
 
 #include "simulateutil.h"
 
@@ -45,7 +46,7 @@ ReturnType SceneItemPickup::pickUpItems(QList<QGraphicsItem *> &existedItems)
     foreach(QGraphicsItem * item,items)
     {
         typeId = TYPE_ID(*item);
-        if(typeId == TYPE_ID(MyItem) || typeId == TYPE_ID(MyArrow))
+        if(typeId == TYPE_ID(MyItem) || typeId == TYPE_ID(MyArrow) || typeId == TYPE_ID(MyPathItem))
         {
             existedItems.push_back(item);
         }

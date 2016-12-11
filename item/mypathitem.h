@@ -7,6 +7,8 @@
 **
 **修改历史:
 **20161209:wey:完成折线功能(暂不支持旋转)
+**20161211:wey:添加箭头(部分支持)
+**             添加动态改变文字的位置(放在折线最长边的中点，会因最长边的变化而动态跳跃)
 *************************************************/
 #ifndef MYPATHITEM_H
 #define MYPATHITEM_H
@@ -68,19 +70,31 @@ public:
     void updateCurrItemPos();
     void setLineType(LineType lineType);
 
+    QString getText();
+    void setText(QString text);
+
     friend QDataStream & operator <<(QDataStream &,MyPathItem * item);
     friend QDataStream & operator >>(QDataStream &,MyPathItem * item);
 
 signals:
+    void editMe();
     void updateSceneDraw();
+
+protected:
+    void mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event);
+    void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 
 private:
     void countPathItemPoints();
     void getNewLine();
     void detectItem(QPointF startPoint, QPointF endPoint);
+    void createTextItem();
+    void updateTextPos();
 
     MyNodeLine * startItem;
     MyNodeLine * endItem;
+
+    MyTextItem * myTextItem;           //文字信息
 
     QPointF startPosPoint,endPosPoint; //折线在scene中的位置
 

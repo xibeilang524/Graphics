@@ -32,7 +32,8 @@
 #define ROTATE_MAX_DEGREE 360   //旋转的最大角度
 
 #define PATH_ITEM_SCALE 0.5     //绘制折线时，折点在AB间的位置
-#define PATH_ITEM_MIN_DIS 15    //折点距离某个端点的最小距离
+#define PATH_ITEM_MIN_DIS 25    //折点距离某个端点的最小距离
+#define ARROW_SIZE 15           //箭头一边的长度
 
 #define POP_SUB_DIALOG_WIDTH  650    //复合组件弹出子窗口固定宽度
 #define POP_SUB_DIALOG_HEIGHT 450    //复合组件弹出子窗口固定高度

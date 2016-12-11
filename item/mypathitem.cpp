@@ -3,9 +3,13 @@
 #include <QPainter>
 #include <QRectF>
 #include <QDebug>
+#include <QGraphicsSceneContextMenuEvent>
 
 #include "myitem.h"
 #include "mynodeline.h"
+#include "mytextitem.h"
+#include "../global.h"
+#include "../manager/menumanager.h"
 
 QDataStream & operator <<(QDataStream &stream,MyPathItem * item)
 {
@@ -55,10 +59,26 @@ MyPathItem::MyPathItem(QObject * parent, QGraphicsItem * parent1):
 
     type = GRA_VECTOR_LINE;
     property.itemBrush = QBrush(Qt::black);
-    property.itemPen = QPen(Qt::red,3);
+    property.itemPen = QPen(Qt::black,3);
+    property.endLineType = LINE_SOLID_TRIANGLE;
 
     startItem = NULL;
     endItem = NULL;
+
+    createTextItem();
+}
+
+//创建文字
+void MyPathItem::createTextItem()
+{
+    myTextItem = new MyTextItem(GRA_TEXT,this);
+    myTextItem->setTextExistType(TEXT_CHILD);
+    myTextItem->setTextInteractionFlags(Qt::NoTextInteraction);
+    myTextItem->setFlag(QGraphicsItem::ItemIsMovable,false);
+    myTextItem->setFlag(QGraphicsItem::ItemIsSelectable,false);
+    myTextItem->cleartText();
+
+    setAcceptHoverEvents(true);
 }
 
 void MyPathItem::setPath(const QPainterPath &path)
@@ -69,9 +89,22 @@ void MyPathItem::setPath(const QPainterPath &path)
 
 QRectF MyPathItem::boundingRect()const
 {
-//    qDebug()<<boundRect.x()<<"__"<<boundRect.y()<<"__"<<boundRect.width()<<"__"<<boundRect.height();
-
     return boundRect;
+}
+
+//双击编辑文字信息
+void MyPathItem::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
+{
+    MY_BUILD_MODEL_ONLY
+
+    emit editMe();
+    QGraphicsPathItem::mouseDoubleClickEvent(event);
+}
+
+void MyPathItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
+{
+    setSelected(true);
+    MenuManager::instance()->menu(Constants::MENU_ITEM_RIGHT_MENU)->exec(event->screenPos());
 }
 
 QPainterPath MyPathItem::shape()const
@@ -108,10 +141,36 @@ void MyPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
         painter->setPen(Qt::NoPen);
     }
 
-    painter->setBrush(Qt::NoBrush);
-
-    painter->setPen(QPen(Qt::red,3));
+    painter->setPen(property.itemPen);
     painter->drawPath(painterPath);
+
+    if(property.endLineType == LINE_SOLID_TRIANGLE)
+    {
+        QPolygonF polygon;
+        if(points.size() > 0)
+        {
+            QPointF lastPoint = points.last();
+            if(property.endPointType == MIDDLE_LEFT)
+            {
+                polygon<<lastPoint<<QPointF(lastPoint.x() - ARROW_SIZE,lastPoint.y() - ARROW_SIZE/2)<<QPointF(lastPoint.x() - ARROW_SIZE,lastPoint.y()+ARROW_SIZE/2);
+            }
+            else if(property.endPointType == TOP_MIDDLE)
+            {
+                polygon<<lastPoint<<QPointF(lastPoint.x() - ARROW_SIZE/2,lastPoint.y() - ARROW_SIZE)<<QPointF(lastPoint.x() + ARROW_SIZE/2,lastPoint.y()-ARROW_SIZE);
+            }
+            else if(property.endPointType == MIDDLE_RIGHT)
+            {
+                polygon<<lastPoint<<QPointF(lastPoint.x() + ARROW_SIZE,lastPoint.y() - ARROW_SIZE/2)<<QPointF(lastPoint.x() + ARROW_SIZE,lastPoint.y()+ARROW_SIZE/2);
+            }
+            else if(property.endPointType == BOTTOM_MIDDLE)
+            {
+                polygon<<lastPoint<<QPointF(lastPoint.x() - ARROW_SIZE/2,lastPoint.y() + ARROW_SIZE)<<QPointF(lastPoint.x() + ARROW_SIZE/2,lastPoint.y()+ARROW_SIZE);
+            }
+        }
+
+        painter->setBrush(property.itemBrush);
+        painter->drawPolygon(polygon);
+    }
 
     painter->restore();
 
@@ -126,7 +185,11 @@ void MyPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
 void MyPathItem::setProperty(ItemProperty property)
 {
     this->property = property;
-
+    myTextItem->setProperty(property);
+    if(property.content.size() > 0)
+    {
+        setText(property.content);
+    }
     update();
 }
 
@@ -206,7 +269,7 @@ void MyPathItem::setEndPoint(QPointF endPoint)
     getNewLine();
 }
 
-//根据当前设置的起点和终点，实时更新折线
+//根据当前设置的起点和终点，实时更新折线与文本的位置
 void MyPathItem::getNewLine()
 {
     QPointF startPoint,endPoint;       //折点的起点和终点
@@ -233,13 +296,43 @@ void MyPathItem::getNewLine()
     QRectF rect(startPosPoint,endPosPoint);
     setPos(rect.topLeft());
 
+    //找出集合中最左和最右的点
     if(points.size() > 0)
     {
-        QPointF firstPoint = points.at(0);
-        QPointF lastPoint = points.last();
+        qreal leftMinX = 0, leftMinY = 0;
+        qreal rightMaxX = 0, rightMaxY = 0;
+        foreach(QPointF point,points)
+        {
+            if(point.x() <= leftMinX)
+            {
+                leftMinX = point.x();
+            }
 
-        boundRect = QRectF(firstPoint,lastPoint);
+            if(point.y() <= leftMinY)
+            {
+                leftMinY = point.y();
+            }
+
+            if(point.x() >= rightMaxX)
+            {
+                rightMaxX = point.x();
+            }
+
+            if(point.y() >= rightMaxY)
+            {
+                rightMaxY = point.y();
+            }
+        }
+
+        leftMinX -= 2;
+        leftMinY -= 2;
+        rightMaxX += 2;
+        rightMaxY += 2;
+
+        boundRect = QRectF(QPointF(leftMinX,leftMinY),QPointF(rightMaxX,rightMaxY));
     }
+
+    updateTextPos();
 
     update();
 }
@@ -271,8 +364,6 @@ void MyPathItem::detectItem(QPointF startPoint,QPointF endPoint)
             endItemRadius = eitem->getProperty().itemRect.width / 2;
         }
     }
-
-    qDebug()<<startPoint<<"+++++++++"<<endPoint;
 
     //左上
     if(startPoint.x() <= endPoint.x() && startPoint.y() <= endPoint.y())
@@ -330,10 +421,26 @@ void MyPathItem::detectItem(QPointF startPoint,QPointF endPoint)
             points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
             points.append(endPoint);
         }
+        else if((property.startPointType == BOTTOM_MIDDLE && property.endPointType == MIDDLE_RIGHT))
+        {
+            points.append(startPoint);
+            points.append(QPointF(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
         else if((property.startPointType == MIDDLE_RIGHT && property.endPointType == TOP_MIDDLE))
         {
             points.append(startPoint);
             points.append(QPoint(endPoint.x(),startPoint.y()));
+            points.append(endPoint);
+        }
+        else if((property.startPointType == MIDDLE_LEFT && property.endPointType == TOP_MIDDLE))
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
             points.append(endPoint);
         }
     }
@@ -407,6 +514,14 @@ void MyPathItem::detectItem(QPointF startPoint,QPointF endPoint)
             }
             points.append(endPoint);
         }
+        else if((property.startPointType == BOTTOM_MIDDLE && property.endPointType == MIDDLE_RIGHT))
+        {
+            points.append(startPoint);
+            points.append(QPointF(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y() + PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y()));
+            points.append(endPoint);
+        }
         else if((property.startPointType == MIDDLE_RIGHT && property.endPointType == TOP_MIDDLE))
         {
             points.append(startPoint);
@@ -422,6 +537,14 @@ void MyPathItem::detectItem(QPointF startPoint,QPointF endPoint)
                 points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
                 points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
             }
+            points.append(endPoint);
+        }
+        else if((property.startPointType == MIDDLE_LEFT && property.endPointType == TOP_MIDDLE))
+        {
+            points.append(startPoint);
+            points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y()));
+            points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
+            points.append(QPoint(endPoint.x(),endPoint.y() - PATH_ITEM_MIN_DIS));
             points.append(endPoint);
         }
     }
@@ -485,12 +608,33 @@ void MyPathItem::detectItem(QPointF startPoint,QPointF endPoint)
             points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
             points.append(endPoint);
         }
+        else if((property.startPointType == BOTTOM_MIDDLE && property.endPointType == MIDDLE_RIGHT))
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS ,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS ,endPoint.y()));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x(),endPoint.y()));
+            }
+            points.append(endPoint);
+        }
         else if((property.startPointType == MIDDLE_RIGHT && property.endPointType == TOP_MIDDLE))
         {
             points.append(startPoint);
             points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
             points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
             points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
+            points.append(endPoint);
+        }
+        else if((property.startPointType == MIDDLE_LEFT && property.endPointType == TOP_MIDDLE))
+        {
+            points.append(startPoint);
+            points.append(QPoint(endPoint.x(),startPoint.y()));
             points.append(endPoint);
         }
     }
@@ -556,6 +700,23 @@ void MyPathItem::detectItem(QPointF startPoint,QPointF endPoint)
             points.append(QPoint(endPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y()));
             points.append(endPoint);
         }
+        else if((property.startPointType == BOTTOM_MIDDLE && property.endPointType == MIDDLE_RIGHT))
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(startPoint.x() + startItemRadius ,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(startPoint.x() + startItemRadius ,endPoint.y()));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x(),startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y() + PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y()));
+            }
+            points.append(endPoint);
+        }
         else if((property.startPointType == MIDDLE_RIGHT && property.endPointType == TOP_MIDDLE))
         {
             points.append(startPoint);
@@ -569,6 +730,23 @@ void MyPathItem::detectItem(QPointF startPoint,QPointF endPoint)
             {
                 points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,startPoint.y()));
                 points.append(QPoint(startPoint.x() + PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
+            }
+            points.append(endPoint);
+        }
+        else if((property.startPointType == MIDDLE_LEFT && property.endPointType == TOP_MIDDLE))
+        {
+            points.append(startPoint);
+            if(pointDistance < startItemRadius || pointDistance < endItemRadius)
+            {
+                points.append(QPoint(endPoint.x() - startItemRadius,startPoint.y()));
+                points.append(QPoint(endPoint.x() - startItemRadius,endPoint.y() - PATH_ITEM_MIN_DIS));
+                points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
+            }
+            else
+            {
+                points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,startPoint.y()));
+                points.append(QPoint(startPoint.x() - PATH_ITEM_MIN_DIS,endPoint.y() - PATH_ITEM_MIN_DIS));
                 points.append(QPoint(endPoint.x() ,endPoint.y() - PATH_ITEM_MIN_DIS));
             }
             points.append(endPoint);
@@ -602,6 +780,61 @@ void MyPathItem::setPathPoints(QList<QPointF> &points)
 void MyPathItem::setLineType(LineType lineType)
 {
     property.lineType = lineType;
+}
+
+QString MyPathItem::getText()
+{
+    return myTextItem->toPlainText();
+}
+
+//更新文字信息，同时更新textItem在item中的位置
+void MyPathItem::setText(QString text)
+{
+    property.content = text;
+    myTextItem->setPlainText(text);
+
+    updateTextPos();
+}
+
+//实时计算Text的位置
+void MyPathItem::updateTextPos()
+{
+    //计算文本的位置,找出折线最长边。
+    qreal maxPos = 0;
+    qreal maxLen = 0;
+    for(int i = 0; i < points.size() - 1; i++)
+    {
+        qreal tmpLen = 0;
+        if(points.at(i).x() == points.at(i+1).x())
+        {
+            if(points.at(i).y() != points.at(i+1).y())
+            {
+                tmpLen = qAbs(points.at(i).y() - points.at(i+1).y());
+            }
+        }
+        else
+        {
+            tmpLen = qAbs(points.at(i).x() - points.at(i+1).x());
+        }
+
+        if(tmpLen > maxLen)
+        {
+            maxLen = tmpLen;
+            maxPos = i;
+        }
+    }
+
+    if(maxPos >=0 && maxPos <= points.size() -1)
+    {
+        QPointF spoint = points.at(maxPos);
+        QPointF epoint = points.at(maxPos+1);
+
+        myTextItem->setPos((spoint.x() + epoint.x())/2 - myTextItem->getBoundRect().width()/2,(spoint.y() + epoint.y())/2);
+    }
+    else
+    {
+        myTextItem->setPos(boundingRect().center());
+    }
 }
 
 MyPathItem::~MyPathItem()

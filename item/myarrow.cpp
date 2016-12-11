@@ -15,9 +15,6 @@
 
 #include "math.h"
 
-const qreal Pi = 3.14;
-#define ARROW_SIZE 15
-
 QDataStream & operator <<(QDataStream &stream,MyArrow * item)
 {
     int type = item->type;
@@ -280,18 +277,18 @@ void MyArrow::countArrowPoint(bool isStart,QPointF  startPoint,QPointF & point1,
 
     if (line().dy() >= 0)
     {
-        angle = (Pi * 2) - angle;
+        angle = (PI * 2) - angle;
     }
 
     if(isStart)
     {
-        point1 = startPoint - QPointF(sin(angle + Pi / 3) * ARROW_SIZE,cos(angle + Pi / 3) * ARROW_SIZE);
-        point2 = startPoint - QPointF(sin(angle + Pi - Pi / 3) * ARROW_SIZE,cos(angle + Pi - Pi / 3) * ARROW_SIZE);
+        point1 = startPoint - QPointF(sin(angle + PI / 3) * ARROW_SIZE,cos(angle + PI / 3) * ARROW_SIZE);
+        point2 = startPoint - QPointF(sin(angle + PI - PI / 3) * ARROW_SIZE,cos(angle + PI - PI / 3) * ARROW_SIZE);
     }
     else
     {
-        point1 = startPoint + QPointF(sin(angle + Pi / 3) * ARROW_SIZE,cos(angle + Pi / 3) * ARROW_SIZE);
-        point2 = startPoint + QPointF(sin(angle + Pi - Pi / 3) * ARROW_SIZE,cos(angle + Pi - Pi / 3) * ARROW_SIZE);
+        point1 = startPoint + QPointF(sin(angle + PI / 3) * ARROW_SIZE,cos(angle + PI / 3) * ARROW_SIZE);
+        point2 = startPoint + QPointF(sin(angle + PI - PI / 3) * ARROW_SIZE,cos(angle + PI - PI / 3) * ARROW_SIZE);
     }
 }
 

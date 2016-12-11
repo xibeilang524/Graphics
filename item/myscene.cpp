@@ -272,6 +272,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
                 MyPathItem * pathItem = createPathItem(LINE_MYITEM,startItem,endItem);
                 pathItem->setStartPointType(startItem->getPointType());
                 pathItem->setEndPointType(endItem->getPointType());
+                pathItem->updateCurrItemPos();
             }
         }
         removeItem(insertTmpPath);
@@ -470,6 +471,7 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
                 MyPathItem * pathItem = createPathItem(LINE_MYITEM,startItem,endItem);
                 pathItem->setProperty(cutInfo.itemProperty);
                 pathItem->setPathPoints(cutInfo.pathPoints);
+                pathItem->updateCurrItemPos();
             }
         }
     }
@@ -532,14 +534,13 @@ MyArrow * MyScene::createArrow(LineType type, MyNodeLine *startNode, MyNodeLine 
 MyPathItem * MyScene::createPathItem(LineType type, MyNodeLine *startNode, MyNodeLine *endNode)
 {
     MyPathItem * pathItem = new MyPathItem;
+    connect(pathItem,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
 
     startNode->addPathLine(pathItem);
     endNode->addPathLine(pathItem);
 
     pathItem->setStartPoint(startNode->getParentItem()->mapToScene(startNode->pos()));
     pathItem->setEndPoint(endNode->getParentItem()->mapToScene(endNode->pos()));
-
-    qDebug()<<pathItem->getStartPoint()<<"_createPathItem__"<<pathItem->getEndPoint();
 
     pathItem->setStartItem(startNode);
     pathItem->setEndItem(endNode);
@@ -558,7 +559,6 @@ MyPathItem * MyScene::createPathItem(LineType type, MyNodeLine *startNode, MyNod
     pathItem->setZValue(-1000.0);
     pathItem->setLineType(type);
 
-    pathItem->updateCurrItemPos();
     addItem(pathItem);
 
     return pathItem;
