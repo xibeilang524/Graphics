@@ -28,6 +28,7 @@
 **20161130:wey:增加支持文件拖入功能
 **20161201:wey:增加本地打开文件先判断是否已经打开
 **20161209:wey:增加删除折线
+**20161215:wey:修复创建原子图时自动创建的文件名未添加版本后缀问题
 *************************************************/
 #ifndef MYGRAPHICSVIEW_H
 #define MYGRAPHICSVIEW_H
@@ -54,7 +55,7 @@ public:
     MyItem * getTopSelectedItem();
 
     void showNodePortEdit(MyNodePort * nodePort);
-    void openLocalFile(QString fileName);
+    void openLocalFile(QString fileName,bool openFile = false);
 
     QString getFirstSelectedItem();
 

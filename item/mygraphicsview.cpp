@@ -1120,7 +1120,7 @@ void MyGraphicsView::editTextItem()
                     Util::showWarn("此文件未添加至工程中，无法进行托管!");
                     return;
                 }
-                QString localFileName = currLocalPath+"\\"+ localAtomID+SaveFileSuffix;
+                QString localFileName = currLocalPath+"/"+ localAtomID+ QString("_v"+QString::number(M_VERTION)) +SaveFileSuffix;
 
                 QFile file(localFileName);
                 if(!file.open(QFile::ReadWrite))
@@ -1129,9 +1129,10 @@ void MyGraphicsView::editTextItem()
                 }
                 bool isExisted = MyPageSwitch::instance()->openPage(localAtomID);
                 MyPageSwitch::instance()->updateCurrMappingInfo(localFileName);
+
                 if(file.size() > 0 && !isExisted)
                 {
-                    openLocalFile(localFileName);
+                    openLocalFile(localFileName,true);
                 }
             }
             else
@@ -1491,9 +1492,9 @@ void MyGraphicsView::fileSaveAs()
 
 //打开本地文件，将文件的信息保存至每个场景中
 //【20161201】新增对所打开的文件先判断是否已存在
-void MyGraphicsView::openLocalFile(QString fileName)
+void MyGraphicsView::openLocalFile(QString fileName, bool openFile)
 {
-    if(MyPageSwitch::instance()->hasContainFile(fileName))
+    if(!openFile && MyPageSwitch::instance()->hasContainFile(fileName))
     {
         MyPageSwitch::instance()->switchToPageByFileName(fileName);
         return;
@@ -1531,7 +1532,7 @@ void MyGraphicsView::openLocalFile(QString fileName)
 //新建工程
 void MyGraphicsView::addPage(QString proPath,QString proName)
 {
-    QString saveFileName = proPath+"/"+proName + SaveFileSuffix;
+    QString saveFileName = proPath+"/"+proName + QString("_v"+QString::number(M_VERTION)) + SaveFileSuffix;
     MyPageSwitch::instance()->addPage();
     QFile file(saveFileName);
     if(!file.open(QFile::ReadWrite))

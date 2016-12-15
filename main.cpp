@@ -34,7 +34,9 @@ int main(int argc, char *argv[])
     do{
         now = QDateTime::currentDateTime();
     }
-    while(n.secsTo(now)<=5);
+    while(n.secsTo(now)<=3);
+
+    screen.hide();
 
     if(!SQLProecss::instance()->initDatabase("./config/DataBaseInfo.properties"))
     {
