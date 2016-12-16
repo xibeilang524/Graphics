@@ -9,12 +9,14 @@
 #include "sceneitempickup.h"
 #include "processcheck.h"
 #include "simulateutil.h"
+#include "./mainwindow.h"
 
 #include "../item/myitem.h"
 #include "../item/mygraphicsview.h"
 #include "../item/myscene.h"
 #include "../util.h"
 #include "../webservice/mywebservice.h"
+#include "../SelfWidget/beforesimulateserviceconfig.h"
 
 MyListWidgetItem::MyListWidgetItem(QListWidget *parent, int type)
     :QListWidgetItem(parent,type)
@@ -165,6 +167,11 @@ void SimulateControlPanel::respStartSimulate()
     }
 
     clearLastSimluteRecord();
+
+
+    BeforeSimulateServiceConfig bsconfig(GlobalMainWindow);
+    bsconfig.setProcedureData(procUnits);
+    bsconfig.exec();
 
     isSimulateState = true;
     //【5】对处理单元进行处理

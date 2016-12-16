@@ -22,7 +22,8 @@ HEADERS += \
     SelfWidget/myloopdialog.h \
     SelfWidget/myplaintextedit.h \
     SelfWidget/myoutputdialog.h \
-    SelfWidget/myshortkey.h
+    SelfWidget/myshortkey.h \
+    SelfWidget/beforesimulateserviceconfig.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -48,7 +49,8 @@ SOURCES += \
     SelfWidget/myloopdialog.cpp \
     SelfWidget/myplaintextedit.cpp \
     SelfWidget/myoutputdialog.cpp \
-    SelfWidget/myshortkey.cpp
+    SelfWidget/myshortkey.cpp \
+    SelfWidget/beforesimulateserviceconfig.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
@@ -68,4 +70,5 @@ FORMS += \
     SelfWidget/mychoosebar.ui \
     SelfWidget/myloopdialog.ui \
     SelfWidget/myoutputdialog.ui \
-    SelfWidget/myshortkey.ui
+    SelfWidget/myshortkey.ui \
+    SelfWidget/beforesimulateserviceconfig.ui

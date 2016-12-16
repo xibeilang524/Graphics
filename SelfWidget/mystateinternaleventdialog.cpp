@@ -1,7 +1,6 @@
 #include "mystateinternaleventdialog.h"
 #include "ui_mystateinternaleventdialog.h"
 
-#include "../Header.h"
 #include "../global.h"
 #include "mychoosebar.h"
 
@@ -27,5 +26,6 @@ MyStateInternalEventDialog::MyStateInternalEventDialog(QWidget *parent) :
 
 MyStateInternalEventDialog::~MyStateInternalEventDialog()
 {
+    delete chooseBar;
     delete ui;
 }
