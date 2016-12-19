@@ -16,6 +16,7 @@
 **20161027:wey:增加三角和D端口
 **20161028:wey:增加文字信息显示
 **             调整右键菜单由全局同一创建
+**20161219:wey:增加对折线的支持
 *************************************************/
 #ifndef MYNODEPORT_H
 #define MYNODEPORT_H
@@ -68,6 +69,9 @@ public:
 
     void updatePortID(QString portId);
 
+    void updateLinePos();
+    void updatePathQuoteType();
+
     void setMoveable(bool isMoveable);
 
     friend QDataStream & operator >>(QDataStream & ,MyNodePort *);
@@ -112,8 +116,6 @@ private:
 
     QMenu * nodePortRightMenu;         //端口右键菜单，支持删除
     MyTextItem * myTextItem;           //文字信息
-
-    QList<MyArrow *> arrows;           //保存添加的箭头
 
 #ifdef ADD_STATE_MODEL
     StatePortProperty statePortProp;   //初始化端口设置

@@ -231,6 +231,47 @@ void MyPathItem::setEndPointType(PointType type)
     property.endPointType = type;
 }
 
+//在【LINE_NODEPORT】模式下保存起点的类型，将DragDirect映射到PointType
+void MyPathItem::setStartPointType(DragDirect type)
+{
+    if(type == DRAG_LEFT)
+    {
+        property.startPointType = MIDDLE_LEFT;
+    }
+    else if(type == DRAG_TOP)
+    {
+        property.startPointType = TOP_MIDDLE;
+    }
+    else if(type == DRAG_RIGHT)
+    {
+        property.startPointType = MIDDLE_RIGHT;
+    }
+    else if(type == DRAG_BOTTOM)
+    {
+        property.startPointType = BOTTOM_MIDDLE;
+    }
+}
+
+void MyPathItem::setEndPointType(DragDirect type)
+{
+    if(type == DRAG_LEFT)
+    {
+        property.endPointType = MIDDLE_LEFT;
+    }
+    else if(type == DRAG_TOP)
+    {
+        property.endPointType = TOP_MIDDLE;
+    }
+    else if(type == DRAG_RIGHT)
+    {
+        property.endPointType = MIDDLE_RIGHT;
+    }
+    else if(type == DRAG_BOTTOM)
+    {
+        property.endPointType = BOTTOM_MIDDLE;
+    }
+}
+
 //设置起点的条类型
 void MyPathItem::setStartLineType(int type)
 {

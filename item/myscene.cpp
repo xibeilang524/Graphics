@@ -212,6 +212,7 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
             }
         }
     }
+    //从端口拖出
     else if(!isDragLine && CurrAddGraType == GRA_LINE && insertTmpLine)
     {
         QList<QGraphicsItem *> startItems = items(insertTmpLine->line().p1());
@@ -277,6 +278,42 @@ void MyScene::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
         }
         removeItem(insertTmpPath);
         delete insertTmpPath;
+    }
+    //从端口拖出
+    else if(!isDragPathLine && CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
+    {
+        QList<QGraphicsItem *> startItems = items(SceneLastClickPoint);
+        if (startItems.count() && startItems.first() == insertTmpPath)
+        {
+            startItems.removeFirst();
+        }
+
+        QList<QGraphicsItem *> endItems = items(insertTmpPath->getEndPoint());
+        if (endItems.count() && endItems.first() == insertTmpPath)
+        {
+            endItems.removeFirst();
+        }
+
+        if (startItems.count() > 0 && endItems.count() > 0 &&
+            startItems.first() != endItems.first())
+        {
+            QString firstItemId = TYPE_ID(* startItems.first());
+            QString secondItemId = TYPE_ID(* endItems.first());
+
+            if(firstItemId == TYPE_ID(MyNodePort) && secondItemId == TYPE_ID(MyNodePort))
+            {
+                MyNodePort *startItem = qgraphicsitem_cast<MyNodePort *>(startItems.first());
+                MyNodePort *endItem = qgraphicsitem_cast<MyNodePort *>(endItems.first());
+
+                MyPathItem * pathItem = createPathItem(LINE_NODEPORT,startItem,endItem);
+                pathItem->setStartPointType(startItem->getDragDirect());
+                pathItem->setEndPointType(endItem->getDragDirect());
+                pathItem->updateCurrItemPos();
+            }
+        }
+
+        removeItem(insertTmpLine);
+        delete insertTmpLine;
     }
     else if(!isDragPathLine && CurrAddGraType == GRA_VECTOR_LINE && insertTmpPath)
     {
@@ -474,6 +511,23 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
                 pathItem->updateCurrItemPos();
             }
         }
+        else if(cutInfo.itemProperty.lineType == LINE_NODEPORT)
+        {
+            int startIndex = findItemById(localNodeports,cutInfo.itemProperty.startItemID);
+            int endIndex = findItemById(localNodeports,cutInfo.itemProperty.endItemID);
+
+            if(startIndex>=0&&startIndex<localNodeports.size() &&
+                    endIndex>=0&&endIndex<localNodeports.size())
+            {
+                MyNodePort * startItem = localNodeports.at(startIndex);
+                MyNodePort * endItem = localNodeports.at(endIndex);
+
+                MyPathItem * pathItem = createPathItem(LINE_NODEPORT,startItem,endItem);
+                pathItem->setProperty(cutInfo.itemProperty);
+                pathItem->setPathPoints(cutInfo.pathPoints);
+                pathItem->updateCurrItemPos();
+            }
+        }
     }
 }
 
@@ -548,12 +602,19 @@ MyPathItem * MyScene::createPathItem(LineType type, MyNodeLine *startNode, MyNod
     pathItem->setPos(startNode->getParentItem()->mapToScene(startNode->pos()));
 
     //对于从拖拽点产生的线条，需要保存其父类的ID和线条在父类的位置
-    if( type == LINE_MYITEM)
+    if(type == LINE_MYITEM)
     {
         MyItem * pStart = dynamic_cast<MyItem *>(startNode->getParentItem());
         MyItem * pEnd = dynamic_cast<MyItem *>(endNode->getParentItem());
         pathItem->setStartItemID(pStart->getProperty().startItemID);
         pathItem->setEndItemID(pEnd->getProperty().startItemID);
+    }
+    else if(type == LINE_NODEPORT)
+    {
+        MyNodePort * pStart = dynamic_cast<MyNodePort *>(startNode);
+        MyNodePort * pEnd = dynamic_cast<MyNodePort *>(endNode);
+        pathItem->setStartItemID(pStart->getNodeProperty().startItemID);
+        pathItem->setEndItemID(pEnd->getNodeProperty().startItemID);
     }
 
     pathItem->setZValue(-1000.0);

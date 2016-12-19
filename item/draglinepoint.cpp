@@ -98,7 +98,6 @@ void DragLinePoint::updateLinePos()
     }
 }
 
-
 DragLinePoint::~DragLinePoint()
 {
 

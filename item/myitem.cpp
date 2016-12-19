@@ -1295,6 +1295,7 @@ void MyItem::procPortChanged(MouseType type, QPointF currPoint)
             tmpPort->setScaleFactor(scaleFactor);
         }
 
+        tmpPort->updatePathQuoteType();
         emit updateSceneDraw();
     }
 }
@@ -2164,6 +2165,11 @@ void MyItem::updateLinePos()
     leftLinePoint->updateLinePos();
     rightLinePoint->updateLinePos();
     bottomLinePoint->updateLinePos();
+
+    foreach (MyNodePort* node, ports)
+    {
+        node->updateLinePos();
+    }
 
     emit updateSceneDraw();
 }

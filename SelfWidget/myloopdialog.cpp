@@ -169,7 +169,6 @@ void MyLoopDialog::respButtYesPress()
 
                 loopProp->signalList.at(j)->finalValue = loopProp->expList.at(i)->value.toInt();
                 loopProp->signalList.at(j)->operateSymbol = loopProp->expList.at(i)->expressType;
-                qDebug()<<loopProp->signalList.at(j)->finalValue<<"__"<<loopProp->signalList.at(i)->operateSymbol;
                 break;
             }
         }

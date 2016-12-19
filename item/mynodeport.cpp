@@ -9,6 +9,7 @@
 #include "myitem.h"
 #include "myarrow.h"
 #include "mytextitem.h"
+#include "mypathitem.h"
 #include "../manager/actionmanager.h"
 
 using namespace Graphics;
@@ -414,6 +415,32 @@ void MyNodePort::setPortInoutProp(StateInOutProperty &prop)
     setText(stateInOutProp.portName);
 }
 #endif
+
+//更新折线线条的位置
+void MyNodePort::updateLinePos()
+{
+    foreach(MyPathItem * pathItem,pathLines)
+    {
+        pathItem->updateCurrItemPos();
+    }
+}
+
+//当端口的方向改变后，需要更改折线的起点/终点的ItemType
+void MyNodePort::updatePathQuoteType()
+{
+    foreach(MyPathItem * pathItem,pathLines)
+    {
+        if(pathItem->getStartItem()->getProperty().startItemID == property.startItemID)
+        {
+            pathItem->setStartPointType(nodeProperty.direct);
+        }
+        else if(pathItem->getEndItem()->getProperty().startItemID == property.startItemID)
+        {
+            pathItem->setEndPointType(nodeProperty.direct);
+        }
+        pathItem->updateCurrItemPos();
+    }
+}
 
 MyNodePort::~MyNodePort()
 {

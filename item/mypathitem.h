@@ -55,6 +55,9 @@ public:
     void setStartPointType(PointType type);
     void setEndPointType(PointType type);
 
+    void setStartPointType(DragDirect type);
+    void setEndPointType(DragDirect type);
+
     void setProperty(ItemProperty property);
     ItemProperty getProperty(){return this->property;}
     GraphicsType getType(){return this->currItemType;}
