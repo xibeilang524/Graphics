@@ -23,6 +23,7 @@
 **20161123:wey:增加判断框条件的词法分析和逻辑运算
 **             调整服务返回结果，将结果包装成map集合
 **20161130:wey:增加对输入输出框的支持
+**20161220:wey:增加预处理和恢复服务，用于在主服务流程执行前进行环境设置
 *************************************************/
 #ifndef SIMULATECONTROLPANEL_H
 #define SIMULATECONTROLPANEL_H
@@ -103,6 +104,10 @@ private:
     QString switchQuoteParameter(MyItem *item, QString & express);
     QString findQuoteResult(MyItem * item, QString quoteServiceName, QString quoteParaName);
     void showCurrProcessResultPanel(bool isPanelEditable);
+    void preExecuteServices();
+    void resetExecuteServices();
+
+    void intSimulateData();
 
     Ui::SimulateControlPanel *ui;
 
@@ -110,6 +115,8 @@ private:
 
     bool isSimulateState;                   //是否为模拟状态
     bool isAutoRun;                         //是否为自动运行
+    SimulateFlow sflow;                     //标识不同阶段的处理流程
+    int preOrResetIndex;                    //执行预处理或现场恢复服务时，当前处理的索引
 
     ProcessUnit * currProcUnit;             //当前处理单元
     ProcessUnit * beforeUnit;               //之前处理单元(推演结束置为NULL)

@@ -26,6 +26,8 @@ extern int GlobalRotateStep; 		 		 	  //旋转到对应角度才进行角度切换
 extern qreal GlobalMinMumSize;            		  //控件缩小的最小范围
 
 extern QList<ServiceProperty *> GlobalServiceProperties;     //全局的服务信息
+extern QList<ServiceProperty *> PreExeServices;              //预处理服务
+extern QList<ServiceProperty *> ResetExeServices;            //重置服务
 
 extern bool GlobalIsSimulateState;               //是否为推演状态，如果是则不允许进行状态变更
 

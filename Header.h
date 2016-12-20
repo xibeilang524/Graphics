@@ -45,6 +45,9 @@
 
 #define LOOP_UNTIL_EXPRESS_ILLEGAL "直到引用值不符合条件"   //循环终止条件无需++、--，直到引用值不满足条件
 
+#define SERVICE_ENABLE "可用"             //数据库某个服务状态标识
+#define SERVICE_DISABLE "不可用"
+
 #define COMBOX_STYLESHEET "QComboBox QAbstractItemView::item{height:23px;}\
                             QComboBox QAbstractItemView::item:hover{background-color:#567dbc;}"
 
@@ -642,6 +645,14 @@ struct StateModelProperty
     QString stateName;          //状态名
     QString continueContent;    //持续事件行为
     QList<StatInnerProperty> props;   //内部事件集合
+};
+
+//模拟处理的流程(预处理、主流程、恢复流程)
+enum SimulateFlow
+{
+    PRE_FLOW,
+    MAIN_FLOW,
+    RESET_FLOW
 };
 
 #endif

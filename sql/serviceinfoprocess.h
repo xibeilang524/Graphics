@@ -24,6 +24,8 @@ public:
 
     QString getLastError();
 
+    void setServiceStatus(QString id, bool isEnable);
+
 private:
     ServiceInfoProcess();
     static ServiceInfoProcess * serviceProcess;

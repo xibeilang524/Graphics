@@ -6,7 +6,6 @@
 #include <QDebug>
 
 #include "../global.h"
-#include "../Header.h"
 #include "../manager/listitemmanager.h"
 #include "../simulate/simulateutil.h"
 #include "../item/mygraphicsview.h"

@@ -56,6 +56,7 @@ MyPropertyEdit::MyPropertyEdit(QWidget *parent) :
     ui->outputWidget->setLayout(outputtLayout);
 
     currItemProp = NULL;
+    currServiceIndex = -1;
 
     connect(ui->serviceName,SIGNAL(currentIndexChanged(int)),this,SLOT(switchServiceInfo(int)));
 }
@@ -91,7 +92,7 @@ void MyPropertyEdit::initProp(ServiceProperty *prop,bool isEditable)
                 break;
             }
         }
-
+        currServiceIndex = index;
         ui->serviceName->setCurrentIndex(index);
 
         ui->serviceState->setText(prop->status);
@@ -133,6 +134,8 @@ void MyPropertyEdit::switchServiceInfo(int index)
         ui->servicePath->setText(prop->servicePath);
         ui->servicePort->setText(prop->method);
 
+        currServiceIndex = index;
+
         inputTableView->clearTable();
         for(int i = 0;i<prop->inputParas.size(); i++)
         {
@@ -155,6 +158,11 @@ void MyPropertyEdit::confirmPropety()
     if(!isEditState)
     {
         return;
+    }
+
+    if(currServiceIndex >= 0 && currServiceIndex < GlobalServiceProperties.size())
+    {
+        currItemProp->id = GlobalServiceProperties.at(currServiceIndex)->id;
     }
 
     currItemProp->hasSettInfo = true;

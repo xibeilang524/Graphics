@@ -53,6 +53,7 @@ private:
     bool isComboxAutoChanged;               //下拉框如果自动改变，则无需响应槽函数
     MyChooseBar * chooseBar;
     bool isEditState;                       //是否为编辑状态
+    int currServiceIndex;                   //当前服务的索引
 };
 
 #endif // MYPROPERTYEDIT_H

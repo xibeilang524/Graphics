@@ -17,6 +17,7 @@
 #include "../util.h"
 #include "../webservice/mywebservice.h"
 #include "../SelfWidget/beforesimulateserviceconfig.h"
+#include "../sql/serviceinfoprocess.h"
 
 MyListWidgetItem::MyListWidgetItem(QListWidget *parent, int type)
     :QListWidgetItem(parent,type)
@@ -47,6 +48,8 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     beforeUnit = NULL;
     isSimulateState = false;
     isAutoRun = true;
+    sflow = PRE_FLOW;
+    preOrResetIndex = 0;
 
     connect(ui->startSimulate,SIGNAL(clicked()),this,SLOT(respStartSimulate()));
     connect(ui->simProcedure,SIGNAL(currentItemChanged(QListWidgetItem * , QListWidgetItem *)),this,SLOT(respItemChanged(QListWidgetItem * , QListWidgetItem *)));
@@ -62,6 +65,110 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     ui->terminalSimulate->setEnabled(false);
 
     connect(MyWebService::instance(),SIGNAL(lastUnitProcessOver(bool,QMap<QString,QString>)),this,SLOT(procLastUnitResult(bool,QMap<QString,QString>)));
+
+    /*************可删***************/
+    intSimulateData();
+}
+
+//初始化模拟全局数据【可删】
+void SimulateControlPanel::intSimulateData()
+{
+    ServiceProperty * prop1 = new ServiceProperty;
+    prop1->hasSettInfo = true;
+    prop1->serviceName = "蓝方飞机初始化";
+
+    prop1->servicePath = "http://localhost:8080/axis2/services/BluePlane";
+    prop1->method = "Initial";
+
+    Parameter * para1 = new Parameter;
+    para1->pName = "destinationX";
+    para1->pValue = "39.9";
+    para1->pType = "double";
+
+    Parameter * para2 = new Parameter;
+    para2->pName = "destinationY";
+    para2->pValue = "116.3";
+    para2->pType = "double";
+
+    Parameter * para3 = new Parameter;
+    para3->pName = "destinationZ";
+    para3->pValue = "500";
+    para3->pType = "double";
+
+    Parameter * para4 = new Parameter;
+    para4->pName = "startX";
+    para4->pValue = "38.18";
+    para4->pType = "double";
+
+    Parameter * para5 = new Parameter;
+    para5->pName = "startY";
+    para5->pValue = "122.01";
+    para5->pType = "double";
+
+    Parameter * para6 = new Parameter;
+    para6->pName = "startZ";
+    para6->pValue = "10000";
+    para6->pType = "double";
+
+    prop1->inputParas.append(para1);
+    prop1->inputParas.append(para2);
+    prop1->inputParas.append(para3);
+    prop1->inputParas.append(para4);
+    prop1->inputParas.append(para5);
+    prop1->inputParas.append(para6);
+
+    PreExeServices.append(prop1);
+
+    ServiceProperty * prop2 = new ServiceProperty;
+    prop2->hasSettInfo = true;
+    prop2->serviceName = "探测服务初始化";
+    prop2->servicePath = "http://localhost:8080/axis2/services/DetectModel";
+    prop2->method = "Initial";
+
+    Parameter * para11 = new Parameter;
+    para11->pName = "dplaneX";
+    para11->pValue = "39.01";
+    para11->pType = "double";
+
+    Parameter * para12 = new Parameter;
+    para12->pName = "dplaneY";
+    para12->pValue = "121.49";
+    para12->pType = "double";
+
+    Parameter * para13 = new Parameter;
+    para13->pName = "dplaneZ";
+    para13->pValue = "1000";
+    para13->pType = "double";
+
+    Parameter * para14 = new Parameter;
+    para14->pName = "radarX";
+    para14->pValue = "39.13";
+    para14->pType = "double";
+
+    Parameter * para15 = new Parameter;
+    para15->pName = "radarY";
+    para15->pValue = "117.20";
+    para15->pType = "double";
+
+    Parameter * para16 = new Parameter;
+    para16->pName = "radarZ";
+    para16->pValue = "100";
+    para16->pType = "double";
+
+    Parameter * para17 = new Parameter;
+    para17->pName = "ratio1";
+    para17->pValue = "0.9";
+    para17->pType = "double";
+
+    prop2->inputParas.append(para11);
+    prop2->inputParas.append(para12);
+    prop2->inputParas.append(para13);
+    prop2->inputParas.append(para14);
+    prop2->inputParas.append(para15);
+    prop2->inputParas.append(para16);
+    prop2->inputParas.append(para17);
+
+    PreExeServices.append(prop2);
 }
 
 //自动运行
@@ -168,15 +275,16 @@ void SimulateControlPanel::respStartSimulate()
 
     clearLastSimluteRecord();
 
-
+    //弹出信息汇总面板
     BeforeSimulateServiceConfig bsconfig(GlobalMainWindow);
     bsconfig.setProcedureData(procUnits);
     bsconfig.exec();
 
     isSimulateState = true;
-    //【5】对处理单元进行处理
-    currProcUnit = procUnits.first();
-    startProcUnit();
+
+    sflow = PRE_FLOW;
+    preOrResetIndex = 0;
+    preExecuteServices();
 }
 
 //清空上一次推演的记录
@@ -200,34 +308,45 @@ void SimulateControlPanel::clearLastSimluteRecord()
 //针对当前处理单元返回的结果进行处理
 void SimulateControlPanel::procLastUnitResult(bool hasFault,QMap<QString,QString> result)
 {
-    if(hasFault)
+    if(sflow == PRE_FLOW)
     {
-        currProcUnit->item->hightLightItem(LEVEL_MIDDLE,true);
-        Util::showWarn("服务访问出错，推演流程终止!");
-        setSimulateState(false);
-        return;
+        preExecuteServices();
     }
-
-    if(currProcUnit->ptype == PRO_PROCESS)
+    else if(sflow == RESET_FLOW)
     {
-        ServiceProperty * prop = currProcUnit->item->getServiceProp();
-
-        foreach(Parameter * para,prop->outputParas)
+        resetExecuteServices();
+    }
+    else
+    {
+        if(hasFault && currProcUnit)
         {
-            para->pValue = result.value(para->pName);
+            currProcUnit->item->hightLightItem(LEVEL_MIDDLE,true);
+            Util::showWarn("服务访问出错，推演流程终止!");
+            setSimulateState(false);
+            return;
         }
 
-        if(!isAutoRun)
+        if(currProcUnit && currProcUnit->ptype == PRO_PROCESS)
         {
-            showCurrProcessResultPanel(false);
+            ServiceProperty * prop = currProcUnit->item->getServiceProp();
+
+            foreach(Parameter * para,prop->outputParas)
+            {
+                para->pValue = result.value(para->pName);
+            }
+
+            if(!isAutoRun)
+            {
+                showCurrProcessResultPanel(false);
+            }
+
+            currProcUnit = currProcUnit->nextChild;
         }
 
-        currProcUnit = currProcUnit->nextChild;
-    }
-
-    if(isAutoRun)
-    {
-        startProcUnit();
+        if(isAutoRun)
+        {
+            startProcUnit();
+        }
     }
 }
 
@@ -342,8 +461,8 @@ void SimulateControlPanel::startProcUnit()
         //结束
         else if(currProcUnit->ptype == PRO_END)
         {
-            setSimulateState(false);
-            currProcUnit->item->hightLightItem(LEVEL_NORMAL,true);
+            sflow = RESET_FLOW;
+            resetExecuteServices();
             break;
         }
 
@@ -485,7 +604,7 @@ void SimulateControlPanel::submitUrl(MyItem * item, ServiceProperty * prop)
         {
             QString paraValue = prop->inputParas.at(i)->pValue;
             QString realParaValue;
-            if(paraValue.startsWith(QString(COMBOX_START_FLAG)))
+            if(item && paraValue.startsWith(QString(COMBOX_START_FLAG)))
             {
                 realParaValue = getQuoteOutValue(item,paraValue);
             }
@@ -769,6 +888,46 @@ void SimulateControlPanel::showCurrProcessResultPanel(bool isPanelEditable)
         QListWidgetItem  * lastItem = ui->simProcedure->item(ui->simProcedure->count() - 1);
         MyListWidgetItem * citem = dynamic_cast<MyListWidgetItem *>(lastItem);
         MyGraphicsView::instance()->showSelectedItemPropEdit(citem->getUnit()->item,citem->data(Qt::UserRole),isPanelEditable);
+    }
+}
+
+//执行预处理操作
+void SimulateControlPanel::preExecuteServices()
+{
+    if(preOrResetIndex >= PreExeServices.size() && sflow == PRE_FLOW)
+    {
+        sflow = MAIN_FLOW;
+    }
+
+    if(sflow == PRE_FLOW && preOrResetIndex >=0 && preOrResetIndex < PreExeServices.size())
+    {
+        ServiceProperty  * prop = PreExeServices.at(preOrResetIndex);
+        submitUrl(NULL,prop);
+        preOrResetIndex++;
+    }
+    else if(sflow == MAIN_FLOW)
+    {
+        //【5】对处理单元进行处理
+        preOrResetIndex = 0;
+        currProcUnit = procUnits.first();
+        startProcUnit();
+    }
+}
+
+//执行恢复操作
+void SimulateControlPanel::resetExecuteServices()
+{
+    if(sflow == RESET_FLOW && preOrResetIndex >= ResetExeServices.size())
+    {
+        setSimulateState(false);
+        currProcUnit->item->hightLightItem(LEVEL_NORMAL,true);
+    }
+
+    if(sflow == RESET_FLOW && preOrResetIndex >=0 && preOrResetIndex < ResetExeServices.size())
+    {
+        ServiceProperty  * prop = ResetExeServices.at(preOrResetIndex);
+        submitUrl(NULL,prop);
+        preOrResetIndex++;
     }
 }
 

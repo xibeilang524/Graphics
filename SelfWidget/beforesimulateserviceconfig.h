@@ -7,7 +7,7 @@
 **       所有输入信息的确认，允许编辑和修改。
 **
 **修改历史:
-**
+**20161219:wey:添加服务流程执行前后的初始化和恢复工作
 *************************************************/
 #ifndef BEFORESIMULATESERVICECONFIG_H
 #define BEFORESIMULATESERVICECONFIG_H
@@ -39,6 +39,8 @@ private slots:
     void respSwitchService(int currIndex);
     void switchServiceInfo(int currIndex);
     void applyService();
+    void initServiceEnvir();
+    void resetServiceEnvir();
     
 private:
     void initServiceData();

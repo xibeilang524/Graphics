@@ -37,7 +37,7 @@ bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty *> &properties
 {
     QString sql = "select s.id,s.name,s.status,s.description,sd.url,s.method,s.outputName,s.outputType from\
             business_softwareonline s left join business_softwareonline_deploy sd\
-                on s.id = sd.relationId where s.status = '可用'";
+                on s.id = sd.relationId where s.status = '"+QString(SERVICE_ENABLE)+"'";
     bool flag = SQLDataAdapter::instance()->getSericeProperties(sql,properties);
 
     if(flag)
@@ -74,6 +74,14 @@ bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty *> &properties
    return flag;
 }
 
+//设置服务的状态
+void ServiceInfoProcess::setServiceStatus(QString id,bool isEnable)
+{
+    QString tableName = "business_softwareonline";
+    QStringList updateKey;
+    updateKey<<"";
+
+}
 
 
 //获取最新的错误信息

@@ -2,6 +2,7 @@
 #include "ui_beforesimulateserviceconfig.h"
 
 #include "mychoosebar.h"
+#include "initservice.h"
 #include "../global.h"
 #include "../item/myitem.h"
 #include "../modelview/serviceinputtableview.h"
@@ -59,6 +60,9 @@ BeforeSimulateServiceConfig::BeforeSimulateServiceConfig(QWidget *parent) :
     connect(ui->serviceList,SIGNAL(currentRowChanged(int)),this,SLOT(respSwitchService(int)));
     connect(ui->serviceName,SIGNAL(currentIndexChanged(int)),this,SLOT(switchServiceInfo(int)));
     connect(ui->applyService,SIGNAL(clicked()),this,SLOT(applyService()));
+
+    connect(ui->initService,SIGNAL(clicked()),this,SLOT(initServiceEnvir()));
+    connect(ui->resetService,SIGNAL(clicked()),this,SLOT(resetServiceEnvir()));
 }
 
 //对流程中处理单元进行解析
@@ -263,6 +267,24 @@ void BeforeSimulateServiceConfig::updateLeftQuoteTable(QList<MyItem *> & pItems)
         ui->quoteTable->item(0,0)->setText("无");
         ui->quoteTable->item(0,1)->setToolTip("无");
     }
+}
+
+//初始化服务执行环境
+void BeforeSimulateServiceConfig::initServiceEnvir()
+{
+    InitService service(this);
+    service.setWindowTitle("初始化服务执行环境");
+    service.preService();
+    service.exec();
+}
+
+//重置服务执行环境
+void BeforeSimulateServiceConfig::resetServiceEnvir()
+{
+    InitService service(this);
+    service.setWindowTitle("恢复服务执行环境");
+    service.resetService();
+    service.exec();
 }
 
 BeforeSimulateServiceConfig::~BeforeSimulateServiceConfig()
