@@ -318,6 +318,11 @@ void SimulateControlPanel::procLastUnitResult(bool hasFault,QMap<QString,QString
     }
     else
     {
+        if(currProcUnit && currProcUnit->item->getServiceProp()->id.size() > 0)
+        {
+            ServiceInfoProcess::instance()->setServiceStatus(currProcUnit->item->getServiceProp()->id,true);
+        }
+
         if(hasFault && currProcUnit)
         {
             currProcUnit->item->hightLightItem(LEVEL_MIDDLE,true);
@@ -366,6 +371,7 @@ void SimulateControlPanel::startProcUnit()
         else if(currProcUnit->ptype == PRO_PROCESS)
         {
             ServiceProperty * prop = currProcUnit->item->getServiceProp();
+            ServiceInfoProcess::instance()->setServiceStatus(prop->id,false);
             submitUrl(currProcUnit->item,prop);
             break;
         }

@@ -75,12 +75,23 @@ bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty *> &properties
 }
 
 //设置服务的状态
-void ServiceInfoProcess::setServiceStatus(QString id,bool isEnable)
+bool ServiceInfoProcess::setServiceStatus(QString id,bool isEnable)
 {
     QString tableName = "business_softwareonline";
-    QStringList updateKey;
-    updateKey<<"";
+    QMap<QString,QString> updateKey;
+    if(isEnable)
+    {
+        updateKey.insert("status",QString("'"+QString(SERVICE_ENABLE)+"'"));
+    }
+    else
+    {
+        updateKey.insert("status",QString("'"+QString(SERVICE_DISABLE)+"'"));
+    }
 
+    QMap<QString,QString> conditionKeyAndValue;
+    conditionKeyAndValue.insert("id",QString("'"+id+"'"));
+
+    return updateData(tableName,updateKey,conditionKeyAndValue);
 }
 
 
