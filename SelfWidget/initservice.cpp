@@ -365,7 +365,7 @@ void InitService::switchServiceInfo(int currIndex)
 }
 
 //查找是否已存在服务
-bool InitService::findHasExistedService(QString & sname)
+bool InitService::findHasExistedService(QString sname)
 {
     if(isPreModel)
     {

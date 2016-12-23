@@ -808,8 +808,8 @@ void MyItem::dragEnterEvent(QGraphicsSceneDragDropEvent *event)
         int graphicsType;
         stream>>graphicsType;
 
-        if(graphicsType == GRA_NODE_PORT || graphicsType == GRA_NODE_TRIANGLE_OUT || graphicsType == GRA_NODE_HALF_CIRCLE
-                || graphicsType == GRA_NODE_TRIANGLE_OUT || graphicsType == GRA_NODE_TRIANGLE_IN || graphicsType ==GRA_NODE_CIRCLE)
+        if(graphicsType == GRA_NODE_PORT || graphicsType == GRA_NODE_TRIANGLE_OUT || graphicsType == GRA_NODE_HALF_CIRCLE_IN
+            || graphicsType == GRA_NODE_HALF_CIRCLE_OUT     || graphicsType == GRA_NODE_TRIANGLE_OUT || graphicsType == GRA_NODE_TRIANGLE_IN || graphicsType ==GRA_NODE_CIRCLE)
         {
             dragGraphicsType = (GraphicsType)graphicsType;
             setSelected(true);

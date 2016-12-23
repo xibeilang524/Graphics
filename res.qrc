@@ -81,11 +81,12 @@
         <file>images/softicon.png</file>
         <file>images/softicon.ico</file>
         <file>images/log.rc</file>
-        <file>images/nodeHalfCircle.png</file>
         <file>images/nodeTriangle.png</file>
         <file>images/State_End.png</file>
         <file>images/State_Start.png</file>
         <file>images/project.png</file>
         <file>images/startup.png</file>
+        <file>images/nodeHalfCircleIn.png</file>
+        <file>images/nodeHalfCircleOut.png</file>
     </qresource>
 </RCC>

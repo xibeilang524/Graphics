@@ -144,7 +144,7 @@ enum GraphicsType
     GRA_ITEM_INFO,       //控件显示信息
     //端口
     GRA_NODE_PROCESS,         //原子处理窗口
-    GRA_NODE_HALF_CIRCLE,     //D端口
+    GRA_NODE_HALF_CIRCLE_OUT, //D端口输出端口
     GRA_NODE_TRIANGLE_IN ,    //三角输入端口
     GRA_NODE_TRIANGLE_OUT,    //三角输出端口
     GRA_NODE_CIRCLE,          //圆输出端口
@@ -158,6 +158,8 @@ enum GraphicsType
     GRA_MASK_BOUND_RECT,      //圆角矩形遮罩
     GRA_MASK_CIRCLE,          //圆形遮罩
 #endif
+
+    GRA_NODE_HALF_CIRCLE_IN,  //D端口输入端口
     GRA_NO_MEAN               //无意义值
 };
 

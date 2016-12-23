@@ -144,9 +144,13 @@ void LeftIconWidget::initListItems()
     nodeTriangleOutPort->setData(Qt::UserRole,(int)GRA_NODE_TRIANGLE_IN);
     nodeWidget->addItem(nodeTriangleOutPort);
 
-    MyListItem * nodeHalfCircle = ListItemManager::instance()->createListItem(Constants::NODE_HALF_CIRCLE_ID,QIcon(":/images/nodeHalfCircle.png"),"D形端口",nodeWidget);
-    nodeHalfCircle->setData(Qt::UserRole,(int)GRA_NODE_HALF_CIRCLE);
-    nodeWidget->addItem(nodeHalfCircle);
+    MyListItem * nodeHalfCircleIn = ListItemManager::instance()->createListItem(Constants::NODE_HALF_CIRCLE_IN_ID,QIcon(":/images/nodeHalfCircleIn.png"),"D形输入端口",nodeWidget);
+    nodeHalfCircleIn->setData(Qt::UserRole,(int)GRA_NODE_HALF_CIRCLE_IN);
+    nodeWidget->addItem(nodeHalfCircleIn);
+
+    MyListItem * nodeHalfCircleOut = ListItemManager::instance()->createListItem(Constants::NODE_HALF_CIRCLE_OUT_ID,QIcon(":/images/nodeHalfCircleOut.png"),"D形输出端口",nodeWidget);
+    nodeHalfCircleOut->setData(Qt::UserRole,(int)GRA_NODE_HALF_CIRCLE_OUT);
+    nodeWidget->addItem(nodeHalfCircleOut);
 
     MyListItem * nodeCircle = ListItemManager::instance()->createListItem(Constants::NODE_CIRCLE_ID,QIcon(":/images/circle.png"),"圆形端口",nodeWidget);
     nodeCircle->setData(Qt::UserRole,(int)GRA_NODE_CIRCLE);

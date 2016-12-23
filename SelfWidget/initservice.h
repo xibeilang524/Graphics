@@ -46,7 +46,7 @@ private slots:
 private:
     void initServiceData();
     void updateDelegateList(QList<MyItem *> pItems);
-    bool findHasExistedService(QString & sname);
+    bool findHasExistedService(QString sname);
     void showSelectedItemInfo(ServiceProperty *prop);
     void setButtState(bool isAddEnabled);
 

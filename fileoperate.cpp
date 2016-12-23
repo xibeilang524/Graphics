@@ -137,7 +137,7 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
         GraphicsType gtype = (GraphicsType)type;
 
         //item上的端口信息
-        if(gtype == GRA_NODE_PORT ||gtype == GRA_NODE_HALF_CIRCLE
+        if(gtype == GRA_NODE_PORT ||gtype == GRA_NODE_HALF_CIRCLE_IN ||gtype == GRA_NODE_HALF_CIRCLE_OUT
                 ||gtype == GRA_NODE_TRIANGLE_OUT ||gtype == GRA_NODE_TRIANGLE_IN ||gtype == GRA_NODE_CIRCLE)
         {
             NodePortProperty nodeProperty;

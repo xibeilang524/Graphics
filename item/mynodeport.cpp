@@ -120,7 +120,15 @@ void MyNodePort::setDragDirect(DragDirect direct)
         {
             case DRAG_LEFT:
                             {
-                                if(currItemType == GRA_NODE_HALF_CIRCLE)
+                                if(currItemType == GRA_NODE_HALF_CIRCLE_IN)
+                                {
+                                    QPainterPath path;
+                                    path.moveTo(-radius,-radius);
+                                    path.lineTo(-radius,radius);
+                                    path.arcTo(QRectF(-radius,-radius,2*radius,2*radius),-90,180);
+                                    itemPolygon = path.toFillPolygon();
+                                }
+                                else if(currItemType == GRA_NODE_HALF_CIRCLE_OUT)
                                 {
                                     QPainterPath path;
                                     path.moveTo(radius,-radius);
@@ -142,7 +150,15 @@ void MyNodePort::setDragDirect(DragDirect direct)
                             }
             case DRAG_TOP:
                             {
-                                if(currItemType == GRA_NODE_HALF_CIRCLE)
+                                if(currItemType == GRA_NODE_HALF_CIRCLE_IN)
+                                {
+                                    QPainterPath path;
+                                    path.moveTo(radius,-radius);
+                                    path.lineTo(-radius,-radius);
+                                    path.arcTo(QRectF(-radius,-radius,2*radius,2*radius),180,180);
+                                    itemPolygon = path.toFillPolygon();
+                                }
+                                else if(currItemType == GRA_NODE_HALF_CIRCLE_OUT)
                                 {
                                     QPainterPath path;
                                     path.moveTo(radius,radius);
@@ -164,7 +180,15 @@ void MyNodePort::setDragDirect(DragDirect direct)
                             }
             case DRAG_RIGHT:
                             {
-                                if(currItemType == GRA_NODE_HALF_CIRCLE)
+                                if(currItemType == GRA_NODE_HALF_CIRCLE_IN)
+                                {
+                                    QPainterPath path;
+                                    path.moveTo(radius,radius);
+                                    path.lineTo(radius,-radius);
+                                    path.arcTo(QRectF(-radius,-radius,2*radius,2*radius),90,180);
+                                    itemPolygon = path.toFillPolygon();
+                                }
+                                else if(currItemType == GRA_NODE_HALF_CIRCLE_OUT)
                                 {
                                     QPainterPath path;
                                     path.moveTo(-radius,-radius);
@@ -186,7 +210,15 @@ void MyNodePort::setDragDirect(DragDirect direct)
                             }
             case DRAG_BOTTOM:
                             {
-                                if(currItemType == GRA_NODE_HALF_CIRCLE)
+                                if(currItemType == GRA_NODE_HALF_CIRCLE_IN)
+                                {
+                                    QPainterPath path;
+                                    path.moveTo(radius,radius);
+                                    path.lineTo(-radius,radius);
+                                    path.arcTo(QRectF(-radius,-radius,2*radius,2*radius),180,-180);
+                                    itemPolygon = path.toFillPolygon();
+                                }
+                                else if(currItemType == GRA_NODE_HALF_CIRCLE_OUT)
                                 {
                                     QPainterPath path;
                                     path.moveTo(-radius,-radius);

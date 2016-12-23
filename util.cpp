@@ -161,8 +161,11 @@ void Util::loadPixmapByGType(GraphicsType type, QPixmap &pixmap)
         case GRA_NODE_TRIANGLE_IN:
                            pixmap.load(":/images/nodeTriangle.png");
                            break;
-        case GRA_NODE_HALF_CIRCLE:
-                           pixmap.load(":/images/nodeHalfCircle.png");
+        case GRA_NODE_HALF_CIRCLE_IN:
+                           pixmap.load(":/images/nodeHalfCircleIn.png");
+                           break;
+        case GRA_NODE_HALF_CIRCLE_OUT:
+                           pixmap.load(":/images/nodeHalfCircleOut.png");
                            break;
         case GRA_NODE_CIRCLE:
                            pixmap.load(":/images/circle.png");
