@@ -144,7 +144,45 @@ void MyPathItem::paint(QPainter *painter, const QStyleOptionGraphicsItem *option
     painter->setPen(property.itemPen);
     painter->drawPath(painterPath);
 
-    if(property.endLineType == LINE_SOLID_TRIANGLE)
+    //Æðµã
+    if(property.startLineType == LINE_HORIZONTAL)
+    {
+
+    }
+    else if(property.startLineType == LINE_SOLID_TRIANGLE)
+    {
+        QPolygonF polygon;
+        if(points.size() > 0)
+        {
+            QPointF lastPoint = points.first();
+            if(property.startPointType == MIDDLE_LEFT)
+            {
+                polygon<<lastPoint<<QPointF(lastPoint.x() - ARROW_SIZE,lastPoint.y() - ARROW_SIZE/2)<<QPointF(lastPoint.x() - ARROW_SIZE,lastPoint.y()+ARROW_SIZE/2);
+            }
+            else if(property.startPointType == TOP_MIDDLE)
+            {
+                polygon<<lastPoint<<QPointF(lastPoint.x() - ARROW_SIZE/2,lastPoint.y() - ARROW_SIZE)<<QPointF(lastPoint.x() + ARROW_SIZE/2,lastPoint.y()-ARROW_SIZE);
+            }
+            else if(property.startPointType == MIDDLE_RIGHT)
+            {
+                polygon<<lastPoint<<QPointF(lastPoint.x() + ARROW_SIZE,lastPoint.y() - ARROW_SIZE/2)<<QPointF(lastPoint.x() + ARROW_SIZE,lastPoint.y()+ARROW_SIZE/2);
+            }
+            else if(property.startPointType == BOTTOM_MIDDLE)
+            {
+                polygon<<lastPoint<<QPointF(lastPoint.x() - ARROW_SIZE/2,lastPoint.y() + ARROW_SIZE)<<QPointF(lastPoint.x() + ARROW_SIZE/2,lastPoint.y()+ARROW_SIZE);
+            }
+        }
+
+        painter->setBrush(property.itemBrush);
+        painter->drawPolygon(polygon);
+    }
+
+    //ÖÕµã
+    if(property.endLineType == LINE_HORIZONTAL)
+    {
+
+    }
+    else if(property.endLineType == LINE_SOLID_TRIANGLE)
     {
         QPolygonF polygon;
         if(points.size() > 0)

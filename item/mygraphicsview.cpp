@@ -1018,6 +1018,21 @@ void MyGraphicsView::setSelectedLineType(int type)
                 arrowItem->setEndLineType(type);
             }
         }
+        else if(itemName == TYPE_ID(MyPathItem))
+        {
+            MyPathItem  * pathItem = dynamic_cast<MyPathItem *>(myScene->selectedItems().first());
+
+            QString objName = QObject::sender()->objectName();
+            if(objName == QString(Constants::LEFT_LINE_ID))
+            {
+                pathItem->setStartLineType(type);
+            }
+            else if(objName == QString(Constants::RIGHT_LINE_ID))
+            {
+                pathItem->setEndLineType(type);
+            }
+            myScene->update();
+        }
     }
 }
 
