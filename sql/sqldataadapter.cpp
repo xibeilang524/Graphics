@@ -100,6 +100,22 @@ bool SQLDataAdapter::getParameterById(QString sql,QList<Parameter> & list)
     return flag;
 }
 
+//根据服务名获取url地址
+bool SQLDataAdapter::getServiceUrl(QString sql, QString &result)
+{
+    DataList dataList;
+    bool flag = SQLProecss::instance()->obtainData(sql,dataList);
+    if(flag)
+    {
+        if(dataList.size() >= 1)
+        {
+            result = dataList.at(0).at(0).toString();
+            return true;
+        }
+    }
+    return false;
+}
+
 SQLDataAdapter::~SQLDataAdapter()
 {
     if(adapter)

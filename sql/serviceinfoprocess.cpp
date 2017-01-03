@@ -94,6 +94,13 @@ bool ServiceInfoProcess::setServiceStatus(QString id,bool isEnable)
     return updateData(tableName,updateKey,conditionKeyAndValue);
 }
 
+//根据服务名查找对应的URL
+bool ServiceInfoProcess::getUrlByServiceName(QString sname,QString &result)
+{
+    QString sql = "select sd.url from business_softwareonline s left join business_softwareonline_deploy sd\
+            on s.id = sd.relationId where s.name='"+sname+"'";
+    return SQLDataAdapter::instance()->getServiceUrl(sql,result);
+}
 
 //获取最新的错误信息
 QString ServiceInfoProcess::getLastError()

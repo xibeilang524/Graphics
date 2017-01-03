@@ -408,6 +408,7 @@ void MyPathItem::getNewLine()
         rightMaxX += 2;
         rightMaxY += 2;
 
+        //此boundRect和setPos有关
         boundRect = QRectF(QPointF(leftMinX,leftMinY),QPointF(rightMaxX,rightMaxY));
     }
 

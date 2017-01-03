@@ -77,7 +77,16 @@ void SimulateControlPanel::intSimulateData()
     prop1->hasSettInfo = true;
     prop1->serviceName = "蓝方飞机初始化";
 
-    prop1->servicePath = "http://localhost:8080/axis2/services/BluePlane";
+    QString path1;
+    if(ServiceInfoProcess::instance()->getUrlByServiceName(prop1->serviceName,path1))
+    {
+        prop1->servicePath = path1;
+    }
+    else
+    {
+        prop1->servicePath = "http://localhost:8080/axis2/services/BluePlane";
+    }
+
     prop1->method = "Initial";
 
     Parameter * para1 = new Parameter;
@@ -122,7 +131,17 @@ void SimulateControlPanel::intSimulateData()
     ServiceProperty * prop2 = new ServiceProperty;
     prop2->hasSettInfo = true;
     prop2->serviceName = "探测服务初始化";
-    prop2->servicePath = "http://localhost:8080/axis2/services/DetectModel";
+    QString path2;
+
+    if(ServiceInfoProcess::instance()->getUrlByServiceName(prop2->serviceName,path2))
+    {
+        prop2->servicePath = path2;
+    }
+    else
+    {
+        prop2->servicePath = "http://localhost:8080/axis2/services/DetectModel";
+    }
+
     prop2->method = "Initial";
 
     Parameter * para11 = new Parameter;

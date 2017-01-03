@@ -6,7 +6,7 @@
 **Others: 服务信息访问
 **
 **修改历史:
-**
+**20170103:wey:添加根据服务名查找对应的URL
 *************************************************/
 #ifndef SERVICEINFOPROCESS_H
 #define SERVICEINFOPROCESS_H
@@ -25,6 +25,8 @@ public:
     QString getLastError();
 
     bool setServiceStatus(QString id, bool isEnable);
+
+    bool getUrlByServiceName(QString sname, QString &result);
 
 private:
     ServiceInfoProcess();

@@ -23,20 +23,20 @@ int main(int argc, char *argv[])
     QTextCodec * codec = QTextCodec::codecForName("GB2312");
     QTextCodec::setCodecForCStrings(codec);
 
-//    QPixmap pixmap(":/images/startup.png");
-//    QSplashScreen screen(pixmap);
-//    screen.setGeometry((ScreenWidth - pixmap.width())/2,(ScreenHeight - pixmap.height())/2,pixmap.width(),pixmap.height());
-//    screen.show();
-//    a.processEvents();
+    QPixmap pixmap(":/images/startup.png");
+    QSplashScreen screen(pixmap);
+    screen.setGeometry((ScreenWidth - pixmap.width())/2,(ScreenHeight - pixmap.height())/2,pixmap.width(),pixmap.height());
+    screen.show();
+    a.processEvents();
 
-//    QDateTime n = QDateTime::currentDateTime();
-//    QDateTime now;
-//    do{
-//        now = QDateTime::currentDateTime();
-//    }
-//    while(n.secsTo(now)<=3);
+    QDateTime n = QDateTime::currentDateTime();
+    QDateTime now;
+    do{
+        now = QDateTime::currentDateTime();
+    }
+    while(n.secsTo(now)<=3);
 
-//    screen.hide();
+    screen.hide();
 
     if(!SQLProecss::instance()->initDatabase("./config/DataBaseInfo.properties"))
     {
