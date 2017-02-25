@@ -78,14 +78,16 @@ void SimulateControlPanel::intSimulateData()
     prop1->serviceName = "蓝方飞机初始化";
 
     QString path1;
-    if(ServiceInfoProcess::instance()->getUrlByServiceName(prop1->serviceName,path1))
-    {
-        prop1->servicePath = path1;
-    }
-    else
-    {
-        prop1->servicePath = "http://localhost:8080/axis2/services/BluePlane";
-    }
+//    if(ServiceInfoProcess::instance()->getUrlByServiceName(prop1->serviceName,path1))
+//    {
+//        prop1->servicePath = path1;
+//    }
+//    else
+//    {
+//        prop1->servicePath = "http://localhost:8080/axis2/services/BluePlane";
+//    }
+
+    prop1->servicePath = "http://192.168.0.11:8080/axis2/services/BluePlane";
 
     prop1->method = "Initial";
 
@@ -133,14 +135,16 @@ void SimulateControlPanel::intSimulateData()
     prop2->serviceName = "探测服务初始化";
     QString path2;
 
-    if(ServiceInfoProcess::instance()->getUrlByServiceName(prop2->serviceName,path2))
-    {
-        prop2->servicePath = path2;
-    }
-    else
-    {
-        prop2->servicePath = "http://localhost:8080/axis2/services/DetectModel";
-    }
+//    if(ServiceInfoProcess::instance()->getUrlByServiceName(prop2->serviceName,path2))
+//    {
+//        prop2->servicePath = path2;
+//    }
+//    else
+//    {
+//        prop2->servicePath = "http://localhost:8080/axis2/services/DetectModel";
+//    }
+
+    prop2->servicePath = "http://192.168.0.11:8080/axis2/services/DetectModel";
 
     prop2->method = "Initial";
 
@@ -271,39 +275,39 @@ void SimulateControlPanel::respStartSimulate()
 
     qDebug()<<"============================";
 
-    foreach(ProcessUnit * tmpUnit,procUnits)
-    {
-        tmpUnit->item->setProcessType(tmpUnit->ptype);
+//    foreach(ProcessUnit * tmpUnit,procUnits)
+//    {
+//        tmpUnit->item->setProcessType(tmpUnit->ptype);
 
-        if(tmpUnit->gtype == GRA_POLYGON)
-        {
-            qDebug()<<tmpUnit->ptype<<"_"<<tmpUnit->item->getText()<<"__"<<tmpUnit->yesChild->item->getText()<<"_"<<tmpUnit->noChild->item->getText();
-        }
-        else
-        {
-            if(tmpUnit->nextChild)
-            {
-                qDebug()<<tmpUnit->item->getText()<<"__"<<tmpUnit->nextChild->item->getText();
-            }
-            else
-            {
-                qDebug()<<tmpUnit->item->getText();
-            }
-        }
-    }
+//        if(tmpUnit->gtype == GRA_POLYGON)
+//        {
+//            qDebug()<<tmpUnit->ptype<<"_"<<tmpUnit->item->getText()<<"__"<<tmpUnit->yesChild->item->getText()<<"_"<<tmpUnit->noChild->item->getText();
+//        }
+//        else
+//        {
+//            if(tmpUnit->nextChild)
+//            {
+//                qDebug()<<tmpUnit->item->getText()<<"__"<<tmpUnit->nextChild->item->getText();
+//            }
+//            else
+//            {
+//                qDebug()<<tmpUnit->item->getText();
+//            }
+//        }
+//    }
 
-    clearLastSimluteRecord();
+//    clearLastSimluteRecord();
 
-    //弹出信息汇总面板
-    BeforeSimulateServiceConfig bsconfig(GlobalMainWindow);
-    bsconfig.setProcedureData(procUnits);
-    bsconfig.exec();
+//    //弹出信息汇总面板
+//    BeforeSimulateServiceConfig bsconfig(GlobalMainWindow);
+//    bsconfig.setProcedureData(procUnits);
+//    bsconfig.exec();
 
-    isSimulateState = true;
+//    isSimulateState = true;
 
-    sflow = PRE_FLOW;
-    preOrResetIndex = 0;
-    preExecuteServices();
+//    sflow = PRE_FLOW;
+//    preOrResetIndex = 0;
+//    preExecuteServices();
 }
 
 //清空上一次推演的记录

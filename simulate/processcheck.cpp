@@ -73,8 +73,11 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
     ProcessUnit * startUnit = NULL;
     ProcessUnit * endUnit = NULL;
 
-    while(!isAtEnd)
+    int index = 0;
+
+    while(!isAtEnd&&index<20)
     {
+        index++;
         if(!currItem)
         {
             return RETURN_ERROR;
