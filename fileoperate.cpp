@@ -209,3 +209,95 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
 
     return RETURN_SUCCESS;
 }
+
+//保存服务至本地磁盘
+ReturnType FileOperate::saveServiceToFile(QString &fileName, bool isPreModel)
+{
+    QRegExp exp("_v(\\d)+");
+
+    if(!fileName.contains(exp))
+    {
+        //包含后缀名，但不包含版本号
+        int hasSuffix = fileName.indexOf(SaveFileSuffix);
+        if(hasSuffix > 0)
+        {
+            fileName = fileName.left(hasSuffix);
+        }
+
+        fileName += QString("_v"+QString::number(M_VERTION));
+    }
+
+    if(!fileName.contains(SaveFileSuffix))
+    {
+        fileName += SaveFileSuffix;
+    }
+
+    QFile file(fileName);
+    if(!file.open(QFile::ReadWrite))
+    {
+        return FILE_CANT_WRITE;
+    }
+
+    QDataStream stream(&file);
+
+    //写入文件标识头
+    stream<<M_VERTION;
+    stream<<SaveFileHeadFlag;
+
+    if(isPreModel)
+    {
+        for(int i=0;i<PreExeServices.size();i++)
+        {
+            stream<<PreExeServices.at(i);
+        }
+    }
+    else
+    {
+        for(int i=0;i<PreExeServices.size();i++)
+        {
+            stream<<ResetExeServices.at(i);
+        }
+    }
+
+    file.close();
+    return RETURN_SUCCESS;
+}
+
+//从本地加载服务
+ReturnType FileOperate::loadServiceFromFile(QString &fileName, bool isPreModel)
+{
+    QFile file(fileName);
+    if(!file.open(QFile::ReadWrite))
+    {
+        return FILE_CANT_READ;
+    }
+
+    QDataStream stream;
+    stream.setDevice(&file);
+
+    ReturnType  rtype = Util::isIllegalFile(stream);
+
+    if(rtype != RETURN_SUCCESS)
+    {
+        file.close();
+        return rtype;
+    }
+
+    while(!stream.atEnd())
+    {
+        ServiceProperty * prop = new ServiceProperty;
+        stream>>prop;
+        if(isPreModel)
+        {
+           PreExeServices.append(prop);
+        }
+        else
+        {
+            ResetExeServices.append(prop);
+        }
+    }
+
+    file.close();
+    return RETURN_SUCCESS;
+
+}

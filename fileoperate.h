@@ -17,6 +17,7 @@
 **20161115:wey:添加对服务的属性、循环的属性读写
 **20161121:wey:添加对文件名版本号的写入，方便知道模型的版本
 **20161209:wey:添加对折线的保存和读取，同时在剪切信息中添加折点集合
+**20170228:wey:添加保存预处理服务至本地磁盘
 *************************************************/
 #ifndef FILEOPERATE_H
 #define FILEOPERATE_H
@@ -34,6 +35,9 @@ public:
 
     ReturnType saveFile(QString &fileName, const QList<QGraphicsItem *> &items);
     ReturnType openFile(QString fileName, QList<CutInfo *> &items);
+
+    ReturnType saveServiceToFile(QString & fileName,bool isPreModel);
+    ReturnType loadServiceFromFile(QString & fileName,bool isPreModel);
 
 private:
     FileOperate();
