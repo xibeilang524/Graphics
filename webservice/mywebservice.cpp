@@ -121,17 +121,15 @@ QMap<QString,QString> MyWebService::parseResult(QString result,bool & hasFault)
         else if(keyList.size() == 1 && valueList.size() > 0)
         {
            QString varName =  keyList.at(0).toElement().text();
-           QStringList varList = varName.split(",");
-//           qDebug()<<keyList<<"___"<<valueList;
-//           qDebug()<<varList.size()<<"__"<<valueList.size();
+           QStringList varList = varName.split("£¬");
 //           for(int i=0;i<valueList.size();i++)
 //           {
 //               qDebug()<<"var:"<<varList.at(i);
 //           }
 
-           for(int i=0;i<valueList.size();i++){
-               qDebug()<<"val:"<<valueList.at(i).toElement().text();
-           }
+//           for(int i=0;i<valueList.size();i++){
+//               qDebug()<<"val:"<<valueList.at(i).toElement().text();
+//           }
            if(varList.size() == valueList.size())
            {
                for(int i = 0; i < varList.size(); i++)
