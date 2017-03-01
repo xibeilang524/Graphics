@@ -11,6 +11,9 @@
 #include "../sql/serviceinfoprocess.h"
 #include "../util.h"
 #include "../simulate/simulateutil.h"
+#include "../fileoperate.h"
+
+#include <QFileDialog>
 
 InitService::InitService(QWidget *parent) :
     QDialog(parent),
@@ -59,8 +62,74 @@ InitService::InitService(QWidget *parent) :
     connect(ui->addService,SIGNAL(clicked()),this,SLOT(addCurrService()));
     connect(ui->removeService,SIGNAL(clicked()),this,SLOT(removeCurrService()));
     connect(ui->applyUpdate,SIGNAL(clicked()),this,SLOT(applyUpdateService()));
+    connect(ui->saveToDisk,SIGNAL(clicked()),this,SLOT(saveToDisk()));
+    connect(ui->loadFromDisk,SIGNAL(clicked()),this,SLOT(loadFromDisk()));
+}
 
+//将当前服务配置保存至本地磁盘
+void InitService::saveToDisk()
+{
+    QString openFileName = QFileDialog::getSaveFileName(this,"选择路径");
+    if(!openFileName.isEmpty())
+    {
+        ReturnType type = FileOperate::instance()->saveServiceToFile(openFileName,isPreModel);
+        if(type == RETURN_SUCCESS)
+        {
+            QMessageBox::information(this,"提示","服务信息保存成功!");
+        }
+    }
+}
 
+//从本地磁盘加载
+void InitService::loadFromDisk()
+{
+    int result = QMessageBox::Yes;
+
+    if(ui->serviceList->count()>0)
+    {
+        result = QMessageBox::warning(this,"警告","此操作会清空当前已经添加的服务,是否继续?",QMessageBox::Yes|QMessageBox::No);
+    }
+
+    if(result == QMessageBox::Yes)
+    {
+        if(isPreModel)
+        {
+            for(int i=0;i<PreExeServices.size();i++)
+            {
+                delete PreExeServices.at(i);
+            }
+            PreExeServices.clear();
+        }
+        else
+        {
+            for(int i=0;i<ResetExeServices.size();i++)
+            {
+                delete ResetExeServices.at(i);
+            }
+            ResetExeServices.clear();
+        }
+        ui->serviceList->clear();
+
+        QString openFileName = QFileDialog::getOpenFileName(this,"选择打开文件","","Files(*"+SaveFileSuffix+")");
+        if(!openFileName.isEmpty())
+        {
+            FileOperate::instance()->loadServiceFromFile(openFileName,isPreModel);
+            if(isPreModel)
+            {
+                for(int i = 0;i<PreExeServices.size();i++)
+                {
+                    ui->serviceList->addItem(PreExeServices.at(i)->serviceName);
+                }
+            }
+            else
+            {
+                for(int i = 0;i<ResetExeServices.size();i++)
+                {
+                    ui->serviceList->addItem(ResetExeServices.at(i)->serviceName);
+                }
+            }
+        }
+    }
 }
 
 //执行预处理服务
@@ -129,6 +198,7 @@ void InitService::addCurrService()
     ui->serviceList->addItem(currItemProp->serviceName);
 
     setButtState(false);
+    ui->saveToDisk->setEnabled(true);
 
     if(isPreModel)
     {
@@ -185,6 +255,13 @@ void InitService::removeCurrService()
             QListWidgetItem * item = ui->serviceList->takeItem(index);
             delete item;
         }
+    }
+
+    setButtState(true);
+
+    if(ui->serviceList->count()<=0)
+    {
+        ui->saveToDisk->setEnabled(false);
     }
 }
 

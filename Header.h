@@ -166,14 +166,14 @@ enum GraphicsType
 //单元类型
 enum ProcessType
 {
-    PRO_NONE,               //无
-    PRO_START,              //开始:圆角矩形
-    PRO_INPUT,              //输入输出:平行四边形
-    PRO_PROCESS,            //处理:矩形
-    PRO_JUDGE,              //判断:菱形
-    PRO_PARALLEL,           //并行:平行线
-    PRO_LOOP,               //循环
-    PRO_END                 //结束:圆角矩形
+    PRO_NONE,               //无0
+    PRO_START,              //开始:圆角矩形1
+    PRO_INPUT,              //输入输出:平行四边形2
+    PRO_PROCESS,            //处理:矩形3
+    PRO_JUDGE,              //判断:菱形4
+    PRO_PARALLEL,           //并行:平行线5
+    PRO_LOOP,               //循环6
+    PRO_END                 //结束:圆角矩形7
 };
 
 //拖入端口的方向

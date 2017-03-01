@@ -65,7 +65,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
 
     MyItem * currItem = startItem;        //当前操作指针指向控件
     QStack<PolygonDesc *> polygons;       //推演过程中记录所有遇到的判断框
-    QStack<PolygonDesc *> loopPolygons;   //推演过程中遇到的循环判断框
+    QStack<PolygonDesc *> loopPolygons;   //推演过程中遇到的循环框
     QStack<ProcessUnit *> doWhileRects;   //推演过程中遇到RECT为多个的进，一个出认定为dowhile循环
 
     ProcessUnit * frontUnit = NULL;       //前一个控制单元
@@ -73,11 +73,8 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
     ProcessUnit * startUnit = NULL;
     ProcessUnit * endUnit = NULL;
 
-    int index = 0;
-
-    while(!isAtEnd&&index<20)
+    while(!isAtEnd)
     {
-        index++;
         if(!currItem)
         {
             return RETURN_ERROR;
@@ -179,7 +176,8 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     {
                         topDesc->isLeftOver = true;
                         topDesc->isProcLeft = false;
-                        if(!topDesc->isProcRight)
+                        //在dowhile循环中，如果no分支指向了前面，那么默认right分支已经处理结束，此处要两个一起判断
+                        if(!topDesc->isProcRight&&!topDesc->isRightOver)
                         {
                             topDesc->isProcRight = true;
 
@@ -208,7 +206,7 @@ ReturnType ProcessCheck::checkProcess(QList<QGraphicsItem *> &existedItems,QList
                     {
                         parent->isProcLeft = false;
                         parent->isLeftOver = true;
-                        if(!parent->isRightOver)
+                        if(!parent->isProcRight&&!parent->isRightOver)
                         {
                             parent->isProcRight = true;
                             currItem = parent->rightItem;

@@ -67,7 +67,7 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     connect(MyWebService::instance(),SIGNAL(lastUnitProcessOver(bool,QMap<QString,QString>)),this,SLOT(procLastUnitResult(bool,QMap<QString,QString>)));
 
     /*************可删***************/
-    intSimulateData();
+//    intSimulateData();
 }
 
 //初始化模拟全局数据【可删】
@@ -75,7 +75,7 @@ void SimulateControlPanel::intSimulateData()
 {
     ServiceProperty * prop1 = new ServiceProperty;
     prop1->hasSettInfo = true;
-    prop1->serviceName = "蓝方飞机初始化";
+    prop1->serviceName = "新导弹模块初始化";
 
     QString path1;
 //    if(ServiceInfoProcess::instance()->getUrlByServiceName(prop1->serviceName,path1))
@@ -87,52 +87,46 @@ void SimulateControlPanel::intSimulateData()
 //        prop1->servicePath = "http://localhost:8080/axis2/services/BluePlane";
 //    }
 
-    prop1->servicePath = "http://192.168.0.11:8080/axis2/services/BluePlane";
+    prop1->servicePath = "http://127.0.0.1:8080/axis2/services/missile";
 
-    prop1->method = "Initial";
+    prop1->method = "initial";
 
     Parameter * para1 = new Parameter;
-    para1->pName = "destinationX";
-    para1->pValue = "39.9";
+    para1->pName = "startplaceJ";
+    para1->pValue = "108.54";
     para1->pType = "double";
 
     Parameter * para2 = new Parameter;
-    para2->pName = "destinationY";
-    para2->pValue = "116.3";
+    para2->pName = "startplaceW";
+    para2->pValue = "34.16";
     para2->pType = "double";
 
     Parameter * para3 = new Parameter;
-    para3->pName = "destinationZ";
-    para3->pValue = "500";
+    para3->pName = "destinationJ";
+    para3->pValue = "115.25";
     para3->pType = "double";
 
     Parameter * para4 = new Parameter;
-    para4->pName = "startX";
-    para4->pValue = "38.18";
+    para4->pName = "destinationW";
+    para4->pValue = "39.26";
     para4->pType = "double";
 
     Parameter * para5 = new Parameter;
-    para5->pName = "startY";
-    para5->pValue = "122.01";
-    para5->pType = "double";
-
-    Parameter * para6 = new Parameter;
-    para6->pName = "startZ";
-    para6->pValue = "10000";
-    para6->pType = "double";
+    para5->pName = "num";
+    para5->pValue = "5";
+    para5->pType = "int";
 
     prop1->inputParas.append(para1);
     prop1->inputParas.append(para2);
     prop1->inputParas.append(para3);
     prop1->inputParas.append(para4);
     prop1->inputParas.append(para5);
-    prop1->inputParas.append(para6);
 
     PreExeServices.append(prop1);
 
     ServiceProperty * prop2 = new ServiceProperty;
     prop2->hasSettInfo = true;
-    prop2->serviceName = "探测服务初始化";
+    prop2->serviceName = "新雷达初始化";
     QString path2;
 
 //    if(ServiceInfoProcess::instance()->getUrlByServiceName(prop2->serviceName,path2))
@@ -144,54 +138,59 @@ void SimulateControlPanel::intSimulateData()
 //        prop2->servicePath = "http://localhost:8080/axis2/services/DetectModel";
 //    }
 
-    prop2->servicePath = "http://192.168.0.11:8080/axis2/services/DetectModel";
+    prop2->servicePath = "http://127.0.0.1:8080/axis2/services/radar";
 
-    prop2->method = "Initial";
+    prop2->method = "initial";
 
     Parameter * para11 = new Parameter;
-    para11->pName = "dplaneX";
-    para11->pValue = "39.01";
+    para11->pName = "placeJ";
+    para11->pValue = "115.25";
     para11->pType = "double";
 
     Parameter * para12 = new Parameter;
-    para12->pName = "dplaneY";
-    para12->pValue = "121.49";
+    para12->pName = "placeW";
+    para12->pValue = "39.26";
     para12->pType = "double";
 
     Parameter * para13 = new Parameter;
-    para13->pName = "dplaneZ";
-    para13->pValue = "1000";
+    para13->pName = "distance";
+    para13->pValue = "500";
     para13->pType = "double";
-
-    Parameter * para14 = new Parameter;
-    para14->pName = "radarX";
-    para14->pValue = "39.13";
-    para14->pType = "double";
-
-    Parameter * para15 = new Parameter;
-    para15->pName = "radarY";
-    para15->pValue = "117.20";
-    para15->pType = "double";
-
-    Parameter * para16 = new Parameter;
-    para16->pName = "radarZ";
-    para16->pValue = "100";
-    para16->pType = "double";
-
-    Parameter * para17 = new Parameter;
-    para17->pName = "ratio1";
-    para17->pValue = "0.9";
-    para17->pType = "double";
 
     prop2->inputParas.append(para11);
     prop2->inputParas.append(para12);
     prop2->inputParas.append(para13);
-    prop2->inputParas.append(para14);
-    prop2->inputParas.append(para15);
-    prop2->inputParas.append(para16);
-    prop2->inputParas.append(para17);
 
     PreExeServices.append(prop2);
+
+    ServiceProperty * prop3 = new ServiceProperty;
+    prop3->hasSettInfo = true;
+    prop3->serviceName = "新拦截模块初始化";
+
+    prop3->servicePath = "http://127.0.0.1:8080/axis2/services/defendMissile";
+
+    prop3->method = "initial";
+
+    Parameter * para21 = new Parameter;
+    para21->pName = "startplaceJ";
+    para21->pValue = "115.25";
+    para21->pType = "double";
+
+    Parameter * para22 = new Parameter;
+    para22->pName = "startplaceW";
+    para22->pValue = "39.26";
+    para22->pType = "double";
+
+    Parameter * para23 = new Parameter;
+    para23->pName = "ratio";
+    para23->pValue = "0.9";
+    para23->pType = "double";
+
+    prop3->inputParas.append(para21);
+    prop3->inputParas.append(para22);
+    prop3->inputParas.append(para23);
+
+    PreExeServices.append(prop3);
 }
 
 //自动运行
@@ -275,39 +274,39 @@ void SimulateControlPanel::respStartSimulate()
 
     qDebug()<<"============================";
 
-//    foreach(ProcessUnit * tmpUnit,procUnits)
-//    {
-//        tmpUnit->item->setProcessType(tmpUnit->ptype);
+    foreach(ProcessUnit * tmpUnit,procUnits)
+    {
+        tmpUnit->item->setProcessType(tmpUnit->ptype);
 
-//        if(tmpUnit->gtype == GRA_POLYGON)
-//        {
-//            qDebug()<<tmpUnit->ptype<<"_"<<tmpUnit->item->getText()<<"__"<<tmpUnit->yesChild->item->getText()<<"_"<<tmpUnit->noChild->item->getText();
-//        }
-//        else
-//        {
-//            if(tmpUnit->nextChild)
-//            {
-//                qDebug()<<tmpUnit->item->getText()<<"__"<<tmpUnit->nextChild->item->getText();
-//            }
-//            else
-//            {
-//                qDebug()<<tmpUnit->item->getText();
-//            }
-//        }
-//    }
+        if(tmpUnit->gtype == GRA_POLYGON)
+        {
+            qDebug()<<tmpUnit->ptype<<"_"<<tmpUnit->item->getText()<<"__"<<tmpUnit->yesChild->item->getText()<<"_"<<tmpUnit->noChild->item->getText();
+        }
+        else
+        {
+            if(tmpUnit->nextChild)
+            {
+                qDebug()<<tmpUnit->item->getText()<<"__"<<tmpUnit->nextChild->item->getText();
+            }
+            else
+            {
+                qDebug()<<tmpUnit->item->getText();
+            }
+        }
+    }
 
-//    clearLastSimluteRecord();
+    clearLastSimluteRecord();
 
-//    //弹出信息汇总面板
-//    BeforeSimulateServiceConfig bsconfig(GlobalMainWindow);
-//    bsconfig.setProcedureData(procUnits);
-//    bsconfig.exec();
+    //弹出信息汇总面板
+    BeforeSimulateServiceConfig bsconfig(GlobalMainWindow);
+    bsconfig.setProcedureData(procUnits);
+    bsconfig.exec();
 
-//    isSimulateState = true;
+    isSimulateState = true;
 
-//    sflow = PRE_FLOW;
-//    preOrResetIndex = 0;
-//    preExecuteServices();
+    sflow = PRE_FLOW;
+    preOrResetIndex = 0;
+    preExecuteServices();
 }
 
 //清空上一次推演的记录

@@ -6,7 +6,7 @@
 **Others:
 **
 **修改历史:
-**
+**2017-02-28:添加将预处理和恢复环境流程保存至本地磁盘
 *************************************************/
 #ifndef INITSERVICE_H
 #define INITSERVICE_H
@@ -42,6 +42,8 @@ private slots:
     void addCurrService();
     void removeCurrService();
     void applyUpdateService();
+    void saveToDisk();
+    void loadFromDisk();
     
 private:
     void initServiceData();
