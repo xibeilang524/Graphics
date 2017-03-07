@@ -101,6 +101,7 @@ MyScene * MyGraphicsView::addScene(QString id)
     connect(tmpScene,SIGNAL(itemPropChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
     connect(tmpScene,SIGNAL(editCurrItem()),this,SLOT(editTextItem()));
     connect(tmpScene,SIGNAL(editCurrPort()),this,SLOT(respEditText()));
+    connect(tmpScene,SIGNAL(dClickEditCurrPort()),this,SLOT(editTextItem()));
     connect(tmpScene,SIGNAL(ctrlPropEditKeyPress()),this,SLOT(editPropertyItem()));
 
     return tmpScene;
@@ -426,9 +427,11 @@ void MyGraphicsView::cutItem()
             cutTmpInfo.content = item->getText();
             foreach (MyNodePort * node, item->getNodePorts())
             {
-                NodePortProperty  props;
-                props.direct = node->getDragDirect();
-                props.scaleFactor = node->getScaleFactor();
+                NodeWholeProperty  props;
+                props.nodeProp.direct = node->getDragDirect();
+                props.nodeProp.scaleFactor = node->getScaleFactor();
+                props.stateProp = node->getStatePortProp();
+                props.inOutProp = node->getStateInOutProp();
                 cutTmpInfo.nodeProperties.push_back(props);
             }
             deleteItem();
@@ -471,11 +474,13 @@ void MyGraphicsView::copyItem()
 
             foreach (MyNodePort * node, item->getNodePorts())
             {
-                NodePortProperty  props;
-                props.content = node->getText();
-                props.portType = node->getType();
-                props.direct = node->getDragDirect();
-                props.scaleFactor = node->getScaleFactor();
+                NodeWholeProperty  props;
+                props.nodeProp.content = node->getText();
+                props.nodeProp.portType = node->getType();
+                props.nodeProp.direct = node->getDragDirect();
+                props.nodeProp.scaleFactor = node->getScaleFactor();
+                props.stateProp = node->getStatePortProp();
+                props.inOutProp = node->getStateInOutProp();
                 cutTmpInfo.nodeProperties.push_back(props);
             }
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
@@ -1185,19 +1190,9 @@ void MyGraphicsView::editTextItem()
             MyNodePort * item = dynamic_cast<MyNodePort*>(selectedItems.first());
 
             GraphicsType gType = item->getType();
-
-            //输出
-            if(gType == GRA_NODE_TRIANGLE_OUT)
-            {
-                MyPortOutputDialog dialog(this);
-                dialog.setInOutState(false);
-                StateInOutProperty prop = item->getStateInOutProp();
-                dialog.setProp(prop);
-                dialog.exec();
-                item->setPortInoutProp(dialog.getProp());
-            }
-            //输入
-            else if(gType == GRA_NODE_HALF_CIRCLE_IN || gType == GRA_NODE_HALF_CIRCLE_OUT)
+#ifdef ADD_STATE_MODEL
+            //三角输入端口
+            if(gType == GRA_NODE_TRIANGLE_IN )
             {
                 MyPortOutputDialog dialog(this);
                 dialog.setInOutState(true);
@@ -1206,7 +1201,17 @@ void MyGraphicsView::editTextItem()
                 dialog.exec();
                 item->setPortInoutProp(dialog.getProp());
             }
-            //圆形端口
+            //圆形/三角形输出端口
+            else if(gType == GRA_NODE_HALF_CIRCLE_OUT || gType == GRA_NODE_TRIANGLE_OUT)
+            {
+                MyPortOutputDialog dialog(this);
+                dialog.setInOutState(false);
+                StateInOutProperty prop = item->getStateInOutProp();
+                dialog.setProp(prop);
+                dialog.exec();
+                item->setPortInoutProp(dialog.getProp());
+            }
+            //圆形输入端口
             else if(gType == GRA_NODE_CIRCLE)
             {
                 MyPortInitialDialog dialog(this);
@@ -1224,6 +1229,14 @@ void MyGraphicsView::editTextItem()
 
                 item->setText(textInput.getText());
             }
+#else
+            MyTextInput textInput(this);
+
+            textInput.setTex(item->getText());
+            textInput.exec();
+
+            item->setText(textInput.getText());
+#endif
         }
     }
 }

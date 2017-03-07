@@ -15,10 +15,11 @@
 #ifndef HEADER_H
 #define HEADER_H
 
-#define M_VERTION 0x000B        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
-#define M_AUTHOR "南京仁谷系统集成有限公司"
+//0x000C：修改nodeport属性
+#define M_VERTION 0x000C        //程序的版本，在保存文件时，要保存当前文件的版本；解析时也要判断
+#define M_AUTHOR                "南京仁谷系统集成有限公司"
 
-//用于控制是否需要加入状态机模块，如果不需要，将此宏取消定义
+//用于控制是否需要加入仿真建模模块，如果不需要，将此宏取消定义。取消后部分功能不会一起编译
 #ifndef ADD_STATE_MODEL
 #define ADD_STATE_MODEL
 #endif
@@ -148,6 +149,7 @@ enum GraphicsType
     GRA_NODE_TRIANGLE_IN ,    //三角输入端口
     GRA_NODE_TRIANGLE_OUT,    //三角输出端口
     GRA_NODE_CIRCLE,          //圆输出端口
+
 #ifdef ADD_STATE_MODEL
     //状态机
     GRA_STATE_START,          //状态机开始
@@ -561,27 +563,6 @@ struct RowToIndex
 
 typedef QList< RowToIndex > RowList;
 
-//暂存一个剪切时的控件信息
-struct CutInfo
-{
-    CutInfo()
-    {
-        hasContent = false;
-        loopProp = new LoopProperty;
-        judgeProp = new JudgeProperty;
-    }
-
-    bool  hasContent;                            //是否包拷贝内容,在剪切和复制后置为true，清空后置为false
-    GraphicsType graphicsType;
-    ItemProperty itemProperty;
-    ServiceProperty serviceProp;                 //服务属性信息
-    LoopProperty * loopProp;                     //服务循环属性信息
-    JudgeProperty * judgeProp;                   //服务判断属性信息
-    QString content;
-    QList<NodePortProperty> nodeProperties;      //控件包含端口的信息
-    QList<QPointF> pathPoints;                   //折线中路径的信息
-};
-
 //高亮等级
 enum HightLightLevel
 {
@@ -610,6 +591,7 @@ struct ProcessUnit
     ProcessUnit * noChild;
 };
 
+
 #ifdef ADD_STATE_MODEL
 /**************************状态机结构体******************************/
 //初始化端口设置
@@ -617,6 +599,9 @@ struct StatePortProperty
 {
     QString portName;        //端口名称
     QString portType;        //端口类型
+
+    friend QDataStream & operator>> (QDataStream & stream,StatePortProperty& prop);
+    friend QDataStream & operator<< (QDataStream & stream,StatePortProperty& prop);
 };
 
 //输入/出端口设置
@@ -625,6 +610,9 @@ struct StateInOutProperty
     QString portName;        //端口名称
     QString portType;        //端口类型
     QList<StatePortProperty> props;    //端口集合
+
+    friend QDataStream & operator>> (QDataStream & stream,StateInOutProperty& prop);
+    friend QDataStream & operator<< (QDataStream & stream,StateInOutProperty& prop);
 };
 
 //开始状态属性
@@ -644,8 +632,8 @@ struct StatInnerProperty
 //模型状态属性
 struct StateModelProperty
 {
-    QString stateName;          //状态名
-    QString continueContent;    //持续事件行为
+    QString stateName;                //状态名
+    QString continueContent;          //持续事件行为
     QList<StatInnerProperty> props;   //内部事件集合
 };
 
@@ -658,5 +646,37 @@ enum SimulateFlow
 };
 
 #endif
+
+
+//一个节点的全部属性，为了解决在本地打开文件时对端口的装配
+struct NodeWholeProperty
+{
+    NodePortProperty nodeProp;
+#ifdef ADD_STATE_MODEL
+    StatePortProperty stateProp;
+    StateInOutProperty inOutProp;
+#endif
+};
+
+//暂存一个剪切时的控件信息
+struct CutInfo
+{
+    CutInfo()
+    {
+        hasContent = false;
+        loopProp = new LoopProperty;
+        judgeProp = new JudgeProperty;
+    }
+
+    bool  hasContent;                            //是否包拷贝内容,在剪切和复制后置为true，清空后置为false
+    GraphicsType graphicsType;
+    ItemProperty itemProperty;
+    ServiceProperty serviceProp;                 //服务属性信息
+    LoopProperty * loopProp;                     //服务循环属性信息
+    JudgeProperty * judgeProp;                   //服务判断属性信息
+    QString content;
+    QList<NodeWholeProperty> nodeProperties;      //控件包含端口的信息
+    QList<QPointF> pathPoints;                   //折线中路径的信息
+};
 
 #endif // HEADER_H

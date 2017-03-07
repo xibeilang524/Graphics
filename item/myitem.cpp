@@ -999,32 +999,32 @@ DragDirect MyItem::getDropDirect(const QPointF &currPoint)
 }
 
 //拷贝或者拖入一个端口
-MyNodePort * MyItem::addNodePort(const NodePortProperty &prop)
+MyNodePort * MyItem::addNodePort(const NodeWholeProperty &prop)
 {
     QPointF itemPos;
-    switch(prop.direct)
+    switch(prop.nodeProp.direct)
     {
         case DRAG_LEFT:
                     {
                         itemPos.setX(boundRect.topLeft().x());
-                        itemPos.setY(prop.scaleFactor*boundRect.height()+boundRect.topLeft().y());
+                        itemPos.setY(prop.nodeProp.scaleFactor*boundRect.height()+boundRect.topLeft().y());
                     }
                     break;
         case DRAG_TOP:
                     {
-                        itemPos.setX(prop.scaleFactor*boundRect.width()+boundRect.topLeft().x());
+                        itemPos.setX(prop.nodeProp.scaleFactor*boundRect.width()+boundRect.topLeft().x());
                         itemPos.setY(boundRect.topLeft().y());
                     }
                     break;
         case DRAG_RIGHT:
                     {
                         itemPos.setX(boundRect.topRight().x());
-                        itemPos.setY(prop.scaleFactor*boundRect.height()+boundRect.topRight().y());
+                        itemPos.setY(prop.nodeProp.scaleFactor*boundRect.height()+boundRect.topRight().y());
                     }
                     break;
         case DRAG_BOTTOM:
                     {
-                        itemPos.setX(prop.scaleFactor*boundRect.width()+boundRect.bottomLeft().x());
+                        itemPos.setX(prop.nodeProp.scaleFactor*boundRect.width()+boundRect.bottomLeft().x());
                         itemPos.setY(boundRect.bottomLeft().y());
                     }
                     break;
@@ -1032,9 +1032,27 @@ MyNodePort * MyItem::addNodePort(const NodePortProperty &prop)
              break;
     }
 
-    MyNodePort * nodePort = createProp(prop.portType,itemPos,prop.direct,prop.scaleFactor);
+    MyNodePort * nodePort = createProp(prop.nodeProp.portType,itemPos,prop.nodeProp.direct,prop.nodeProp.scaleFactor);
+    switch(prop.nodeProp.portType)
+    {
+        case GRA_NODE_CIRCLE:
+                            {
+                                StatePortProperty pp =  prop.stateProp;
+                                nodePort->setPortProp(pp);
+                                break;
+                            }
 
-    nodePort->setText(prop.content);
+
+        case GRA_NODE_TRIANGLE_OUT:
+        case GRA_NODE_HALF_CIRCLE_OUT:
+                            {
+                                StateInOutProperty pp = prop.inOutProp;
+                                nodePort->setPortInoutProp(pp);
+                                break;
+                            }
+    }
+
+    nodePort->setText(prop.nodeProp.content);
 
     return nodePort;
 }
@@ -1322,11 +1340,17 @@ void MyItem::procDeleteNodePort(MyNodePort *nodePort)
     }
 }
 
-//编辑某个端口
+//右键编辑某个端口
 void MyItem::procEditNodePort(MyNodePort *)
 {
     emit editItemPort();
 //    MyGraphicsView::instance()->showNodePortEdit(nodePort);
+}
+
+//在ADD_STATE_MODEL模式下双击进行编辑
+void MyItem::procDoubleClickEditNodePort(MyNodePort *)
+{
+    emit dClickEditItemPort();
 }
 
 //将当前值和最大及最小值相比较，只能在此范围内,到达最大或最小值的边界时，返回用于设置改变方向

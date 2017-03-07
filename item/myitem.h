@@ -89,7 +89,7 @@ public:
 
     const QList<MyNodePort *> & getNodePorts(){return this->ports;}
 
-    MyNodePort *addNodePort(const NodePortProperty & prop);
+    MyNodePort *addNodePort(const NodeWholeProperty &prop);
     void removeNodePort(MyNodePort * port);
 
     void setPos(const QPointF &pos);
@@ -136,6 +136,7 @@ signals:
     void updateSceneDraw();
     void editMe();
     void editItemPort();
+    void dClickEditItemPort();
     void propHasChanged(ItemProperty);
     void itemPosChanged(MyItem  * );
     void itemRotationChanged(MyItem  *);
@@ -150,6 +151,7 @@ private slots:
 
     void procDeleteNodePort(MyNodePort * nodePort);
     void procEditNodePort(MyNodePort *nodePort);
+    void procDoubleClickEditNodePort(MyNodePort *);
     void procUpdateTextGeometry();
 
 protected:

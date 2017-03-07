@@ -68,6 +68,7 @@ signals:
     void itemPropChanged(ItemProperty);
     void editCurrItem();
     void editCurrPort();
+    void dClickEditCurrPort();
     void ctrlPropEditKeyPress();
 
 private slots:

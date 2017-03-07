@@ -41,6 +41,20 @@ QDataStream & operator <<(QDataStream & dataStream,MyNodePort * nodePort)
     int type = nodePort->currItemType;
     dataStream<<type<<nodePort->nodeProperty;
 
+#ifdef ADD_STATE_MODEL
+    switch(nodePort->nodeProperty.portType)
+    {
+        case GRA_NODE_CIRCLE:
+                            dataStream<<nodePort->statePortProp;
+                            break;
+
+        case GRA_NODE_TRIANGLE_OUT:
+        case GRA_NODE_HALF_CIRCLE_OUT:
+                            dataStream<<nodePort->stateInOutProp;
+                            break;
+    }
+#endif
+
     return dataStream;
 }
 
@@ -48,13 +62,72 @@ QDataStream & operator >>(QDataStream & dataStream,MyNodePort * nodePort)
 {
     int type;
     NodePortProperty property;
-
     dataStream>>type>>property;
+
+#ifdef ADD_STATE_MODEL
+    switch(property.portType)
+    {
+        case GRA_NODE_CIRCLE:
+                            dataStream>>nodePort->statePortProp;
+                            break;
+
+        case GRA_NODE_TRIANGLE_OUT:
+        case GRA_NODE_HALF_CIRCLE_OUT:
+                            dataStream>>nodePort->stateInOutProp;
+                            break;
+    }
+#endif
 
     nodePort->currItemType = (GraphicsType)type;
     nodePort->nodeProperty = property;
     return dataStream;
 }
+
+#ifdef ADD_STATE_MODEL
+//对初始化端口的保存
+QDataStream & operator<<(QDataStream & stream,StatePortProperty &prop)
+{
+    stream<<prop.portName<<prop.portType;
+    return stream;
+}
+
+QDataStream & operator>> (QDataStream & stream,StatePortProperty &prop)
+{
+    stream>>prop.portName>>prop.portType;
+    return stream;
+}
+
+//输入/出端口设置
+QDataStream & operator<< (QDataStream & stream,StateInOutProperty & prop)
+{
+    stream<<prop.portName<<prop.portType;
+    stream<<prop.props.size();
+
+    for(int i=0;i<prop.props.size();i++)
+    {
+        StatePortProperty sprop = prop.props.at(i);
+        stream<<sprop;
+    }
+    return stream;
+}
+
+QDataStream & operator>> (QDataStream & stream,StateInOutProperty & prop)
+{
+    stream>>prop.portName>>prop.portType;
+
+    int size = 0;
+    stream>>size;
+
+    for(int i=0;i<size;i++)
+    {
+        StatePortProperty sprop;
+        stream>>sprop;
+        prop.props.append(sprop);
+    }
+
+    return stream;
+}
+#endif
 
 MyNodePort::MyNodePort(GraphicsType type, MyItem *parentItem, QObject *parent1):
     MyNodeLine(type,parentItem,parent1)
@@ -93,6 +166,7 @@ void MyNodePort::initWidget(MyItem *parentItem)
     initNodePortRightMenu();
     connect(this,SIGNAL(deletePort(MyNodePort*)),parentItem,SLOT(procDeleteNodePort(MyNodePort*)));
     connect(this,SIGNAL(editPort(MyNodePort*)),parentItem,SLOT(procEditNodePort(MyNodePort*)));
+    connect(this,SIGNAL(dClickEditPort(MyNodePort*)),parentItem,SLOT(procDoubleClickEditNodePort(MyNodePort*)));
     connect(this,SIGNAL(portPosChanged(MouseType,QPointF)),parentItem,SLOT(procPortChanged(MouseType,QPointF)));
 }
 
@@ -309,7 +383,7 @@ void MyNodePort::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
 
 void MyNodePort::mouseDoubleClickEvent(QGraphicsSceneMouseEvent *event)
 {
-    emit editPort(this);
+    emit dClickEditPort(this);
     QGraphicsPolygonItem::mouseDoubleClickEvent(event);
 }
 

@@ -18,6 +18,7 @@
 **             调整右键菜单由全局同一创建
 **20161219:wey:增加对折线的支持
 **20161223:wey:增加D型输入端口
+**20170307:wey:增加仿真属性StatePortProperty、StateInOutProperty
 *************************************************/
 #ifndef MYNODEPORT_H
 #define MYNODEPORT_H
@@ -93,6 +94,7 @@ signals:
     void deletePort(MyNodePort *);
     void editPort(MyNodePort *);
     void portPosChanged(MouseType,QPointF);
+    void dClickEditPort(MyNodePort *);
 
 protected:
     void mousePressEvent(QGraphicsSceneMouseEvent *event);

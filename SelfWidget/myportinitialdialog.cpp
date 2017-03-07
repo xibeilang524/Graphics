@@ -26,7 +26,7 @@ MyPortInitialDialog::MyPortInitialDialog(QWidget *parent) :
     layout->setContentsMargins(1,1,1,1);
     ui->widget_3->setLayout(layout);
 
-    connect(ui->widget_3,SIGNAL(confirmPressed()),this,SLOT(updateProp()));
+    connect(chooseBar,SIGNAL(confirmPressed()),this,SLOT(updateProp()));
 }
 
 void MyPortInitialDialog::updateProp()

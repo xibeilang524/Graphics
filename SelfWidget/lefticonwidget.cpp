@@ -152,7 +152,7 @@ void LeftIconWidget::initListItems()
     nodeHalfCircleOut->setData(Qt::UserRole,(int)GRA_NODE_HALF_CIRCLE_OUT);
     nodeWidget->addItem(nodeHalfCircleOut);
 
-    MyListItem * nodeCircle = ListItemManager::instance()->createListItem(Constants::NODE_CIRCLE_ID,QIcon(":/images/circle.png"),"圆形端口",nodeWidget);
+    MyListItem * nodeCircle = ListItemManager::instance()->createListItem(Constants::NODE_CIRCLE_ID,QIcon(":/images/circle.png"),"初始化端口",nodeWidget);
     nodeCircle->setData(Qt::UserRole,(int)GRA_NODE_CIRCLE);
     nodeWidget->addItem(nodeCircle);
 }

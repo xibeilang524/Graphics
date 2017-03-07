@@ -101,7 +101,7 @@ ReturnType FileOperate::saveFile(QString & fileName,const QList<QGraphicsItem *>
 }
 
 /**
- *本地解析文件,因端口NodePort的属性NodePortProperty是单独保存，需要依照类型来判断读取
+*本地解析文件,因端口NodePort的属性NodePortProperty是单独保存，需要依照类型来判断读取
 *读取完成后，直接将端口进行装配至每个Item中,使得调用层无需知晓具体的细节部分
 *同时记录加载文件中最大的Zvalue，再新添加item时，会置于所有层的顶部
 */
@@ -124,7 +124,7 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
         return rtype;
     }
 
-    QList<NodePortProperty > localNodePorts;
+    QList<NodeWholeProperty > localNodePorts;
 
     qreal maxZvalue = 0;
 
@@ -140,9 +140,22 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
         if(gtype == GRA_NODE_PORT ||gtype == GRA_NODE_HALF_CIRCLE_IN ||gtype == GRA_NODE_HALF_CIRCLE_OUT
                 ||gtype == GRA_NODE_TRIANGLE_OUT ||gtype == GRA_NODE_TRIANGLE_IN ||gtype == GRA_NODE_CIRCLE)
         {
-            NodePortProperty nodeProperty;
-            nodeProperty.portType = (GraphicsType)type;
-            stream>>nodeProperty;
+            NodeWholeProperty nodeProperty;
+            nodeProperty.nodeProp.portType = (GraphicsType)type;
+            stream>>nodeProperty.nodeProp;
+#ifdef ADD_STATE_MODEL
+            switch(gtype)
+            {
+                case GRA_NODE_CIRCLE:
+                                    stream>>nodeProperty.stateProp;
+                                    break;
+
+                case GRA_NODE_TRIANGLE_OUT:
+                case GRA_NODE_HALF_CIRCLE_OUT:
+                                    stream>>nodeProperty.inOutProp;
+                                    break;
+            }
+#endif
             localNodePorts.push_back(nodeProperty);
         }
         else
@@ -198,9 +211,9 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
         {
             for(int j = 0; j < items.size() ;j++)
             {
-                if(items.at(j)->itemProperty.startItemID == localNodePorts.at(i).parentItemID)
+                if(items.at(j)->itemProperty.startItemID == localNodePorts.at(i).nodeProp.parentItemID)
                 {
-                    NodePortProperty prop = localNodePorts.at(i);
+                    NodeWholeProperty prop = localNodePorts.at(i);
                     items.at(j)->nodeProperties.push_back(prop);
                 }
             }

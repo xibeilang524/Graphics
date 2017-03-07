@@ -441,12 +441,12 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
         item->setMoveable(cutInfo.itemProperty.isMoveable);
 
         //本地打开时，由于创建时会产生新的ID，但需要手动的更新
-        foreach(NodePortProperty prop,cutInfo.nodeProperties)
+        foreach(NodeWholeProperty prop,cutInfo.nodeProperties)
         {
             MyNodePort * tmp = item->addNodePort(prop);
             if(!isCopy)
             {
-                tmp->updatePortID(prop.startItemID);
+                tmp->updatePortID(prop.nodeProp.startItemID);
                 localNodeports.push_back(tmp);
             }
         }
@@ -696,6 +696,7 @@ void MyScene::addMyItemConnect(MyItem * item)
     connect(item,SIGNAL(propHasChanged(ItemProperty)),this,SIGNAL(itemPropChanged(ItemProperty)));
     connect(item,SIGNAL(editMe()),this,SIGNAL(editCurrItem()));
     connect(item,SIGNAL(editItemPort()),this,SIGNAL(editCurrPort()));
+    connect(item,SIGNAL(dClickEditItemPort()),this,SIGNAL(dClickEditCurrPort()));
     connect(item,SIGNAL(itemPosChanged(MyItem *)),this,SLOT(showItemPosInfo(MyItem *)));
     connect(item,SIGNAL(itemRotationChanged(MyItem *)),this,SLOT(showItemRotationInfo(MyItem *)));
     connect(item,SIGNAL(clearOtherSelectedItems(MyItem*)),this,SLOT(respClearOtherSelectedItems(MyItem*)));
