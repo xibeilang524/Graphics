@@ -87,7 +87,7 @@ void SimulateControlPanel::intSimulateData()
 //        prop1->servicePath = "http://localhost:8080/axis2/services/BluePlane";
 //    }
 
-    prop1->servicePath = "http://127.0.0.1:8080/axis2/services/missile";
+    prop1->servicePath = "http://127.0.0.1:8080/axis2/services/missileNew";
 
     prop1->method = "initial";
 
@@ -138,7 +138,7 @@ void SimulateControlPanel::intSimulateData()
 //        prop2->servicePath = "http://localhost:8080/axis2/services/DetectModel";
 //    }
 
-    prop2->servicePath = "http://127.0.0.1:8080/axis2/services/radar";
+    prop2->servicePath = "http://127.0.0.1:8080/axis2/services/radarNew";
 
     prop2->method = "initial";
 

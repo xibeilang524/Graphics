@@ -31,7 +31,6 @@ InitService::InitService(QWidget *parent) :
     this->setGeometry((ScreenWidth-width)/2,(ScreenHeight-height)/2,width,height);
 
     chooseBar = new MyChooseBar(ui->widget_3);
-
     chooseBar->setParetWidget(this);
 
     QHBoxLayout * layout = new QHBoxLayout;
@@ -160,6 +159,17 @@ void InitService::addCurrService()
 
     currItemProp->hasSettInfo = true;
     currItemProp->serviceName = ui->serviceName->currentText();
+
+    //保存连接地址
+    for(int i=0;i<GlobalServiceProperties.size();i++)
+    {
+        if(GlobalServiceProperties.at(i)->serviceName==currItemProp->serviceName)
+        {
+            currItemProp->servicePath = GlobalServiceProperties.at(i)->servicePath;
+            currItemProp->method = GlobalServiceProperties.at(i)->method;
+            break;
+        }
+    }
 
     foreach(Parameter * para,currItemProp->inputParas)
     {
