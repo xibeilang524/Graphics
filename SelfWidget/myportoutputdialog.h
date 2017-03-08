@@ -16,6 +16,7 @@
 #include "../Header.h"
 
 class MyChooseBar;
+class QTableWidgetItem;
 
 namespace Ui {
 class MyPortOutputDialog;
@@ -35,8 +36,13 @@ public:
 
 private slots:
     void updateProp();
-    
+    void addNewItem();
+    void removeSelectedItem();
+    void removeAllItem();
+
 private:
+    void addRow(const QString pname, const QString ptype);
+
     Ui::MyPortOutputDialog *ui;
 
     StateInOutProperty sprop;

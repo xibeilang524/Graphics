@@ -24,7 +24,8 @@ HEADERS += \
     SelfWidget/myoutputdialog.h \
     SelfWidget/myshortkey.h \
     SelfWidget/beforesimulateserviceconfig.h \
-    SelfWidget/initservice.h
+    SelfWidget/initservice.h \
+    SelfWidget/myportparameter.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -52,7 +53,8 @@ SOURCES += \
     SelfWidget/myoutputdialog.cpp \
     SelfWidget/myshortkey.cpp \
     SelfWidget/beforesimulateserviceconfig.cpp \
-    SelfWidget/initservice.cpp
+    SelfWidget/initservice.cpp \
+    SelfWidget/myportparameter.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
@@ -74,4 +76,5 @@ FORMS += \
     SelfWidget/myoutputdialog.ui \
     SelfWidget/myshortkey.ui \
     SelfWidget/beforesimulateserviceconfig.ui \
-    SelfWidget/initservice.ui
+    SelfWidget/initservice.ui \
+    SelfWidget/myportparameter.ui
