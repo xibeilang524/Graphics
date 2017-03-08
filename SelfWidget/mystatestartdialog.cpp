@@ -35,6 +35,7 @@ void MyStateStartDialog::setContent(QString content)
 {
     ui->plainTextEdit->clear();
     ui->plainTextEdit->setPlainText(content);
+    this->content = content;
 }
 
 MyStateStartDialog::~MyStateStartDialog()

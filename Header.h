@@ -619,6 +619,9 @@ struct StateInOutProperty
 struct StateStartProperty
 {
     QString content;
+
+    friend QDataStream & operator<< (QDataStream & stream,StateStartProperty & prop);
+    friend QDataStream & operator>> (QDataStream & stream,StateStartProperty & prop);
 };
 
 //内部事件属性
@@ -627,6 +630,9 @@ struct StatInnerProperty
     QString propName;
     QString propType;
     QString propDesc;
+
+    friend QDataStream & operator<< (QDataStream &stream,StatInnerProperty & prop);
+    friend QDataStream & operator>> (QDataStream &stream,StatInnerProperty & prop);
 };
 
 //模型状态属性
@@ -635,6 +641,9 @@ struct StateModelProperty
     QString stateName;                //状态名
     QString continueContent;          //持续事件行为
     QList<StatInnerProperty> props;   //内部事件集合
+
+    friend QDataStream & operator<< (QDataStream &stream,StateModelProperty & prop);
+    friend QDataStream & operator>> (QDataStream &stream,StateModelProperty & prop);
 };
 
 //模拟处理的流程(预处理、主流程、恢复流程)
@@ -675,8 +684,12 @@ struct CutInfo
     LoopProperty * loopProp;                     //服务循环属性信息
     JudgeProperty * judgeProp;                   //服务判断属性信息
     QString content;
-    QList<NodeWholeProperty> nodeProperties;      //控件包含端口的信息
+    QList<NodeWholeProperty> nodeProperties;     //控件包含端口的信息
     QList<QPointF> pathPoints;                   //折线中路径的信息
+#ifdef ADD_STATE_MODEL
+    StateStartProperty stateStartProp;           //仿真开始状态属性
+    StateModelProperty stateModelProp;           //仿真模型状态属性
+#endif
 };
 
 #endif // HEADER_H

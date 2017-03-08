@@ -18,14 +18,16 @@ MyChooseBar::MyChooseBar(QWidget *parent) :
 //响应点击
 void MyChooseBar::respConfirm()
 {
+    MY_ASSERT(pWidget)
     emit confirmPressed();
-    respCancel();
+    pWidget->close();
 }
 
 //响应取消
 void MyChooseBar::respCancel()
 {
     MY_ASSERT(pWidget)
+    emit cancelPressed();
     pWidget->close();
 }
 

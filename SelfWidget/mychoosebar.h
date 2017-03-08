@@ -29,6 +29,7 @@ public:
 
 signals:
     void confirmPressed();
+    void cancelPressed();
 
 private slots:
     void respCancel();

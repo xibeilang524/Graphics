@@ -6,12 +6,13 @@
 **Others:
 **
 **修改历史:
-**
+**20170308:wey:增加对表格等操作。
 *************************************************/
 #ifndef MYSTATEMODELDIALOG_H
 #define MYSTATEMODELDIALOG_H
 
 #include <QDialog>
+#include <QModelIndex>
 class MyChooseBar;
 
 #include "../Header.h"
@@ -34,15 +35,20 @@ public:
 private slots:
     void respContinueAction();
     void respAddItem();
+    void respRemoveAllItem();
+    void respRemoveSelectedItem();
     void updateInfo();
+    void respShowCurrItem(QModelIndex index);
 
 private:
+    void addRow(StatInnerProperty & pp);
+
     Ui::MyStateModelDialog *ui;
     MyChooseBar * chooseBar;
 
-    StateModelProperty prop;
+    StateModelProperty prop;                //保存原始的数据
+    QList<StatInnerProperty> props;         //保存最新的的条目集合
 
-    QList<StatInnerProperty> props;
     QString continueContent;
 };
 

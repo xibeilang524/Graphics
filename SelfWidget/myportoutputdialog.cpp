@@ -37,19 +37,13 @@ MyPortOutputDialog::MyPortOutputDialog(QWidget *parent) :
 
 void MyPortOutputDialog::setInOutState(bool isInstate)
 {
-    ui->portTypeBox->clear();
-    QStringList portType;
     if(isInstate)
     {
         setWindowTitle("输入端口设置");
-        portType<<"事件类"<<"事件类1";
-        ui->portTypeBox->addItems(portType);
     }
     else
     {
         setWindowTitle("输出端口设置");
-        portType<<"属性类"<<"属性类2";
-        ui->portTypeBox->addItems(portType);
     }
 }
 
@@ -60,6 +54,8 @@ void MyPortOutputDialog::setProp(StateInOutProperty &prop)
 
     this->sprop.portName = prop.portName;
     this->sprop.portType = prop.portType;
+
+    ui->portTypeBox->setCurrentIndex(prop.portType.toInt());
 
     for(int i = 0;i<prop.props.size();i++)
     {
@@ -73,7 +69,7 @@ void MyPortOutputDialog::setProp(StateInOutProperty &prop)
 void MyPortOutputDialog::updateProp()
 {
     sprop.portName = ui->portName->text();
-    sprop.portType = ui->portTypeBox->currentText();
+    sprop.portType = QString::number(ui->portTypeBox->currentIndex());
 }
 
 //添加新条目

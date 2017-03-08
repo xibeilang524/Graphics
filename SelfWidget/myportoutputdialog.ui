@@ -81,6 +81,11 @@
            </property>
            <item>
             <property name="text">
+             <string>属性类</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
              <string>事件类</string>
             </property>
            </item>

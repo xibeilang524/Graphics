@@ -13,6 +13,8 @@
 
 #include <QDialog>
 
+#include "Header.h"
+
 class MyChooseBar;
 
 namespace Ui {
@@ -26,11 +28,20 @@ class MyStateInternalEventDialog : public QDialog
 public:
     explicit MyStateInternalEventDialog(QWidget *parent = 0);
     ~MyStateInternalEventDialog();
+
+    bool getResult(StatInnerProperty & property);
+    void showDesc(StatInnerProperty property);
+
+private slots:
+    void respConfirm();
+    void respCancel();
     
 private:
     Ui::MyStateInternalEventDialog *ui;
 
     MyChooseBar * chooseBar;
+    StatInnerProperty  prop;
+    bool isOkPressed;
 };
 
 #endif // MYSTATEINTERNALEVENTDIALOG_H

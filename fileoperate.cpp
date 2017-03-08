@@ -176,6 +176,16 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
             }
             else
             {
+#ifdef ADD_STATE_MODEL
+                if(gtype == GRA_STATE_START)
+                {
+                    stream>>info->stateStartProp;
+                }
+                else if(gtype == GRA_STATE_PROCESS)
+                {
+                    stream>>info->stateModelProp;
+                }
+#endif
                 if(info->itemProperty.ptype == PRO_PROCESS)
                 {
                     stream>>(&info->serviceProp);

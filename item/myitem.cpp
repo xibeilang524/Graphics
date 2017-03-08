@@ -321,11 +321,13 @@ QDataStream & operator >>(QDataStream & stream,ItemProperty & prop)
     return stream;
 }
 
+//±£´æ¸ñÊ½¡¾GraphicsType¡¿¡¾ItemProperty¡¿¡¾ServiceProperty/JudgeProperty/LoopProperty/StateStartProperty/StateModelProperty¡¿
 QDataStream & operator <<(QDataStream &stream,MyItem * item)
 {
     int type = item->currItemType;
 
     stream<<type<<item->property;
+
     if(item->getProperty().ptype == PRO_PROCESS)
     {
         stream<<item->getServiceProp();
@@ -338,6 +340,17 @@ QDataStream & operator <<(QDataStream &stream,MyItem * item)
     {
         stream<<item->getLoopProp();
     }
+
+#ifdef ADD_STATE_MODEL
+    if(item->currItemType == GRA_STATE_START)
+    {
+        stream<<item->startProp;
+    }
+    else if(item->currItemType == GRA_STATE_PROCESS)
+    {
+        stream<<item->stateModeProp;
+    }
+#endif
 
     return stream;
 }
@@ -380,6 +393,62 @@ QDataStream & operator >>(QDataStream &stream,MyItem * item)
 
     return stream;
 }
+
+#ifdef ADD_STATE_MODEL
+QDataStream & operator<< (QDataStream & stream,StateStartProperty & prop)
+{
+    stream<<prop.content;
+    return stream;
+}
+
+QDataStream & operator>> (QDataStream & stream,StateStartProperty & prop)
+{
+    stream>>prop.content;
+    return stream;
+}
+
+QDataStream & operator<< (QDataStream & stream,StatInnerProperty & prop)
+{
+    stream<<prop.propName<<prop.propType<<prop.propDesc;
+    return stream;
+}
+
+QDataStream & operator>> (QDataStream & stream,StatInnerProperty & prop)
+{
+    stream>>prop.propName>>prop.propType>>prop.propDesc;
+    return stream;
+}
+
+QDataStream & operator<< (QDataStream &stream,StateModelProperty & prop)
+{
+    stream<<prop.stateName<<prop.continueContent;
+    stream<<prop.props.size();
+    for(int i=0;i<prop.props.size();i++)
+    {
+        StatInnerProperty pp = prop.props.at(i);
+        stream<<pp;
+    }
+
+    return stream;
+}
+
+QDataStream & operator>> (QDataStream &stream,StateModelProperty & prop)
+{
+    stream>>prop.stateName>>prop.continueContent;
+
+    int size = 0;
+    stream>>size;
+
+    for(int i=0;i<size;i++)
+    {
+        StatInnerProperty pp;
+        stream>>pp;
+        prop.props.append(pp);
+    }
+    return stream;
+}
+
+#endif
 
 MyItem::MyItem(GraphicsType itemType, QGraphicsScene *parentScene, QObject *parent1, QGraphicsItem *parent2):
     parentScene(parentScene),

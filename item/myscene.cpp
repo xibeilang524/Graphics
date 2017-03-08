@@ -425,6 +425,17 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
             item->setJudgeProp(cutInfo.judgeProp);
         }
 
+#ifdef ADD_STATE_MODEL
+        if(cutInfo.graphicsType == GRA_STATE_START)
+        {
+            item->setStartProp(cutInfo.stateStartProp);
+        }
+        else if(cutInfo.graphicsType == GRA_STATE_PROCESS)
+        {
+            item->setModelProp(cutInfo.stateModelProp);
+        }
+#endif
+
         if(isCopy)
         {
             item->setPos(SceneLastClickPoint);

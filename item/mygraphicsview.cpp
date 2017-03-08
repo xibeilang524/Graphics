@@ -430,10 +430,16 @@ void MyGraphicsView::cutItem()
                 NodeWholeProperty  props;
                 props.nodeProp.direct = node->getDragDirect();
                 props.nodeProp.scaleFactor = node->getScaleFactor();
+#ifdef ADD_STATE_MODEL
                 props.stateProp = node->getStatePortProp();
                 props.inOutProp = node->getStateInOutProp();
+#endif
                 cutTmpInfo.nodeProperties.push_back(props);
             }
+#ifdef ADD_STATE_MODEL
+            cutTmpInfo.stateStartProp = item->getStartProp();
+            cutTmpInfo.stateModelProp = item->getModelProp();
+#endif
             deleteItem();
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
             ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(true);
@@ -479,10 +485,16 @@ void MyGraphicsView::copyItem()
                 props.nodeProp.portType = node->getType();
                 props.nodeProp.direct = node->getDragDirect();
                 props.nodeProp.scaleFactor = node->getScaleFactor();
+#ifdef ADD_STATE_MODEL
                 props.stateProp = node->getStatePortProp();
                 props.inOutProp = node->getStateInOutProp();
+#endif
                 cutTmpInfo.nodeProperties.push_back(props);
             }
+#ifdef ADD_STATE_MODEL
+                cutTmpInfo.stateStartProp = item->getStartProp();
+                cutTmpInfo.stateModelProp = item->getModelProp();
+#endif
             ActionManager::instance()->action(Constants::PASTE_ID)->setEnabled(true);
             ActionManager::instance()->action(Constants::CLEAR_PASTE_ID)->setEnabled(true);
         }
@@ -1112,9 +1124,9 @@ void MyGraphicsView::editTextItem()
         if(itemName == TYPE_ID(MyItem))
         {
             MyItem * item = dynamic_cast<MyItem*>(selectedItems.first());
+
 #ifdef ADD_STATE_MODEL
             GraphicsType gType = item->getType();
-
             if(gType == GRA_STATE_START)
             {
                 MyStateStartDialog dialog(this);

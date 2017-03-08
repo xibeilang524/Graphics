@@ -101,8 +101,14 @@
         <layout class="QHBoxLayout" name="horizontalLayout_2">
          <item>
           <widget class="QTableWidget" name="tableWidget">
+           <attribute name="horizontalHeaderVisible">
+            <bool>true</bool>
+           </attribute>
            <attribute name="horizontalHeaderStretchLastSection">
             <bool>true</bool>
+           </attribute>
+           <attribute name="verticalHeaderVisible">
+            <bool>false</bool>
            </attribute>
            <column>
             <property name="text">
@@ -134,7 +140,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="deleteSelectedItem">
+             <widget class="QPushButton" name="removeSelectedItem">
               <property name="minimumSize">
                <size>
                 <width>120</width>
@@ -153,7 +159,7 @@
              </widget>
             </item>
             <item>
-             <widget class="QPushButton" name="deleteAll">
+             <widget class="QPushButton" name="removeAll">
               <property name="minimumSize">
                <size>
                 <width>120</width>
