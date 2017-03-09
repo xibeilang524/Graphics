@@ -12,6 +12,9 @@
 #define MYSTATESETDIALOG_H
 
 #include <QDialog>
+
+#include "Header.h"
+
 class MyChooseBar;
 
 namespace Ui {
@@ -25,10 +28,24 @@ class MyStateSetDialog : public QDialog
 public:
     explicit MyStateSetDialog(QWidget *parent = 0);
     ~MyStateSetDialog();
+
+    void initComboxList(QStringList & innerList,QStringList & outerList);
+    void setProp(LinkedStateProperty & linkProp);
+    LinkedStateProperty & getProp(){return this->prop;}
+
+private slots:
+    void respSetInterEventList(bool);
+    void respSetOuterEventList(bool);
+    void respConfirm();
     
 private:
     Ui::MyStateSetDialog *ui;
     MyChooseBar * chooseBar;
+
+    LinkedStateProperty  prop;
+
+    QStringList innerList;
+    QStringList outerList;
 };
 
 #endif // MYSTATESETDIALOG_H

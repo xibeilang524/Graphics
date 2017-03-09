@@ -355,45 +355,6 @@ QDataStream & operator <<(QDataStream &stream,MyItem * item)
     return stream;
 }
 
-QDataStream & operator >>(QDataStream &stream,MyItem * item)
-{
-    int type;
-    ItemProperty prop;
-
-    stream>>type>>prop;
-    item->currItemType = (GraphicsType)type;
-
-    item->setProperty(prop);
-
-    if(prop.ptype == PRO_PROCESS)
-    {
-        ServiceProperty * sprop = new ServiceProperty;
-
-        stream>>sprop;
-        item->setServiceProperty(sprop);
-
-        delete sprop;
-    }
-    else if(prop.ptype == PRO_LOOP)
-    {
-        LoopProperty * lprop = new LoopProperty;
-        stream>>lprop;
-        item->setLoopProp(lprop);
-
-        delete lprop;
-    }
-    else if(prop.ptype == PRO_JUDGE || prop.ptype == PRO_INPUT)
-    {
-        JudgeProperty * jprop = new JudgeProperty;
-        stream>>jprop;
-        item->setJudgeProp(jprop);
-
-        delete jprop;
-    }
-
-    return stream;
-}
-
 #ifdef ADD_STATE_MODEL
 QDataStream & operator<< (QDataStream & stream,StateStartProperty & prop)
 {
@@ -1112,7 +1073,9 @@ MyNodePort * MyItem::addNodePort(const NodeWholeProperty &prop)
                             }
 
 
+        case GRA_NODE_TRIANGLE_IN:
         case GRA_NODE_TRIANGLE_OUT:
+        case GRA_NODE_HALF_CIRCLE_IN:
         case GRA_NODE_HALF_CIRCLE_OUT:
                             {
                                 StateInOutProperty pp = prop.inOutProp;

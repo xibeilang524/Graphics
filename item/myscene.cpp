@@ -485,6 +485,9 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
 
                 MyArrow * arrow = createArrow(LINE_MYITEM,startItem,endItem);
                 arrow->setProperty(cutInfo.itemProperty);
+#ifdef ADD_STATE_MODEL
+                arrow->setLinkedProp(cutInfo.linkedProp);
+#endif
             }
         }
         else if(cutInfo.itemProperty.lineType == LINE_NODEPORT)
@@ -520,6 +523,9 @@ void MyScene::addItem(CutInfo cutInfo, bool isCopy)
                 pathItem->setProperty(cutInfo.itemProperty);
                 pathItem->setPathPoints(cutInfo.pathPoints);
                 pathItem->updateCurrItemPos();
+#ifdef ADD_STATE_MODEL
+                pathItem->setLinkedProp(cutInfo.linkedProp);
+#endif
             }
         }
         else if(cutInfo.itemProperty.lineType == LINE_NODEPORT)

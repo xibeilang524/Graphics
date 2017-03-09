@@ -21,21 +21,27 @@ QDataStream & operator <<(QDataStream &stream,MyArrow * item)
 
     stream<<type<<item->property;
 
+#ifdef ADD_STATE_MODEL
+    stream<<item->likedProp;
+#endif
+
     return stream;
 }
 
-QDataStream & operator >>(QDataStream &stream,MyArrow * item)
+#ifdef ADD_STATE_MODEL
+QDataStream & operator<< (QDataStream & stream,LinkedStateProperty & prop)
 {
-    int type;
-    ItemProperty prop;
-
-    stream>>type>>prop;
-    item->type = (GraphicsType)type;
-
-    item->setProperty(prop);
-
+    stream<<prop.hasSettled<<prop.triggerMethod<<prop.triggerType<<prop.desc;
     return stream;
 }
+
+QDataStream & operator>> (QDataStream & stream,LinkedStateProperty & prop)
+{
+    stream>>prop.hasSettled>>prop.triggerMethod>>prop.triggerType>>prop.desc;
+    return stream;
+}
+#endif
+
 
 MyArrow::MyArrow(QGraphicsItem *parent):
     QGraphicsLineItem(parent)
@@ -50,6 +56,16 @@ MyArrow::MyArrow(QGraphicsItem *parent):
 
     createTextItem();
 }
+
+#ifdef ADD_STATE_MODEL
+void MyArrow::setLinkedProp(LinkedStateProperty &prop)
+{
+    this->likedProp.triggerMethod = prop.triggerMethod;
+    this->likedProp.triggerType = prop.triggerType;
+    this->likedProp.desc = prop.desc;
+    this->likedProp.hasSettled = prop.hasSettled;
+}
+#endif
 
 //设置线条两端的类型
 void MyArrow::setLineType(LineType lineType)

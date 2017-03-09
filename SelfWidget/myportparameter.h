@@ -12,6 +12,7 @@
 #define MYPORTPARAMETER_H
 
 #include <QDialog>
+#include "Header.h"
 
 class QAbstractButton;
 
@@ -26,6 +27,8 @@ class MyPortParameter : public QDialog
 public:
     explicit MyPortParameter(QWidget *parent = 0);
     bool getResult(QString &pname,QString &ptype);
+
+    void showDesc(StatePortProperty prop);
 
     ~MyPortParameter();
 

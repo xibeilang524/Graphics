@@ -12,17 +12,21 @@
 **20161025:wey:增加工作区间右键菜单，支持关闭、保存、关闭左侧所有、关闭右侧所有
 **20161026:wey:修复工作区间个数为0时，依然可以响应Ctrl+w的事件
 **20161201:wey:增加根据文件名全路径切换
+**20170309:wey:PageMapping新增linkedItem用于引用遮罩页面的双击控件
 *************************************************/
 #ifndef MYPAGESWITCH_H
 #define MYPAGESWITCH_H
 
 #include <QWidget>
 
+#include "Header.h"
+
 class QPushButton;
 class QHBoxLayout;
 class MyScene;
 class MyPageItem;
 class QAction;
+class MyItem;
 
 //建立文件与页面、场景之间的关系，此实例可以描述当前页面的基本信息
 struct PageMapping
@@ -30,10 +34,16 @@ struct PageMapping
     PageMapping()
     {
         isAssociated = false;
+#ifdef  ADD_STATE_MODEL
+        linkedItem = NULL;
+#endif
     }
     QString id;
     MyPageItem * pageItem;
     MyScene * scene;         //关联的scene
+#ifdef  ADD_STATE_MODEL
+    MyItem * linkedItem;     //双击某个遮罩，将此遮罩控件引用传递至当前页面，以新页面中引用
+#endif
     QString pageName;        //工作区名
     QString pathName;        //路径名(文件夹名):c:/abc
     QString fullPathName;    //(如果保存)当前场景文件显示图元的全路径名称:c:/abc/123.bin
@@ -53,7 +63,7 @@ public:
     void addSwitchContextMenu();
 
     bool openPage(QString pageId);
-    void updateCurrMappingInfo(QString & fileName);
+    void updateCurrMappingInfo(QString & fileName, MyItem *linkItem = NULL);
 
     void switchToPageByFileName(QString fileName);
 

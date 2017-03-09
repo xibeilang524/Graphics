@@ -37,7 +37,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButton">
+          <widget class="QRadioButton" name="internalEvent">
            <property name="minimumSize">
             <size>
              <width>150</width>
@@ -50,7 +50,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QRadioButton" name="radioButton_2">
+          <widget class="QRadioButton" name="outerEvent">
            <property name="minimumSize">
             <size>
              <width>150</width>
@@ -137,7 +137,7 @@
        </widget>
       </item>
       <item>
-       <widget class="QPlainTextEdit" name="plainTextEdit"/>
+       <widget class="QPlainTextEdit" name="desc"/>
       </item>
       <item>
        <widget class="QWidget" name="widget_4" native="true">

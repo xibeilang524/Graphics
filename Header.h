@@ -272,7 +272,9 @@ struct ItemProperty
     void createUUID()
     {
         startItemID = QUuid::createUuid().toString();    //新建对象时创建唯一标识符
+#ifdef ADD_STATE_MODEL
         associativeID = QUuid::createUuid().toString();
+#endif
     }
 
     QString startItemID;                  //在用于非直线的控件时，只用startItemId标识当前控件
@@ -591,7 +593,6 @@ struct ProcessUnit
     ProcessUnit * noChild;
 };
 
-
 #ifdef ADD_STATE_MODEL
 /**************************状态机结构体******************************/
 //初始化端口设置
@@ -654,6 +655,23 @@ enum SimulateFlow
     RESET_FLOW
 };
 
+//状态连线属性
+struct LinkedStateProperty
+{
+    LinkedStateProperty()
+    {
+        hasSettled = false;
+    }
+
+    bool hasSettled;            //是否设置值，默认为false
+    QString triggerMethod;      //触发方式
+    QString triggerType;        //事件类型(内部事件/外部事件)
+    QString desc;               //事件描述
+
+    friend QDataStream & operator<< (QDataStream & stream,LinkedStateProperty & prop);
+    friend QDataStream & operator>> (QDataStream & stream,LinkedStateProperty & prop);
+};
+
 #endif
 
 
@@ -689,6 +707,7 @@ struct CutInfo
 #ifdef ADD_STATE_MODEL
     StateStartProperty stateStartProp;           //仿真开始状态属性
     StateModelProperty stateModelProp;           //仿真模型状态属性
+    LinkedStateProperty linkedProp;              //仿真模型
 #endif
 };
 

@@ -37,6 +37,13 @@ bool MyPortParameter::getResult(QString &pname, QString &ptype)
     return isOkPressed;
 }
 
+//显示相信信息
+void MyPortParameter::showDesc(StatePortProperty prop)
+{
+    ui->portName->setText(prop.portName);
+    ui->portType->setText(prop.portType);
+}
+
 MyPortParameter::~MyPortParameter()
 {
     delete ui;

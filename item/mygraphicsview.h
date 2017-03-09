@@ -56,7 +56,7 @@ public:
     MyItem * getTopSelectedItem();
 
     void showNodePortEdit(MyNodePort * nodePort);
-    void openLocalFile(QString fileName,bool openFile = false);
+    void openLocalFile(QString fileName, bool openFile = false, MyItem *linkItem = NULL);
 
     QString getFirstSelectedItem();
 

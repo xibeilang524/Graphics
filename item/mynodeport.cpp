@@ -48,38 +48,15 @@ QDataStream & operator <<(QDataStream & dataStream,MyNodePort * nodePort)
                             dataStream<<nodePort->statePortProp;
                             break;
 
+        case GRA_NODE_TRIANGLE_IN:
         case GRA_NODE_TRIANGLE_OUT:
+        case GRA_NODE_HALF_CIRCLE_IN:
         case GRA_NODE_HALF_CIRCLE_OUT:
                             dataStream<<nodePort->stateInOutProp;
                             break;
     }
 #endif
 
-    return dataStream;
-}
-
-QDataStream & operator >>(QDataStream & dataStream,MyNodePort * nodePort)
-{
-    int type;
-    NodePortProperty property;
-    dataStream>>type>>property;
-
-#ifdef ADD_STATE_MODEL
-    switch(property.portType)
-    {
-        case GRA_NODE_CIRCLE:
-                            dataStream>>nodePort->statePortProp;
-                            break;
-
-        case GRA_NODE_TRIANGLE_OUT:
-        case GRA_NODE_HALF_CIRCLE_OUT:
-                            dataStream>>nodePort->stateInOutProp;
-                            break;
-    }
-#endif
-
-    nodePort->currItemType = (GraphicsType)type;
-    nodePort->nodeProperty = property;
     return dataStream;
 }
 

@@ -150,7 +150,9 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
                                     stream>>nodeProperty.stateProp;
                                     break;
 
+                case GRA_NODE_TRIANGLE_IN:
                 case GRA_NODE_TRIANGLE_OUT:
+                case GRA_NODE_HALF_CIRCLE_IN:
                 case GRA_NODE_HALF_CIRCLE_OUT:
                                     stream>>nodeProperty.inOutProp;
                                     break;
@@ -163,6 +165,7 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
             CutInfo * info = new CutInfo;
             stream>>info->itemProperty;
 
+            //’€œﬂ
             if(gtype == GRA_VECTOR_LINE)
             {
                 int pointSize = 0;
@@ -173,6 +176,9 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
                     stream>>point;
                     info->pathPoints.push_back(point);
                 }
+#ifdef ADD_STATE_MODEL
+                    stream>>info->linkedProp;
+#endif
             }
             else
             {
@@ -184,6 +190,10 @@ ReturnType FileOperate::openFile(QString fileName,QList<CutInfo *> &items)
                 else if(gtype == GRA_STATE_PROCESS)
                 {
                     stream>>info->stateModelProp;
+                }
+                else if(gtype == GRA_LINE)
+                {
+                    stream>>info->linkedProp;
                 }
 #endif
                 if(info->itemProperty.ptype == PRO_PROCESS)

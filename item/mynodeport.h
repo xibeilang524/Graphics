@@ -76,7 +76,6 @@ public:
 
     void setMoveable(bool isMoveable);
 
-    friend QDataStream & operator >>(QDataStream & ,MyNodePort *);
     friend QDataStream & operator <<(QDataStream & ,MyNodePort *);
 
     QString getText();

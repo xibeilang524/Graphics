@@ -80,7 +80,11 @@ public:
     void setText(QString text);
 
     friend QDataStream & operator <<(QDataStream &,MyPathItem * item);
-    friend QDataStream & operator >>(QDataStream &,MyPathItem * item);
+
+#ifdef ADD_STATE_MODEL
+    void setLinkedProp(LinkedStateProperty & prop);
+    LinkedStateProperty & getLikedProp(){return this->likedProp;}
+#endif
 
 signals:
     void editMe();
@@ -112,6 +116,10 @@ private:
     QPainterPath painterPath;          //当前路径
 
     QList<QPointF> points;             //根据起点和终点坐标计算出当前折线的每个关键点(折线点)
+
+#ifdef ADD_STATE_MODEL
+    LinkedStateProperty likedProp;     //状态连线属性
+#endif
 };
 
 #endif // MYPATHITEM_H

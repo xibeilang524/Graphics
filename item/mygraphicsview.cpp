@@ -1160,11 +1160,11 @@ void MyGraphicsView::editTextItem()
                     Util::showWarn("原子组件图打开失败!");
                 }
                 bool isExisted = MyPageSwitch::instance()->openPage(localAtomID);
-                MyPageSwitch::instance()->updateCurrMappingInfo(localFileName);
+                MyPageSwitch::instance()->updateCurrMappingInfo(localFileName,item);
 
                 if(file.size() > 0 && !isExisted)
                 {
-                    openLocalFile(localFileName,true);
+                    openLocalFile(localFileName,true,item);
                 }
             }
             else
@@ -1187,15 +1187,58 @@ void MyGraphicsView::editTextItem()
         {
             MyArrow * item = dynamic_cast<MyArrow*>(selectedItems.first());
 
+#ifdef ADD_STATE_MODEL
+            QStringList innerEventList,outerEventList;
             MyStateSetDialog dialog(this);
+            //获取内部事件的列表
+            if(item->getLineType() == LINE_MYITEM)
+            {
+                MyNodeLine * nodeLine = item->getStartItem();
+                if(nodeLine)
+                {
+                    MyItem * pStart = dynamic_cast<MyItem *>(nodeLine->getParentItem());
+                    if(pStart)
+                    {
+                       QList<StatInnerProperty> innerProps = pStart->getModelProp().props;
+                       foreach(StatInnerProperty pp,innerProps)
+                       {
+                           innerEventList.append(pp.propName);
+                       }
+                    }
+                }
+            }
+
+            //TODO 获取外部事件列表
+            const PageMapping * currPage = MyPageSwitch::instance()->currPageMapping();
+            if(currPage->linkedItem)
+            {
+               QList<MyNodePort *> nodePorts = currPage->linkedItem->getNodePorts();
+               foreach( MyNodePort * nodePort,nodePorts)
+               {
+                   if(nodePort->getType()==GRA_NODE_TRIANGLE_IN || nodePort->getType()==GRA_NODE_HALF_CIRCLE_IN)
+                   {
+                       if(nodePort->getText().size() > 0)
+                       {
+                           outerEventList.append(nodePort->getText());
+                       }
+                   }
+               }
+            }
+            else
+            {
+                QMessageBox::warning(GlobalMainWindow,"警告","无法获取上层控件，外部端口事件获取失败!");
+            }
+
+            dialog.initComboxList(innerEventList,outerEventList);
+            dialog.setProp(item->getLikedProp());
             dialog.exec();
-
-//            MyTextInput textInput(this);
-
-//            textInput.setTex(item->getText());
-//            textInput.exec();
-
-//            item->setText(textInput.getText());
+            item->setLinkedProp(dialog.getProp());
+#else
+            MyTextInput textInput(this);
+            textInput.setTex(item->getText());
+            textInput.exec();
+            item->setText(textInput.getText());
+#endif
         }
         else if(itemName == TYPE_ID(MyNodePort))
         {
@@ -1250,6 +1293,65 @@ void MyGraphicsView::editTextItem()
             item->setText(textInput.getText());
 #endif
         }
+#ifdef ADD_STATE_MODEL
+        else if(itemName == TYPE_ID(MyPathItem))
+        {
+            MyPathItem * item = dynamic_cast<MyPathItem*>(selectedItems.first());
+
+#ifdef ADD_STATE_MODEL
+            QStringList innerEventList,outerEventList;
+            MyStateSetDialog dialog(this);
+            //获取内部事件的列表
+            if(item->getLineType() == LINE_MYITEM)
+            {
+                MyNodeLine * nodeLine = item->getStartItem();
+                if(nodeLine)
+                {
+                    MyItem * pStart = dynamic_cast<MyItem *>(nodeLine->getParentItem());
+                    if(pStart)
+                    {
+                       QList<StatInnerProperty> innerProps = pStart->getModelProp().props;
+                       foreach(StatInnerProperty pp,innerProps)
+                       {
+                           innerEventList.append(pp.propName);
+                       }
+                    }
+                }
+            }
+
+            //TODO 获取外部事件列表
+            const PageMapping * currPage = MyPageSwitch::instance()->currPageMapping();
+            if(currPage->linkedItem)
+            {
+               QList<MyNodePort *> nodePorts = currPage->linkedItem->getNodePorts();
+               foreach( MyNodePort * nodePort,nodePorts)
+               {
+                   if(nodePort->getType()==GRA_NODE_TRIANGLE_IN || nodePort->getType()==GRA_NODE_HALF_CIRCLE_IN)
+                   {
+                       if(nodePort->getText().size() > 0)
+                       {
+                           outerEventList.append(nodePort->getText());
+                       }
+                   }
+               }
+            }
+            else
+            {
+                QMessageBox::warning(GlobalMainWindow,"警告","无法获取上层控件，外部端口事件获取失败!");
+            }
+
+            dialog.initComboxList(innerEventList,outerEventList);
+            dialog.setProp(item->getLikedProp());
+            dialog.exec();
+            item->setLinkedProp(dialog.getProp());
+#else
+            MyTextInput textInput(this);
+            textInput.setTex(item->getText());
+            textInput.exec();
+            item->setText(textInput.getText());
+#endif
+        }
+#endif
     }
 }
 
@@ -1532,7 +1634,7 @@ void MyGraphicsView::fileSaveAs()
 
 //打开本地文件，将文件的信息保存至每个场景中
 //【20161201】新增对所打开的文件先判断是否已存在
-void MyGraphicsView::openLocalFile(QString fileName, bool openFile)
+void MyGraphicsView::openLocalFile(QString fileName, bool openFile,MyItem * linkItem)
 {
     if(!openFile && MyPageSwitch::instance()->hasContainFile(fileName))
     {
@@ -1563,7 +1665,7 @@ void MyGraphicsView::openLocalFile(QString fileName, bool openFile)
 
         setKeyCtrlStated(false);
 
-        MyPageSwitch::instance()->updateCurrMappingInfo(fileName);
+        MyPageSwitch::instance()->updateCurrMappingInfo(fileName,linkItem);
         MyPageSwitch::instance()->emitSwitchPage();
     }
     scene()->update();

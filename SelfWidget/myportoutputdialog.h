@@ -12,6 +12,7 @@
 #define MYPORTOUTPUTDIALOG_H
 
 #include <QDialog>
+#include <QModelIndex>
 
 #include "../Header.h"
 
@@ -39,6 +40,7 @@ private slots:
     void addNewItem();
     void removeSelectedItem();
     void removeAllItem();
+    void respDClickItem(QModelIndex);
 
 private:
     void addRow(const QString pname, const QString ptype);
@@ -46,6 +48,7 @@ private:
     Ui::MyPortOutputDialog *ui;
 
     StateInOutProperty sprop;
+    QList<StatePortProperty> props;         //保存暂存的添加集合
     MyChooseBar * chooseBar;
 };
 

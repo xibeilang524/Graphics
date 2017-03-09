@@ -22,19 +22,6 @@ QDataStream & operator <<(QDataStream &stream,MyTextItem * item)
     return stream;
 }
 
-QDataStream & operator >>(QDataStream &stream,MyTextItem * item)
-{
-    int type;
-    ItemProperty prop;
-
-    stream>>type>>prop;
-    item->type = (GraphicsType)type;
-
-    item->setProperty(prop);
-
-    return stream;
-}
-
 MyTextItem::MyTextItem(GraphicsType itemType, QGraphicsItem *parent, QGraphicsScene *scene):
     type(itemType),
     QGraphicsTextItem(parent,scene)

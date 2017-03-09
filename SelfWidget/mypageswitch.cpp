@@ -298,12 +298,15 @@ int MyPageSwitch::getPageIndex(QString id)
 }
 
 //更新当前文件的描述信息
-void MyPageSwitch::updateCurrMappingInfo(QString & fileName)
+void MyPageSwitch::updateCurrMappingInfo(QString & fileName,MyItem * linkItem)
 {
     MY_ASSERT(selectedPage)
     QFileInfo info(fileName);
     selectedPage->fullPathName = fileName;
     selectedPage->pathName = info.absolutePath();
+#ifdef ADD_STATE_MODEL
+    selectedPage->linkedItem = linkItem;
+#endif
 }
 
 //手动的发射信号

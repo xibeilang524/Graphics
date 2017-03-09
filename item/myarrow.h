@@ -80,7 +80,11 @@ public:
     void setText(QString text);
 
     friend QDataStream & operator <<(QDataStream &,MyArrow * item);
-    friend QDataStream & operator >>(QDataStream &,MyArrow * item);
+
+#ifdef ADD_STATE_MODEL
+    void setLinkedProp(LinkedStateProperty & prop);
+    LinkedStateProperty & getLikedProp(){return this->likedProp;}
+#endif
 
 signals:
     void editMe();
@@ -111,6 +115,10 @@ private:
     QRectF boundRect;
 
     MyTextItem * myTextItem;           //文字信息
+
+#ifdef ADD_STATE_MODEL
+    LinkedStateProperty likedProp;     //状态连线属性
+#endif
 };
 
 #endif // MYARROW_H

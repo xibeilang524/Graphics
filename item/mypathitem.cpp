@@ -24,29 +24,9 @@ QDataStream & operator <<(QDataStream &stream,MyPathItem * item)
         stream<<point;
     }
 
-    return stream;
-}
-
-QDataStream & operator >>(QDataStream &stream,MyPathItem * item)
-{
-    int type;
-    ItemProperty prop;
-    int pointSize = 0;
-
-    stream>>type>>prop;
-    stream>>pointSize;
-
-    QList<QPointF> points;
-    for(int i = 0; i < pointSize; i++)
-    {
-        QPointF point;
-        stream>>point;
-        points.push_back(point);
-    }
-
-    item->type = (GraphicsType)type;
-    item->setProperty(prop);
-    item->setPathPoints(points);
+#ifdef ADD_STATE_MODEL
+    stream<<item->likedProp;
+#endif
 
     return stream;
 }
@@ -1345,6 +1325,16 @@ void MyPathItem::updateTextPos()
         myTextItem->setPos(boundingRect().center());
     }
 }
+
+#ifdef ADD_STATE_MODEL
+void MyPathItem::setLinkedProp(LinkedStateProperty &prop)
+{
+    this->likedProp.triggerMethod = prop.triggerMethod;
+    this->likedProp.triggerType = prop.triggerType;
+    this->likedProp.desc = prop.desc;
+    this->likedProp.hasSettled = prop.hasSettled;
+}
+#endif
 
 MyPathItem::~MyPathItem()
 {

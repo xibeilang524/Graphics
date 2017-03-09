@@ -53,7 +53,6 @@ public:
     QRectF getBoundRect();
 
     friend QDataStream & operator <<(QDataStream &,MyTextItem * item);
-    friend QDataStream & operator >>(QDataStream &,MyTextItem * item);
 
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
 

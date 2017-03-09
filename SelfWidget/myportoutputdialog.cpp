@@ -1,7 +1,6 @@
 #include "myportoutputdialog.h"
 #include "ui_myportoutputdialog.h"
 
-#include "../Header.h"
 #include "../global.h"
 #include "mychoosebar.h"
 #include "myportparameter.h"
@@ -28,6 +27,7 @@ MyPortOutputDialog::MyPortOutputDialog(QWidget *parent) :
     connect(ui->addItem,SIGNAL(clicked()),this,SLOT(addNewItem()));
     connect(ui->removeSelectedItem,SIGNAL(clicked()),this,SLOT(removeSelectedItem()));
     connect(ui->removeAllItem,SIGNAL(clicked()),this,SLOT(removeAllItem()));
+    connect(ui->tableWidget,SIGNAL(doubleClicked(QModelIndex)),this,SLOT(respDClickItem(QModelIndex)));
 
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
     ui->tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -62,6 +62,7 @@ void MyPortOutputDialog::setProp(StateInOutProperty &prop)
         addRow(prop.props.at(i).portName,prop.props.at(i).portType);
         StatePortProperty pp = {prop.props.at(i).portName,prop.props.at(i).portType};
         this->sprop.props.append(pp);
+        this->props.append(pp);
     }
 }
 
@@ -70,6 +71,11 @@ void MyPortOutputDialog::updateProp()
 {
     sprop.portName = ui->portName->text();
     sprop.portType = QString::number(ui->portTypeBox->currentIndex());
+    sprop.props.clear();
+    foreach(StatePortProperty pp ,props)
+    {
+        sprop.props.append(pp);
+    }
 }
 
 //添加新条目
@@ -77,6 +83,7 @@ void MyPortOutputDialog::addNewItem()
 {
     MyPortParameter parameter;
     parameter.exec();
+
     QString pname,ptype;
     if(parameter.getResult(pname,ptype))
     {
@@ -84,7 +91,30 @@ void MyPortOutputDialog::addNewItem()
         {
             StatePortProperty pp = {pname,ptype};
             addRow(pname,ptype);
-            this->sprop.props.append(pp);
+            props.append(pp);
+        }
+    }
+}
+
+//显示某一行的信息，允许修改
+void MyPortOutputDialog::respDClickItem(QModelIndex index)
+{
+    if(index.isValid() && index.row() >=0 && index.row() < ui->tableWidget->rowCount())
+    {
+        MyPortParameter parameter;
+        parameter.showDesc(props.at(index.row()));
+        parameter.exec();
+
+        QString pname,ptype;
+        if(parameter.getResult(pname,ptype))
+        {
+            if(pname.size() > 0 && ptype.size() > 0)
+            {
+                StatePortProperty pp = {pname,ptype};
+                props.replace(index.row(),pp);
+                ui->tableWidget->item(index.row(),0)->setText(pp.portName);
+                ui->tableWidget->item(index.row(),1)->setText(pp.portType);
+            }
         }
     }
 }
@@ -125,7 +155,7 @@ void MyPortOutputDialog::removeSelectedItem()
             for(int i = list.size()-1; i >=0; i--)
             {
                 ui->tableWidget->removeRow(list.at(i));
-                this->sprop.props.removeAt(list.at(i));
+                props.removeAt(list.at(i));
             }
         }
     }
@@ -138,7 +168,7 @@ void MyPortOutputDialog::removeAllItem()
     {
         ui->tableWidget->removeRow(i);
     }
-    this->sprop.props.clear();
+    props.clear();
 }
 
 StateInOutProperty & MyPortOutputDialog::getProp()
