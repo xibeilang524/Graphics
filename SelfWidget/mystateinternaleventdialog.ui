@@ -89,6 +89,11 @@
              <string>时间表达式</string>
             </property>
            </item>
+           <item>
+            <property name="text">
+             <string>条件表达式</string>
+            </property>
+           </item>
           </widget>
          </item>
         </layout>

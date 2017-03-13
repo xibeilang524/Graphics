@@ -382,7 +382,7 @@ QDataStream & operator>> (QDataStream & stream,StatInnerProperty & prop)
 
 QDataStream & operator<< (QDataStream &stream,StateModelProperty & prop)
 {
-    stream<<prop.stateName<<prop.continueContent;
+    stream<<prop.stateName<<prop.actionContent<<prop.continueContent;
     stream<<prop.props.size();
     for(int i=0;i<prop.props.size();i++)
     {
@@ -395,8 +395,7 @@ QDataStream & operator<< (QDataStream &stream,StateModelProperty & prop)
 
 QDataStream & operator>> (QDataStream &stream,StateModelProperty & prop)
 {
-    stream>>prop.stateName>>prop.continueContent;
-
+    stream>>prop.stateName>>prop.actionContent>>prop.continueContent;
     int size = 0;
     stream>>size;
 
@@ -2115,6 +2114,7 @@ void MyItem::setModelProp(StateModelProperty &prop)
 {
     stateModeProp.stateName = prop.stateName;
     stateModeProp.continueContent = prop.continueContent;
+    stateModeProp.actionContent = prop.actionContent;
     stateModeProp.props.clear();
     foreach(StatInnerProperty tmpProp,prop.props)
     {

@@ -25,6 +25,7 @@
 #include "./SelfWidget/serviceview.h"
 #include "./SelfWidget/aboutsoft.h"
 #include "./SelfWidget/myshortkey.h"
+#include "./SelfWidget/extralprocess.h"
 #include "./manager/mylinecombobox.h"
 #include "./simulate/simulatecontrolpanel.h"
 #include "./project/myprowizard.h"
@@ -299,6 +300,17 @@ void MainWindow::createActionAndMenus()
     widgetMenu->addAction(buildModelAction);
     widgetMenu->addAction(simulateAction);
 
+    //【工具栏】
+    MyMenu * toolMenu = MenuManager::instance()->createMenu(Constants::MENUBAR_TOOL_MENU,QString("工具(&T)"));
+    menuBar()->addMenu(toolMenu);
+
+    MyAction * startProcessAction = ActionManager::instance()->crateAction(Constants::START_UP_PROCESS,QIcon(":/images/startProcess.png"),"启动外部程序");
+    startProcessAction->setShortcut(QKeySequence("Ctrl+Shift+T"));
+    ActionManager::instance()->registerAction(startProcessAction,ExtralProcess::instance(),SLOT(exec()));
+    GlobalKeyMap.insert(startProcessAction->shortcut().toString(),startProcessAction->text());
+
+    toolMenu->addAction(startProcessAction);
+
     //【帮助菜单栏】
     MyAction * assisantAction = ActionManager::instance()->crateAction(Constants::ASSISANT_KEY_LIST,QIcon(),"快捷键列表");
     ActionManager::instance()->registerAction(assisantAction,this,SLOT(showAssisantList()));
@@ -339,6 +351,7 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(closeRightWorkAction,MyPageSwitch::instance(),SLOT(closeRightPage()));
 
     GlobalKeyMap.insert("Alt+<-,->","左右切换工作区");
+
 }
 
 //直接处理，无需再出发KeyPressEvent，否则一个事件会处理两遍
@@ -429,6 +442,11 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
                 ActionManager::instance()->action(Constants::BUILD_MODEL_ID)->setChecked(true);
             }
         }
+    }
+    //工具-启动外部程序
+    if(event->modifiers() == Qt::ControlModifier && event->modifiers() == Qt::ShiftModifier && event->key() == Qt::Key_T)
+    {
+        ExtralProcess::instance()->exec();
     }
 
     QMainWindow::keyPressEvent(event);

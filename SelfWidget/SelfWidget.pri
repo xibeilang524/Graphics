@@ -25,7 +25,8 @@ HEADERS += \
     SelfWidget/myshortkey.h \
     SelfWidget/beforesimulateserviceconfig.h \
     SelfWidget/initservice.h \
-    SelfWidget/myportparameter.h
+    SelfWidget/myportparameter.h \
+    SelfWidget/extralprocess.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -54,7 +55,8 @@ SOURCES += \
     SelfWidget/myshortkey.cpp \
     SelfWidget/beforesimulateserviceconfig.cpp \
     SelfWidget/initservice.cpp \
-    SelfWidget/myportparameter.cpp
+    SelfWidget/myportparameter.cpp \
+    SelfWidget/extralprocess.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
@@ -77,4 +79,5 @@ FORMS += \
     SelfWidget/myshortkey.ui \
     SelfWidget/beforesimulateserviceconfig.ui \
     SelfWidget/initservice.ui \
-    SelfWidget/myportparameter.ui
+    SelfWidget/myportparameter.ui \
+    SelfWidget/extralprocess.ui

@@ -640,6 +640,7 @@ struct StatInnerProperty
 struct StateModelProperty
 {
     QString stateName;                //状态名
+    QString actionContent;            //动作设置
     QString continueContent;          //持续事件行为
     QList<StatInnerProperty> props;   //内部事件集合
 

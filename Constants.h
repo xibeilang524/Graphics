@@ -107,6 +107,7 @@ const char MENUBAR_EDIT_MENU[] = "Constants.Menu.EditMenu";
 const char MENUBAR_ITEM_MENU[] = "Constants.Menu.ItemMenu";
 const char MENUBAR_WIDGET_MENU[] = "Constants.Menu.WidgetMenu";
 const char MENUBAR_HELP_MENU[] = "Constants.Menu.HelpMenu";
+const char MENUBAR_TOOL_MENU[] = "Constants.Menu.ToolMenu";
 
 const char MENU_MYPAGE_SWITCH[] = "Constants.Menu.PageSwitchMenu";
 const char MENU_GRAPHICS_VIEW[] = "Constants.Menu.GraphicsViewMenu";
@@ -114,6 +115,9 @@ const char MENU_ITEM_RIGHT_MENU[] = "Constants.Menu.ItemRightMenu";
 
 const char MENU_SERVICE_INPUT[] = "Constants.Menu.ServiceInputMenu";
 const char MENU_NODE_PORT[] = "Constants.Menu.NodePort";
+
+//¡¾¹¤¾ßÀ¸¡¿
+const char START_UP_PROCESS[] = "Constants.StartUpExtralProcess";
 
 } // namespace Constants
 } // namespace Graphics

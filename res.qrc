@@ -88,5 +88,8 @@
         <file>images/startup.png</file>
         <file>images/nodeHalfCircleIn.png</file>
         <file>images/nodeHalfCircleOut.png</file>
+        <file>images/startProcess.png</file>
+        <file>images/start.png</file>
+        <file>images/stop.png</file>
     </qresource>
 </RCC>

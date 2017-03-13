@@ -25,6 +25,7 @@ MyStateModelDialog::MyStateModelDialog(QWidget *parent) :
     layout->setContentsMargins(1,1,1,1);
     ui->widget_4->setLayout(layout);
 
+    connect(ui->goInAction,SIGNAL(clicked()),this,SLOT(respGoInAction()));
     connect(ui->continueAction,SIGNAL(clicked()),this,SLOT(respContinueAction()));
     connect(ui->addItem,SIGNAL(clicked()),this,SLOT(respAddItem()));
     connect(ui->removeAll,SIGNAL(clicked()),this,SLOT(respRemoveAllItem()));
@@ -38,11 +39,23 @@ MyStateModelDialog::MyStateModelDialog(QWidget *parent) :
     ui->tableWidget->setAlternatingRowColors(true);
 }
 
+//进入动作
+void MyStateModelDialog::respGoInAction()
+{
+    MyStateStartDialog dialog(this);
+    this->setWindowTitle("状态进入动作设置");
+    dialog.setContent(actionContent);
+    dialog.exec();
+    actionContent = dialog.getContent();
+}
+
 void MyStateModelDialog::setModelProp(StateModelProperty &property)
 {
     prop.stateName = property.stateName;
     prop.continueContent = property.continueContent;
+    prop.actionContent = property.actionContent;
     continueContent = prop.continueContent;
+    actionContent = property.actionContent;
 
     foreach(StatInnerProperty tmpProp,property.props)
     {
@@ -59,6 +72,7 @@ void MyStateModelDialog::updateInfo()
 {
     prop.stateName = ui->stateName->text();
     prop.continueContent = continueContent;
+    prop.actionContent = actionContent;
 
     prop.props.clear();
     foreach(StatInnerProperty tmpProp,props)

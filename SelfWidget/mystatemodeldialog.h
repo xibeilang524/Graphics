@@ -39,6 +39,7 @@ private slots:
     void respRemoveSelectedItem();
     void updateInfo();
     void respShowCurrItem(QModelIndex index);
+    void respGoInAction();
 
 private:
     void addRow(StatInnerProperty & pp);
@@ -49,7 +50,8 @@ private:
     StateModelProperty prop;                //保存原始的数据
     QList<StatInnerProperty> props;         //保存最新的的条目集合
 
-    QString continueContent;
+    QString continueContent;                //持续行为设置
+    QString actionContent;                  //动作设置
 };
 
 #endif // MYSTATEMODELDIALOG_H
