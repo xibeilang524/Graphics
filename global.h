@@ -30,6 +30,7 @@ extern QList<ServiceProperty *> PreExeServices;              //预处理服务
 extern QList<ServiceProperty *> ResetExeServices;            //重置服务
 
 extern bool GlobalIsSimulateState;               //是否为推演状态，如果是则不允许进行状态变更
+extern bool IsConfigIniExisted;                  //全局的配置文件是否存在
 
 extern QMap<QString,QString> GlobalKeyMap;       //快捷键注册信息
 

@@ -1247,7 +1247,7 @@ void MyGraphicsView::editTextItem()
             GraphicsType gType = item->getType();
 #ifdef ADD_STATE_MODEL
             //Èý½ÇÊäÈë¶Ë¿Ú
-            if(gType == GRA_NODE_TRIANGLE_IN )
+            if(gType == GRA_NODE_TRIANGLE_IN || gType == GRA_NODE_HALF_CIRCLE_IN)
             {
                 MyPortOutputDialog dialog(this);
                 dialog.setInOutState(true);

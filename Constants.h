@@ -118,6 +118,7 @@ const char MENU_NODE_PORT[] = "Constants.Menu.NodePort";
 
 //¡¾¹¤¾ßÀ¸¡¿
 const char START_UP_PROCESS[] = "Constants.StartUpExtralProcess";
+const char SPLASH_MAKE[] = "Constants.SplashMake";
 
 } // namespace Constants
 } // namespace Graphics

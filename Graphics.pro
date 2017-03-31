@@ -20,7 +20,8 @@ SOURCES += main.cpp\
     global.cpp \
     util.cpp \
     fileoperate.cpp \
-    myapplication.cpp
+    myapplication.cpp \
+    mysettings.cpp
 
 HEADERS  += mainwindow.h \
     Constants.h \
@@ -28,7 +29,8 @@ HEADERS  += mainwindow.h \
     global.h \
     util.h \
     fileoperate.h \
-    myapplication.h
+    myapplication.h \
+    mysettings.h
 
 include($$PWD/SelfWidget/SelfWidget.pri)
 include($$PWD/item/item.pri)

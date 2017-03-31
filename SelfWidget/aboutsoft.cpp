@@ -7,6 +7,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QTextBrowser>
+#include <QApplication>
 
 #include "../Header.h"
 
@@ -24,17 +25,18 @@ void AboutSoft::initDialog()
     layout->setSizeConstraint(QLayout::SetFixedSize);
 
     const QString description = QString(
-        "<h3>多组件模型在线协同调用工具 %1</h3>"
-        "Based on Qt %2 (%3 bit)<br/>"
+        "<h3>%1 %2</h3>"
+        "Based on Qt %3 (%4 bit)<br/>"
         "<br/>"
-        "Built on %4 at %5<br />"
+        "Built on %5 at %6<br />"
         "<br/>"
         "<br/>"
-        "Copyright 2014-%6 %7. All rights reserved.<br/>"
+        "Copyright 2014-%7 %8. All rights reserved.<br/>"
         "<br/>"
         "办公地址：江苏省南京市浦口区团结路99号孵鹰大厦A-403<br/>"
         "电话(传真)：025-58101129<br/>"
         "<br/>")
+        .arg(qApp->applicationName())
         .arg(M_VERTION).
             arg(QLatin1String(QT_VERSION_STR)).arg(QString::number(QSysInfo::WordSize))
             .arg(QLatin1String(__DATE__)).arg(QLatin1String(__TIME__))

@@ -166,11 +166,11 @@ void MyPageSwitch::deleteThisPage(QString pageId)
 
     if(pageIndex >= 0)
     {
-        tipInfo = QString("是否删除 [%1]?").arg(pages.at(pageIndex)->pageName);
+        tipInfo = QString("是否关闭 [%1]?").arg(pages.at(pageIndex)->pageName);
     }
     else
     {
-        tipInfo = "是否删除此工作区?";
+        tipInfo = "是否关闭此工作区?";
     }
 
     int result = Util::getWarnChoice(tipInfo);

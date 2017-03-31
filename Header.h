@@ -24,6 +24,11 @@
 #define ADD_STATE_MODEL
 #endif
 
+//是否需要加入数据库模块
+#ifndef REMOVE_SQL_MODEL
+#define REMOVE_SQL_MODEL
+#endif
+
 #define PI 3.141592653
 #define ICON_WIDTH  60          //拖拽图标的宽高
 #define ICON_HEIGHT 60

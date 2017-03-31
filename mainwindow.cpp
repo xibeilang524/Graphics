@@ -26,16 +26,19 @@
 #include "./SelfWidget/aboutsoft.h"
 #include "./SelfWidget/myshortkey.h"
 #include "./SelfWidget/extralprocess.h"
+#include "./SelfWidget/splashmaker.h"
 #include "./manager/mylinecombobox.h"
 #include "./simulate/simulatecontrolpanel.h"
 #include "./project/myprowizard.h"
 #include "fileoperate.h"
 #include "global.h"
 #include "util.h"
+#include "mysettings.h"
 
 using namespace Graphics;
 
-MainWindow::MainWindow(QWidget *parent) :
+MainWindow::MainWindow(MySettings *settings, QWidget *parent) :
+    settings(settings),
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
@@ -54,10 +57,12 @@ MainWindow::MainWindow(QWidget *parent) :
     itemBar = NULL;
     sceneBar = NULL;
     editBar = NULL;
+#ifndef REMOVE_SQL_MODEL
     databaseBar = NULL;
+#endif
 
     GlobalItemZValue = 0;
-    windowTitles<<"多组件模型在线协同调用工具-建模"<<"多组件模型在线协同调用工具-推演";
+    windowTitles<<QString(qApp->applicationName()+"-建模")<<QString(qApp->applicationName()+"-推演");
     currWorkspaceFullPath = "";
 
     createSceneAndView();
@@ -309,7 +314,13 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(startProcessAction,ExtralProcess::instance(),SLOT(exec()));
     GlobalKeyMap.insert(startProcessAction->shortcut().toString(),startProcessAction->text());
 
+    MyAction * splashMakeAction = ActionManager::instance()->crateAction(Constants::SPLASH_MAKE,QIcon(""),"设置启动信息");
+    splashMakeAction->setShortcut(QKeySequence("Ctrl+Shift+R"));
+    ActionManager::instance()->registerAction(splashMakeAction,SplashMaker::instance(),SLOT(execMe()));
+    GlobalKeyMap.insert(splashMakeAction->shortcut().toString(),splashMakeAction->text());
+
     toolMenu->addAction(startProcessAction);
+    toolMenu->addAction(splashMakeAction);
 
     //【帮助菜单栏】
     MyAction * assisantAction = ActionManager::instance()->crateAction(Constants::ASSISANT_KEY_LIST,QIcon(),"快捷键列表");
@@ -330,13 +341,14 @@ void MainWindow::createActionAndMenus()
     helpMenu->addAction(supportAction);
     helpMenu->addAction(aboutAction);
 
+#ifndef REMOVE_SQL_MODEL
     MyAction * databaseViewAction = ActionManager::instance()->crateAction(Constants::DATABASE_VIEW,QIcon(":/images/database_view.png"),"查看数据库");
 //    databaseViewAction->setShortcut(QKeySequence("Ctrl+P"));
     ActionManager::instance()->registerAction(databaseViewAction,ServiceView::instance(),SLOT(viewDatabaseContent()));
 
     MyAction * databaseRefreshAction = ActionManager::instance()->crateAction(Constants::DATABASE_REFRESH,QIcon(":/images/database_refresh.png"),"刷新数据库");
     ActionManager::instance()->registerAction(databaseRefreshAction,ServiceView::instance(),SLOT(refreshDatabaseContent()));
-
+#endif
     //【工作区间右键菜单】
     MyAction * closeWorkAction = ActionManager::instance()->crateAction(Constants::CLOSE_WORKSPACE,QIcon(""),"关闭工作区");
     ActionManager::instance()->registerAction(closeWorkAction,MyPageSwitch::instance(),SLOT(closePage()));
@@ -351,7 +363,6 @@ void MainWindow::createActionAndMenus()
     ActionManager::instance()->registerAction(closeRightWorkAction,MyPageSwitch::instance(),SLOT(closeRightPage()));
 
     GlobalKeyMap.insert("Alt+<-,->","左右切换工作区");
-
 }
 
 //直接处理，无需再出发KeyPressEvent，否则一个事件会处理两遍
@@ -640,7 +651,9 @@ void MainWindow::switchWorkModel()
     fileBar->setEnabled(enable);
     itemBar->setEnabled(enable);
     editBar->setEnabled(enable);
+#ifndef REMOVE_SQL_MODEL
     databaseBar->setEnabled(!enable);
+#endif
 }
 
 //切换工作区更新窗口标题
@@ -869,9 +882,11 @@ void MainWindow::createToolBar()
     sceneBar->addSeparator();
     sceneBar->addWidget(mySlider);
 
+#ifndef REMOVE_SQL_MODEL
     databaseBar = addToolBar("Database");
     databaseBar->addAction(ActionManager::instance()->action(Constants::DATABASE_VIEW));
     databaseBar->addAction(ActionManager::instance()->action(Constants::DATABASE_REFRESH));
+#endif
 }
 
 //创建状态栏
@@ -885,6 +900,11 @@ void MainWindow::createStatusBar()
 void MainWindow::respShowStatusInfo(QString text)
 {
     statusBar()->showMessage(text);
+}
+
+MySettings * MainWindow::globalSettings()
+{
+    return this->settings;
 }
 
 MainWindow::~MainWindow()

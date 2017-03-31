@@ -34,6 +34,7 @@
 **20161201:wey:增加切换工作区后，窗口显示工作区信息
 **             增加快捷键列表显示
 **20170313:wey:添加启动外部程序窗口
+**20170331:wey:添加启动信息制作窗口
 *************************************************/
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
@@ -49,6 +50,7 @@ class RightToolBox;
 class LeftIconWidget;
 class HideSplit;
 class SimulateControlPanel;
+class MySettings;
 
 namespace Ui {
 class MainWindow;
@@ -59,9 +61,10 @@ class MainWindow : public QMainWindow
     Q_OBJECT
     
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(MySettings * settings,QWidget *parent = 0);
     void keyPress(QKeyEvent * event);
     void respShowStatusInfo(QString);
+    MySettings * globalSettings();
     ~MainWindow();
 
 signals:
@@ -106,13 +109,15 @@ private:
     LeftIconWidget * leftIconWidget;
     RightToolBox * rightToolBox;
     SimulateControlPanel * simulatePanel;
+    MySettings * settings;
 
     QToolBar * fileBar;
     QToolBar * itemBar;
     QToolBar * editBar;
     QToolBar * sceneBar;
+#ifndef REMOVE_SQL_MODEL
     QToolBar * databaseBar;
-
+#endif
     CutInfo cutTmpInfo;               //保存剪切信息
 
     QStringList windowTitles;         //窗口标题

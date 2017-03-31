@@ -26,7 +26,9 @@ HEADERS += \
     SelfWidget/beforesimulateserviceconfig.h \
     SelfWidget/initservice.h \
     SelfWidget/myportparameter.h \
-    SelfWidget/extralprocess.h
+    SelfWidget/extralprocess.h \
+    SelfWidget/mysplashscreen.h \
+    SelfWidget/splashmaker.h
 
 SOURCES += \
     SelfWidget/myslider.cpp \
@@ -56,7 +58,9 @@ SOURCES += \
     SelfWidget/beforesimulateserviceconfig.cpp \
     SelfWidget/initservice.cpp \
     SelfWidget/myportparameter.cpp \
-    SelfWidget/extralprocess.cpp
+    SelfWidget/extralprocess.cpp \
+    SelfWidget/mysplashscreen.cpp \
+    SelfWidget/splashmaker.cpp
 
 FORMS += \
     SelfWidget/righttoolbox.ui \
@@ -80,4 +84,5 @@ FORMS += \
     SelfWidget/beforesimulateserviceconfig.ui \
     SelfWidget/initservice.ui \
     SelfWidget/myportparameter.ui \
-    SelfWidget/extralprocess.ui
+    SelfWidget/extralprocess.ui \
+    SelfWidget/splashmaker.ui

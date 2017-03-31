@@ -42,7 +42,6 @@ QDataStream & operator>> (QDataStream & stream,LinkedStateProperty & prop)
 }
 #endif
 
-
 MyArrow::MyArrow(QGraphicsItem *parent):
     QGraphicsLineItem(parent)
 {
@@ -64,6 +63,8 @@ void MyArrow::setLinkedProp(LinkedStateProperty &prop)
     this->likedProp.triggerType = prop.triggerType;
     this->likedProp.desc = prop.desc;
     this->likedProp.hasSettled = prop.hasSettled;
+
+    setText(prop.triggerType);
 }
 #endif
 

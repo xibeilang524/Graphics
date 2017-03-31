@@ -2,18 +2,31 @@
 #include "myapplication.h"
 
 #include <QTextCodec>
-#include <QSplashScreen>
 #include <QDesktopWidget>
+#include <QDir>
 
 #include "./manager/actionmanager.h"
 #include "SelfWidget/hidesplit.h"
+#include "SelfWidget/mysplashscreen.h"
 #include "global.h"
 #include "sql/sqlproecss.h"
+#include "mysettings.h"
 #include "util.h"
+
+const char APP_NAME[] = "Graphics";
+const char CONFIG_PATH[] = "Graphics.ini";
+
+MySettings * createSettings()
+{
+    return new MySettings(QString("%1/%2").arg(APP_NAME).arg(CONFIG_PATH),QSettings::IniFormat);
+}
 
 int main(int argc, char *argv[])
 {    
     MyApplication a(argc, argv);
+    a.setApplicationVersion(QString::number(M_VERTION));
+    a.setOrganizationName(M_AUTHOR);
+    a.setApplicationName(APP_NAME);
 
     ScreenWidth = qApp->desktop()->screenGeometry().width();
     ScreenHeight = qApp->desktop()->screenGeometry().height();
@@ -23,8 +36,15 @@ int main(int argc, char *argv[])
     QTextCodec * codec = QTextCodec::codecForName("GB2312");
     QTextCodec::setCodecForCStrings(codec);
 
+    MySettings * settings = createSettings();
+    settings->setIniCodec(codec);
+
+    QFileInfo fileInfo(settings->fileName());
+    IsConfigIniExisted = fileInfo.exists();
+
     QPixmap pixmap(":/images/startup.png");
-    QSplashScreen screen(pixmap);
+    MySplashScreen screen(pixmap);
+    screen.setSettings(settings);
     screen.setGeometry((ScreenWidth - pixmap.width())/2,(ScreenHeight - pixmap.height())/2,pixmap.width(),pixmap.height());
     screen.show();
     a.processEvents();
@@ -38,10 +58,12 @@ int main(int argc, char *argv[])
 
     screen.hide();
 
+#ifndef REMOVE_SQL_MODEL
     if(!SQLProecss::instance()->initDatabase("./config/DataBaseInfo.properties"))
     {
         Util::showWarn(SQLProecss::instance()->getLastError());
     }
+#endif
 
     SaveFileSuffix = ".bin";
     SaveFileHeadFlag = "RGVISIO";
@@ -50,7 +72,7 @@ int main(int argc, char *argv[])
 
     ActionManager actionManager;
     SplitManager splitManager;
-    MainWindow w;
+    MainWindow w(settings);
     w.show();
     
     return a.exec();
