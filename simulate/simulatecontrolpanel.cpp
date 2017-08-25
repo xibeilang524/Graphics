@@ -25,8 +25,8 @@ MyListWidgetItem::MyListWidgetItem(QListWidget *parent, int type)
     punit = NULL;
 }
 
-MyListWidgetItem::MyListWidgetItem(const QString &text, QListWidget *parent, int type)
-    :QListWidgetItem(text,parent,type)
+MyListWidgetItem::MyListWidgetItem(const QIcon &icon, const QString &text, QListWidget *parent, int type)
+    :QListWidgetItem(icon,text,parent,type)
 {
     punit = NULL;
 }
@@ -306,7 +306,12 @@ void SimulateControlPanel::respStartSimulate()
 
     sflow = PRE_FLOW;
     preOrResetIndex = 0;
+    executeRequestService = 0;
     preExecuteServices();
+
+    ui->tabWidget->setCurrentIndex(TEXT_TAB_INDEX);
+    ui->textBrowser->clear();
+    ui->simProcedure->clear();
 }
 
 //清空上一次推演的记录
@@ -745,15 +750,17 @@ MyListWidgetItem * SimulateControlPanel::showSimulateOperate(ProcessUnit *unit)
 
     Util::loadPixmapByGType(unit->gtype,pixmap);
 
-    MyListWidgetItem * item = new MyListWidgetItem;
-    item->setIcon(QIcon(pixmap));
-    item->setText(unit->item->getText());
-    item->bindProscessUnit(unit);
+//    MyListWidgetItem * item = new MyListWidgetItem;
+//    item->setIcon(QIcon(pixmap));
+//    item->setText(unit->item->getText());
+//    item->bindProscessUnit(unit);
 
-    ui->simProcedure->addItem(item);
-    ui->simProcedure->scrollToBottom();
+    ui->textBrowser->append(QString("[%1]%2: %3").arg(++executeRequestService).arg(QDateTime::currentDateTime().toString("hh:mm:ss")).arg(unit->item->getText()));
 
-    return item;
+//    ui->simProcedure->insertItem(0,item);
+//    ui->simProcedure->scrollToBottom();
+
+    return NULL;
 }
 
 //点击控件时，高亮显示

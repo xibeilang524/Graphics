@@ -42,7 +42,7 @@ bool ServiceInfoProcess::getServiceProperty(QList<ServiceProperty *> &properties
 
     if(flag)
     {
-        QString psql = "select p.id,p.parameterName,p.parameterType,p.addTime from\
+        QString psql = "select p.id,p.parameterName,p.parameterType,p.parameterDes from\
                 business_softwareonline s left join business_softwareonline_parameter p\
                 on s.id = p.relationId where s.id = ";
 

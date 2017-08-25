@@ -43,7 +43,7 @@ QVariant ServiceInputModel::data(const QModelIndex &index, int role) const
                           switch(index.column())
                           {
                               case 0:
-                                      return paraList.at(index.row())->pName;
+                                      return paraList.at(index.row())->pRemark;
                               case 1:
                                       return paraList.at(index.row())->pType;
                               case 2:

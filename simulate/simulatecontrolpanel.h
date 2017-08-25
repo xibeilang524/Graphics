@@ -42,6 +42,11 @@ namespace Ui {
 class SimulateControlPanel;
 }
 
+enum TabIndex{
+    ITEM_TAB_INDEX = 0,
+    TEXT_TAB_INDEX = 1,
+};
+
 //循环记录
 struct LoopRecord
 {
@@ -58,7 +63,7 @@ class MyListWidgetItem : public QListWidgetItem
 {
 public:
     MyListWidgetItem(QListWidget * parent = 0, int type = Type);
-    MyListWidgetItem(const QString & text, QListWidget * parent = 0, int type = Type);
+    MyListWidgetItem(const QIcon & icon,const QString & text, QListWidget * parent = 0, int type = Type);
 
     void bindProscessUnit(ProcessUnit *unit);
     ProcessUnit * getUnit(){return this->punit;}
@@ -117,6 +122,7 @@ private:
     bool isAutoRun;                         //是否为自动运行
     SimulateFlow sflow;                     //标识不同阶段的处理流程
     int preOrResetIndex;                    //执行预处理或现场恢复服务时，当前处理的索引
+    int executeRequestService;              //请求的次数
 
     ProcessUnit * currProcUnit;             //当前处理单元
     ProcessUnit * beforeUnit;               //之前处理单元(推演结束置为NULL)

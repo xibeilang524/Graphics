@@ -28,7 +28,6 @@ MyWebService::MyWebService()
 //提交服务
 void MyWebService::submit(QString currUrl)
 {
-    qDebug()<<currUrl;
     QNetworkRequest url;
     url.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
     url.setUrl(QUrl(currUrl));
@@ -45,7 +44,7 @@ void MyWebService::replyFinshed(QNetworkReply *reply)
 
     QMap<QString,QString> result;
 
-    if(code != 200)
+    if(code.toInt() != 200)
     {
         result.insert("result","执行服务失败!");
         emit lastUnitProcessOver(true,result);
@@ -121,7 +120,7 @@ QMap<QString,QString> MyWebService::parseResult(QString result,bool & hasFault)
         else if(keyList.size() == 1 && valueList.size() > 0)
         {
            QString varName =  keyList.at(0).toElement().text();
-           QStringList varList = varName.split("，");
+           QStringList varList = varName.split(",");
 //           for(int i=0;i<valueList.size();i++)
 //           {
 //               qDebug()<<"var:"<<varList.at(i);

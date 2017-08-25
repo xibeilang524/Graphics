@@ -74,6 +74,7 @@ bool SQLDataAdapter::getSericeProperties(QString sql, QList<ServiceProperty *> &
                 Parameter * output = new Parameter;
                 output->pName = nameList.at(i);
                 output->pType = typeList.at(i);
+                output->pRemark = nameList.at(i);
                 property->outputParas.append(output);
             }
         }
@@ -94,7 +95,7 @@ bool SQLDataAdapter::getParameterById(QString sql,QList<Parameter> & list)
         para.pId = variant.at(0).toString();
         para.pName = variant.at(1).toString();
         para.pType = variant.at(2).toString();
-        para.pRemark = variant.at(3).toDateTime().toString("yyyy-MM-dd");
+        para.pRemark = variant.at(3).toString();
         list.append(para);
     }
     return flag;
