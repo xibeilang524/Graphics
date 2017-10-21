@@ -32,6 +32,9 @@ void MyWebService::submit(QString currUrl)
     url.setHeader(QNetworkRequest::ContentTypeHeader,"application/x-www-form-urlencoded");
     url.setUrl(QUrl(currUrl));
     QString b("");
+
+    qDebug()<<currUrl;
+
     accessManager->post(url,b.toAscii());
 }
 

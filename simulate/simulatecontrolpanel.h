@@ -45,6 +45,7 @@ class SimulateControlPanel;
 enum TabIndex{
     ITEM_TAB_INDEX = 0,
     TEXT_TAB_INDEX = 1,
+    URL_TAB_INDEX = 2
 };
 
 //循环记录
@@ -96,6 +97,7 @@ private slots:
     void stopCurrSimulate();
     void chooseRunMethod(bool flag);
     void stepByStep();
+    void changeUrlBrowser(bool flag);
     
 private:
     void setFlagState(QLabel * label,bool isSuccess);
@@ -124,8 +126,12 @@ private:
     int preOrResetIndex;                    //执行预处理或现场恢复服务时，当前处理的索引
     int executeRequestService;              //请求的次数
 
+    ProcessUnit * lastProcUnit;             //除结束外最后一个处理的单元
     ProcessUnit * currProcUnit;             //当前处理单元
     ProcessUnit * beforeUnit;               //之前处理单元(推演结束置为NULL)
+
+    QString serverIp;
+    int serverPort;
 
     QList<LoopRecord *>  loopRecords;       //记录每个循环的状态信息
 };

@@ -4,6 +4,8 @@
 #include <QDebug>
 #include <QApplication>
 #include <QMessageBox>
+#include <QHostInfo>
+#include <QNetworkInterface>
 
 #include "SimulateHeader.h"
 #include "sceneitempickup.h"
@@ -46,6 +48,7 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     setFixedWidth(300);
     currProcUnit = NULL;
     beforeUnit = NULL;
+    lastProcUnit = NULL;
     isSimulateState = false;
     isAutoRun = true;
     sflow = PRE_FLOW;
@@ -56,6 +59,7 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     connect(ui->simProcedure,SIGNAL(itemClicked (QListWidgetItem*)),this,SLOT(respItemActivated(QListWidgetItem*)));
     connect(ui->simProcedure,SIGNAL(itemDoubleClicked(QListWidgetItem *)),this,SLOT(respItemDoubleClicked(QListWidgetItem *)));
     connect(ui->terminalSimulate,SIGNAL(clicked()),this,SLOT(stopCurrSimulate()));
+    connect(ui->viewUrlRequest,SIGNAL(toggled(bool)),this,SLOT(changeUrlBrowser(bool)));
 
     connect(ui->autoRun,SIGNAL(toggled(bool)),this,SLOT(chooseRunMethod(bool)));
     connect(ui->signalRun,SIGNAL(toggled(bool)),this,SLOT(chooseRunMethod(bool)));
@@ -65,6 +69,28 @@ SimulateControlPanel::SimulateControlPanel(QWidget *parent) :
     ui->terminalSimulate->setEnabled(false);
 
     connect(MyWebService::instance(),SIGNAL(lastUnitProcessOver(bool,QMap<QString,QString>)),this,SLOT(procLastUnitResult(bool,QMap<QString,QString>)));
+
+    ui->availbleIp->addItem("");
+    ui->availbleIp->setEditable(true);
+    ui->availblePort->setEditable(true);
+
+    ui->availblePort->addItem("8080");
+
+    QString ipAddr;
+    QList<QNetworkInterface> network = QNetworkInterface::allInterfaces();
+    foreach (QNetworkInterface i, network)
+    {
+         QList<QNetworkAddressEntry> ipAll = i.addressEntries();
+
+         foreach (QNetworkAddressEntry ip, ipAll)
+         {
+             if(ip.ip().protocol()==QAbstractSocket::IPv4Protocol)
+             {
+                 ipAddr = ip.ip().toString();
+                 ui->availbleIp->addItem(ipAddr);
+             }
+         }
+     }
 
     /*************可删***************/
 //    intSimulateData();
@@ -225,6 +251,11 @@ void SimulateControlPanel::stepByStep()
     }
 }
 
+void SimulateControlPanel::changeUrlBrowser(bool flag)
+{
+    flag?ui->tabWidget->setCurrentIndex(URL_TAB_INDEX):ui->tabWidget->setCurrentIndex(TEXT_TAB_INDEX);
+}
+
 /*!
  *开始流程推演
  *【1】:提取当前场景中控件和线条
@@ -235,6 +266,23 @@ void SimulateControlPanel::stepByStep()
  *!*/
 void SimulateControlPanel::respStartSimulate()
 {
+    serverIp = ui->availbleIp->currentText();
+    serverPort = ui->availblePort->currentText().toInt();
+
+    QRegExp exp("(\\d{1,3}\\.){3}(\\d{1,3})");
+
+    if(!exp.exactMatch(serverIp))
+    {
+        QMessageBox::warning(this,"警告","服务器IP地址格式错误，请重新设置!");
+        return;
+    }
+
+    if(serverPort <= 0 )
+    {
+        QMessageBox::warning(this,"警告","服务器端口格式错误，请重新设置!");
+        return;
+    }
+
     setSimulateState(true);
 
     emit resetSimluate();
@@ -309,8 +357,10 @@ void SimulateControlPanel::respStartSimulate()
     executeRequestService = 0;
     preExecuteServices();
 
-    ui->tabWidget->setCurrentIndex(TEXT_TAB_INDEX);
+    changeUrlBrowser(ui->viewUrlRequest->isChecked());
+
     ui->textBrowser->clear();
+    ui->urlBrowser->clear();
     ui->simProcedure->clear();
 }
 
@@ -488,7 +538,7 @@ void SimulateControlPanel::startProcUnit()
             {
                 showCurrProcessResultPanel(false);
             }
-
+            lastProcUnit = currProcUnit;
             currProcUnit = currProcUnit->nextChild;
         }
         //结束
@@ -496,6 +546,9 @@ void SimulateControlPanel::startProcUnit()
         {
             sflow = RESET_FLOW;
             resetExecuteServices();
+            if(lastProcUnit){
+                MyGraphicsView::instance()->showSelectedItemPropEdit(lastProcUnit->item);
+            }
             break;
         }
 
@@ -628,7 +681,24 @@ bool SimulateControlPanel::countLoopValue(MyItem * item, SignalVariList &loopLis
 //组装URL值
 void SimulateControlPanel::submitUrl(MyItem * item, ServiceProperty * prop)
 {
-    QString fullUrl = prop->servicePath+"/"+prop->method;
+    int pos = 0;
+    QRegExp exp("(\\d+\\.?){4}");
+
+    pos = exp.indexIn(prop->servicePath,pos);
+
+    QString protcol = prop->servicePath.mid(0,pos);
+
+    QRegExp portExp(":(\\d+)");
+
+    pos = 0;
+
+    pos = portExp.indexIn(prop->servicePath,pos);
+
+    QString path = prop->servicePath.mid(pos + portExp.matchedLength());
+
+    QString fullPath = protcol + serverIp + ":" + QString::number(serverPort) + path;
+
+    QString fullUrl = fullPath+"/"+prop->method;
 
     if(prop->inputParas.size() > 0)
     {
@@ -655,9 +725,7 @@ void SimulateControlPanel::submitUrl(MyItem * item, ServiceProperty * prop)
         }
     }
 
-//    qDebug() <<__FUNCTION__
-//            <<fullUrl
-//            <<"\n";
+    ui->urlBrowser->append(QString("[%1]%2: %3").arg(executeRequestService).arg(QDateTime::currentDateTime().toString("hh:mm:ss")).arg(fullUrl));
 
     MyWebService::instance()->submit(fullUrl);
 }
